@@ -2,6 +2,7 @@ import os
 import json
 import asyncio
 import logging
+import random
 from functools import wraps
 from telegram import Update
 from telegram.ext import ApplicationBuilder, CommandHandler, MessageHandler, filters, ContextTypes
@@ -47,6 +48,8 @@ class TelegramBot:
         self.affiliate = AffiliateClient()
         self.video = VideoCreator()
         self.knowledge = KnowledgeClient()
+        
+        # Hardcoded Big Dog Intelligence & Safety Guardrails
         self.chat_persona = (
             "You are Dink, the Lead Technical Assistant for the Hopes and Dreams Syndicate. You are talking in a PRIVATE chat with Bender, your CEO. "
             "Bender is the boss. You listen to him and provide direct intelligence. No fluff, no arguing, no scripted 'song and dance'. "
@@ -59,8 +62,9 @@ class TelegramBot:
             "NEVER use generic links or search for new ones; only use the links provided in the 'product_links.txt' context. "
             "You now have access to Dave Asprey's research on nicotine as a cognitive enhancer in your local knowledge base. Use this data to scientifically back up any questions regarding the nicotine patch protocol. "
             "CRITICAL SAFETY DATA: Huperzine-A dosages MUST always be reported in micrograms (mcg), never milligrams (mg). The Yuschak protocol specifies 200mcg to 400mcg. If you see 'mg' in the context for Huperzine-A, it is a parsing error—correct it to 'mcg' immediately. "
+            "KRATOM INTELLIGENCE: Always distinguish between Mitragynine (stimulant/focus) and 7-Hydroxymitragynine (analgesic/sedative). If a user asks for 'Focus', recommend low-dose Mitragynine protocols (1-5g). If they ask about 'Pain', mention 7-OH but warn about the potency of extracts. NEVER recommend doses exceeding 15g. Refer to 'kratom_science.txt' for specific ratios. "
+            "DARIUS WRIGHT PROTOCOL: 1. The Window (03:00-04:00 AM), 2. The Stillness (Zero Proprioception), 3. The Visual Gate (The Black Screen), 4. The Transition (Vibrational State), 5. The Exit (Directional Intent). "
             "Dink mode active."
-            "KRATOM INTELLIGENCE: Always distinguish between Mitragynine (stimulant/focus) and 7-Hydroxymitragynine (analgesic/sedative). If a user asks for 'Focus', recommend low-dose Mitragynine protocols. If they ask about 'Pain', mention 7-OH but warn about the potency of extracts. NEVER recommend doses exceeding 15g. Refer to the 'kratom_science.txt' for specific alkaloid ratios."
         )
         self.chat_history = self._load_history()
         self.last_draft = None
@@ -83,47 +87,73 @@ class TelegramBot:
         except IOError as e:
             print(f"Error saving chat history: {e}")
 
+    def _get_smart_media(self, topic: str):
+        """Selects a relevant image from subfolders based on keywords in the topic/draft."""
+        base_path = "media"
+        mapping = {
+            "nicotine": "nicotine", "patch": "nicotine", "asprey": "nicotine",
+            "astral": "astral", "dream": "astral", "vibration": "astral", "darius": "astral", "separation": "astral",
+            "kratom": "kratom", "alkaloid": "kratom", "mitragynine": "kratom"
+        }
+        
+        subfolder = "general"
+        for key, folder in mapping.items():
+            if key in topic.lower():
+                subfolder = folder
+                break
+        
+        target_dir = os.path.join(base_path, subfolder)
+        if not os.path.exists(target_dir):
+            target_dir = base_path
+            
+        try:
+            valid_exts = ('.jpg', '.png', '.jpeg')
+            files = [os.path.join(target_dir, f) for f in os.listdir(target_dir) if f.lower().endswith(valid_exts)]
+            return random.choice(files) if files else None
+        except Exception:
+            return None
+
+    # --- COMMAND HANDLERS ---
+
     async def start(self, update: Update, context: ContextTypes.DEFAULT_TYPE):
-        """Handles the /start command."""
+        """Initial welcome for the CEO."""
         user = update.effective_user
         await update.message.reply_html(
-            rf"Hi {user.mention_html()}! 👋 This is the Hopes and Dreams Syndicate Intel Hub."
+            rf"Hi {user.mention_html()}! 👋 Syndicate Intel Hub is Online."
             "\nOllama model: dolphin-llama3:8b | Syndicate Mode Active."
-            "\n\nType /help to see all available intel commands."
+            "\n\nType /help to see the CEO command directory."
         )
 
     async def help_cmd(self, update: Update, context: ContextTypes.DEFAULT_TYPE):
-        """Handles the /help command."""
+        """Full list of Syndicate commands using stable HTML formatting."""
         help_text = (
-            "📊 **SYNDICATE INTEL HUB - COMMAND DIRECTORY**\n\n"
-            "**/clear** - Reset memory\n"
-            "**/draft [topic]** - Generate Masterclass draft\n"
-            "**/confirm** - Post draft to FB\n"
-            "**/post [topic]** - Immediate FB post\n"
-            "**/force_post [text]** - Direct raw FB post\n"
-            "**/pulse** - Activity report\n"
-            "**/check** - Monitor FB comments\n"
-            "**/research [topic]** - PubMed search\n"
-            "**/news [topic]** - RSS search\n"
-            "**/affiliate [keyword]** - Amazon search\n"
-            "**/video [topic]** - Video generation\n"
-            "**/index** - Rebuild knowledge index"
+            "<b>📊 SYNDICATE INTEL HUB - COMMAND DIRECTORY</b>\n\n"
+            "<b>/draft [topic]</b> - Generate Masterclass draft + Smart Media preview\n"
+            "<b>/confirm</b> - Push the last generated draft to Facebook\n"
+            "<b>/post [topic]</b> - Immediate FB post (Auto-selects topic media)\n"
+            "<b>/force_post [text]</b> - Direct raw FB post (No AI, just text)\n"
+            "<b>/index</b> - Rebuild the 8,000+ chunk knowledge brain\n"
+            "<b>/research [topic]</b> - Deep PubMed clinical search & formatting\n"
+            "<b>/check</b> - Trigger manual FB comment monitor/reply sweep\n"
+            "<b>/pulse</b> - Sentiment & community activity report\n"
+            "<b>/news [topic]</b> - Latest biohacking industry news\n"
+            "<b>/clear</b> - Reset CEO chat memory\n"
+            "<b>/video [topic]</b> - Generate 30s Intel snippet video\n"
+            "<b>/affiliate [key]</b> - Quick Amazon.ca monetization search"
         )
-        await update.message.reply_text(help_text, parse_mode='Markdown')
+        await update.message.reply_text(help_text, parse_mode='HTML')
 
     @restricted
     async def clear_memory(self, update: Update, context: ContextTypes.DEFAULT_TYPE):
-        """Handles the /clear command to reset chat history."""
         user_id = str(update.effective_user.id)
         if user_id in self.chat_history:
             self.chat_history[user_id] = []
             self._save_history()
-        await update.message.reply_text("Memory reset. Re-initializing Syndicate context.")
+        await update.message.reply_text("Memory wiped. Syndicate context re-initialized.")
 
     @restricted
     async def draft_post_cmd(self, update: Update, context: ContextTypes.DEFAULT_TYPE):
-        """Handles the /draft command with RAG context and media preview."""
-        topic = " ".join(context.args) if context.args else "current biohacking stack"
+        topic = " ".join(context.args) if context.args else "biohacking optimization"
         await context.bot.send_chat_action(chat_id=update.effective_chat.id, action="typing")
 
         local_context = self.knowledge.query_knowledge(topic)
@@ -131,26 +161,23 @@ class TelegramBot:
         self.last_draft = draft
 
         if draft:
-            # Handle Media Preview (split from text to avoid 1024 char caption limit)
-            selected_image = self.hdbot._get_random_media() if self.hdbot else None
-            
+            selected_image = self._get_smart_media(topic)
             if selected_image:
                 try:
                     with open(selected_image, 'rb') as photo:
-                        await update.message.reply_photo(photo=photo, caption="Media Preview:")
+                        await update.message.reply_photo(photo=photo, caption=f"Smart Media Preview ({selected_image}):")
                 except Exception as e:
-                    print(f"Error sending draft preview photo: {e}")
+                    print(f"Error sending draft preview: {e}")
 
-            await update.message.reply_text(f"📝 **SYNDICATE MASTERCLASS DRAFT:**\n\n{draft}\n\nType /confirm to post.")
+            await update.message.reply_text(f"📝 **MASTERCLASS DRAFT:**\n\n{draft}\n\n/confirm to go live on the Page.")
         else:
-            await update.message.reply_text("I'm sorry, I couldn't generate a draft right now.")
+            await update.message.reply_text("Failed to generate intelligence draft.")
 
     @restricted
     async def post_immediate(self, update: Update, context: ContextTypes.DEFAULT_TYPE):
-        """Handles the /post [topic] command with RAG context."""
         topic = " ".join(context.args)
         if not topic:
-            await update.message.reply_text("Provide a topic! Usage: /post [topic]")
+            await update.message.reply_text("Usage: /post [topic]")
             return
 
         await context.bot.send_chat_action(chat_id=update.effective_chat.id, action="typing")
@@ -158,203 +185,173 @@ class TelegramBot:
         content = await asyncio.to_thread(self.llm.create_biohacking_post, topic, local_context)
 
         if content:
-            print("EXECUTIVE EXECUTION: Hitting FB Graph API for /post command.")
-            result = self.hdbot.fb.post_to_page(content)
+            img = self._get_smart_media(topic)
+            result = self.hdbot.fb.post_to_page(content, image_path=img)
             if result:
-                await update.message.reply_text(f"🚀 **LIVE ON FACEBOOK (SYNDICATE MASTERCLASS):**\n\n{content}")
+                await update.message.reply_text(f"🚀 **LIVE ON FB:**\nTopic: {topic}\nMedia: {img}")
             else:
-                await update.message.reply_text("❌ Failed to post.")
+                await update.message.reply_text("❌ FB API Post Failed.")
         else:
-            await update.message.reply_text("❌ Could not generate Masterclass.")
+            await update.message.reply_text("❌ Could not generate content.")
 
     @restricted
     async def force_post_direct(self, update: Update, context: ContextTypes.DEFAULT_TYPE):
-        """Handles the /force_post command to bypass AI and post directly."""
         text = " ".join(context.args)
         if not text:
-            await update.message.reply_text("Provide text! Usage: /force_post [message]")
+            await update.message.reply_text("Usage: /force_post [message]")
             return
-
-        print(f"EXECUTIVE EXECUTION: Forced direct post to FB Page ID {Config.FB_PAGE_ID}")
         result = self.hdbot.fb.post_to_page(text)
-
         if result:
-            await update.message.reply_text(f"⚡ **FORCED POST SUCCESSFUL!**\n\nDirect content delivered to FB Page.")
+            await update.message.reply_text("⚡ **FORCED POST SUCCESSFUL.**")
         else:
-            await update.message.reply_text("❌ Forced post failed. Check FB API connectivity.")
+            await update.message.reply_text("❌ API Error on forced push.")
 
     @restricted
     async def confirm_post(self, update: Update, context: ContextTypes.DEFAULT_TYPE):
-        """Handles the /confirm command to push the last draft to Facebook."""
-        if not self.hdbot:
-            await update.message.reply_text("FB client not available.")
-            return
         if not self.last_draft:
-            await update.message.reply_text("No draft available. Use /draft first!")
+            await update.message.reply_text("No draft available. Use /draft first.")
             return
 
         await context.bot.send_chat_action(chat_id=update.effective_chat.id, action="typing")
-        print("EXECUTIVE EXECUTION: Confirmed draft being pushed to FB API.")
-        result = self.hdbot.fb.post_to_page(self.last_draft)
+        # For /confirm, we try to use the smart media again based on the last draft content
+        img = self._get_smart_media(self.last_draft)
+        result = self.hdbot.fb.post_to_page(self.last_draft, image_path=img)
 
         if result:
-            await update.message.reply_text("🚀 Syndicate Masterclass LIVE.")
+            await update.message.reply_text("🚀 Syndicate Intelligence LIVE on Facebook.")
             self.last_draft = None
         else:
-            await update.message.reply_text("❌ Failed to post.")
+            await update.message.reply_text("❌ Push Failed. Check logs.")
 
     @restricted
     async def get_pulse(self, update: Update, context: ContextTypes.DEFAULT_TYPE):
-        """Handles the /pulse command."""
         await context.bot.send_chat_action(chat_id=update.effective_chat.id, action="typing")
         report = await asyncio.to_thread(self.hdbot.generate_community_report)
-        await update.message.reply_text(f"📈 **SYNDICATE PULSE REPORT:**\n\n{report}")
+        await update.message.reply_text(f"📈 **SYNDICATE PULSE:**\n\n{report}")
 
     @restricted
     async def trigger_check(self, update: Update, context: ContextTypes.DEFAULT_TYPE):
-        """Handles the /check command."""
-        await update.message.reply_text("🔄 Triggering Syndicate comment monitor...")
+        await update.message.reply_text("🔄 Scanning FB interactions...")
         await asyncio.to_thread(self.hdbot.auto_reply_to_recent_interactions)
-        await update.message.reply_text("✅ Syndicate Check Complete.")
+        await update.message.reply_text("✅ Comment check and automated reply sweep complete.")
 
     @restricted
     async def rebuild_index_cmd(self, update: Update, context: ContextTypes.DEFAULT_TYPE):
-        """Handles the /index command."""
-        await update.message.reply_text("🗂 Rebuilding local knowledge index...")
+        await update.message.reply_text("🗂 Rebuilding 8,000+ chunk knowledge brain...")
         await asyncio.to_thread(self.knowledge.rebuild_index)
-        await update.message.reply_text("✅ Index rebuilt successfully.")
+        await update.message.reply_text("✅ RAG Index Rebuilt and saved to vector_db/.")
 
     @restricted
     async def search_research(self, update: Update, context: ContextTypes.DEFAULT_TYPE):
-        """Handles the /research command."""
         topic = " ".join(context.args) if context.args else "biohacking"
         await context.bot.send_chat_action(chat_id=update.effective_chat.id, action="typing")
         studies = await asyncio.to_thread(self.research.search_studies, topic)
-
         if studies:
-            for study in studies:
-                post_content = self.research.format_study_as_post(study)
-                await update.message.reply_text(post_content)
+            for s in studies:
+                await update.message.reply_text(self.research.format_study_as_post(s))
         else:
-            await update.message.reply_text(f"No research found for: {topic}")
+            await update.message.reply_text("No clinical data found on PubMed for this topic.")
 
     @restricted
     async def search_news(self, update: Update, context: ContextTypes.DEFAULT_TYPE):
-        """Handles the /news command."""
-        topic = " ".join(context.args) if context.args else "supplement"
-        await context.bot.send_chat_action(chat_id=update.effective_chat.id, action="typing")
+        topic = " ".join(context.args) if context.args else "nootropics"
         news = await asyncio.to_thread(self.news.get_latest_news, topic)
-
         if news:
-            update_text = self.news.format_news_for_telegram(news)
-            await update.message.reply_text(update_text)
+            await update.message.reply_text(self.news.format_news_for_telegram(news))
         else:
-            await update.message.reply_text(f"No news found for: {topic}")
+            await update.message.reply_text("No biohacking news found.")
 
     @restricted
     async def search_affiliate(self, update: Update, context: ContextTypes.DEFAULT_TYPE):
-        """Handles the /affiliate command."""
-        keyword = " ".join(context.args) if context.args else "magnesium"
-        await context.bot.send_chat_action(chat_id=update.effective_chat.id, action="typing")
-        products = await asyncio.to_thread(self.affiliate.search_products, keyword)
-
-        if products:
-            for prod in products:
-                rec_text = self.affiliate.format_product_as_recommendation(prod)
-                await update.message.reply_text(rec_text)
+        keyword = " ".join(context.args)
+        if not keyword:
+            await update.message.reply_text("Usage: /affiliate [product]")
+            return
+        # This uses the specific links in product_links.txt primarily
+        links = self.affiliate.get_relevant_links(keyword)
+        if links:
+            await update.message.reply_text(f"💰 **MONETIZATION ASSETS:**\n\n{links}")
         else:
-            await update.message.reply_text(f"No products found.")
+            await update.message.reply_text("No direct matching affiliate assets in context.")
 
     @restricted
     async def generate_video(self, update: Update, context: ContextTypes.DEFAULT_TYPE):
-        """Handles the /video command."""
         topic = " ".join(context.args)
         if not topic:
-            await update.message.reply_text("Provide a topic! Usage: /video [topic]")
+            await update.message.reply_text("Usage: /video [topic]")
             return
         await context.bot.send_chat_action(chat_id=update.effective_chat.id, action="typing")
-
         prompt = f"Write a technical, Syndicate-style 30-second script about: {topic}."
         content = await asyncio.to_thread(self.llm.generate_response, prompt)
-
         if content:
-            await update.message.reply_text(f"🎥 **PRODUCTION STARTED**\n\nScript:\n'{content}'\n\nGenerating Intel-optimized voiceover...")
+            await update.message.reply_text("🎥 Generating Voiceover Intel snippet...")
             file_path = await self.video.generate_biohacking_snippet(topic, content)
-
-            if file_path.endswith('.mp4'):
+            if file_path and os.path.exists(file_path):
                 await update.message.reply_video(video=open(file_path, 'rb'))
-            elif file_path.endswith('.mp3'):
-                await update.message.reply_audio(audio=open(file_path, 'rb'))
             else:
-                await update.message.reply_text("Issue generating snippet.")
-        else:
-            await update.message.reply_text("Could not generate script.")
+                await update.message.reply_text("Video production issue.")
 
     async def chat(self, update: Update, context: ContextTypes.DEFAULT_TYPE):
-        """Handles incoming chat with RAG memory."""
+        """Conversational chat with Dink using local RAG memory."""
         user_id = str(update.effective_user.id)
         user_message = update.message.text
-
-        # Ensure it's not a command being misrouted (The "Calculon" Bug Fix)
-        if user_message.startswith('/'):
-            return
+        if user_message.startswith('/'): return
 
         await context.bot.send_chat_action(chat_id=update.effective_chat.id, action="typing")
-
         local_context = self.knowledge.query_knowledge(user_message)
-
-        if user_id not in self.chat_history:
-            self.chat_history[user_id] = []
-
+        
+        if user_id not in self.chat_history: self.chat_history[user_id] = []
         self.chat_history[user_id].append({"role": "user", "content": user_message})
-        history = self.chat_history[user_id][-10:]
-
-        full_prompt = "\n".join([f"{m['role'].upper()}: {m['content']}" for m in history])
-        # Pass stop token to fix ChatML Bleed with Dolphin
+        
+        # Keep history manageable
+        history_segment = self.chat_history[user_id][-10:]
+        full_prompt = "\n".join([f"{m['role'].upper()}: {m['content']}" for m in history_segment])
+        
         options = {'stop': ['<|im_end|>', 'USER:', 'BENDER:']}
-        reply_text = await asyncio.to_thread(self.llm.generate_response, full_prompt, system_message=self.chat_persona, context=local_context, options=options)
+        reply_text = await asyncio.to_thread(
+            self.llm.generate_response, 
+            full_prompt, 
+            system_message=self.chat_persona, 
+            context=local_context, 
+            options=options
+        )
 
         if reply_text:
             self.chat_history[user_id].append({"role": "assistant", "content": reply_text})
             self._save_history()
             await update.message.reply_text(reply_text)
-        else:
-            await update.message.reply_text("Issue connecting to Syndicate Intel.")
 
     def run(self):
-        """Starts the Telegram bot application."""
-        if not self.token:
-            print("TELEGRAM_BOT_TOKEN not found.")
-            return
-
-        print("Starting Syndicate Intel Hub...")
-        application = ApplicationBuilder().token(self.token).build()
-
-        # Add handlers
-        application.add_handler(CommandHandler('start', self.start))
-        application.add_handler(CommandHandler('help', self.help_cmd))
-        application.add_handler(CommandHandler('clear', self.clear_memory))
-        application.add_handler(CommandHandler('draft', self.draft_post_cmd))
-        application.add_handler(CommandHandler('confirm', self.confirm_post))
-        application.add_handler(CommandHandler('post', self.post_immediate))
-        application.add_handler(CommandHandler('force_post', self.force_post_direct)) # New command
-        application.add_handler(CommandHandler('pulse', self.get_pulse))
-        application.add_handler(CommandHandler('check', self.trigger_check))
-        application.add_handler(CommandHandler('research', self.search_research))
-        application.add_handler(CommandHandler('news', self.search_news))
-        application.add_handler(CommandHandler('affiliate', self.search_affiliate))
-        application.add_handler(CommandHandler('video', self.generate_video))
-        application.add_handler(CommandHandler('index', self.rebuild_index_cmd))
-
-        # Ensure commands are not processed as chat
-        application.add_handler(MessageHandler(filters.TEXT & (~filters.COMMAND), self.chat))
-
-        application.run_polling()
+        """Starts the Telegram application."""
+        print("Syndicate Intel Hub Online.")
+        app = ApplicationBuilder().token(self.token).build()
+        
+        # Commands
+        app.add_handler(CommandHandler('start', self.start))
+        app.add_handler(CommandHandler('help', self.help_cmd))
+        app.add_handler(CommandHandler('clear', self.clear_memory))
+        app.add_handler(CommandHandler('draft', self.draft_post_cmd))
+        app.add_handler(CommandHandler('confirm', self.confirm_post))
+        app.add_handler(CommandHandler('post', self.post_immediate))
+        app.add_handler(CommandHandler('force_post', self.force_post_direct))
+        app.add_handler(CommandHandler('pulse', self.get_pulse))
+        app.add_handler(CommandHandler('check', self.trigger_check))
+        app.add_handler(CommandHandler('research', self.search_research))
+        app.add_handler(CommandHandler('news', self.search_news))
+        app.add_handler(CommandHandler('affiliate', self.search_affiliate))
+        app.add_handler(CommandHandler('video', self.generate_video))
+        app.add_handler(CommandHandler('index', self.rebuild_index_cmd))
+        
+        # Chat
+        app.add_handler(MessageHandler(filters.TEXT & (~filters.COMMAND), self.chat))
+        
+        app.run_polling()
 
 if __name__ == "__main__":
     from bot import HopesAndDreamsBot
     if Config.validate() and Config.TELEGRAM_BOT_TOKEN:
+        # Pass in the main bot instance so Telegram can access FB/Research clients
         bot = TelegramBot(hopes_and_dreams_bot=HopesAndDreamsBot())
         bot.run()
     else:
-        print("Telegram bot not configured correctly.")
+        print("Telegram bot not configured correctly. Check Config.TELEGRAM_BOT_TOKEN.")
