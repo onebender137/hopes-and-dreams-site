@@ -1,0 +1,16 @@
+# Ignore the massive virtual environment
+hd_env/
+
+# Ignore your private API keys
+.env
+.env.template
+
+# Ignore Python's background junk
+__pycache__/
+*.pyc
+
+# Ignore those Windows/WSL metadata files
+*.Zone.Identifier
+
+# Ignore the heavy vector database
+vector_db/

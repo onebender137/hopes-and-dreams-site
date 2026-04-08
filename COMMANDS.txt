@@ -1,0 +1,19 @@
+SYNDICATE INTEL HUB - COMMAND DIRECTORY
+
+/start - Initialize the hub and display overview.
+/help - Display this directory of specialized commands.
+/commands - Download this directory as a .txt file for reference.
+/clear - Reset conversation memory and re-initialize context.
+/draft [topic] - Generate a technical Syndicate Masterclass draft (RAG-enhanced).
+/confirm - Push the last generated draft LIVE to the Facebook Page.
+/post [topic] - Generate and IMMEDIATELY post a Masterclass to Facebook.
+/force_post [text] - Bypass AI logic and post raw text directly to Facebook.
+/pulse - Generate a Community Pulse sentiment report from Page activity.
+/check - Manually trigger the monitor to poll and reply to recent Facebook comments.
+/research [topic] - Deep-dive PubMed for peer-reviewed studies on a specific topic.
+/news [topic] - Aggregate recent RSS news feed intelligence.
+/affiliate [keyword] - Research high-conversion Amazon products for monetization.
+/video [topic] - Produce a 30-second biohacking video snippet (voiceover + script).
+/index - Rebuild the local RAG knowledge base index from source files.
+
+Dink mode active. Stay sharp.
