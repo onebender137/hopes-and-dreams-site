@@ -1,16 +1,43 @@
-# Ignore the massive virtual environment
-hd_env/
-
-# Ignore your private API keys
+# --- SYNDICATE CORE (Private) ---
 .env
 .env.template
+config.py
+auth/
+tokens.json
 
-# Ignore Python's background junk
+# --- SYSTEM & PYTHON JUNK ---
 __pycache__/
 *.pyc
-
-# Ignore those Windows/WSL metadata files
+*.pyo
+*.pyd
+.Python
+env/
+venv/
+hd_env/
+.vscode/
+.idea/
+.DS_Store
 *.Zone.Identifier
 
-# Ignore the heavy vector database
+# --- BIG DATA (Local Only) ---
+# We ignore the vector database because it's huge and Dink can rebuild it from the PDFs
 vector_db/
+
+# If your PDF library is over 500MB, uncomment the line below to stop pushing it
+# knowledge_base/
+
+# If your "wild" photos/videos get too heavy for GitHub's 100MB limit, uncomment below
+# media/
+
+# --- LOGS & MEMORY ---
+# Keep your personal chat history and logs out of the public cloud
+*.log
+replied_comments.json
+chat_memory.json
+nohup.out
+
+# --- TEMPORARY ASSETS ---
+temp/
+output/
+*.mp4
+*.mp3
