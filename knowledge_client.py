@@ -56,7 +56,7 @@ class KnowledgeClient:
         self.vector_store.save_local(VECTOR_DB_DIR)
         print("Knowledge index built and saved successfully.")
 
-    def query_knowledge(self, query: str, limit: int = 3):
+    def query_knowledge(self, query: str, limit: int = 6):
         """Retrieves the most relevant chunks from the local knowledge base."""
         if not self.vector_store:
             return ""
