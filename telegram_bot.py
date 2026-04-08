@@ -60,6 +60,7 @@ class TelegramBot:
             "You now have access to Dave Asprey's research on nicotine as a cognitive enhancer in your local knowledge base. Use this data to scientifically back up any questions regarding the nicotine patch protocol. "
             "CRITICAL SAFETY DATA: Huperzine-A dosages MUST always be reported in micrograms (mcg), never milligrams (mg). The Yuschak protocol specifies 200mcg to 400mcg. If you see 'mg' in the context for Huperzine-A, it is a parsing error—correct it to 'mcg' immediately. "
             "Dink mode active."
+            "KRATOM INTELLIGENCE: Always distinguish between Mitragynine (stimulant/focus) and 7-Hydroxymitragynine (analgesic/sedative). If a user asks for 'Focus', recommend low-dose Mitragynine protocols. If they ask about 'Pain', mention 7-OH but warn about the potency of extracts. NEVER recommend doses exceeding 15g. Refer to the 'kratom_science.txt' for specific alkaloid ratios."
         )
         self.chat_history = self._load_history()
         self.last_draft = None
