@@ -1,19 +1,30 @@
 import os
+
+# --- CRITICAL WSL/LINUX FIX ---
+# Must be set BEFORE moviepy is imported
+os.environ["IMAGEMAGICK_BINARY"] = "/usr/bin/convert"
+
 import asyncio
 import edge_tts
+from moviepy.config import change_settings
+
+# Explicitly tell MoviePy where the binary is
+change_settings({"IMAGEMAGICK_BINARY": "/usr/bin/convert"})
+
 from moviepy.editor import TextClip, AudioFileClip, ColorClip, CompositeVideoClip
 from config import Config
 
 class VideoCreator:
     def __init__(self, output_dir="output"):
-        """Initializes the Video Automation engine (Video Production tool #3 and #2)."""
+        """Initializes the Video Automation engine with Syndicate standards."""
         self.output_dir = output_dir
         if not os.path.exists(output_dir):
             os.makedirs(output_dir)
 
     async def generate_voiceover(self, text: str, output_name: str = "voiceover.mp3"):
         """Generates high-quality human-like voiceover using Microsoft Edge-TTS."""
-        voice = "en-US-GuyNeural" # Natural sounding male voice
+        # GuyNeural provides the authoritative, gritty tone required for the Syndicate
+        voice = "en-US-GuyNeural" 
         communicate = edge_tts.Communicate(text, voice)
         output_path = os.path.join(self.output_dir, output_name)
         print(f"Generating voiceover: {output_path}...")
@@ -21,54 +32,81 @@ class VideoCreator:
         return output_path
 
     def create_daily_short(self, text: str, audio_path: str, output_name: str = "daily_short.mp4"):
-        """Creates a simple, high-impact video snippet for YouTube/FB Reels."""
+        """Creates a high-impact video snippet for FB Reels/Stories."""
         print(f"Creating video: {output_name}...")
         output_path = os.path.join(self.output_dir, output_name)
 
-        # 1. Load Audio
+        # 1. Load Audio and determine length
         audio = AudioFileClip(audio_path)
         duration = audio.duration
 
-        # 2. Create Background (Simple Blue/Black for biohacking feel)
-        bg = ColorClip(size=(1080, 1920), color=(0, 0, 50)).set_duration(duration)
+        # 2. Create Background (Deep Syndicate Blue)
+        # 1080x1920 is the standard for mobile vertical video
+        bg = ColorClip(size=(1080, 1920), color=(0, 0, 40)).set_duration(duration)
 
-        # 3. Create Text Overlay
-        # Note: MoviePy requires ImageMagick for TextClip.
-        # For simplicity, we'll use a very basic setup.
-        # Use a multi-line wrap if the text is long
-        wrapped_text = "\n".join([text[i:i+30] for i in range(0, len(text), 30)])
+        # 3. Text Safety Logic
+        # ImageMagick crashes if text is too long (exceeds width/height limits)
+        # We cap it at 450 characters for the visual overlay.
+        display_text = (text[:450] + "...") if len(text) > 450 else text
 
-        txt_clip = TextClip(wrapped_text, fontsize=70, color='white', font='Arial-Bold', method='caption', size=(900, None))
-        txt_clip = txt_clip.set_pos('center').set_duration(duration)
+        # 4. Create Text Overlay with ImageMagick
+        try:
+            # 'caption' method handles word wrapping automatically
+            txt_clip = TextClip(
+                display_text, 
+                fontsize=55, # Reduced slightly for better fit
+                color='white', 
+                font='Arial-Bold', 
+                method='caption', 
+                size=(900, None), # Fixed width of 900px to give margins
+                align='center'
+            )
+            txt_clip = txt_clip.set_pos('center').set_duration(duration)
+            
+            # 5. Composite Layers
+            video = CompositeVideoClip([bg, txt_clip])
+        except Exception as e:
+            print(f"WARNING: ImageMagick text rendering failed: {e}")
+            print("Falling back to background-only video with full audio.")
+            video = bg
 
-        # 4. Composite
-        video = CompositeVideoClip([bg, txt_clip])
         video.audio = audio
 
-        # 5. Write Video
-        video.write_videofile(output_path, fps=24, codec='libx264')
+        # 6. Production Render
+        # Threads=4 speeds up rendering on multi-core MSI systems
+        video.write_videofile(
+            output_path, 
+            fps=24, 
+            codec='libx264', 
+            audio_codec='aac', 
+            threads=4, 
+            logger=None
+        )
         return output_path
 
     async def generate_biohacking_snippet(self, topic: str, content: str):
-        """Higher-level method to produce a full video snippet from a topic and text."""
-        audio_file = f"{topic.replace(' ', '_')}_audio.mp3"
-        video_file = f"{topic.replace(' ', '_')}_video.mp4"
+        """Higher-level production method to produce a full snippet."""
+        safe_topic = topic.replace(' ', '_').lower()
+        audio_file = f"{safe_topic}_audio.mp3"
+        video_file = f"{safe_topic}_video.mp4"
 
+        # Step 1: Voiceover
         audio_path = await self.generate_voiceover(content, audio_file)
-        # Check if moviepy can render text (requires ImageMagick)
-        # If it fails, we at least have the voiceover!
+        
+        # Step 2: Video Composition
         try:
             video_path = self.create_daily_short(content, audio_path, video_file)
             return video_path
         except Exception as e:
-            print(f"Error creating video clip: {e}. Voiceover generated: {audio_path}")
+            print(f"Critical error in video production: {e}")
+            # Fallback to returning audio path so Telegram can at least send the intel
             return audio_path
 
 if __name__ == "__main__":
-    # Test Video Engine
+    # Internal Test Harness
     async def test():
         creator = VideoCreator()
-        text = "Magnesium Glycinate is a powerful biohacking supplement that promotes deep, restful sleep. Take 400 milligrams before bed for maximum results!"
-        await creator.generate_biohacking_snippet("Magnesium", text)
+        test_text = "Syndicate Protocol Alpha: Nicotine patches combined with Huperzine-A for 4-hour deep work blocks."
+        await creator.generate_biohacking_snippet("Test_Protocol", test_text)
 
     asyncio.run(test())
