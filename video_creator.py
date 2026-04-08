@@ -2,6 +2,7 @@ import os
 import random
 
 # --- CRITICAL WSL/LINUX FIX ---
+# Must be set BEFORE moviepy is imported to ensure the backend is found
 os.environ["IMAGEMAGICK_BINARY"] = "/usr/bin/convert"
 
 import asyncio
@@ -24,6 +25,7 @@ class VideoCreator:
 
     async def generate_voiceover(self, text: str, output_name: str = "voiceover.mp3"):
         """Generates high-quality human-like voiceover using Microsoft Edge-TTS."""
+        # GuyNeural provides the authoritative, gritty tone required for the Syndicate
         voice = "en-US-GuyNeural" 
         communicate = edge_tts.Communicate(text, voice)
         output_path = os.path.join(self.output_dir, output_name)
@@ -34,9 +36,9 @@ class VideoCreator:
     def _get_random_background(self, topic: str):
         """Picks a random 'wild' image from the relevant topic folder."""
         mapping = {
-            "nicotine": "nicotine", "patch": "nicotine",
-            "astral": "astral", "dream": "astral", "vibration": "astral",
-            "kratom": "kratom", "alkaloid": "kratom"
+            "nicotine": "nicotine", "patch": "nicotine", "asprey": "nicotine",
+            "astral": "astral", "dream": "astral", "vibration": "astral", "darius": "astral",
+            "kratom": "kratom", "alkaloid": "kratom", "mitragynine": "kratom"
         }
         
         subfolder = "general"
@@ -59,11 +61,11 @@ class VideoCreator:
             return None
 
     def create_daily_short(self, text: str, audio_path: str, topic: str, output_name: str = "daily_short.mp4"):
-        """Creates a high-impact video snippet with 'wild' backgrounds."""
+        """Creates a high-impact video snippet using 'Wild' backgrounds."""
         print(f"Creating video: {output_name}...")
         output_path = os.path.join(self.output_dir, output_name)
 
-        # 1. Load Audio
+        # 1. Load Audio and determine length
         audio = AudioFileClip(audio_path)
         duration = audio.duration
 
@@ -73,22 +75,24 @@ class VideoCreator:
         if bg_image_path:
             # Load the 'wild' image, resize for vertical (1080x1920), and center it
             bg = ImageClip(bg_image_path).set_duration(duration)
-            bg = bg.resize(height=1920) # Scale to vertical height
+            bg = bg.resize(height=1920) 
             bg = bg.set_position('center')
             
-            # Add a slight dark overlay to make text pop against 'wild' images
+            # Dark overlay to make white text pop against busy images
             overlay = ColorClip(size=(1080, 1920), color=(0, 0, 0)).set_opacity(0.4).set_duration(duration)
             background_group = [bg, overlay]
         else:
-            # Fallback to deep blue if no image is found
+            # Fallback to Syndicate Blue if no image found
             bg = ColorClip(size=(1080, 1920), color=(0, 0, 40)).set_duration(duration)
             background_group = [bg]
 
         # 3. Text Safety Logic
+        # ImageMagick crashes if text is too long. Cap at 450 chars.
         display_text = (text[:450] + "...") if len(text) > 450 else text
 
-        # 4. Create Text Overlay
+        # 4. Create Text Overlay with ImageMagick
         try:
+            # 'caption' method handles word wrapping automatically
             txt_clip = TextClip(
                 display_text, 
                 fontsize=60, 
@@ -100,7 +104,7 @@ class VideoCreator:
             )
             txt_clip = txt_clip.set_pos('center').set_duration(duration)
             
-            # 5. Composite All Layers
+            # 5. Composite Layers
             video = CompositeVideoClip(background_group + [txt_clip])
         except Exception as e:
             print(f"WARNING: ImageMagick text rendering failed: {e}")
@@ -108,7 +112,7 @@ class VideoCreator:
 
         video.audio = audio
 
-        # 6. Production Render
+        # 6. Production Render (Optimized for your MSI CPU)
         video.write_videofile(
             output_path, 
             fps=24, 
@@ -125,10 +129,11 @@ class VideoCreator:
         audio_file = f"{safe_topic}_audio.mp3"
         video_file = f"{safe_topic}_video.mp4"
 
+        # Step 1: Voiceover
         audio_path = await self.generate_voiceover(content, audio_file)
         
+        # Step 2: Video Composition
         try:
-            # Added 'topic' parameter here to select the right background
             video_path = self.create_daily_short(content, audio_path, topic, video_file)
             return video_path
         except Exception as e:
