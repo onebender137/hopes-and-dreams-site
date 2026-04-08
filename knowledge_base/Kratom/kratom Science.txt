@@ -1,0 +1,15 @@
+ALKALOID PROFILE: MITRAGYNA SPECIOSA
+1. Mitragynine (MG): 
+   - Makes up ~66% of total alkaloid content.
+   - Primary Stimulant: At low doses (1-5g), it acts as an adrenergic agonist, increasing focus and physical energy.
+   - Mechanism: Binds to mu-opioid receptors but acts as a G-protein biased agonist (low risk of respiratory depression compared to traditional opioids).
+
+2. 7-Hydroxymitragynine (7-OH):
+   - Minor constituent (<2% in raw leaf) but 13-46x more potent than morphine.
+   - Primary Analgesic: Responsible for the "Sedative" mode at high doses (5-15g).
+   - Warning: Semi-synthetic extracts high in 7-OH are much higher risk for physical dependence.
+
+BIOHACKING PROTOCOL:
+- The "Focus" Mode: 1g to 2g of White or Green vein.
+- The "Recovery" Mode: 4g to 6g of Red vein.
+- Tolerance Ceiling: Never exceed 15g in 24 hours to avoid 'The Wobbles' (vestibular system disruption).
