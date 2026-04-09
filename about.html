@@ -7,7 +7,8 @@
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;700;900&display=swap" rel="stylesheet">
     <style>
         :root {
-            --bg-main: #03091f; 
+            /* Updated to match the global navy brand */
+            --bg-main: #0a0f2b; 
             --card-bg: #0d162d; 
             --neon-blue: #38bdf8;
             --neon-gold: #fbbf24;
@@ -25,7 +26,7 @@
             overflow-x: hidden;
         }
 
-        /* --- HEADER (Identical to Home) --- */
+        /* --- HEADER --- */
         header {
             display: flex;
             flex-direction: column;
@@ -51,7 +52,7 @@
             mask-image: radial-gradient(circle, rgba(0,0,0,1) 45%, rgba(0,0,0,0) 95%);
         }
 
-        /* --- NAV (Identical to Home) --- */
+        /* --- NAV --- */
         nav {
             margin-top: 40px; 
             padding-bottom: 60px;
@@ -77,6 +78,7 @@
             color: var(--neon-gold);
             opacity: 1;
             text-shadow: 0 0 20px var(--neon-blue);
+            transform: scale(1.1);
         }
 
         nav a.active {
@@ -101,7 +103,7 @@
 
         .about-hero {
             text-align: center;
-            margin-bottom: 80px;
+            margin-bottom: 60px;
         }
 
         h1 {
@@ -131,11 +133,65 @@
             line-height: 1.8;
         }
 
+        .intro-text strong {
+            color: var(--neon-blue);
+        }
+
+        /* --- UNDER CONSTRUCTION BANNER --- */
+        .construction-banner {
+            background-color: rgba(251, 191, 36, 0.05);
+            border: 2px dashed var(--neon-gold);
+            border-radius: 16px;
+            padding: 40px 30px;
+            margin: 0 auto 80px;
+            max-width: 800px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            text-align: center;
+            box-shadow: inset 0 0 30px rgba(251, 191, 36, 0.05);
+        }
+
+        .construction-icon {
+            width: 64px;
+            height: 64px;
+            color: var(--neon-gold);
+            margin-bottom: 15px;
+            filter: drop-shadow(0 0 10px rgba(251, 191, 36, 0.4));
+        }
+
+        .construction-banner h2 {
+            color: var(--neon-gold);
+            font-size: 1.5rem;
+            margin: 0 0 10px 0;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+        }
+
+        .construction-banner p {
+            color: var(--text-dim);
+            font-size: 1.05rem;
+            margin: 0 0 20px 0;
+            max-width: 600px;
+        }
+
+        .circa-badge {
+            background-color: var(--card-bg);
+            border: 1px solid var(--neon-blue);
+            color: var(--neon-blue);
+            padding: 6px 16px;
+            border-radius: 50px;
+            font-size: 0.85rem;
+            font-weight: 700;
+            letter-spacing: 1px;
+            text-transform: uppercase;
+        }
+
+        /* --- MISSION GRID --- */
         .mission-grid {
             display: grid;
             grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
             gap: 30px;
-            margin-top: 80px;
         }
 
         .mission-card {
@@ -144,12 +200,33 @@
             border-radius: 24px;
             border: 1px solid rgba(56, 189, 248, 0.1);
             transition: 0.4s;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .mission-card::before {
+            content: '';
+            position: absolute;
+            top: 0; left: 0; width: 100%; height: 4px;
+            background: linear-gradient(90deg, var(--neon-blue), transparent);
+            opacity: 0.5;
         }
 
         .mission-card:hover {
             border-color: var(--neon-blue);
             transform: translateY(-10px);
             box-shadow: 0 20px 40px -20px rgba(56, 189, 248, 0.4);
+        }
+
+        .card-icon {
+            width: 40px;
+            height: 40px;
+            color: var(--neon-gold);
+            margin-bottom: 20px;
+        }
+
+        .mission-card:nth-child(even) .card-icon {
+            color: var(--neon-blue);
         }
 
         .mission-card h3 {
@@ -178,7 +255,7 @@
 
         footer {
             text-align: center;
-            padding: 60px 0;
+            padding: 60px 0 0;
             color: #4b5563;
             font-size: 0.85rem;
         }
@@ -207,39 +284,26 @@
         <div class="glow-divider"></div>
 
         <section class="about-hero">
-            <h1>About Hopes and Dreams</h1>
-            <span class="tagline">Turning Ambition into Action</span>
+            <h1>The Architect's Log</h1>
+            <span class="tagline">Turning Ambition into Infrastructure</span>
             
             <div class="intro-text">
-                <p>Welcome to Hopes and Dreams. What started as a community-driven Facebook group has grown into a dedicated platform designed to help people bridge the gap between where they are and where they want to be.</p>
-                <p>At Hopes and Dreams, we aren't just dreamers—we’re <strong>builders</strong>. Whether it's through our automated community tools or our deep-dive articles, we’re here to help you build a better version of tomorrow, one hack at a time.</p>
+                <p>Welcome to Hopes and Dreams. What started as a community-driven Facebook group focused on spreading hope has evolved into a highly technical, dedicated platform.</p>
+                <p>Operating as the architect behind this digital hub, my focus has shifted from simply sharing ideas to actively building the tools required to execute them. From programming automated Telegram agents for <strong>The Syndicate</strong> to deploying custom biohacking protocols, we aren't just dreamers anymore—we are actively writing the code for a better tomorrow.</p>
             </div>
         </section>
 
+        <div class="construction-banner">
+            <svg class="construction-icon" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 002.573 1.066c1.543-.94 3.31.826 2.37 2.37a1.724 1.724 0 001.065 2.572c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 00-1.066 2.573c.94 1.543-.826 3.31-2.37 2.37a1.724 1.724 0 00-2.572 1.065c-.426 1.756-2.924 1.756-3.35 0a1.724 1.724 0 00-2.573-1.066c-1.543.94-3.31-.826-2.37-2.37a1.724 1.724 0 00-1.065-2.572c-1.756-.426-1.756-2.924 0-3.35a1.724 1.724 0 001.066-2.573c-.94-1.543.826-3.31 2.37-2.37.996.608 2.296.07 2.572-1.065z"></path>
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"></path>
+            </svg>
+            <h2>Sector Under Construction</h2>
+            <p>We are currently compiling the full dossier and technical background of the Syndicate. Stand by for complete documentation of our tech stacks and protocols.</p>
+            <div class="circa-badge">Initiated: April 2026</div>
+        </div>
+
         <div class="mission-grid">
             <div class="mission-card">
-                <h3>Actionable Life Hacks</h3>
-                <p>Practical tips to streamline your daily routine and reclaim your time. We focus on high-impact changes that actually fit into a busy life.</p>
-            </div>
-            <div class="mission-card">
-                <h3>Curated Recommendations</h3>
-                <p>We hand-pick tools, tech, and resources that actually move the needle, ensuring you spend your money and energy wisely.</p>
-            </div>
-            <div class="mission-card">
-                <h3>A Community of Growth</h3>
-                <p>Positive, forward-thinking content that cuts through the noise of the modern internet. Built for those who choose action over apathy.</p>
-            </div>
-        </div>
-
-        <div class="location-shoutout">
-            <p>Proudly based out of the vibrant community of <strong>Saint John, New Brunswick</strong>.</p>
-            <p>We believe that <strong>"Hope"</strong> is the fuel, but <strong>"Dreams"</strong> require a roadmap.</p>
-        </div>
-
-        <footer>
-            <p>&copy; 2026 Hopes and Dreams. All Rights Reserved.</p>
-        </footer>
-    </div>
-
-</body>
-</html>
+                <svg class="card-icon" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M13 10V3L4 14h7v7l9-11h-7z"></path></svg>
+                <h3>Actionable Protocols
