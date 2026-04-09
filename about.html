@@ -25,7 +25,7 @@
             overflow-x: hidden;
         }
 
-        /* --- LOCKED HEADER --- */
+       /* --- LOCKED HEADER --- */
         header {
             display: flex;
             flex-direction: column;
@@ -76,6 +76,12 @@
             letter-spacing: 2px;
             transition: all 0.3s ease;
             white-space: nowrap; /* Prevents single words from breaking */
+        }
+
+        nav a:hover {
+            color: var(--neon-gold);
+            text-shadow: 0 0 15px var(--neon-blue);
+            transform: scale(1.05);
         }
 
         nav a:hover {
