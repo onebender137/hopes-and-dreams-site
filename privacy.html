@@ -7,7 +7,8 @@
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;700;900&display=swap" rel="stylesheet">
     <style>
         :root {
-            --bg-main: #03091f; 
+            /* Updated to match the global navy brand */
+            --bg-main: #0a0f2b; 
             --card-bg: #0d162d; 
             --neon-blue: #38bdf8;
             --neon-gold: #fbbf24;
@@ -25,7 +26,7 @@
             overflow-x: hidden;
         }
 
-        /* --- HEADER (Identical to Home) --- */
+        /* --- HEADER --- */
         header {
             display: flex;
             flex-direction: column;
@@ -51,7 +52,7 @@
             mask-image: radial-gradient(circle, rgba(0,0,0,1) 45%, rgba(0,0,0,0) 95%);
         }
 
-        /* --- NAV (Identical to Home) --- */
+        /* --- NAV --- */
         nav {
             margin-top: 40px; 
             padding-bottom: 60px;
@@ -76,10 +77,10 @@
         nav a:hover {
             color: var(--neon-gold);
             opacity: 1;
-            text-shadow: 0 0 20px var(--neon-blue);
+            text-shadow: 0 0 20px var(--neon-blue), 0 0 10px var(--neon-gold);
+            transform: scale(1.1);
         }
 
-        /* Highlights the Privacy link since we are on that page */
         nav a.active {
             color: var(--neon-gold);
             opacity: 1;
@@ -97,21 +98,45 @@
             height: 1px;
             background: radial-gradient(circle, var(--neon-blue) 0%, transparent 70%);
             opacity: 0.2;
-            margin-bottom: 40px;
+            margin-bottom: 60px;
         }
 
         .policy-card {
             background-color: var(--card-bg);
-            padding: 50px;
+            padding: 60px;
             border-radius: 24px;
             border: 1px solid rgba(56, 189, 248, 0.1);
             box-shadow: 0 20px 40px -20px rgba(0, 0, 0, 0.5);
+            position: relative;
+            overflow: hidden;
+        }
+
+        .policy-card::before {
+            content: '';
+            position: absolute;
+            top: 0; left: 0; width: 100%; height: 4px;
+            background: linear-gradient(90deg, var(--neon-blue), transparent);
+            opacity: 0.5;
+        }
+
+        .header-section {
+            text-align: center;
+            margin-bottom: 50px;
+        }
+
+        .shield-icon {
+            width: 64px;
+            height: 64px;
+            color: var(--neon-blue);
+            margin-bottom: 20px;
+            filter: drop-shadow(0 0 10px rgba(56, 189, 248, 0.4));
         }
 
         h1 {
             color: var(--neon-blue);
             font-size: 2.5rem;
             font-weight: 900;
+            margin-top: 0;
             margin-bottom: 10px;
             text-transform: uppercase;
             letter-spacing: 2px;
@@ -120,10 +145,11 @@
         .last-updated {
             color: var(--neon-gold);
             font-size: 0.9rem;
+            font-weight: 700;
             text-transform: uppercase;
             letter-spacing: 2px;
-            margin-bottom: 40px;
             display: block;
+            opacity: 0.8;
         }
 
         h2 {
@@ -133,59 +159,91 @@
             margin-bottom: 15px;
             border-left: 4px solid var(--neon-blue);
             padding-left: 15px;
+            text-transform: uppercase;
+            letter-spacing: 1px;
         }
 
         p {
             color: var(--text-dim);
             font-size: 1.1rem;
             margin-bottom: 20px;
+            line-height: 1.8;
         }
 
         .affiliate-highlight {
             background: rgba(251, 191, 36, 0.05);
-            border: 1px solid rgba(251, 191, 36, 0.2);
-            padding: 25px;
+            border: 1px dashed rgba(251, 191, 36, 0.4);
+            padding: 25px 30px;
             border-radius: 12px;
-            margin: 30px 0;
+            margin: 40px 0;
+            box-shadow: inset 0 0 20px rgba(251, 191, 36, 0.02);
+        }
+
+        .affiliate-highlight p {
+            margin: 0;
         }
 
         .affiliate-highlight strong {
             color: var(--neon-gold);
+            text-transform: uppercase;
+            letter-spacing: 1px;
         }
 
         .contact-box {
-            margin-top: 50px;
+            margin-top: 60px;
             text-align: center;
             border-top: 1px solid rgba(255, 255, 255, 0.05);
-            padding-top: 40px;
+            padding-top: 50px;
+        }
+
+        .contact-email {
+            color: var(--text-main);
+            font-size: 1.5rem;
+            font-weight: 700;
+            text-decoration: none;
+            display: block;
+            margin-bottom: 10px;
+            transition: color 0.3s;
+        }
+
+        .contact-email:hover {
+            color: var(--neon-blue);
         }
 
         .fb-link {
             display: inline-block;
-            margin-top: 15px;
-            color: var(--neon-blue);
+            margin-top: 25px;
+            padding: 12px 30px;
+            background: transparent;
+            border: 2px solid var(--neon-gold);
+            border-radius: 50px;
+            color: var(--neon-gold);
             text-decoration: none;
             font-weight: 700;
-            font-size: 1.2rem;
-            transition: 0.3s;
+            font-size: 1.1rem;
+            text-transform: uppercase;
+            letter-spacing: 1.5px;
+            transition: all 0.3s ease;
         }
 
         .fb-link:hover {
-            color: var(--neon-gold);
-            text-shadow: 0 0 10px var(--neon-gold);
+            background: var(--neon-gold);
+            color: var(--bg-main);
+            box-shadow: 0 0 20px rgba(251, 191, 36, 0.4);
         }
 
         footer {
             text-align: center;
-            padding: 40px 0;
+            padding: 40px 0 0;
             color: #4b5563;
             font-size: 0.85rem;
         }
 
         @media (max-width: 600px) {
-            .policy-card { padding: 30px 20px; }
+            .policy-card { padding: 40px 20px; }
             h1 { font-size: 1.8rem; }
             nav { flex-direction: column; gap: 20px; align-items: center; }
+            .fb-link { font-size: 1rem; padding: 10px 20px; }
         }
     </style>
 </head>
@@ -207,28 +265,35 @@
         <div class="glow-divider"></div>
 
         <article class="policy-card">
-            <h1>Privacy Policy & Disclosures</h1>
-            <span class="last-updated">Last Updated: April 2026</span>
+            <div class="header-section">
+                <!-- Security Shield Icon -->
+                <svg class="shield-icon" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z"></path>
+                </svg>
+                <h1>Privacy Policy & Disclosures</h1>
+                <span class="last-updated">Last Updated: April 2026</span>
+            </div>
 
             <p>At Hopes and Dreams, your privacy is a priority. This policy outlines how we handle information and our relationship with third-party programs.</p>
 
             <h2>1. Information We Collect</h2>
-            <p>We do not currently require user registration. We may collect minimal, non-identifying data (such as browser type or time spent on page) via standard web logs to improve our content.</p>
+            <p>We do not currently require user registration. We may collect minimal, non-identifying data (such as browser type or time spent on page) via standard web logs to improve our content and infrastructure.</p>
 
             <h2>2. Cookies</h2>
-            <p>We may use basic cookies to enhance your browsing experience. You can choose to disable cookies through your individual browser settings.</p>
+            <p>We may use basic cookies to enhance your browsing experience. You can choose to disable cookies through your individual browser settings at any time without losing access to the core dossier.</p>
 
-            <h2>3. Affiliate Disclosure (Amazon Associates)</h2>
+            <h2>3. Affiliate Disclosure</h2>
             <p>Hopes and Dreams is a participant in the Amazon Services LLC Associates Program, an affiliate advertising program designed to provide a means for sites to earn advertising fees by advertising and linking to Amazon.ca and Amazon.com.</p>
             
             <div class="affiliate-highlight">
-                <p><strong>Important:</strong> As an Amazon Associate, I earn from qualifying purchases. This comes at no extra cost to you and helps support the growth of our community.</p>
+                <p><strong>Transmission Important:</strong> As an Amazon Associate, I earn from qualifying purchases. This comes at no extra cost to you and helps supply the resources required to keep the Syndicate running.</p>
             </div>
 
             <div class="contact-box">
-                <h2><a href="mailto:hopesdreams137@gmail.com">Contact Us</a></h2>
-                <p>If you have questions regarding this policy or the Hopes and Dreams project, you can reach out to us directly through our official Facebook Group.</p>
-                <a href="https://www.facebook.com/profile.php?id=61581034972328" class="fb-link">Join our Facebook Group →</a>
+                <p>If you have questions regarding this policy or the protocols outlined within the Hopes and Dreams project, initialize contact below:</p>
+                <a href="mailto:hopesdreams137@gmail.com" class="contact-email">hopesdreams137@gmail.com</a>
+                <br>
+                <a href="https://www.facebook.com/profile.php?id=61581034972328" class="fb-link" target="_blank" rel="noopener noreferrer">Join the Syndicate on Facebook</a>
             </div>
         </article>
 
