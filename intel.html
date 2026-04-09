@@ -6,6 +6,7 @@
     <title>Syndicate Intel Hub | Hopes and Dreams</title>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;700;900&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="style.css">
+    <script src="script.js" defer></script>
     <style>
         .container { max-width: 900px; margin: 0 auto; padding: 0 24px 100px; }
 
@@ -57,7 +58,7 @@
     </header>
 
     <div class="container">
-        <article class="protocol-card">
+        <article class="protocol-card" data-reveal>
             <h1>Phase 1: The Gateway Protocol</h1>
             <p>Lucid dreaming isn't a "gift"—it's a physiological state that can be architected using the <strong>Yuschak Protocol</strong> and specific cholinergic stacks.</p>
             
@@ -79,19 +80,63 @@
             </div>
         </article>
 
-        <h2 class="section-title" style="margin-top: 80px;">The Syndicate Toolkit</h2>
+        <div class="glow-divider"></div>
+
         <div class="grid">
-            <div class="card">
+            <!-- Sleep Calculator Widget -->
+            <div class="widget-container" data-reveal>
+                <div class="widget-title">
+                    <svg width="24" height="24" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg>
+                    Sleep Cycle Architect
+                </div>
+                <div class="input-group">
+                    <label>Desired Wake-up Time</label>
+                    <input type="time" id="wake-time" value="07:00">
+                </div>
+                <div class="result-box active" id="sleep-results">
+                    <p style="margin-top: 0; font-size: 0.9rem; color: var(--text-dim);">To wake up refreshed, aim to fall asleep at one of these times:</p>
+                    <div class="time-grid" id="suggested-times">
+                        <!-- Times injected by JS -->
+                    </div>
+                </div>
+            </div>
+
+            <!-- Protocol Checklist Widget -->
+            <div class="widget-container" data-reveal>
+                <div class="widget-title">
+                    <svg width="24" height="24" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2m-6 9l2 2 4-4"></path></svg>
+                    Daily Optimization Log
+                </div>
+                <div class="check-list">
+                    <label class="check-item">
+                        <input type="checkbox" class="protocol-check" data-id="cold-plunge">
+                        <span>Vagus Nerve Cold Exposure</span>
+                    </label>
+                    <label class="check-item">
+                        <input type="checkbox" class="protocol-check" data-id="alpha-gpc">
+                        <span>Cholinergic Loading (Alpha-GPC)</span>
+                    </label>
+                    <label class="check-item">
+                        <input type="checkbox" class="protocol-check" data-id="meditation">
+                        <span>Cortisol Down-Regulation</span>
+                    </label>
+                </div>
+            </div>
+        </div>
+
+        <h2 class="section-title" style="margin-top: 80px;" data-reveal>The Syndicate Toolkit</h2>
+        <div class="grid">
+            <div class="card" data-reveal>
                 <h3>Obsidian</h3>
                 <p>The premier local-first knowledge base for building your 'Second Brain'. Own your data, link your thoughts, and architect your own internal wiki.</p>
                 <a href="https://obsidian.md/" target="_blank" class="cta-button" style="font-size: 0.8rem; padding: 8px 16px;">Explore Obsidian</a>
             </div>
-            <div class="card">
+            <div class="card" data-reveal>
                 <h3>Daylio</h3>
                 <p>Frictionless mood and habit tracking. Capture your daily state in seconds to identify the correlations between your protocols and your performance.</p>
                 <a href="https://daylio.net/" target="_blank" class="cta-button" style="font-size: 0.8rem; padding: 8px 16px;">Explore Daylio</a>
             </div>
-            <div class="card">
+            <div class="card" data-reveal>
                 <h3>Calm</h3>
                 <p>Guided meditation and sleep architecture. Essential for down-regulating the nervous system after high-intensity cognitive work.</p>
                 <a href="https://www.calm.com/" target="_blank" class="cta-button" style="font-size: 0.8rem; padding: 8px 16px;">Explore Calm</a>
@@ -99,12 +144,12 @@
         </div>
 
         <div class="grid">
-            <div class="card">
+            <div class="card" data-reveal>
                 <h3>Oura Ring</h3>
                 <p>Deep biometric insights. Track sleep stages, HRV, and readiness to ensure your biological hardware is keeping up with your digital output.</p>
                 <a href="https://ouraring.com/" target="_blank" class="cta-button" style="font-size: 0.8rem; padding: 8px 16px;">Explore Oura</a>
             </div>
-            <div class="card">
+            <div class="card" data-reveal>
                 <h3>Garmin</h3>
                 <p>Advanced performance analytics. From VO2 Max to body battery, Garmin provides the raw data needed to optimize physical excellence.</p>
                 <a href="https://www.garmin.com/" target="_blank" class="cta-button" style="font-size: 0.8rem; padding: 8px 16px;">Explore Garmin</a>
@@ -115,5 +160,56 @@
             <p>&copy; 2026 Hopes and Dreams Syndicate. All Rights Reserved.</p>
         </footer>
     </div>
+    <script>
+        // Sleep Calculator Logic
+        const wakeInput = document.getElementById('wake-time');
+        const suggestContainer = document.getElementById('suggested-times');
+
+        function calculateSleepTimes() {
+            const wakeTime = wakeInput.value;
+            const [hours, minutes] = wakeTime.split(':').map(Number);
+            const wakeDate = new Date();
+            wakeDate.setHours(hours, minutes, 0);
+
+            suggestContainer.innerHTML = '';
+            
+            // Calculate 6, 5, and 4 cycles (9, 7.5, 6 hours)
+            [6, 5, 4].forEach(cycles => {
+                const sleepDate = new Date(wakeDate.getTime() - (cycles * 90 * 60 * 1000) - (15 * 60 * 1000)); // 15 mins to fall asleep
+                const timeStr = sleepDate.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit', hour12: false });
+                
+                const card = document.createElement('div');
+                card.className = 'time-card';
+                card.textContent = timeStr;
+                suggestContainer.appendChild(card);
+            });
+        }
+
+        wakeInput.addEventListener('change', calculateSleepTimes);
+        calculateSleepTimes();
+
+        // Checklist Logic
+        const checks = document.querySelectorAll('.protocol-check');
+        
+        // Load state
+        checks.forEach(check => {
+            const id = check.getAttribute('data-id');
+            const saved = localStorage.getItem('protocol_' + id);
+            if (saved === 'true') {
+                check.checked = true;
+                check.parentElement.classList.add('completed');
+            }
+
+            check.addEventListener('change', (e) => {
+                const isChecked = e.target.checked;
+                localStorage.setItem('protocol_' + id, isChecked);
+                if (isChecked) {
+                    check.parentElement.classList.add('completed');
+                } else {
+                    check.parentElement.classList.remove('completed');
+                }
+            });
+        });
+    </script>
 </body>
 </html>
