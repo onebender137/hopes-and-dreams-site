@@ -1,14 +1,245 @@
-About Hopes and Dreams
-Turning Ambition into Action.
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>About Us | Hopes and Dreams</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;700;900&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --bg-main: #03091f; 
+            --card-bg: #0d162d; 
+            --neon-blue: #38bdf8;
+            --neon-gold: #fbbf24;
+            --text-main: #f8fafc;
+            --text-dim: #94a3b8;
+        }
 
-Welcome to Hopes and Dreams. What started as a community-driven Facebook group has grown into a dedicated platform designed to help people bridge the gap between where they are and where they want to be.
+        body {
+            background-color: var(--bg-main);
+            color: var(--text-main);
+            font-family: 'Inter', sans-serif;
+            margin: 0;
+            padding: 0;
+            line-height: 1.6;
+            overflow-x: hidden;
+        }
 
-Based out of the vibrant community of Saint John, New Brunswick, we believe that "Hope" is the fuel, but "Dreams" require a roadmap. Our mission is to provide:
+        /* --- HEADER (Identical to Home) --- */
+        header {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            width: 100%;
+            padding: 40px 0 20px 0;
+            background-color: var(--bg-main);
+        }
 
-Actionable Life Hacks: Practical tips to streamline your daily routine and reclaim your time.
+        .logo-wrap {
+            width: 95%;
+            max-width: 700px;
+            position: relative;
+            line-height: 0;
+        }
 
-Curated Recommendations: We hand-pick tools, tech, and resources that actually move the needle, ensuring you spend your money wisely.
+        .logo-wrap img {
+            width: 100%;
+            height: auto;
+            display: block;
+            filter: contrast(1.15) brightness(0.95) saturate(1.1);
+            -webkit-mask-image: radial-gradient(circle, rgba(0,0,0,1) 45%, rgba(0,0,0,0) 95%);
+            mask-image: radial-gradient(circle, rgba(0,0,0,1) 45%, rgba(0,0,0,0) 95%);
+        }
 
-A Community of Growth: Positive, forward-thinking content that cuts through the noise of the modern internet.
+        /* --- NAV (Identical to Home) --- */
+        nav {
+            margin-top: 40px; 
+            padding-bottom: 60px;
+            z-index: 10;
+            position: relative;
+            display: flex;
+            gap: 40px;
+        }
 
-At Hopes and Dreams, we aren't just dreamers—we’re builders. Whether it's through our automated community tools or our deep-dive articles, we’re here to help you build a better version of tomorrow, one hack at a time.
+        nav a {
+            color: var(--neon-blue);
+            text-decoration: none;
+            font-size: 1.3rem; 
+            font-weight: 800; 
+            text-transform: uppercase;
+            letter-spacing: 4px;
+            transition: all 0.3s ease;
+            opacity: 0.9;
+            text-shadow: 0 0 10px rgba(56, 189, 248, 0.3);
+        }
+
+        nav a:hover {
+            color: var(--neon-gold);
+            opacity: 1;
+            text-shadow: 0 0 20px var(--neon-blue);
+        }
+
+        nav a.active {
+            color: var(--neon-gold);
+            opacity: 1;
+        }
+
+        /* --- CONTENT SECTION --- */
+        .container {
+            max-width: 1000px;
+            margin: 0 auto;
+            padding: 0 24px 100px;
+        }
+
+        .glow-divider {
+            width: 100%;
+            height: 1px;
+            background: radial-gradient(circle, var(--neon-blue) 0%, transparent 70%);
+            opacity: 0.2;
+            margin-bottom: 60px;
+        }
+
+        .about-hero {
+            text-align: center;
+            margin-bottom: 80px;
+        }
+
+        h1 {
+            color: var(--neon-blue);
+            font-size: 3rem;
+            font-weight: 900;
+            margin-bottom: 10px;
+            text-transform: uppercase;
+            letter-spacing: 2px;
+        }
+
+        .tagline {
+            color: var(--neon-gold);
+            font-size: 1.4rem;
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: 4px;
+            margin-bottom: 40px;
+            display: block;
+        }
+
+        .intro-text {
+            font-size: 1.25rem;
+            color: var(--text-dim);
+            max-width: 800px;
+            margin: 0 auto;
+            line-height: 1.8;
+        }
+
+        .mission-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 30px;
+            margin-top: 80px;
+        }
+
+        .mission-card {
+            background-color: var(--card-bg);
+            padding: 40px;
+            border-radius: 24px;
+            border: 1px solid rgba(56, 189, 248, 0.1);
+            transition: 0.4s;
+        }
+
+        .mission-card:hover {
+            border-color: var(--neon-blue);
+            transform: translateY(-10px);
+            box-shadow: 0 20px 40px -20px rgba(56, 189, 248, 0.4);
+        }
+
+        .mission-card h3 {
+            color: var(--neon-blue);
+            font-size: 1.5rem;
+            margin-top: 0;
+            margin-bottom: 15px;
+        }
+
+        .mission-card p {
+            color: var(--text-dim);
+            margin-bottom: 0;
+            font-size: 1.05rem;
+        }
+
+        .location-shoutout {
+            margin-top: 100px;
+            text-align: center;
+            padding: 40px;
+            border-top: 1px solid rgba(255, 255, 255, 0.05);
+        }
+
+        .location-shoutout strong {
+            color: var(--neon-blue);
+        }
+
+        footer {
+            text-align: center;
+            padding: 60px 0;
+            color: #4b5563;
+            font-size: 0.85rem;
+        }
+
+        @media (max-width: 600px) {
+            h1 { font-size: 2.2rem; }
+            nav { flex-direction: column; gap: 20px; align-items: center; }
+        }
+    </style>
+</head>
+<body>
+
+    <header>
+        <div class="logo-wrap">
+            <img src="https://raw.githubusercontent.com/onebender137/hopes-and-dreams-site/main/TOPPER.jpg" alt="Hopes and Dreams">
+        </div>
+        
+        <nav>
+            <a href="index.html">Home</a>
+            <a href="about.html" class="active">About</a>
+            <a href="privacy.html">Privacy</a>
+        </nav>
+    </header>
+
+    <div class="container">
+        <div class="glow-divider"></div>
+
+        <section class="about-hero">
+            <h1>About Hopes and Dreams</h1>
+            <span class="tagline">Turning Ambition into Action</span>
+            
+            <div class="intro-text">
+                <p>Welcome to Hopes and Dreams. What started as a community-driven Facebook group has grown into a dedicated platform designed to help people bridge the gap between where they are and where they want to be.</p>
+                <p>At Hopes and Dreams, we aren't just dreamers—we’re <strong>builders</strong>. Whether it's through our automated community tools or our deep-dive articles, we’re here to help you build a better version of tomorrow, one hack at a time.</p>
+            </div>
+        </section>
+
+        <div class="mission-grid">
+            <div class="mission-card">
+                <h3>Actionable Life Hacks</h3>
+                <p>Practical tips to streamline your daily routine and reclaim your time. We focus on high-impact changes that actually fit into a busy life.</p>
+            </div>
+            <div class="mission-card">
+                <h3>Curated Recommendations</h3>
+                <p>We hand-pick tools, tech, and resources that actually move the needle, ensuring you spend your money and energy wisely.</p>
+            </div>
+            <div class="mission-card">
+                <h3>A Community of Growth</h3>
+                <p>Positive, forward-thinking content that cuts through the noise of the modern internet. Built for those who choose action over apathy.</p>
+            </div>
+        </div>
+
+        <div class="location-shoutout">
+            <p>Proudly based out of the vibrant community of <strong>Saint John, New Brunswick</strong>.</p>
+            <p>We believe that <strong>"Hope"</strong> is the fuel, but <strong>"Dreams"</strong> require a roadmap.</p>
+        </div>
+
+        <footer>
+            <p>&copy; 2026 Hopes and Dreams. All Rights Reserved.</p>
+        </footer>
+    </div>
+
+</body>
+</html>
