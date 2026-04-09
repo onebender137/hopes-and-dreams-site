@@ -72,4 +72,165 @@
             text-shadow: 0 0 10px rgba(56, 189, 248, 0.3);
         }
 
-        nav a:hover, nav a.active
+        nav a:hover, nav a.active {
+            color: var(--neon-gold);
+            opacity: 1;
+            text-shadow: 0 0 20px var(--neon-blue);
+        }
+
+        /* --- CONTENT SECTION --- */
+        .container {
+            max-width: 900px;
+            margin: 0 auto;
+            padding: 0 24px 100px;
+        }
+
+        .glow-divider {
+            width: 100%;
+            height: 1px;
+            background: radial-gradient(circle, var(--neon-blue) 0%, transparent 70%);
+            opacity: 0.2;
+            margin-bottom: 40px;
+        }
+
+        .policy-card {
+            background-color: var(--card-bg);
+            padding: 50px;
+            border-radius: 24px;
+            border: 1px solid rgba(56, 189, 248, 0.1);
+            box-shadow: 0 20px 40px -20px rgba(0, 0, 0, 0.5);
+        }
+
+        h1 {
+            color: var(--neon-blue);
+            font-size: 2.5rem;
+            font-weight: 900;
+            margin-bottom: 10px;
+            text-transform: uppercase;
+            letter-spacing: 2px;
+        }
+
+        .last-updated {
+            color: var(--neon-gold);
+            font-size: 0.9rem;
+            text-transform: uppercase;
+            letter-spacing: 2px;
+            margin-bottom: 40px;
+            display: block;
+        }
+
+        h2 {
+            color: var(--neon-blue);
+            font-size: 1.4rem;
+            margin-top: 40px;
+            margin-bottom: 15px;
+            border-left: 4px solid var(--neon-blue);
+            padding-left: 15px;
+        }
+
+        p {
+            color: var(--text-dim);
+            font-size: 1.1rem;
+            margin-bottom: 20px;
+        }
+
+        /* Affiliate Highlight */
+        .affiliate-highlight {
+            background: rgba(251, 191, 36, 0.05);
+            border: 1px solid rgba(251, 191, 36, 0.2);
+            padding: 25px;
+            border-radius: 12px;
+            margin: 30px 0;
+        }
+
+        .affiliate-highlight strong {
+            color: var(--neon-gold);
+        }
+
+        .contact-box {
+            margin-top: 50px;
+            text-align: center;
+            border-top: 1px solid rgba(255, 255, 255, 0.05);
+            padding-top: 40px;
+        }
+
+        .fb-link {
+            display: inline-block;
+            margin-top: 15px;
+            color: var(--neon-blue);
+            text-decoration: none;
+            font-weight: 700;
+            font-size: 1.2rem;
+            border-bottom: 2px solid transparent;
+            transition: 0.3s;
+        }
+
+        .fb-link:hover {
+            color: var(--neon-gold);
+            border-bottom: 2px solid var(--neon-gold);
+        }
+
+        footer {
+            text-align: center;
+            padding: 40px 0;
+            color: #4b5563;
+            font-size: 0.85rem;
+        }
+
+        @media (max-width: 600px) {
+            .policy-card { padding: 30px 20px; }
+            h1 { font-size: 1.8rem; }
+            nav { flex-direction: column; gap: 20px; align-items: center; }
+        }
+    </style>
+</head>
+<body>
+
+    <header>
+        <div class="logo-wrap">
+            <img src="https://raw.githubusercontent.com/onebender137/hopes-and-dreams-site/main/TOPPER.jpg" alt="Hopes and Dreams">
+        </div>
+        
+        <nav>
+            <a href="index.html">Home</a>
+            <a href="about.html">About</a>
+            <a href="privacy.html" class="active">Privacy</a>
+        </nav>
+    </header>
+
+    <div class="container">
+        <div class="glow-divider"></div>
+
+        <article class="policy-card">
+            <h1>Privacy Policy & Disclosures</h1>
+            <span class="last-updated">Last Updated: April 2026</span>
+
+            <p>At Hopes and Dreams, your privacy is a priority. This policy outlines how we handle information and our relationship with third-party programs.</p>
+
+            <h2>1. Information We Collect</h2>
+            <p>We do not currently require user registration. We may collect minimal, non-identifying data (such as browser type or time spent on page) via standard web logs to improve our content and user experience.</p>
+
+            <h2>2. Cookies</h2>
+            <p>We may use basic cookies to enhance your browsing experience. These are small files stored on your device that help us understand how you interact with the site. You can choose to disable cookies through your individual browser settings.</p>
+
+            <h2>3. Affiliate Disclosure (Amazon Associates)</h2>
+            <p>Hopes and Dreams is a participant in the Amazon Services LLC Associates Program, an affiliate advertising program designed to provide a means for sites to earn advertising fees by advertising and linking to Amazon.ca and Amazon.com.</p>
+            
+            <div class="affiliate-highlight">
+                <p><strong>Important:</strong> As an Amazon Associate, I earn from qualifying purchases. This comes at no extra cost to you and helps support the growth of our community and the development of new resources.</p>
+            </div>
+
+            <div class="contact-box">
+                <h2>4. Contact Us</h2>
+                <p>If you have questions regarding this policy or the Hopes and Dreams project, you can reach out to us directly through our official Facebook Group.</p>
+                <a href="#" class="fb-link">Join the Syndicate on Facebook →</a>
+            </div>
+        </article>
+
+        <footer>
+            <p>&copy; 2026 Hopes and Dreams. All Rights Reserved.</p>
+        </footer>
+    </div>
+
+</body>
+</html>
