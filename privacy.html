@@ -25,7 +25,7 @@
             overflow-x: hidden;
         }
 
-        /* --- HEADER & NAV (Matches Index Exactly) --- */
+        /* --- HEADER (Identical to Home) --- */
         header {
             display: flex;
             flex-direction: column;
@@ -51,6 +51,7 @@
             mask-image: radial-gradient(circle, rgba(0,0,0,1) 45%, rgba(0,0,0,0) 95%);
         }
 
+        /* --- NAV (Identical to Home) --- */
         nav {
             margin-top: 40px; 
             padding-bottom: 60px;
@@ -72,10 +73,16 @@
             text-shadow: 0 0 10px rgba(56, 189, 248, 0.3);
         }
 
-        nav a:hover, nav a.active {
+        nav a:hover {
             color: var(--neon-gold);
             opacity: 1;
             text-shadow: 0 0 20px var(--neon-blue);
+        }
+
+        /* Highlights the Privacy link since we are on that page */
+        nav a.active {
+            color: var(--neon-gold);
+            opacity: 1;
         }
 
         /* --- CONTENT SECTION --- */
@@ -134,7 +141,6 @@
             margin-bottom: 20px;
         }
 
-        /* Affiliate Highlight */
         .affiliate-highlight {
             background: rgba(251, 191, 36, 0.05);
             border: 1px solid rgba(251, 191, 36, 0.2);
@@ -161,13 +167,12 @@
             text-decoration: none;
             font-weight: 700;
             font-size: 1.2rem;
-            border-bottom: 2px solid transparent;
             transition: 0.3s;
         }
 
         .fb-link:hover {
             color: var(--neon-gold);
-            border-bottom: 2px solid var(--neon-gold);
+            text-shadow: 0 0 10px var(--neon-gold);
         }
 
         footer {
@@ -208,22 +213,22 @@
             <p>At Hopes and Dreams, your privacy is a priority. This policy outlines how we handle information and our relationship with third-party programs.</p>
 
             <h2>1. Information We Collect</h2>
-            <p>We do not currently require user registration. We may collect minimal, non-identifying data (such as browser type or time spent on page) via standard web logs to improve our content and user experience.</p>
+            <p>We do not currently require user registration. We may collect minimal, non-identifying data (such as browser type or time spent on page) via standard web logs to improve our content.</p>
 
             <h2>2. Cookies</h2>
-            <p>We may use basic cookies to enhance your browsing experience. These are small files stored on your device that help us understand how you interact with the site. You can choose to disable cookies through your individual browser settings.</p>
+            <p>We may use basic cookies to enhance your browsing experience. You can choose to disable cookies through your individual browser settings.</p>
 
             <h2>3. Affiliate Disclosure (Amazon Associates)</h2>
             <p>Hopes and Dreams is a participant in the Amazon Services LLC Associates Program, an affiliate advertising program designed to provide a means for sites to earn advertising fees by advertising and linking to Amazon.ca and Amazon.com.</p>
             
             <div class="affiliate-highlight">
-                <p><strong>Important:</strong> As an Amazon Associate, I earn from qualifying purchases. This comes at no extra cost to you and helps support the growth of our community and the development of new resources.</p>
+                <p><strong>Important:</strong> As an Amazon Associate, I earn from qualifying purchases. This comes at no extra cost to you and helps support the growth of our community.</p>
             </div>
 
             <div class="contact-box">
                 <h2>4. Contact Us</h2>
                 <p>If you have questions regarding this policy or the Hopes and Dreams project, you can reach out to us directly through our official Facebook Group.</p>
-                <a href="#" class="fb-link">Join the Syndicate on Facebook →</a>
+                <a href="https://facebook.com" class="fb-link">Join our Facebook Group →</a>
             </div>
         </article>
 
