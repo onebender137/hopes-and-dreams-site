@@ -4,215 +4,167 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Hopes and Dreams | Turning Ambition into Action</title>
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;800&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;700;800&display=swap" rel="stylesheet">
     <style>
         :root {
-            --bg-color: #050a14; /* Darker midnight for better contrast */
-            --card-bg: #111827;
-            --accent-color: #38bdf8; /* Electric Blue from logo */
-            --star-gold: #fbbf24;    /* Gold from the shooting star */
-            --text-main: #f8fafc;
+            /* Exact color match to your logo background */
+            --bg-deep: #060813; 
+            --card-bg: #0d1226;
+            --neon-blue: #38bdf8;
+            --neon-gold: #ff9900;
+            --text-main: #ffffff;
             --text-dim: #94a3b8;
-            --glow: 0 0 20px rgba(56, 189, 248, 0.2);
         }
 
         body {
-            background-color: var(--bg-color);
+            background-color: var(--bg-deep);
             color: var(--text-main);
             font-family: 'Inter', sans-serif;
-            line-height: 1.6;
             margin: 0;
             padding: 0;
-            overflow-x: hidden;
+            line-height: 1.6;
         }
 
-        .container {
-            max-width: 1000px;
-            margin: 0 auto;
-            padding: 0 24px;
-        }
-
-        /* Header & Navigation */
+        /* 1. SEAMLESS LOGO HEADER */
         header {
-            padding: 40px 0;
             text-align: center;
-            background: radial-gradient(circle at top, rgba(56, 189, 248, 0.15) 0%, transparent 70%);
+            padding: 40px 20px 20px;
+            background: linear-gradient(180deg, #0a0e24 0%, var(--bg-deep) 100%);
         }
 
-        .logo-container {
-            max-width: 450px;
-            margin: 0 auto 20px;
+        .logo-wrap {
+            max-width: 600px;
+            margin: 0 auto;
         }
 
-        .logo-container img {
+        .logo-wrap img {
             width: 100%;
             height: auto;
-            filter: drop-shadow(0 0 10px rgba(56, 189, 248, 0.3));
+            /* This filter helps blend the image edges if there's a slight color mismatch */
+            filter: drop-shadow(0 0 15px rgba(56, 189, 248, 0.2));
         }
 
+        /* 2. GLOWING NAVIGATION */
         nav {
-            margin-top: 25px;
-            display: flex;
-            justify-content: center;
-            gap: 30px;
+            margin-top: 10px;
+            border-bottom: 1px solid rgba(56, 189, 248, 0.1);
+            padding-bottom: 20px;
         }
 
         nav a {
             color: var(--text-dim);
             text-decoration: none;
-            font-weight: 600;
-            font-size: 0.9rem;
+            margin: 0 15px;
+            font-size: 0.85rem;
             text-transform: uppercase;
-            letter-spacing: 1.5px;
-            transition: color 0.3s ease;
+            letter-spacing: 2px;
+            transition: 0.3s;
         }
 
         nav a:hover {
-            color: var(--accent-color);
+            color: var(--neon-blue);
+            text-shadow: 0 0 8px var(--neon-blue);
         }
 
-        /* Hero Section */
-        .hero-section {
-            background: linear-gradient(145deg, #1e293b, #111827);
-            padding: 60px 40px;
-            border-radius: 24px;
-            border: 1px solid rgba(56, 189, 248, 0.2);
-            margin-top: 20px;
-            box-shadow: var(--glow);
+        /* 3. HERO CONTENT */
+        .container {
+            max-width: 900px;
+            margin: 0 auto;
+            padding: 40px 20px;
+        }
+
+        .hero-text {
             text-align: center;
+            margin-bottom: 60px;
         }
 
-        h1 {
-            font-size: 3.5rem;
-            margin: 0;
-            background: linear-gradient(to right, #38bdf8, #818cf8, #fbbf24);
-            -webkit-background-clip: text;
-            -webkit-text-fill-color: transparent;
-            letter-spacing: -2px;
-            font-weight: 800;
+        .hero-text h2 {
+            font-size: 1.2rem;
+            color: var(--neon-gold);
+            text-transform: uppercase;
+            letter-spacing: 4px;
+            margin-bottom: 10px;
         }
 
-        .tagline {
-            color: var(--star-gold);
-            font-size: 1.4rem;
-            margin-top: 10px;
-            font-weight: 400;
+        .hero-text p {
+            font-size: 1.2rem;
+            color: var(--text-dim);
+            max-width: 700px;
+            margin: 0 auto;
         }
 
-        /* Features Grid */
-        .featured-grid {
+        /* 4. FEATURE CARDS */
+        .grid {
             display: grid;
             grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
-            gap: 24px;
-            margin: 40px 0;
+            gap: 25px;
         }
 
         .card {
-            background-color: var(--card-bg);
-            padding: 32px;
-            border-radius: 16px;
+            background: var(--card-bg);
+            padding: 35px;
+            border-radius: 20px;
             border: 1px solid rgba(255, 255, 255, 0.05);
-            transition: all 0.3s ease;
+            transition: transform 0.3s, border 0.3s;
+            position: relative;
+            overflow: hidden;
         }
 
         .card:hover {
-            transform: translateY(-8px);
-            border-color: var(--accent-color);
-            box-shadow: 0 10px 30px -10px rgba(56, 189, 248, 0.3);
+            transform: translateY(-10px);
+            border-color: var(--neon-blue);
+            box-shadow: 0 10px 30px -10px rgba(56, 189, 248, 0.4);
         }
 
         .card h3 {
             margin-top: 0;
-            color: var(--accent-color);
-            font-size: 1.25rem;
+            color: var(--neon-blue);
+            font-size: 1.4rem;
         }
 
-        .card p {
-            color: var(--text-dim);
-            font-size: 0.95rem;
-        }
-
-        /* Amazon Disclosure */
-        .amazon-box {
-            background: rgba(251, 191, 36, 0.05);
-            border: 1px solid rgba(251, 191, 36, 0.3);
+        /* 5. AMAZON BOX */
+        .amazon-bar {
+            margin-top: 60px;
             padding: 20px;
             border-radius: 12px;
+            background: rgba(255, 153, 0, 0.05);
+            border: 1px dashed var(--neon-gold);
             text-align: center;
-            font-size: 0.85rem;
-            color: var(--star-gold);
+            font-size: 0.8rem;
+            color: var(--neon-gold);
         }
 
         footer {
-            margin-top: 100px;
-            padding-bottom: 50px;
+            margin-top: 80px;
+            padding: 40px 0;
             text-align: center;
-            color: var(--text-dim);
-            font-size: 0.9rem;
+            border-top: 1px solid rgba(255, 255, 255, 0.05);
+            color: #475569;
         }
 
-        footer a {
-            color: var(--accent-color);
-            text-decoration: none;
-        }
-
-        /* Mobile Adjustments */
         @media (max-width: 600px) {
-            h1 { font-size: 2.5rem; }
-            .hero-section { padding: 40px 20px; }
-            nav { flex-direction: column; gap: 15px; }
+            .logo-wrap { max-width: 90%; }
         }
     </style>
 </head>
 <body>
 
     <header>
-        <div class="container">
-            <div class="logo-container">
-                <img src="https://github.com/onebender137/hopes-and-dreams-site/blob/main/hopes-and-dreams-pro-logo.png" alt="Hopes and Dreams Logo">
-            </div>
-            
-            <nav>
-                <a href="index.html">Home</a>
-                <a href="about.html">About</a>
-                <a href="privacy.html">Privacy</a>
-            </nav>
+        <div class="logo-wrap">
+            <img src="https://github.com/onebender137/hopes-and-dreams-site/blob/main/hopes-and-dreams-pro-logo.png?raw=true" alt="Hopes and Dreams">
         </div>
+        
+        <nav>
+            <a href="index.html">Home</a>
+            <a href="about.html">About</a>
+            <a href="privacy.html">Privacy</a>
+        </nav>
     </header>
 
     <div class="container">
-        <section class="hero-section">
-            <h1>Hopes and Dreams</h1>
-            <p class="tagline">Turning Ambition into Action</p>
-            <div style="max-width: 700px; margin: 30px auto 0;">
-                <p>Based in <strong>Saint John, NB</strong>, Hopes and Dreams is a community-first initiative. We specialize in identifying the life hacks, tech stacks, and tools that help modern builders bridge the gap between their current reality and their ultimate goals.</p>
-            </div>
+        <section class="hero-text">
+            <h2>Turning Ambition into Action</h2>
+            <p>Based in Saint John, NB, we identify the life hacks and tech stacks that help modern builders bridge the gap between reality and their ultimate goals.</p>
         </section>
 
-        <div class="featured-grid">
-            <div class="card">
-                <h3>Life Hacks</h3>
-                <p>Simple optimizations for a more productive day. From morning routines to workflow automation that saves you hours.</p>
-            </div>
-            <div class="card">
-                <h3>Curated Tech</h3>
-                <p>Hard-hitting reviews on the equipment we actually use to build the Syndicate and beyond. No fluff, just gear that works.</p>
-            </div>
-            <div class="card">
-                <h3>Community</h3>
-                <p>Connecting dreamers across the Maritimes and beyond. Join our ecosystem to collaborate with like-minded builders.</p>
-            </div>
-        </div>
-
-        <div class="amazon-box">
-            <p>💡 <strong>Transparency:</strong> As an Amazon Associate, I earn from qualifying purchases. This helps keep the Nexus running!</p>
-        </div>
-
-        <footer>
-            <p>&copy; 2026 Hopes and Dreams. All Rights Reserved.</p>
-            <p><a href="privacy.html">Privacy Policy & Disclosures</a></p>
-        </footer>
-    </div>
-
-</body>
-</html>
+        <div class="grid">
