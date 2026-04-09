@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Privacy & Disclosures | Hopes and Dreams</title>
+    <title>Hopes and Dreams | Architecting the Future</title>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;700;900&display=swap" rel="stylesheet">
     <style>
         :root {
@@ -16,22 +16,37 @@
         }
 
         body {
-            background-color: var(--bg-main);
+            background-color: #0a0f2b; 
             color: var(--text-main);
             font-family: 'Inter', sans-serif;
-            margin: 0; padding: 0; line-height: 1.6;
+            margin: 0;
+            padding: 0;
+            line-height: 1.6;
             overflow-x: hidden;
         }
 
         /* --- HEADER --- */
         header {
-            display: flex; flex-direction: column; align-items: center;
-            width: 100%; padding: 40px 0 20px 0; background-color: var(--bg-main);
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            width: 100%;
+            padding: 40px 0 20px 0;
+            background-color: #0a0f2b;
         }
 
-        .logo-wrap { width: 95%; max-width: 700px; line-height: 0; }
-        .logo-wrap img { 
-            width: 100%; height: auto; 
+        .logo-wrap {
+            width: 95%;
+            max-width: 700px;
+            position: relative;
+            line-height: 0;
+            background-color: #0a0f2b;
+        }
+
+        .logo-wrap img {
+            width: 100%;
+            height: auto;
+            display: block;
             filter: contrast(1.15) brightness(0.95) saturate(1.1);
             -webkit-mask-image: radial-gradient(circle, rgba(0,0,0,1) 45%, rgba(0,0,0,0) 95%);
             mask-image: radial-gradient(circle, rgba(0,0,0,1) 45%, rgba(0,0,0,0) 95%);
@@ -45,14 +60,12 @@
             position: relative;
             display: flex;
             gap: 40px;
-            flex-wrap: wrap;
-            justify-content: center;
         }
 
         nav a {
             color: var(--neon-blue);
             text-decoration: none;
-            font-size: 1.2rem; 
+            font-size: 1.3rem; 
             font-weight: 800;
             text-transform: uppercase;
             letter-spacing: 4px;
@@ -69,65 +82,164 @@
         }
 
         /* --- CONTENT SECTION --- */
-        .container { max-width: 900px; margin: 0 auto; padding: 0 24px 100px; }
+        .container {
+            max-width: 1000px;
+            margin: 0 auto;
+            padding: 0 24px;
+            text-align: center;
+        }
 
         .glow-divider {
-            width: 100%; height: 1px;
+            width: 100%;
+            height: 1px;
             background: radial-gradient(circle, var(--neon-blue) 0%, transparent 70%);
-            opacity: 0.2; margin-bottom: 60px;
+            opacity: 0.2;
+            margin: 60px 0;
         }
 
-        .policy-card {
+        .section-title {
+            color: var(--neon-gold);
+            font-size: 2rem;
+            font-weight: 900;
+            text-transform: uppercase;
+            letter-spacing: 2px;
+            margin-bottom: 40px;
+            text-shadow: 0 0 15px rgba(251, 191, 36, 0.2);
+        }
+
+        .hero-description {
+            max-width: 800px;
+            margin: 0 auto 80px;
+        }
+
+        .hero-description h1 {
+            color: var(--neon-gold);
+            font-size: 2.5rem;
+            font-weight: 900;
+            margin-bottom: 20px;
+            text-transform: uppercase;
+            letter-spacing: -1px;
+        }
+
+        .hero-description p {
+            font-size: 1.2rem;
+            color: var(--text-dim);
+            margin-bottom: 30px;
+        }
+
+        .hero-description strong {
+            color: var(--neon-blue);
+        }
+
+        /* --- FEATURE GRID --- */
+        .grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 30px;
+            margin-bottom: 60px;
+        }
+
+        /* Wire up links to cards */
+        .card-link {
+            text-decoration: none;
+            display: block;
+            color: inherit;
+        }
+
+        .card {
             background-color: var(--card-bg);
-            padding: 60px; border-radius: 24px;
-            border: 1px solid rgba(56, 189, 248, 0.1);
-            box-shadow: 0 20px 40px -20px rgba(0, 0, 0, 0.5);
-            position: relative; overflow: hidden;
+            padding: 40px;
+            border-radius: 24px;
+            border: 1px solid rgba(56, 189, 248, 0.05);
             text-align: left;
+            transition: 0.4s ease;
+            position: relative;
+            overflow: hidden;
+            height: 100%;
+            box-sizing: border-box;
         }
 
-        .policy-card::before {
-            content: ''; position: absolute; top: 0; left: 0; width: 100%; height: 4px;
+        .card::before {
+            content: '';
+            position: absolute;
+            top: 0; left: 0; width: 100%; height: 4px;
             background: linear-gradient(90deg, var(--neon-blue), transparent);
+            opacity: 0.5;
         }
 
-        .header-section { text-align: center; margin-bottom: 50px; }
-        .shield-icon {
-            width: 64px; height: 64px; color: var(--neon-blue);
-            margin-bottom: 20px; filter: drop-shadow(0 0 10px rgba(56, 189, 248, 0.4));
+        .card:hover {
+            transform: translateY(-10px);
+            border-color: var(--neon-blue);
+            box-shadow: 0 20px 40px -20px rgba(56, 189, 248, 0.4);
         }
 
-        h1 { color: var(--neon-blue); font-size: 2.5rem; font-weight: 900; text-transform: uppercase; letter-spacing: 2px; }
-        .last-updated { color: var(--neon-gold); font-size: 0.9rem; font-weight: 700; text-transform: uppercase; letter-spacing: 2px; display: block; }
-
-        h2 { color: var(--neon-blue); font-size: 1.4rem; margin-top: 40px; border-left: 4px solid var(--neon-blue); padding-left: 15px; text-transform: uppercase; }
-        p { color: var(--text-dim); font-size: 1.1rem; line-height: 1.8; }
-
-        .affiliate-highlight {
-            background: rgba(251, 191, 36, 0.05);
-            border: 1px dashed rgba(251, 191, 36, 0.4);
-            padding: 25px 30px; border-radius: 12px; margin: 40px 0;
+        /* Icon Styling */
+        .card-icon {
+            width: 48px;
+            height: 48px;
+            color: var(--neon-gold);
+            margin-bottom: 20px;
+            filter: drop-shadow(0 0 8px rgba(251, 191, 36, 0.4));
         }
-        .affiliate-highlight strong { color: var(--neon-gold); text-transform: uppercase; }
 
-        .contact-box { margin-top: 60px; text-align: center; border-top: 1px solid rgba(255, 255, 255, 0.05); padding-top: 50px; }
-        .contact-email { color: var(--text-main); font-size: 1.5rem; font-weight: 700; text-decoration: none; transition: 0.3s; }
-        .contact-email:hover { color: var(--neon-blue); }
-
-        .fb-link {
-            display: inline-block; margin-top: 25px; padding: 12px 30px;
-            border: 2px solid var(--neon-gold); border-radius: 50px;
-            color: var(--neon-gold); text-decoration: none; font-weight: 700;
-            text-transform: uppercase; transition: 0.3s;
+        .card:nth-child(even) .card-icon {
+            color: var(--neon-blue);
+            filter: drop-shadow(0 0 8px rgba(56, 189, 248, 0.4));
         }
-        .fb-link:hover { background: var(--neon-gold); color: var(--bg-main); box-shadow: 0 0 20px rgba(251, 191, 36, 0.4); }
 
-        footer { text-align: center; padding: 40px 0 0; color: #4b5563; font-size: 0.85rem; }
+        .card h3 {
+            color: var(--neon-blue);
+            margin-top: 0;
+            font-size: 1.5rem;
+            font-weight: 700;
+        }
+
+        .card p {
+            color: var(--text-dim);
+            font-size: 1.05rem;
+        }
+
+        /* --- FOOTER --- */
+        .amazon-box {
+            background: rgba(251, 191, 36, 0.02);
+            border: 1px solid rgba(251, 191, 36, 0.1);
+            padding: 24px;
+            border-radius: 16px;
+            color: var(--neon-gold);
+            font-size: 0.9rem;
+            margin-top: 60px;
+            margin-bottom: 80px;
+        }
+
+        .quote-section {
+            font-style: italic;
+            color: var(--text-main);
+            font-size: 1.4rem;
+            margin: 80px 0;
+            opacity: 0.8;
+            border-left: 4px solid var(--neon-blue);
+            padding-left: 20px;
+            text-align: left;
+            max-width: 800px;
+            margin-left: auto;
+            margin-right: auto;
+        }
+
+        footer {
+            padding: 80px 0 40px;
+            border-top: 1px solid rgba(255, 255, 255, 0.05);
+            color: #4b5563;
+            font-size: 0.85rem;
+        }
+
+        footer a { color: inherit; text-decoration: none; margin: 0 15px; }
+        footer a:hover { color: var(--neon-blue); }
 
         @media (max-width: 600px) {
-            .policy-card { padding: 40px 20px; }
-            h1 { font-size: 1.8rem; }
-            nav { flex-direction: column; gap: 20px; }
+            nav { flex-direction: column; gap: 20px; margin-top: 30px; }
+            nav a { font-size: 1.1rem; letter-spacing: 2px; }
+            .hero-description h1 { font-size: 1.8rem; }
+            .section-title { font-size: 1.5rem; }
         }
     </style>
 </head>
