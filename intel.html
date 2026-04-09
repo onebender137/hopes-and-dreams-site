@@ -5,88 +5,8 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Syndicate Intel Hub | Hopes and Dreams</title>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;700;900&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="style.css">
     <style>
-  /* This targets your navigation links specifically on mobile */
-  @media (max-width: 600px) {
-    nav, .menu, header { 
-      display: flex !important;
-      flex-direction: column !important;
-      align-items: center !important;
-    }
-    
-    nav a, .nav-link {
-      display: block !important;
-      width: 100%;
-      text-align: center;
-      padding: 10px 0;
-      margin: 5px 0;
-    }
-  }
-</style>
-    
-    <style>
-        :root {
-            --bg-main: #0a0f2b; 
-            --card-bg: #0d162d; 
-            --neon-blue: #38bdf8;
-            --neon-gold: #fbbf24;
-            --text-main: #f8fafc;
-            --text-dim: #94a3b8;
-        }
-
-        body {
-            background-color: var(--bg-main);
-            color: var(--text-main);
-            font-family: 'Inter', sans-serif;
-            margin: 0; padding: 0; line-height: 1.6;
-            overflow-x: hidden;
-        }
-
-        /* --- HEADER --- */
-        header {
-            display: flex; flex-direction: column; align-items: center;
-            width: 100%; padding: 40px 0 20px 0; background-color: var(--bg-main);
-        }
-
-        .logo-wrap { width: 95%; max-width: 700px; line-height: 0; }
-        .logo-wrap img { 
-            width: 100%; height: auto; 
-            filter: contrast(1.15) brightness(0.95) saturate(1.1);
-            -webkit-mask-image: radial-gradient(circle, rgba(0,0,0,1) 45%, rgba(0,0,0,0) 95%);
-            mask-image: radial-gradient(circle, rgba(0,0,0,1) 45%, rgba(0,0,0,0) 95%);
-        }
-
-        /* --- NAVIGATION --- */
-        nav {
-            margin-top: 40px; 
-            padding-bottom: 60px;
-            z-index: 10;
-            position: relative;
-            display: flex;
-            gap: 40px;
-            flex-wrap: wrap;
-            justify-content: center;
-        }
-
-        nav a {
-            color: var(--neon-blue);
-            text-decoration: none;
-            font-size: 1.2rem; 
-            font-weight: 800;
-            text-transform: uppercase;
-            letter-spacing: 4px;
-            transition: all 0.3s ease;
-            opacity: 0.9;
-            text-shadow: 0 0 10px rgba(56, 189, 248, 0.3);
-        }
-
-        nav a:hover {
-            color: var(--neon-gold);
-            opacity: 1;
-            text-shadow: 0 0 20px var(--neon-blue), 0 0 10px var(--neon-gold);
-            transform: scale(1.1);
-        }
-
         .container { max-width: 900px; margin: 0 auto; padding: 0 24px 100px; }
 
         /* Protocol Styling */
@@ -119,8 +39,6 @@
             margin-top: 15px; margin-right: 10px; transition: 0.3s;
         }
         .cta-button:hover { transform: scale(1.05); box-shadow: 0 0 20px rgba(251, 191, 36, 0.4); }
-
-        footer { text-align: center; padding: 40px 0; border-top: 1px solid rgba(255,255,255,0.05); color: #4b5563; font-size: 0.85rem; }
     </style>
 </head>
 <body>
@@ -132,7 +50,7 @@
         <nav>
             <a href="index.html">Home</a>
             <a href="shop.html">Procurement</a>
-            <a href="intel.html" style="color: var(--neon-gold)">Intel Hub</a>
+            <a href="intel.html" class="active">Intel Hub</a>
             <a href="about.html">About</a>
             <a href="privacy.html">Privacy</a>
         </nav>
@@ -160,6 +78,38 @@
                 <strong>The Move:</strong> Look *through* the darkness, not *at* it. When the vibrations begin, do not fight. Observe the separation.
             </div>
         </article>
+
+        <h2 class="section-title" style="margin-top: 80px;">The Syndicate Toolkit</h2>
+        <div class="grid">
+            <div class="card">
+                <h3>Obsidian</h3>
+                <p>The premier local-first knowledge base for building your 'Second Brain'. Own your data, link your thoughts, and architect your own internal wiki.</p>
+                <a href="https://obsidian.md/" target="_blank" class="cta-button" style="font-size: 0.8rem; padding: 8px 16px;">Explore Obsidian</a>
+            </div>
+            <div class="card">
+                <h3>Daylio</h3>
+                <p>Frictionless mood and habit tracking. Capture your daily state in seconds to identify the correlations between your protocols and your performance.</p>
+                <a href="https://daylio.net/" target="_blank" class="cta-button" style="font-size: 0.8rem; padding: 8px 16px;">Explore Daylio</a>
+            </div>
+            <div class="card">
+                <h3>Calm</h3>
+                <p>Guided meditation and sleep architecture. Essential for down-regulating the nervous system after high-intensity cognitive work.</p>
+                <a href="https://www.calm.com/" target="_blank" class="cta-button" style="font-size: 0.8rem; padding: 8px 16px;">Explore Calm</a>
+            </div>
+        </div>
+
+        <div class="grid">
+            <div class="card">
+                <h3>Oura Ring</h3>
+                <p>Deep biometric insights. Track sleep stages, HRV, and readiness to ensure your biological hardware is keeping up with your digital output.</p>
+                <a href="https://ouraring.com/" target="_blank" class="cta-button" style="font-size: 0.8rem; padding: 8px 16px;">Explore Oura</a>
+            </div>
+            <div class="card">
+                <h3>Garmin</h3>
+                <p>Advanced performance analytics. From VO2 Max to body battery, Garmin provides the raw data needed to optimize physical excellence.</p>
+                <a href="https://www.garmin.com/" target="_blank" class="cta-button" style="font-size: 0.8rem; padding: 8px 16px;">Explore Garmin</a>
+            </div>
+        </div>
 
         <footer>
             <p>&copy; 2026 Hopes and Dreams Syndicate. All Rights Reserved.</p>

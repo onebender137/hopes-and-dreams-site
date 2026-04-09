@@ -5,94 +5,8 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>About | Hopes and Dreams</title>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;700;900&display=swap" rel="stylesheet">
-    
+    <link rel="stylesheet" href="style.css">
     <style>
-        :root {
-            --bg-main: #0a0f2b; 
-            --card-bg: #0d162d; 
-            --neon-blue: #38bdf8;
-            --neon-gold: #fbbf24;
-            --text-main: #f8fafc;
-            --text-dim: #94a3b8;
-        }
-
-        body {
-            background-color: #0a0f2b; 
-            color: var(--text-main);
-            font-family: 'Inter', sans-serif;
-            margin: 0;
-            padding: 0;
-            line-height: 1.6;
-            overflow-x: hidden;
-        }
-
-        /* --- HEADER & NAVIGATION --- */
-        header {
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            width: 100%;
-            padding: 40px 0 20px 0;
-            background-color: #0a0f2b;
-        }
-
-        .logo-wrap {
-            width: 95%;
-            max-width: 700px;
-            position: relative;
-            line-height: 0;
-        }
-
-        .logo-wrap img {
-            width: 100%;
-            height: auto;
-            display: block;
-            filter: contrast(1.15) brightness(0.95) saturate(1.1);
-            -webkit-mask-image: radial-gradient(circle, rgba(0,0,0,1) 45%, rgba(0,0,0,0) 95%);
-            mask-image: radial-gradient(circle, rgba(0,0,0,1) 45%, rgba(0,0,0,0) 95%);
-        }
-
-        nav {
-            margin-top: 40px; 
-            padding-bottom: 60px;
-            display: flex;
-            gap: 40px;
-            justify-content: center;
-            flex-wrap: wrap; 
-        }
-
-        nav a {
-            color: var(--neon-blue);
-            text-decoration: none;
-            font-size: 1.3rem; 
-            font-weight: 800;
-            text-transform: uppercase;
-            letter-spacing: 4px;
-            transition: all 0.3s ease;
-            text-shadow: 0 0 10px rgba(56, 189, 248, 0.3);
-        }
-
-        nav a:hover {
-            color: var(--neon-gold);
-            transform: scale(1.1);
-        }
-
-        /* --- ABOUT CONTENT STYLES --- */
-        .container {
-            max-width: 900px;
-            margin: 0 auto;
-            padding: 0 24px;
-            text-align: center;
-        }
-
-        .glow-divider {
-            width: 100%;
-            height: 1px;
-            background: radial-gradient(circle, var(--neon-blue) 0%, transparent 70%);
-            opacity: 0.2;
-            margin: 40px 0;
-        }
-
         .page-title {
             color: var(--neon-gold);
             font-size: 3rem;
@@ -149,34 +63,9 @@
 
         /* --- MOBILE FIXES --- */
         @media (max-width: 600px) {
-            nav {
-                flex-direction: column !important;
-                align-items: center !important;
-                gap: 20px !important;
-            }
-            
-            nav a {
-                display: block !important;
-                width: 100%;
-                text-align: center;
-                font-size: 1.1rem;
-                letter-spacing: 2px;
-            }
-
             .page-title { font-size: 2rem; letter-spacing: 4px; }
             .construction-banner { padding: 40px 20px; }
         }
-
-        footer {
-            padding: 60px 0 40px;
-            border-top: 1px solid rgba(255, 255, 255, 0.05);
-            color: #4b5563;
-            font-size: 0.85rem;
-            text-align: center;
-        }
-
-        footer a { color: inherit; text-decoration: none; margin: 0 10px; }
-        footer a:hover { color: var(--neon-blue); }
     </style>
 </head>
 <body>
@@ -185,12 +74,11 @@
         <div class="logo-wrap">
             <img src="https://raw.githubusercontent.com/onebender137/hopes-and-dreams-site/main/TOPPER.jpg" alt="Hopes and Dreams">
         </div>
-        
         <nav>
             <a href="index.html">Home</a>
             <a href="shop.html">Procurement</a>
             <a href="intel.html">Intel Hub</a>
-            <a href="about.html" style="color: var(--neon-gold)">About</a>
+            <a href="about.html" class="active">About</a>
             <a href="privacy.html">Privacy</a>
         </nav>
     </header>
@@ -201,13 +89,21 @@
         <h1 class="page-title">The Blueprint</h1>
 
         <div class="construction-banner">
-            <svg class="construction-icon" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
-                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 002.573 1.066c1.543-.94 3.31.826 2.37 2.37a1.724 1.724 0 001.065 2.572c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 00-1.066 2.573c.94 1.543-.826 3.31-2.37 2.37a1.724 1.724 0 00-2.572 1.065c-.426 1.756-2.924 1.756-3.35 0a1.724 1.724 0 00-2.573-1.066c-1.543.94-3.31-.826-2.37-2.37a1.724 1.724 0 00-1.065-2.572c-1.756-.426-1.756-2.924 0-3.35a1.724 1.724 0 001.066-2.573c-.94-1.543.826-3.31 2.37-2.37.996.608 2.296.07 2.572-1.065z"></path>
-                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"></path>
-            </svg>
+            <h2>The Mission</h2>
+            <p>Hopes and Dreams is more than a project; it's a dedicated effort to empower individuals through the fusion of modern science and intentional living. Based in Saint John, NB, we serve as a beacon for those seeking to transcend their current limitations and achieve peak cognitive and physical performance.</p>
             
-            <h2>Under Construction</h2>
-            <p>We are currently architecting this section of the hub. The full dossier and technical background of the Syndicate are being finalized.</p>
+            <p>Our "Syndicate" initiative is the technical arm of this mission, focusing on the deployment of automated AI systems, local LLMs, and advanced biohacking protocols to create a sustainable "Second Brain" for every member of our community.</p>
+
+            <div class="glow-divider"></div>
+
+            <h2>The Syndicate</h2>
+            <p>The Syndicate is our private research and development collective. We focus on:
+                <ul style="text-align: left; color: var(--text-dim); max-width: 500px; margin: 0 auto 30px;">
+                    <li><strong>Neuro-Optimization:</strong> Leveraging nootropics and focus protocols.</li>
+                    <li><strong>Applied Biohacking:</strong> Real-world biological tuning and monitoring.</li>
+                    <li><strong>Infrastructure:</strong> Building the digital and hardware stacks for the future.</li>
+                </ul>
+            </p>
             
             <div class="circa-badge">
                 Initiated: April 2026
