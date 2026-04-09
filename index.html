@@ -7,8 +7,7 @@
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;700;900&display=swap" rel="stylesheet">
     <style>
         :root {
-            /* Your exact GIMP code */
-            --bg-main: #03091f; 
+            --bg-main: #03091f; /* Your exact GIMP code */
             --card-bg: #0d162d; 
             --neon-blue: #38bdf8;
             --neon-gold: #fbbf24;
@@ -32,36 +31,38 @@
             flex-direction: column;
             align-items: center;
             width: 100%;
-            padding: 20px 0 0 0;
+            padding: 40px 0 0 0;
             background-color: var(--bg-main);
         }
 
         .logo-wrap {
-            width: 100%;
+            width: 95%;
             max-width: 700px;
             position: relative;
             line-height: 0;
+            background-color: var(--bg-main);
         }
 
         .logo-wrap img {
             width: 100%;
             height: auto;
             display: block;
-            
-            /* REMOVED mix-blend-mode to stop the "lighting up" effect */
-            
-            /* FILTER: Crushes the dark blues in the image to match the site perfectly */
-            filter: contrast(1.1) brightness(1.0);
 
-            /* THE FIX: This creates a soft fade on the edges of the image.
-               Even if the colors are 1% off, the edges are now invisible. */
-            -webkit-mask-image: radial-gradient(circle, rgba(0,0,0,1) 60%, rgba(0,0,0,0) 100%);
-            mask-image: radial-gradient(circle, rgba(0,0,0,1) 60%, rgba(0,0,0,0) 100%);
+            /* 1. CRUSH THE BLACKS: 
+               By bumping contrast and dropping brightness slightly, 
+               the dark blue pixels are forced to match the background deeper. */
+            filter: contrast(1.15) brightness(0.95) saturate(1.1);
+
+            /* 2. AGGRESSIVE MASK: 
+               We start the fade-out at 40% now instead of 60%. 
+               This kills the corners and edges of the "box" completely. */
+            -webkit-mask-image: radial-gradient(circle, rgba(0,0,0,1) 40%, rgba(0,0,0,0) 95%);
+            mask-image: radial-gradient(circle, rgba(0,0,0,1) 40%, rgba(0,0,0,0) 95%);
         }
 
         nav {
-            margin-top: -15px; /* Pulls links up slightly */
-            padding-bottom: 40px;
+            margin-top: -15px; 
+            padding-bottom: 50px;
             z-index: 10;
             position: relative;
         }
@@ -75,7 +76,7 @@
             text-transform: uppercase;
             letter-spacing: 3px;
             transition: 0.3s;
-            opacity: 0.8;
+            opacity: 0.7;
         }
 
         nav a:hover {
@@ -106,8 +107,13 @@
         }
 
         .hero-description p {
-            font-size: 1.2rem;
+            font-size: 1.25rem;
             color: var(--text-dim);
+            font-weight: 400;
+        }
+
+        .hero-description strong {
+            color: var(--neon-blue);
         }
 
         /* --- GRID --- */
@@ -191,20 +197,20 @@
         <div class="grid">
             <div class="card">
                 <h3>Life Hacks</h3>
-                <p>Simple optimizations for a more productive day. From high-performance morning routines to workflow automation.</p>
+                <p>Simple optimizations for a more productive day. From high-performance morning routines to workflow automation that buys back your time.</p>
             </div>
             <div class="card">
                 <h3>Curated Tech</h3>
-                <p>Hard-hitting reviews on the equipment and software we actually use to build the Syndicate and beyond.</p>
+                <p>Hard-hitting reviews on the equipment and software we actually use to build the Syndicate and beyond. No fluff, just gear that works.</p>
             </div>
             <div class="card">
                 <h3>Community</h3>
-                <p>Connecting dreamers and doers across the Maritimes and beyond. Join our ecosystem to participate.</p>
+                <p>Connecting dreamers and doers across the Maritimes and beyond. Join our ecosystem to participate in the next wave of building.</p>
             </div>
         </div>
 
         <div class="amazon-box">
-            <strong>Disclosure:</strong> As an Amazon Associate, I earn from qualifying purchases.
+            <strong>Disclosure:</strong> As an Amazon Associate, I earn from qualifying purchases. This helps keep the Nexus running and free for the community.
         </div>
 
         <footer>
