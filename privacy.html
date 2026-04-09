@@ -3,26 +3,9 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Hopes and Dreams | Architecting the Future</title>
+    <title>Privacy | Hopes and Dreams</title>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;700;900&display=swap" rel="stylesheet">
-    <style>
-  /* This targets your navigation links specifically on mobile */
-  @media (max-width: 600px) {
-    nav, .menu, header { 
-      display: flex !important;
-      flex-direction: column !important;
-      align-items: center !important;
-    }
     
-    nav a, .nav-link {
-      display: block !important;
-      width: 100%;
-      text-align: center;
-      padding: 10px 0;
-      margin: 5px 0;
-    }
-  }
-</style>
     <style>
         :root {
             --bg-main: #0a0f2b; 
@@ -43,7 +26,7 @@
             overflow-x: hidden;
         }
 
-        /* --- HEADER --- */
+        /* --- HEADER & NAVIGATION --- */
         header {
             display: flex;
             flex-direction: column;
@@ -58,7 +41,6 @@
             max-width: 700px;
             position: relative;
             line-height: 0;
-            background-color: #0a0f2b;
         }
 
         .logo-wrap img {
@@ -70,14 +52,13 @@
             mask-image: radial-gradient(circle, rgba(0,0,0,1) 45%, rgba(0,0,0,0) 95%);
         }
 
-        /* --- NAVIGATION --- */
         nav {
             margin-top: 40px; 
             padding-bottom: 60px;
-            z-index: 10;
-            position: relative;
             display: flex;
             gap: 40px;
+            justify-content: center;
+            flex-wrap: wrap; /* Helps with mobile jumping */
         }
 
         nav a {
@@ -88,176 +69,117 @@
             text-transform: uppercase;
             letter-spacing: 4px;
             transition: all 0.3s ease;
-            opacity: 0.9;
             text-shadow: 0 0 10px rgba(56, 189, 248, 0.3);
         }
 
         nav a:hover {
             color: var(--neon-gold);
-            opacity: 1;
-            text-shadow: 0 0 20px var(--neon-blue), 0 0 10px var(--neon-gold);
             transform: scale(1.1);
         }
 
-        /* --- CONTENT SECTION --- */
+        /* --- PRIVACY CONTENT STYLES --- */
         .container {
-            max-width: 1000px;
+            max-width: 900px;
             margin: 0 auto;
             padding: 0 24px;
             text-align: center;
         }
 
-        .glow-divider {
-            width: 100%;
-            height: 1px;
-            background: radial-gradient(circle, var(--neon-blue) 0%, transparent 70%);
-            opacity: 0.2;
-            margin: 60px 0;
-        }
-
-        .section-title {
-            color: var(--neon-gold);
-            font-size: 2rem;
-            font-weight: 900;
-            text-transform: uppercase;
-            letter-spacing: 2px;
-            margin-bottom: 40px;
-            text-shadow: 0 0 15px rgba(251, 191, 36, 0.2);
-        }
-
-        .hero-description {
-            max-width: 800px;
-            margin: 0 auto 80px;
-        }
-
-        .hero-description h1 {
-            color: var(--neon-gold);
-            font-size: 2.5rem;
-            font-weight: 900;
-            margin-bottom: 20px;
-            text-transform: uppercase;
-            letter-spacing: -1px;
-        }
-
-        .hero-description p {
-            font-size: 1.2rem;
-            color: var(--text-dim);
-            margin-bottom: 30px;
-        }
-
-        .hero-description strong {
-            color: var(--neon-blue);
-        }
-
-        /* --- FEATURE GRID --- */
-        .grid {
-            display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
-            gap: 30px;
+        .policy-card {
+            background: var(--card-bg);
+            padding: 40px;
+            border-radius: 24px;
+            border: 1px solid rgba(56, 189, 248, 0.1);
+            text-align: left;
             margin-bottom: 60px;
         }
 
-        /* Wire up links to cards */
-        .card-link {
-            text-decoration: none;
-            display: block;
-            color: inherit;
-        }
-
-        .card {
-            background-color: var(--card-bg);
-            padding: 40px;
-            border-radius: 24px;
-            border: 1px solid rgba(56, 189, 248, 0.05);
-            text-align: left;
-            transition: 0.4s ease;
-            position: relative;
-            overflow: hidden;
-            height: 100%;
-            box-sizing: border-box;
-        }
-
-        .card::before {
-            content: '';
-            position: absolute;
-            top: 0; left: 0; width: 100%; height: 4px;
-            background: linear-gradient(90deg, var(--neon-blue), transparent);
-            opacity: 0.5;
-        }
-
-        .card:hover {
-            transform: translateY(-10px);
-            border-color: var(--neon-blue);
-            box-shadow: 0 20px 40px -20px rgba(56, 189, 248, 0.4);
-        }
-
-        /* Icon Styling */
-        .card-icon {
-            width: 48px;
-            height: 48px;
+        /* This fixes the massive symbol */
+        .shield-icon {
+            width: 60px;
+            height: 60px;
             color: var(--neon-gold);
             margin-bottom: 20px;
-            filter: drop-shadow(0 0 8px rgba(251, 191, 36, 0.4));
+            display: block;
         }
 
-        .card:nth-child(even) .card-icon {
-            color: var(--neon-blue);
-            filter: drop-shadow(0 0 8px rgba(56, 189, 248, 0.4));
-        }
-
-        .card h3 {
-            color: var(--neon-blue);
-            margin-top: 0;
-            font-size: 1.5rem;
-            font-weight: 700;
-        }
-
-        .card p {
-            color: var(--text-dim);
-            font-size: 1.05rem;
-        }
-
-        /* --- FOOTER --- */
-        .amazon-box {
-            background: rgba(251, 191, 36, 0.02);
-            border: 1px solid rgba(251, 191, 36, 0.1);
-            padding: 24px;
-            border-radius: 16px;
+        .policy-card h1 {
             color: var(--neon-gold);
-            font-size: 0.9rem;
-            margin-top: 60px;
-            margin-bottom: 80px;
+            font-size: 2.2rem;
+            margin: 0 0 10px 0;
         }
 
-        .quote-section {
-            font-style: italic;
-            color: var(--text-main);
-            font-size: 1.4rem;
-            margin: 80px 0;
-            opacity: 0.8;
-            border-left: 4px solid var(--neon-blue);
-            padding-left: 20px;
-            text-align: left;
-            max-width: 800px;
-            margin-left: auto;
-            margin-right: auto;
+        .last-updated {
+            color: var(--text-dim);
+            font-size: 0.9rem;
+            display: block;
+            margin-bottom: 30px;
+        }
+
+        .policy-card h2 {
+            color: var(--neon-blue);
+            margin-top: 30px;
+            font-size: 1.5rem;
+        }
+
+        .policy-card p {
+            color: var(--text-dim);
+            font-size: 1.1rem;
+        }
+
+        .affiliate-highlight {
+            background: rgba(56, 189, 248, 0.05);
+            padding: 20px;
+            border-left: 4px solid var(--neon-gold);
+            margin: 30px 0;
+        }
+
+        .contact-box {
+            margin-top: 40px;
+            padding-top: 30px;
+            border-top: 1px solid rgba(255,255,255,0.1);
+        }
+
+        .contact-email {
+            color: var(--neon-blue);
+            font-weight: bold;
+            text-decoration: none;
+            font-size: 1.2rem;
+        }
+
+        .fb-link {
+            display: inline-block;
+            margin-top: 15px;
+            color: var(--neon-gold);
+            text-decoration: none;
+            font-weight: bold;
+        }
+
+        /* --- MOBILE FIXES --- */
+        @media (max-width: 600px) {
+            nav {
+                flex-direction: column !important;
+                align-items: center !important;
+                gap: 20px !important;
+            }
+            
+            nav a {
+                display: block !important;
+                width: 100%;
+                text-align: center;
+                font-size: 1.1rem;
+                letter-spacing: 2px;
+            }
+
+            .policy-card { padding: 25px; }
+            .policy-card h1 { font-size: 1.6rem; }
         }
 
         footer {
-            padding: 80px 0 40px;
-            border-top: 1px solid rgba(255, 255, 255, 0.05);
+            padding: 40px 0;
             color: #4b5563;
             font-size: 0.85rem;
-        }
-
-        footer a { color: inherit; text-decoration: none; margin: 0 15px; }
-        footer a:hover { color: var(--neon-blue); }
-
-        @media (max-width: 600px) {
-            nav { flex-direction: column; gap: 20px; margin-top: 30px; }
-            nav a { font-size: 1.1rem; letter-spacing: 2px; }
-            .hero-description h1 { font-size: 1.8rem; }
-            .section-title { font-size: 1.5rem; }
+            text-align: center;
         }
     </style>
 </head>
@@ -277,10 +199,9 @@
     </header>
 
     <div class="container">
-        <div class="glow-divider"></div>
-
         <article class="policy-card">
             <div class="header-section">
+                <!-- SVG Shield Icon -->
                 <svg class="shield-icon" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z"></path>
                 </svg>
