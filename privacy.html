@@ -1,18 +1,75 @@
-Privacy Policy & Disclosures
-Last Updated: April 2026
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Privacy & Disclosures | Hopes and Dreams</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;700;900&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --bg-main: #03091f; 
+            --card-bg: #0d162d; 
+            --neon-blue: #38bdf8;
+            --neon-gold: #fbbf24;
+            --text-main: #f8fafc;
+            --text-dim: #94a3b8;
+        }
 
-At Hopes and Dreams, your privacy is a priority. This policy outlines how we handle information and our relationship with third-party programs.
+        body {
+            background-color: var(--bg-main);
+            color: var(--text-main);
+            font-family: 'Inter', sans-serif;
+            margin: 0;
+            padding: 0;
+            line-height: 1.6;
+            overflow-x: hidden;
+        }
 
-1. Information We Collect
-We do not currently require user registration. We may collect minimal, non-identifying data (such as browser type or time spent on page) via standard web logs to improve our content.
+        /* --- HEADER & NAV (Matches Index Exactly) --- */
+        header {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            width: 100%;
+            padding: 40px 0 20px 0;
+            background-color: var(--bg-main);
+        }
 
-2. Cookies
-We may use basic cookies to enhance your browsing experience. You can choose to disable cookies through your individual browser settings.
+        .logo-wrap {
+            width: 95%;
+            max-width: 700px;
+            position: relative;
+            line-height: 0;
+        }
 
-3. Affiliate Disclosure (Amazon Associates)
-Hopes and Dreams is a participant in the Amazon Services LLC Associates Program, an affiliate advertising program designed to provide a means for sites to earn advertising fees by advertising and linking to Amazon.ca and Amazon.com.
+        .logo-wrap img {
+            width: 100%;
+            height: auto;
+            display: block;
+            filter: contrast(1.15) brightness(0.95) saturate(1.1);
+            -webkit-mask-image: radial-gradient(circle, rgba(0,0,0,1) 45%, rgba(0,0,0,0) 95%);
+            mask-image: radial-gradient(circle, rgba(0,0,0,1) 45%, rgba(0,0,0,0) 95%);
+        }
 
-Important: As an Amazon Associate, I earn from qualifying purchases. This comes at no extra cost to you and helps support the growth of our community.
+        nav {
+            margin-top: 40px; 
+            padding-bottom: 60px;
+            z-index: 10;
+            position: relative;
+            display: flex;
+            gap: 40px;
+        }
 
-4. Contact Us
-If you have questions regarding this policy or the Hopes and Dreams project, you can reach out to us directly through our official Facebook Group.
+        nav a {
+            color: var(--neon-blue);
+            text-decoration: none;
+            font-size: 1.3rem; 
+            font-weight: 800; 
+            text-transform: uppercase;
+            letter-spacing: 4px;
+            transition: all 0.3s ease;
+            opacity: 0.9;
+            text-shadow: 0 0 10px rgba(56, 189, 248, 0.3);
+        }
+
+        nav a:hover, nav a.active
