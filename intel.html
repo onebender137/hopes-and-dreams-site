@@ -6,6 +6,25 @@
     <title>Syndicate Intel Hub | Hopes and Dreams</title>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;700;900&display=swap" rel="stylesheet">
     <style>
+  /* This targets your navigation links specifically on mobile */
+  @media (max-width: 600px) {
+    nav, .menu, header { 
+      display: flex !important;
+      flex-direction: column !important;
+      align-items: center !important;
+    }
+    
+    nav a, .nav-link {
+      display: block !important;
+      width: 100%;
+      text-align: center;
+      padding: 10px 0;
+      margin: 5px 0;
+    }
+  }
+</style>
+    
+    <style>
         :root {
             --bg-main: #0a0f2b; 
             --card-bg: #0d162d; 
