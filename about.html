@@ -4,7 +4,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>About Us | Hopes and Dreams Syndicate</title>
+    <title>About Us | Hopes and Dreams</title>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;700;900&display=swap" rel="stylesheet">
     <style>
         :root {
@@ -17,53 +17,51 @@
         }
 
         body {
-            background-color: var(--bg-main);
+            background-color: #0a0f2b; 
             color: var(--text-main);
             font-family: 'Inter', sans-serif;
-            margin: 0; padding: 0; line-height: 1.6;
+            margin: 0;
+            padding: 0;
+            line-height: 1.6;
             overflow-x: hidden;
         }
 
+        /* --- HEADER --- */
         header {
             display: flex;
             flex-direction: column;
             align-items: center;
             width: 100%;
             padding: 40px 0 20px 0;
-            background-color: var(--bg-main);
-            min-height: 280px;
+            background-color: #0a0f2b;
         }
 
         .logo-wrap {
             width: 95%;
             max-width: 700px;
-            height: 150px;
-            display: flex;
-            align-items: center;
-            justify-content: center;
             position: relative;
+            line-height: 0;
         }
 
         .logo-wrap img {
             width: 100%;
             height: auto;
-            max-height: 150px;
-            object-fit: contain;
             display: block;
             filter: contrast(1.15) brightness(0.95) saturate(1.1);
             -webkit-mask-image: radial-gradient(circle, rgba(0,0,0,1) 45%, rgba(0,0,0,0) 95%);
             mask-image: radial-gradient(circle, rgba(0,0,0,1) 45%, rgba(0,0,0,0) 95%);
         }
 
+        /* --- NAVIGATION --- */
         nav {
             margin-top: 40px; 
             padding-bottom: 60px;
             z-index: 10;
+            position: relative;
             display: flex;
-            gap: 30px;
+            gap: 40px;
             flex-wrap: wrap;
             justify-content: center;
-            width: 100%;
         }
 
         nav a {
@@ -72,11 +70,10 @@
             font-size: 1.2rem; 
             font-weight: 800;
             text-transform: uppercase;
-            letter-spacing: 3px;
+            letter-spacing: 4px;
             transition: all 0.3s ease;
             opacity: 0.9;
             text-shadow: 0 0 10px rgba(56, 189, 248, 0.3);
-            white-space: nowrap;
         }
 
         nav a:hover {
@@ -86,55 +83,108 @@
             transform: scale(1.1);
         }
 
-        @media (max-width: 600px) {
-            header { min-height: auto; padding-top: 20px; }
-            nav { flex-direction: column; gap: 15px; margin-top: 20px; padding-bottom: 40px; }
-            nav a { font-size: 1.1rem; letter-spacing: 2px; }
-            .logo-wrap { height: 100px; }
-            .logo-wrap img { max-height: 100px; }
+        /* --- CONTENT SECTION --- */
+        .container {
+            max-width: 800px; 
+            margin: 0 auto;
+            padding: 0 24px;
+            text-align: center;
         }
 
-        .container { max-width: 800px; margin: 0 auto; padding: 0 24px; text-align: center; }
-        
         .glow-divider {
-            width: 100%; height: 1px;
+            width: 100%;
+            height: 1px;
             background: radial-gradient(circle, var(--neon-blue) 0%, transparent 70%);
-            opacity: 0.2; margin: 60px 0;
+            opacity: 0.2;
+            margin: 60px 0;
         }
 
         .page-title {
-            color: var(--neon-gold); font-size: 2.5rem; font-weight: 900;
-            text-transform: uppercase; letter-spacing: 2px; margin-bottom: 20px;
+            color: var(--neon-gold);
+            font-size: 2.5rem;
+            font-weight: 900;
+            text-transform: uppercase;
+            letter-spacing: 2px;
+            margin-bottom: 20px;
             text-shadow: 0 0 15px rgba(251, 191, 36, 0.2);
         }
 
+        /* --- UNDER CONSTRUCTION BANNER --- */
         .construction-banner {
             background-color: rgba(251, 191, 36, 0.05);
             border: 2px dashed var(--neon-gold);
-            border-radius: 16px; padding: 50px 30px;
-            margin: 40px auto 80px; max-width: 600px;
-            display: flex; flex-direction: column; align-items: center;
+            border-radius: 16px;
+            padding: 50px 30px;
+            margin: 40px auto 80px;
+            max-width: 600px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            box-shadow: inset 0 0 30px rgba(251, 191, 36, 0.05);
         }
 
-        .construction-icon { width: 80px; height: 80px; color: var(--neon-gold); margin-bottom: 20px; }
-        
+        .construction-icon {
+            width: 80px;
+            height: 80px;
+            color: var(--neon-gold);
+            margin-bottom: 20px;
+            filter: drop-shadow(0 0 10px rgba(251, 191, 36, 0.4));
+        }
+
+        .construction-banner h2 {
+            color: var(--neon-gold);
+            font-size: 1.8rem;
+            margin: 0 0 15px 0;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+        }
+
+        .construction-banner p {
+            color: var(--text-dim);
+            font-size: 1.1rem;
+            margin: 0 0 25px 0;
+            max-width: 450px;
+        }
+
         .circa-badge {
-            background-color: var(--card-bg); border: 1px solid var(--neon-blue);
-            color: var(--neon-blue); padding: 8px 16px; border-radius: 50px;
-            font-size: 0.9rem; font-weight: 700; text-transform: uppercase;
+            background-color: var(--card-bg);
+            border: 1px solid var(--neon-blue);
+            color: var(--neon-blue);
+            padding: 8px 16px;
+            border-radius: 50px;
+            font-size: 0.9rem;
+            font-weight: 700;
+            letter-spacing: 1px;
+            text-transform: uppercase;
+            box-shadow: 0 0 10px rgba(56, 189, 248, 0.2);
         }
 
+        /* --- FOOTER --- */
         footer {
-            padding: 80px 0 40px; border-top: 1px solid rgba(255, 255, 255, 0.05);
-            color: #4b5563; font-size: 0.85rem;
+            padding: 80px 0 40px;
+            border-top: 1px solid rgba(255, 255, 255, 0.05);
+            color: #4b5563;
+            font-size: 0.85rem;
+            margin-top: auto;
         }
 
         footer a { color: inherit; text-decoration: none; margin: 0 15px; }
+        footer a:hover { color: var(--neon-blue); }
+
+        @media (max-width: 600px) {
+            nav { flex-direction: column; gap: 20px; margin-top: 30px; }
+            nav a { font-size: 1.1rem; letter-spacing: 2px; }
+            .page-title { font-size: 2rem; }
+        }
     </style>
 </head>
 <body>
+
     <header>
-        <div class="logo-wrap"><img src="https://raw.githubusercontent.com/onebender137/hopes-and-dreams-site/main/TOPPER.jpg" alt="Hopes and Dreams"></div>
+        <div class="logo-wrap">
+            <img src="https://raw.githubusercontent.com/onebender137/hopes-and-dreams-site/main/TOPPER.jpg" alt="Hopes and Dreams">
+        </div>
+        
         <nav>
             <a href="index.html">Home</a>
             <a href="shop.html">Procurement</a>
@@ -143,22 +193,31 @@
             <a href="privacy.html">Privacy</a>
         </nav>
     </header>
+
     <div class="container">
         <div class="glow-divider"></div>
+
         <h1 class="page-title">The Blueprint</h1>
+
         <div class="construction-banner">
             <svg class="construction-icon" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 002.573 1.066c1.543-.94 3.31.826 2.37 2.37a1.724 1.724 0 001.065 2.572c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 00-1.066 2.573c.94 1.543-.826 3.31-2.37 2.37a1.724 1.724 0 00-2.572 1.065c-.426 1.756-2.924 1.756-3.35 0a1.724 1.724 0 00-2.573-1.066c-1.543.94-3.31-.826-2.37-2.37a1.724 1.724 0 00-1.065-2.572c-1.756-.426-1.756-2.924 0-3.35a1.724 1.724 0 001.066-2.573c-.94-1.543.826-3.31 2.37-2.37.996.608 2.296.07 2.572-1.065z"></path>
                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"></path>
             </svg>
+            
             <h2>Under Construction</h2>
-            <p>We are architecting the full Syndicate dossier. Stay tuned for the technical background.</p>
-            <div class="circa-badge">Initiated: April 2026</div>
+            <p>We are currently architecting this section of the hub. The full dossier and technical background of the Syndicate are being finalized.</p>
+            
+            <div class="circa-badge">
+                Initiated: April 2026
+            </div>
         </div>
+
         <footer>
             <p>&copy; 2026 Hopes and Dreams. All Rights Reserved.</p>
             <p><a href="privacy.html">Privacy Policy</a> | <a href="about.html">Contact Us</a></p>
         </footer>
     </div>
+
 </body>
 </html>
