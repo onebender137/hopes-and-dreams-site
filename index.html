@@ -25,21 +25,23 @@
             overflow-x: hidden;
         }
 
-        /* --- LOCKED HEADER --- */
+      /* --- UNIFIED SYNDICATE HEADER --- */
         header {
             display: flex;
             flex-direction: column;
             align-items: center;
             width: 100%;
-            padding: 40px 0 0 0; /* Fixed top padding */
+            padding: 40px 0 20px 0;
             background-color: #0a0f2b;
-            min-height: 280px; /* Forces header to always be the same height */
+            min-height: 280px; /* Locks vertical height to stop bouncing */
         }
 
         .logo-wrap {
             width: 95%;
             max-width: 700px;
-            height: 180px; /* Fixed height for logo area */
+            position: relative;
+            line-height: 0;
+            height: 150px; /* Fixed height for logo container */
             display: flex;
             align-items: center;
             justify-content: center;
@@ -49,39 +51,49 @@
             width: 100%;
             height: auto;
             max-height: 150px;
-            object-fit: contain;
+            display: block;
             filter: contrast(1.15) brightness(0.95) saturate(1.1);
             -webkit-mask-image: radial-gradient(circle, rgba(0,0,0,1) 45%, rgba(0,0,0,0) 95%);
             mask-image: radial-gradient(circle, rgba(0,0,0,1) 45%, rgba(0,0,0,0) 95%);
         }
 
-        /* --- LOCKED NAVIGATION --- */
+        /* --- UNIFIED NAVIGATION --- */
         nav {
-            margin-top: 20px;
-            padding-bottom: 40px;
+            margin-top: 40px; 
+            padding-bottom: 60px;
+            z-index: 10;
+            position: relative;
             display: flex;
-            gap: 25px; /* Consistent spacing */
+            gap: 30px; /* Fixed spacing for all pages */
             flex-wrap: wrap;
             justify-content: center;
             width: 100%;
-            max-width: 800px;
         }
 
         nav a {
             color: var(--neon-blue);
             text-decoration: none;
-            font-size: 1.1rem; /* Uniform font size for mobile/desktop */
+            font-size: 1.2rem; 
             font-weight: 800;
             text-transform: uppercase;
-            letter-spacing: 2px;
+            letter-spacing: 3px;
             transition: all 0.3s ease;
-            white-space: nowrap; /* Prevents single words from breaking */
+            opacity: 0.9;
+            text-shadow: 0 0 10px rgba(56, 189, 248, 0.3);
+            white-space: nowrap; /* Prevents text from breaking mid-word */
         }
 
         nav a:hover {
             color: var(--neon-gold);
-            text-shadow: 0 0 15px var(--neon-blue);
-            transform: scale(1.05);
+            opacity: 1;
+            text-shadow: 0 0 20px var(--neon-blue), 0 0 10px var(--neon-gold);
+            transform: scale(1.1);
+        }
+
+        @media (max-width: 600px) {
+            header { min-height: auto; padding-top: 20px; }
+            nav { flex-direction: column; gap: 15px; margin-top: 20px; }
+            nav a { font-size: 1.1rem; letter-spacing: 2px; }
         }
 
         /* --- CONTENT SECTION --- */
