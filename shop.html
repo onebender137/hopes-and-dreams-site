@@ -1,0 +1,178 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Procurement | Hopes and Dreams Syndicate</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;700;900&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --bg-main: #0a0f2b; 
+            --card-bg: #0d162d; 
+            --neon-blue: #38bdf8;
+            --neon-gold: #fbbf24;
+            --text-main: #f8fafc;
+            --text-dim: #94a3b8;
+        }
+
+        body {
+            background-color: var(--bg-main);
+            color: var(--text-main);
+            font-family: 'Inter', sans-serif;
+            margin: 0; padding: 0; line-height: 1.6;
+        }
+
+        header {
+            display: flex; flex-direction: column; align-items: center;
+            width: 100%; padding: 40px 0 20px 0; background-color: var(--bg-main);
+        }
+
+        .logo-wrap { width: 95%; max-width: 700px; line-height: 0; }
+        .logo-wrap img { width: 100%; height: auto; filter: contrast(1.1) brightness(0.9); }
+
+        nav { margin-top: 40px; padding-bottom: 60px; display: flex; gap: 40px; }
+        nav a {
+            color: var(--neon-blue); text-decoration: none; font-size: 1.1rem; 
+            font-weight: 800; text-transform: uppercase; letter-spacing: 3px;
+        }
+        nav a:hover { color: var(--neon-gold); text-shadow: 0 0 10px var(--neon-blue); }
+
+        .container { max-width: 1100px; margin: 0 auto; padding: 0 24px 100px; text-align: center; }
+
+        h1 { color: var(--neon-gold); text-transform: uppercase; letter-spacing: 4px; margin-bottom: 10px; }
+        .subtitle { color: var(--text-dim); margin-bottom: 60px; font-size: 1.1rem; text-transform: uppercase; letter-spacing: 2px; }
+
+        /* Procurement Grid */
+        .shop-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+            gap: 25px;
+        }
+
+        .item-card {
+            background-color: var(--card-bg);
+            padding: 30px;
+            border-radius: 20px;
+            border: 1px solid rgba(56, 189, 248, 0.1);
+            text-align: left;
+            transition: 0.3s;
+            display: flex;
+            flex-direction: column;
+            justify-content: space-between;
+        }
+
+        .item-card:hover {
+            border-color: var(--neon-gold);
+            transform: translateY(-5px);
+            box-shadow: 0 10px 30px -10px rgba(251, 191, 36, 0.2);
+        }
+
+        .tag {
+            font-size: 0.7rem;
+            text-transform: uppercase;
+            color: var(--neon-blue);
+            font-weight: 900;
+            letter-spacing: 1px;
+            margin-bottom: 10px;
+            display: block;
+        }
+
+        .item-card h3 { color: var(--text-main); margin: 0 0 10px 0; font-size: 1.3rem; }
+        .item-card p { color: var(--text-dim); font-size: 0.95rem; margin-bottom: 20px; flex-grow: 1; }
+
+        .buy-btn {
+            display: block;
+            text-align: center;
+            background: transparent;
+            color: var(--neon-gold);
+            border: 1px solid var(--neon-gold);
+            padding: 10px;
+            border-radius: 8px;
+            text-decoration: none;
+            font-weight: 700;
+            text-transform: uppercase;
+            font-size: 0.8rem;
+            transition: 0.3s;
+        }
+
+        .buy-btn:hover {
+            background: var(--neon-gold);
+            color: var(--bg-main);
+        }
+
+        .disclaimer {
+            margin-top: 80px;
+            padding: 20px;
+            border-top: 1px solid rgba(255,255,255,0.05);
+            color: #4b5563;
+            font-size: 0.8rem;
+        }
+    </style>
+</head>
+<body>
+
+    <header>
+        <div class="logo-wrap">
+            <img src="https://raw.githubusercontent.com/onebender137/hopes-and-dreams-site/main/TOPPER.jpg" alt="Hopes and Dreams">
+        </div>
+        <nav>
+            <a href="index.html">Home</a>
+            <a href="intel.html">Intel Hub</a>
+            <a href="shop.html" style="color: var(--neon-gold)">Procurement</a>
+            <a href="about.html">About</a>
+        </nav>
+    </header>
+
+    <div class="container">
+        <h1>Syndicate Procurement</h1>
+        <div class="subtitle">Vetted Tools for Cognitive Sovereignty</div>
+
+        <div class="shop-grid">
+            <!-- Item 1: Huperzine A -->
+            <div class="item-card">
+                <div>
+                    <span class="tag">Lucid Dreaming / AChE</span>
+                    <h3>Huperzine-A</h3>
+                    <p>The core of the Yuschak Protocol. Essential for maintaining high acetylcholine levels during REM cycles.</p>
+                </div>
+                <a href="https://amzn.to/3PY1ehV" target="_blank" class="buy-btn">Acquire via Amazon.ca</a>
+            </div>
+
+            <!-- Item 2: Alpha GPC -->
+            <div class="item-card">
+                <div>
+                    <span class="tag">Neuro-Optimization</span>
+                    <h3>Alpha GPC Choline</h3>
+                    <p>High-bioavailability choline source for memory retention and neurotransmitter synthesis.</p>
+                </div>
+                <a href="https://amzn.to/4mhwkxa" target="_blank" class="buy-btn">Acquire via Amazon.ca</a>
+            </div>
+
+            <!-- Item 3: 5-HTP -->
+            <div class="item-card">
+                <div>
+                    <span class="tag">Sleep / Mood</span>
+                    <h3>5-HTP (200mg)</h3>
+                    <p>Serotonin precursor to optimize deep sleep stages and emotional resilience.</p>
+                </div>
+                <a href="https://amzn.to/4ttDRuZ" target="_blank" class="buy-btn">Acquire via Amazon.ca</a>
+            </div>
+
+            <!-- Item 4: Agmatine Sulfate -->
+            <div class="item-card">
+                <div>
+                    <span class="tag">Focus / Pump</span>
+                    <h3>Agmatine Sulfate</h3>
+                    <p>Neuromodulator for focus and physical output. High purity for peak systemic performance.</p>
+                </div>
+                <a href="https://amzn.to/4t5ObKc" target="_blank" class="buy-btn">Acquire via Amazon.ca</a>
+            </div>
+        </div>
+
+        <div class="disclaimer">
+            *As an Amazon Associate, I earn from qualifying purchases. This procurement hub supports Syndicate infrastructure. Not medical advice.
+        </div>
+    </div>
+
+</body>
+</html>
