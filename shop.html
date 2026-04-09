@@ -20,26 +20,57 @@
             color: var(--text-main);
             font-family: 'Inter', sans-serif;
             margin: 0; padding: 0; line-height: 1.6;
+            overflow-x: hidden;
         }
 
+        /* --- HEADER --- */
         header {
             display: flex; flex-direction: column; align-items: center;
             width: 100%; padding: 40px 0 20px 0; background-color: var(--bg-main);
         }
 
         .logo-wrap { width: 95%; max-width: 700px; line-height: 0; }
-        .logo-wrap img { width: 100%; height: auto; filter: contrast(1.1) brightness(0.9); }
-
-        nav { margin-top: 40px; padding-bottom: 60px; display: flex; gap: 40px; }
-        nav a {
-            color: var(--neon-blue); text-decoration: none; font-size: 1.1rem; 
-            font-weight: 800; text-transform: uppercase; letter-spacing: 3px;
+        .logo-wrap img { 
+            width: 100%; height: auto; 
+            filter: contrast(1.15) brightness(0.95) saturate(1.1);
+            -webkit-mask-image: radial-gradient(circle, rgba(0,0,0,1) 45%, rgba(0,0,0,0) 95%);
+            mask-image: radial-gradient(circle, rgba(0,0,0,1) 45%, rgba(0,0,0,0) 95%);
         }
-        nav a:hover { color: var(--neon-gold); text-shadow: 0 0 10px var(--neon-blue); }
+
+        /* --- NAVIGATION --- */
+        nav {
+            margin-top: 40px; 
+            padding-bottom: 60px;
+            z-index: 10;
+            position: relative;
+            display: flex;
+            gap: 40px;
+            flex-wrap: wrap;
+            justify-content: center;
+        }
+
+        nav a {
+            color: var(--neon-blue);
+            text-decoration: none;
+            font-size: 1.2rem; 
+            font-weight: 800;
+            text-transform: uppercase;
+            letter-spacing: 4px;
+            transition: all 0.3s ease;
+            opacity: 0.9;
+            text-shadow: 0 0 10px rgba(56, 189, 248, 0.3);
+        }
+
+        nav a:hover {
+            color: var(--neon-gold);
+            opacity: 1;
+            text-shadow: 0 0 20px var(--neon-blue), 0 0 10px var(--neon-gold);
+            transform: scale(1.1);
+        }
 
         .container { max-width: 1100px; margin: 0 auto; padding: 0 24px 100px; text-align: center; }
 
-        h1 { color: var(--neon-gold); text-transform: uppercase; letter-spacing: 4px; margin-bottom: 10px; }
+        h1 { color: var(--neon-gold); text-transform: uppercase; letter-spacing: 4px; margin-bottom: 10px; font-size: 2.5rem; font-weight: 900; }
         .subtitle { color: var(--text-dim); margin-bottom: 60px; font-size: 1.1rem; text-transform: uppercase; letter-spacing: 2px; }
 
         /* Procurement Grid */
@@ -117,9 +148,10 @@
         </div>
         <nav>
             <a href="index.html">Home</a>
-            <a href="intel.html">Intel Hub</a>
             <a href="shop.html" style="color: var(--neon-gold)">Procurement</a>
+            <a href="intel.html">Intel Hub</a>
             <a href="about.html">About</a>
+            <a href="privacy.html">Privacy</a>
         </nav>
     </header>
 
