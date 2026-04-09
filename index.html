@@ -40,7 +40,6 @@
             max-width: 700px;
             position: relative;
             line-height: 0;
-            background-color: #0a0f2b;
         }
 
         .logo-wrap img {
@@ -60,12 +59,14 @@
             position: relative;
             display: flex;
             gap: 40px;
+            flex-wrap: wrap;
+            justify-content: center;
         }
 
         nav a {
             color: var(--neon-blue);
             text-decoration: none;
-            font-size: 1.3rem; 
+            font-size: 1.2rem; 
             font-weight: 800;
             text-transform: uppercase;
             letter-spacing: 4px;
@@ -139,7 +140,6 @@
             margin-bottom: 60px;
         }
 
-        /* Wire up links to cards */
         .card-link {
             text-decoration: none;
             display: block;
@@ -173,7 +173,6 @@
             box-shadow: 0 20px 40px -20px rgba(56, 189, 248, 0.4);
         }
 
-        /* Icon Styling */
         .card-icon {
             width: 48px;
             height: 48px;
@@ -251,8 +250,8 @@
         </div>
         
         <nav>
-            <a href="index.html">Home</a>
-            <a href="shop.html">Shop</a>
+            <a href="index.html" style="color: var(--neon-gold)">Home</a>
+            <a href="shop.html">Procurement</a>
             <a href="intel.html">Intel Hub</a>
             <a href="about.html">About</a>
             <a href="privacy.html">Privacy</a>
