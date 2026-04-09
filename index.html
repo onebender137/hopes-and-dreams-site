@@ -7,7 +7,7 @@
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;700;900&display=swap" rel="stylesheet">
     <style>
         :root {
-            --bg-main: #03091f; /* Your exact GIMP code */
+            --bg-main: #03091f; 
             --card-bg: #0d162d; 
             --neon-blue: #38bdf8;
             --neon-gold: #fbbf24;
@@ -47,22 +47,15 @@
             width: 100%;
             height: auto;
             display: block;
-
-            /* 1. CRUSH THE BLACKS: 
-               By bumping contrast and dropping brightness slightly, 
-               the dark blue pixels are forced to match the background deeper. */
             filter: contrast(1.15) brightness(0.95) saturate(1.1);
-
-            /* 2. AGGRESSIVE MASK: 
-               We start the fade-out at 40% now instead of 60%. 
-               This kills the corners and edges of the "box" completely. */
             -webkit-mask-image: radial-gradient(circle, rgba(0,0,0,1) 40%, rgba(0,0,0,0) 95%);
             mask-image: radial-gradient(circle, rgba(0,0,0,1) 40%, rgba(0,0,0,0) 95%);
         }
 
         nav {
-            margin-top: -15px; 
-            padding-bottom: 50px;
+            /* FIXED: Moved them down by removing the negative margin */
+            margin-top: 20px; 
+            padding-bottom: 60px;
             z-index: 10;
             position: relative;
         }
@@ -70,19 +63,20 @@
         nav a {
             color: var(--neon-blue);
             text-decoration: none;
-            margin: 0 20px;
-            font-size: 0.85rem;
+            margin: 0 25px;
+            /* FIXED: Made them bigger */
+            font-size: 1.1rem; 
             font-weight: 700;
             text-transform: uppercase;
             letter-spacing: 3px;
             transition: 0.3s;
-            opacity: 0.7;
+            opacity: 0.8;
         }
 
         nav a:hover {
             color: var(--neon-gold);
             opacity: 1;
-            text-shadow: 0 0 10px var(--neon-blue);
+            text-shadow: 0 0 15px var(--neon-blue);
         }
 
         /* --- CONTENT --- */
@@ -109,11 +103,6 @@
         .hero-description p {
             font-size: 1.25rem;
             color: var(--text-dim);
-            font-weight: 400;
-        }
-
-        .hero-description strong {
-            color: var(--neon-blue);
         }
 
         /* --- GRID --- */
@@ -165,7 +154,8 @@
         }
 
         @media (max-width: 600px) {
-            nav a { margin: 0 10px; font-size: 0.75rem; }
+            nav { display: flex; flex-direction: column; gap: 20px; align-items: center; }
+            nav a { margin: 0; font-size: 1rem; }
         }
     </style>
 </head>
