@@ -16,41 +16,39 @@
         }
 
         body {
-            background-color: #0a0f2b; 
+            background-color: var(--bg-main);
             color: var(--text-main);
             font-family: 'Inter', sans-serif;
-            margin: 0;
-            padding: 0;
-            line-height: 1.6;
+            margin: 0; padding: 0; line-height: 1.6;
             overflow-x: hidden;
         }
 
-      /* --- UNIFIED SYNDICATE HEADER --- */
+        /* --- UNIFIED SYNDICATE HEADER --- */
         header {
             display: flex;
             flex-direction: column;
             align-items: center;
             width: 100%;
             padding: 40px 0 20px 0;
-            background-color: #0a0f2b;
-            min-height: 280px; /* Locks vertical height to stop bouncing */
+            background-color: var(--bg-main);
+            min-height: 280px; /* Prevents vertical bouncing */
         }
 
         .logo-wrap {
             width: 95%;
             max-width: 700px;
-            position: relative;
-            line-height: 0;
-            height: 150px; /* Fixed height for logo container */
+            height: 150px; /* Fixed height container */
             display: flex;
             align-items: center;
             justify-content: center;
+            position: relative;
         }
 
         .logo-wrap img {
             width: 100%;
             height: auto;
             max-height: 150px;
+            object-fit: contain;
             display: block;
             filter: contrast(1.15) brightness(0.95) saturate(1.1);
             -webkit-mask-image: radial-gradient(circle, rgba(0,0,0,1) 45%, rgba(0,0,0,0) 95%);
@@ -62,9 +60,8 @@
             margin-top: 40px; 
             padding-bottom: 60px;
             z-index: 10;
-            position: relative;
             display: flex;
-            gap: 30px; /* Fixed spacing for all pages */
+            gap: 30px;
             flex-wrap: wrap;
             justify-content: center;
             width: 100%;
@@ -80,7 +77,7 @@
             transition: all 0.3s ease;
             opacity: 0.9;
             text-shadow: 0 0 10px rgba(56, 189, 248, 0.3);
-            white-space: nowrap; /* Prevents text from breaking mid-word */
+            white-space: nowrap;
         }
 
         nav a:hover {
@@ -92,8 +89,10 @@
 
         @media (max-width: 600px) {
             header { min-height: auto; padding-top: 20px; }
-            nav { flex-direction: column; gap: 15px; margin-top: 20px; }
+            nav { flex-direction: column; gap: 15px; margin-top: 20px; padding-bottom: 40px; }
             nav a { font-size: 1.1rem; letter-spacing: 2px; }
+            .logo-wrap { height: 100px; }
+            .logo-wrap img { max-height: 100px; }
         }
 
         /* --- CONTENT SECTION --- */
@@ -247,13 +246,6 @@
 
         footer a { color: inherit; text-decoration: none; margin: 0 15px; }
         footer a:hover { color: var(--neon-blue); }
-
-        @media (max-width: 600px) {
-            nav { flex-direction: column; gap: 20px; margin-top: 30px; }
-            nav a { font-size: 1.1rem; letter-spacing: 2px; }
-            .hero-description h1 { font-size: 1.8rem; }
-            .section-title { font-size: 1.5rem; }
-        }
     </style>
 </head>
 <body>
