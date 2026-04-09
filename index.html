@@ -4,7 +4,6 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Hopes and Dreams | Turning Ambition into Action</title>
-    <!-- Added heavier weights for that 'Pro' look -->
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;700;900&display=swap" rel="stylesheet">
     <style>
         :root {
@@ -32,28 +31,26 @@
             flex-direction: column;
             align-items: center;
             width: 100%;
-            padding: 10px 0 40px 0;
-            /* Removed the gradient here to ensure the logo blend is 100% crisp */
+            padding: 20px 0 30px 0; /* Balanced padding */
             background: var(--bg-black);
         }
 
         .logo-wrap {
             width: 100%;
-            max-width: 700px; /* Made slightly larger */
+            max-width: 650px; 
             line-height: 0;
         }
 
         .logo-wrap img {
             width: 100%;
             height: auto;
-            /* Blends the JPG black into the CSS black */
             mix-blend-mode: screen; 
             display: block;
         }
 
         nav {
-            /* Adjusted to give the logo text some breathing room */
-            margin-top: -30px; 
+            /* FIXED: Removed the negative margin so links sit below the image */
+            margin-top: 10px; 
             z-index: 10;
             position: relative;
         }
@@ -62,7 +59,7 @@
             color: var(--neon-blue);
             text-decoration: none;
             margin: 0 20px;
-            font-size: 0.8rem;
+            font-size: 0.85rem;
             font-weight: 700;
             text-transform: uppercase;
             letter-spacing: 3px;
@@ -84,13 +81,13 @@
             text-align: center;
         }
 
-        /* Subtle glow transition between header and content */
         .glow-divider {
             width: 100%;
             height: 1px;
             background: radial-gradient(circle, var(--neon-blue) 0%, transparent 70%);
             opacity: 0.2;
             margin-bottom: 60px;
+            margin-top: 20px;
         }
 
         .hero-description {
@@ -102,12 +99,10 @@
             font-size: 1.2rem;
             color: var(--text-dim);
             line-height: 1.8;
-            font-weight: 400;
         }
 
         .hero-description strong {
             color: var(--neon-blue);
-            font-weight: 700;
         }
 
         /* --- FEATURE GRID --- */
@@ -123,13 +118,30 @@
             padding: 40px;
             border-radius: 24px;
             border: 1px solid rgba(56, 189, 248, 0.05);
-            transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+            transition: all 0.4s ease;
             text-align: left;
-            position: relative;
-            overflow: hidden;
         }
 
         .card:hover {
-            transform: translateY(-12px);
+            transform: translateY(-10px);
             border-color: var(--neon-blue);
-            box-shadow: 0 20px 40px -20px rgba(
+            box-shadow: 0 20px 40px -20px rgba(56, 189, 248, 0.4);
+        }
+
+        .card h3 {
+            margin-top: 0;
+            color: var(--neon-blue);
+            font-size: 1.4rem;
+            font-weight: 700;
+            margin-bottom: 15px;
+        }
+
+        .card p {
+            color: var(--text-dim);
+            font-size: 1rem;
+            margin-bottom: 0;
+        }
+
+        /* --- DISCLOSURE & FOOTER --- */
+        .amazon-box {
+            background: rgba(251, 191, 3
