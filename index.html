@@ -7,6 +7,7 @@
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;700;900&display=swap" rel="stylesheet">
     <style>
         :root {
+            /* Using pure black to help the blend */
             --bg-black: #000000;
             --card-bg: #0a0e1a;
             --neon-blue: #38bdf8;
@@ -30,44 +31,51 @@
             flex-direction: column;
             align-items: center;
             width: 100%;
-            padding: 40px 0;
+            padding: 40px 0 20px 0;
             background-color: var(--bg-black);
         }
 
         .logo-wrap {
             width: 90%;
-            max-width: 600px;
-            margin-bottom: 20px; /* Space between logo and nav */
+            max-width: 650px;
+            margin-bottom: 0;
         }
 
         .logo-wrap img {
             width: 100%;
             height: auto;
             display: block;
-            /* Using a filter to ensure it pops against the black */
-            filter: drop-shadow(0 0 10px rgba(56, 189, 248, 0.2));
+            
+            /* MAGIC TRICK: This blend mode combined with the filters below 
+               forces the "not-quite-black" pixels in the JPG to vanish. */
+            mix-blend-mode: screen; 
+            filter: contrast(1.1) brightness(1.1);
         }
 
         nav {
             display: flex;
             justify-content: center;
             gap: 30px;
-            padding: 10px 0;
+            padding: 0 0 40px 0;
+            /* Slight manual adjustment to sit perfectly under the image text */
+            margin-top: 10px; 
         }
 
         nav a {
             color: var(--neon-blue);
             text-decoration: none;
-            font-size: 0.9rem;
+            font-size: 0.85rem;
             font-weight: 700;
             text-transform: uppercase;
-            letter-spacing: 2px;
+            letter-spacing: 3px;
             transition: 0.3s ease;
+            opacity: 0.8;
         }
 
         nav a:hover {
             color: var(--neon-gold);
-            text-shadow: 0 0 8px var(--neon-blue);
+            opacity: 1;
+            text-shadow: 0 0 10px var(--neon-blue);
         }
 
         /* --- CONTENT --- */
@@ -78,26 +86,29 @@
             text-align: center;
         }
 
+        /* Simple divider to separate the header from content */
         .divider {
-            width: 100px;
+            width: 80px;
             height: 2px;
-            background: var(--neon-blue);
-            margin: 20px auto 50px;
-            box-shadow: 0 0 10px var(--neon-blue);
+            background: linear-gradient(90deg, transparent, var(--neon-blue), transparent);
+            margin: 0 auto 60px;
+            opacity: 0.5;
         }
 
         .hero-description {
-            max-width: 700px;
+            max-width: 750px;
             margin: 0 auto 80px;
         }
 
         .hero-description p {
             font-size: 1.2rem;
             color: var(--text-dim);
+            font-weight: 400;
         }
 
         .hero-description strong {
             color: var(--neon-blue);
+            font-weight: 700;
         }
 
         /* --- GRID --- */
@@ -105,56 +116,64 @@
             display: grid;
             grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
             gap: 30px;
-            margin-bottom: 80px;
+            margin-bottom: 100px;
         }
 
         .card {
             background: var(--card-bg);
             padding: 40px;
-            border-radius: 20px;
-            border: 1px solid rgba(56, 189, 248, 0.1);
+            border-radius: 24px;
+            border: 1px solid rgba(56, 189, 248, 0.05);
             text-align: left;
-            transition: 0.3s;
+            transition: 0.4s ease;
         }
 
         .card:hover {
             border-color: var(--neon-blue);
-            transform: translateY(-5px);
+            transform: translateY(-8px);
+            box-shadow: 0 15px 35px -15px rgba(56, 189, 248, 0.4);
         }
 
         .card h3 {
             color: var(--neon-blue);
             margin-top: 0;
             font-size: 1.4rem;
+            font-weight: 700;
+            margin-bottom: 15px;
         }
 
         .card p {
             color: var(--text-dim);
+            font-size: 1rem;
             margin-bottom: 0;
         }
 
         /* --- FOOTER --- */
         .amazon-box {
-            border: 1px dashed var(--neon-gold);
-            padding: 20px;
-            border-radius: 12px;
+            border: 1px solid rgba(251, 191, 36, 0.2);
+            background: rgba(251, 191, 36, 0.02);
+            padding: 24px;
+            border-radius: 16px;
             color: var(--neon-gold);
             font-size: 0.85rem;
-            margin-bottom: 60px;
+            margin-bottom: 80px;
         }
 
         footer {
-            padding: 60px 0;
-            border-top: 1px solid rgba(255, 255, 255, 0.1);
+            padding: 80px 0 40px;
+            border-top: 1px solid rgba(255, 255, 255, 0.05);
             color: #4b5563;
             font-size: 0.8rem;
+            letter-spacing: 1.5px;
         }
 
-        footer a { color: inherit; text-decoration: none; margin: 0 10px; }
+        footer a { color: inherit; text-decoration: none; margin: 0 15px; }
         footer a:hover { color: var(--neon-blue); }
 
         @media (max-width: 600px) {
-            nav { flex-direction: column; align-items: center; gap: 15px; }
+            nav { gap: 15px; }
+            nav a { font-size: 0.75rem; letter-spacing: 2px; }
+            .card { padding: 30px; }
         }
     </style>
 </head>
@@ -162,7 +181,6 @@
 
     <header>
         <div class="logo-wrap">
-            <!-- Using the most direct RAW link format for GitHub -->
             <img src="https://raw.githubusercontent.com/onebender137/hopes-and-dreams-site/main/TOPPER.jpg" alt="Hopes and Dreams">
         </div>
         
@@ -187,25 +205,28 @@
         <div class="grid">
             <div class="card">
                 <h3>Life Hacks</h3>
-                <p>Simple optimizations for a more productive day. From high-performance morning routines to workflow automation.</p>
+                <p>Simple optimizations for a more productive day. From high-performance morning routines to workflow automation that buys back your time.</p>
             </div>
             <div class="card">
                 <h3>Curated Tech</h3>
-                <p>Hard-hitting reviews on the equipment and software we actually use to build the Syndicate and beyond.</p>
+                <p>Hard-hitting reviews on the equipment and software we actually use to build the Syndicate and beyond. No fluff, just gear that works.</p>
             </div>
             <div class="card">
                 <h3>Community</h3>
-                <p>Connecting dreamers and doers across the Maritimes and beyond. Join our ecosystem to participate.</p>
+                <p>Connecting dreamers and doers across the Maritimes and beyond. Join our ecosystem to participate in the next wave of building.</p>
             </div>
         </div>
 
         <div class="amazon-box">
-            <strong>Disclosure:</strong> As an Amazon Associate, I earn from qualifying purchases.
+            <strong>Disclosure:</strong> As an Amazon Associate, I earn from qualifying purchases. This helps keep the Nexus running and free for the community.
         </div>
 
         <footer>
             <p>&copy; 2026 Hopes and Dreams. All Rights Reserved.</p>
-            <p><a href="privacy.html">Privacy Policy</a> | <a href="about.html">Contact</a></p>
+            <p>
+                <a href="privacy.html">Privacy Policy</a> | 
+                <a href="about.html">Contact Us</a>
+            </p>
         </footer>
     </div>
 
