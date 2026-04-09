@@ -3,28 +3,140 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Privacy | Hopes and Dreams Syndicate</title>
+    <title>Privacy & Disclosures | Hopes and Dreams</title>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;700;900&display=swap" rel="stylesheet">
     <style>
-        /* Exact same styles as Home */
-        :root { --bg-main: #0a0f2b; --card-bg: #0d162d; --neon-blue: #38bdf8; --neon-gold: #fbbf24; --text-main: #f8fafc; --text-dim: #94a3b8; }
-        body { background-color: var(--bg-main); color: var(--text-main); font-family: 'Inter', sans-serif; margin: 0; padding: 0; line-height: 1.6; overflow-x: hidden; }
-        header { display: flex; flex-direction: column; align-items: center; width: 100%; padding: 40px 0 20px 0; background-color: var(--bg-main); min-height: 280px; }
-        .logo-wrap { width: 95%; max-width: 700px; height: 150px; display: flex; align-items: center; justify-content: center; position: relative; }
-        .logo-wrap img { width: 100%; height: auto; max-height: 150px; object-fit: contain; display: block; filter: contrast(1.15) brightness(0.95) saturate(1.1); -webkit-mask-image: radial-gradient(circle, rgba(0,0,0,1) 45%, rgba(0,0,0,0) 95%); mask-image: radial-gradient(circle, rgba(0,0,0,1) 45%, rgba(0,0,0,0) 95%); }
-        nav { margin-top: 40px; padding-bottom: 60px; z-index: 10; display: flex; gap: 30px; flex-wrap: wrap; justify-content: center; width: 100%; }
-        nav a { color: var(--neon-blue); text-decoration: none; font-size: 1.2rem; font-weight: 800; text-transform: uppercase; letter-spacing: 3px; transition: all 0.3s ease; opacity: 0.9; text-shadow: 0 0 10px rgba(56, 189, 248, 0.3); white-space: nowrap; }
-        @media (max-width: 600px) { header { min-height: auto; padding-top: 20px; } nav { flex-direction: column; gap: 15px; margin-top: 20px; padding-bottom: 40px; } nav a { font-size: 1.1rem; } .logo-wrap { height: 100px; } .logo-wrap img { max-height: 100px; } }
-        .container { max-width: 800px; margin: 0 auto; padding: 0 24px; text-align: left; }
-        .glow-divider { width: 100%; height: 1px; background: radial-gradient(circle, var(--neon-blue) 0%, transparent 70%); opacity: 0.2; margin: 60px 0; }
-        .page-title { color: var(--neon-gold); font-size: 2.5rem; font-weight: 900; text-transform: uppercase; letter-spacing: 2px; margin-bottom: 20px; text-align: center; }
-        footer { padding: 80px 0 40px; border-top: 1px solid rgba(255, 255, 255, 0.05); color: #4b5563; font-size: 0.85rem; text-align: center; }
-        footer a { color: inherit; text-decoration: none; margin: 0 15px; }
+        :root {
+            --bg-main: #0a0f2b; 
+            --card-bg: #0d162d; 
+            --neon-blue: #38bdf8;
+            --neon-gold: #fbbf24;
+            --text-main: #f8fafc;
+            --text-dim: #94a3b8;
+        }
+
+        body {
+            background-color: var(--bg-main);
+            color: var(--text-main);
+            font-family: 'Inter', sans-serif;
+            margin: 0; padding: 0; line-height: 1.6;
+            overflow-x: hidden;
+        }
+
+        /* --- HEADER --- */
+        header {
+            display: flex; flex-direction: column; align-items: center;
+            width: 100%; padding: 40px 0 20px 0; background-color: var(--bg-main);
+        }
+
+        .logo-wrap { width: 95%; max-width: 700px; line-height: 0; }
+        .logo-wrap img { 
+            width: 100%; height: auto; 
+            filter: contrast(1.15) brightness(0.95) saturate(1.1);
+            -webkit-mask-image: radial-gradient(circle, rgba(0,0,0,1) 45%, rgba(0,0,0,0) 95%);
+            mask-image: radial-gradient(circle, rgba(0,0,0,1) 45%, rgba(0,0,0,0) 95%);
+        }
+
+        /* --- NAVIGATION --- */
+        nav {
+            margin-top: 40px; 
+            padding-bottom: 60px;
+            z-index: 10;
+            position: relative;
+            display: flex;
+            gap: 40px;
+            flex-wrap: wrap;
+            justify-content: center;
+        }
+
+        nav a {
+            color: var(--neon-blue);
+            text-decoration: none;
+            font-size: 1.2rem; 
+            font-weight: 800;
+            text-transform: uppercase;
+            letter-spacing: 4px;
+            transition: all 0.3s ease;
+            opacity: 0.9;
+            text-shadow: 0 0 10px rgba(56, 189, 248, 0.3);
+        }
+
+        nav a:hover {
+            color: var(--neon-gold);
+            opacity: 1;
+            text-shadow: 0 0 20px var(--neon-blue), 0 0 10px var(--neon-gold);
+            transform: scale(1.1);
+        }
+
+        /* --- CONTENT SECTION --- */
+        .container { max-width: 900px; margin: 0 auto; padding: 0 24px 100px; }
+
+        .glow-divider {
+            width: 100%; height: 1px;
+            background: radial-gradient(circle, var(--neon-blue) 0%, transparent 70%);
+            opacity: 0.2; margin-bottom: 60px;
+        }
+
+        .policy-card {
+            background-color: var(--card-bg);
+            padding: 60px; border-radius: 24px;
+            border: 1px solid rgba(56, 189, 248, 0.1);
+            box-shadow: 0 20px 40px -20px rgba(0, 0, 0, 0.5);
+            position: relative; overflow: hidden;
+            text-align: left;
+        }
+
+        .policy-card::before {
+            content: ''; position: absolute; top: 0; left: 0; width: 100%; height: 4px;
+            background: linear-gradient(90deg, var(--neon-blue), transparent);
+        }
+
+        .header-section { text-align: center; margin-bottom: 50px; }
+        .shield-icon {
+            width: 64px; height: 64px; color: var(--neon-blue);
+            margin-bottom: 20px; filter: drop-shadow(0 0 10px rgba(56, 189, 248, 0.4));
+        }
+
+        h1 { color: var(--neon-blue); font-size: 2.5rem; font-weight: 900; text-transform: uppercase; letter-spacing: 2px; }
+        .last-updated { color: var(--neon-gold); font-size: 0.9rem; font-weight: 700; text-transform: uppercase; letter-spacing: 2px; display: block; }
+
+        h2 { color: var(--neon-blue); font-size: 1.4rem; margin-top: 40px; border-left: 4px solid var(--neon-blue); padding-left: 15px; text-transform: uppercase; }
+        p { color: var(--text-dim); font-size: 1.1rem; line-height: 1.8; }
+
+        .affiliate-highlight {
+            background: rgba(251, 191, 36, 0.05);
+            border: 1px dashed rgba(251, 191, 36, 0.4);
+            padding: 25px 30px; border-radius: 12px; margin: 40px 0;
+        }
+        .affiliate-highlight strong { color: var(--neon-gold); text-transform: uppercase; }
+
+        .contact-box { margin-top: 60px; text-align: center; border-top: 1px solid rgba(255, 255, 255, 0.05); padding-top: 50px; }
+        .contact-email { color: var(--text-main); font-size: 1.5rem; font-weight: 700; text-decoration: none; transition: 0.3s; }
+        .contact-email:hover { color: var(--neon-blue); }
+
+        .fb-link {
+            display: inline-block; margin-top: 25px; padding: 12px 30px;
+            border: 2px solid var(--neon-gold); border-radius: 50px;
+            color: var(--neon-gold); text-decoration: none; font-weight: 700;
+            text-transform: uppercase; transition: 0.3s;
+        }
+        .fb-link:hover { background: var(--neon-gold); color: var(--bg-main); box-shadow: 0 0 20px rgba(251, 191, 36, 0.4); }
+
+        footer { text-align: center; padding: 40px 0 0; color: #4b5563; font-size: 0.85rem; }
+
+        @media (max-width: 600px) {
+            .policy-card { padding: 40px 20px; }
+            h1 { font-size: 1.8rem; }
+            nav { flex-direction: column; gap: 20px; }
+        }
     </style>
 </head>
 <body>
+
     <header>
-        <div class="logo-wrap"><img src="https://raw.githubusercontent.com/onebender137/hopes-and-dreams-site/main/TOPPER.jpg" alt="Hopes and Dreams"></div>
+        <div class="logo-wrap">
+            <img src="https://raw.githubusercontent.com/onebender137/hopes-and-dreams-site/main/TOPPER.jpg" alt="Hopes and Dreams">
+        </div>
         <nav>
             <a href="index.html">Home</a>
             <a href="shop.html">Procurement</a>
@@ -33,14 +145,46 @@
             <a href="privacy.html" style="color: var(--neon-gold)">Privacy</a>
         </nav>
     </header>
+
     <div class="container">
         <div class="glow-divider"></div>
-        <h1 class="page-title">Privacy Protocol</h1>
-        <p>Data Sovereignty is a core tenet of the Syndicate. Your path to optimization is your own.</p>
+
+        <article class="policy-card">
+            <div class="header-section">
+                <svg class="shield-icon" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z"></path>
+                </svg>
+                <h1>Privacy Policy & Disclosures</h1>
+                <span class="last-updated">Last Updated: April 2026</span>
+            </div>
+
+            <p>At Hopes and Dreams, your privacy is a priority. This policy outlines how we handle information and our relationship with third-party programs.</p>
+
+            <h2>1. Information We Collect</h2>
+            <p>We do not currently require user registration. We may collect minimal, non-identifying data via standard web logs to improve our content and infrastructure.</p>
+
+            <h2>2. Cookies</h2>
+            <p>We may use basic cookies to enhance your browsing experience. You can choose to disable cookies through your browser settings at any time.</p>
+
+            <h2>3. Affiliate Disclosure</h2>
+            <p>Hopes and Dreams is a participant in the Amazon Services LLC Associates Program, an affiliate advertising program designed to provide a means for sites to earn advertising fees by linking to Amazon.ca and Amazon.com.</p>
+            
+            <div class="affiliate-highlight">
+                <p><strong>Transmission Important:</strong> As an Amazon Associate, I earn from qualifying purchases. This helps supply the resources required to keep the Syndicate running at peak efficiency.</p>
+            </div>
+
+            <div class="contact-box">
+                <p>If you have questions regarding this policy or the Syndicate project, initialize contact below:</p>
+                <a href="mailto:hopesdreams137@gmail.com" class="contact-email">hopesdreams137@gmail.com</a>
+                <br>
+                <a href="https://www.facebook.com/profile.php?id=61581034972328" class="fb-link" target="_blank" rel="noopener noreferrer">Join the Syndicate on Facebook</a>
+            </div>
+        </article>
+
         <footer>
             <p>&copy; 2026 Hopes and Dreams. All Rights Reserved.</p>
-            <p><a href="privacy.html">Privacy Policy</a> | <a href="about.html">Contact Us</a></p>
         </footer>
     </div>
+
 </body>
 </html>
