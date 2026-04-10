@@ -1,5 +1,4 @@
-// --- Shared Functionality ---
-
+// Scroll Reveal Logic
 document.addEventListener('DOMContentLoaded', () => {
     // Scroll Progress Bar
     const progress = document.getElementById('scroll-progress');
@@ -36,7 +35,7 @@ document.addEventListener('DOMContentLoaded', () => {
     const currentTheme = localStorage.getItem('theme');
     if (currentTheme === 'light') {
         body.classList.add('light-mode');
-        if (themeToggle) themeToggle.innerHTML = '🌙 DARK MODE';
+        if (themeToggle) themeToggle.textContent = '🌙 DARK MODE';
         if (logo) {
             // Check if logo src is relative to articles
             const isArticle = window.location.pathname.includes('/articles/');
@@ -51,13 +50,13 @@ document.addEventListener('DOMContentLoaded', () => {
             let theme = 'dark';
             if (body.classList.contains('light-mode')) {
                 theme = 'light';
-                themeToggle.innerHTML = '🌙 DARK MODE';
+                themeToggle.textContent = '🌙 DARK MODE';
                 if (logo) {
                     const isArticle = window.location.pathname.includes('/articles/');
                     logo.src = isArticle ? '../topper-inverted.png' : 'topper-inverted.png';
                 }
             } else {
-                themeToggle.innerHTML = '☀️ LIGHT MODE';
+                themeToggle.textContent = '☀️ LIGHT MODE';
                 if (logo) {
                     const isArticle = window.location.pathname.includes('/articles/');
                     logo.src = isArticle ? '../topper.png' : 'topper.png';
@@ -66,105 +65,73 @@ document.addEventListener('DOMContentLoaded', () => {
             localStorage.setItem('theme', theme);
         });
     }
-});
 
-// Particle System
-function initParticles(canvas) {
-    const ctx = canvas.getContext('2d');
-    let particles = [];
-    const particleCount = 60;
+    // Custom Cursor Logic
+    if (window.innerWidth >= 1024) {
+        const cursor = document.createElement('div');
+        cursor.className = 'custom-cursor';
+        document.body.appendChild(cursor);
 
-    function resize() {
-        canvas.width = canvas.offsetWidth;
-        canvas.height = canvas.offsetHeight;
-    }
-
-    window.addEventListener('resize', resize);
-    resize();
-
-    class Particle {
-        constructor() {
-            this.reset();
+        const trailCount = 8;
+        const trails = [];
+        for (let i = 0; i < trailCount; i++) {
+            const trail = document.createElement('div');
+            trail.className = 'cursor-trail';
+            document.body.appendChild(trail);
+            trails.push({
+                el: trail,
+                x: 0,
+                y: 0
+            });
         }
-        reset() {
-            this.x = Math.random() * canvas.width;
-            this.y = Math.random() * canvas.height;
-            this.vx = (Math.random() - 0.5) * 0.5;
-            this.vy = (Math.random() - 0.5) * 0.5;
-            this.size = Math.random() * 2;
-            this.alpha = Math.random() * 0.5 + 0.2;
-        }
-        update() {
-            this.x += this.vx;
-            this.y += this.vy;
-            if (this.x < 0 || this.x > canvas.width || this.y < 0 || this.y > canvas.height) {
-                this.reset();
-            }
-        }
-        draw() {
-            ctx.beginPath();
-            ctx.arc(this.x, this.y, this.size, 0, Math.PI * 2);
-            ctx.fillStyle = `rgba(56, 189, 248, ${this.alpha})`;
-            ctx.fill();
-        }
-    }
 
-    for (let i = 0; i < particleCount; i++) {
-        particles.push(new Particle());
-    }
+        let mouseX = 0;
+        let mouseY = 0;
 
-    function animate() {
-        ctx.clearRect(0, 0, canvas.width, canvas.height);
-        particles.forEach(p => {
-            p.update();
-            p.draw();
+        window.addEventListener('mousemove', (e) => {
+            mouseX = e.clientX;
+            mouseY = e.clientY;
+
+            cursor.style.left = mouseX + 'px';
+            cursor.style.top = mouseY + 'px';
         });
-        requestAnimationFrame(animate);
-    }
-    animate();
-}
 
-// Quote Rotator
-function initQuoteRotator(container) {
-    const quotes = [
-        "\"We aren't just dreaming of a better life; we’re building the infrastructure to make it inevitable.\"",
-        "\"Cognitive sovereignty is the ultimate frontier of human freedom.\"",
-        "\"The biological hardware must be upgraded to support the digital ambition.\"",
-        "\"Focus is a currency. Spend it where it yields the highest return.\"",
-        "\"The best way to predict the future is to architect it.\""
-    ];
-    let current = 0;
-    const textEl = container.querySelector('.quote-text');
+        function animateTrails() {
+            let x = mouseX;
+            let y = mouseY;
 
-    setInterval(() => {
-        textEl.classList.add('fade-out');
-        setTimeout(() => {
-            current = (current + 1) % quotes.length;
-            textEl.textContent = quotes[current];
-            textEl.classList.remove('fade-out');
-        }, 500);
-    }, 6000);
-}
+            trails.forEach((trail, index) => {
+                const nextTrail = trails[index + 1] || { x: mouseX, y: mouseY };
 
-// Category Filters
-function initFilters(btns) {
-    const cards = document.querySelectorAll('.item-card');
-    btns.forEach(btn => {
-        btn.addEventListener('click', () => {
-            // Update buttons
-            btns.forEach(b => b.classList.remove('active'));
-            btn.classList.add('active');
+                trail.x += (x - trail.x) * 0.3;
+                trail.y += (y - trail.y) * 0.3;
 
-            const filter = btn.getAttribute('data-filter');
+                trail.el.style.left = trail.x + 'px';
+                trail.el.style.top = trail.y + 'px';
+                trail.el.style.opacity = 1 - (index / trailCount);
+                trail.el.style.transform = `translate(-50%, -50%) scale(${1 - index / trailCount})`;
 
-            cards.forEach(card => {
-                const category = card.getAttribute('data-category');
-                if (filter === 'all' || category === filter) {
-                    card.classList.remove('hidden');
-                } else {
-                    card.classList.add('hidden');
-                }
+                x = trail.x;
+                y = trail.y;
+            });
+
+            requestAnimationFrame(animateTrails);
+        }
+        animateTrails();
+
+        // Cursor scaling on links
+        const interactiveElements = document.querySelectorAll('a, button, .accordion-header, input');
+        interactiveElements.forEach(el => {
+            el.addEventListener('mouseenter', () => {
+                cursor.style.width = '40px';
+                cursor.style.height = '40px';
+                cursor.style.backgroundColor = 'rgba(56, 189, 248, 0.3)';
+            });
+            el.addEventListener('mouseleave', () => {
+                cursor.style.width = '20px';
+                cursor.style.height = '20px';
+                cursor.style.backgroundColor = 'var(--neon-blue)';
             });
         });
-    });
-}
+    }
+});
