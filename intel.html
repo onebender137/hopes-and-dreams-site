@@ -40,10 +40,77 @@
             margin-top: 15px; margin-right: 10px; transition: 0.3s;
         }
         .cta-button:hover { transform: scale(1.05); box-shadow: 0 0 20px rgba(251, 191, 36, 0.4); }
+
+        /* Accordion Styling */
+        .accordion-container {
+            max-width: 800px;
+            margin: 80px auto;
+            text-align: center;
+        }
+
+        .accordion-item {
+            margin-bottom: 15px;
+        }
+
+        .accordion-header {
+            background: var(--card-bg);
+            color: var(--text-main);
+            padding: 12px 20px;
+            border-radius: 8px;
+            cursor: pointer;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            border: 1px solid rgba(56, 189, 248, 0.1);
+            transition: 0.3s;
+            font-weight: 700;
+            width: fit-content;
+            margin: 0 auto;
+            min-width: 320px;
+            font-size: 1rem;
+        }
+
+        .accordion-header:hover {
+            border-color: var(--neon-blue);
+            background: rgba(56, 189, 248, 0.05);
+        }
+
+        .accordion-content {
+            max-height: 0;
+            overflow: hidden;
+            transition: max-height 0.3s ease-out;
+            padding: 0 20px;
+            color: var(--text-dim);
+            font-size: 1rem;
+            max-width: 650px;
+            margin: 0 auto;
+            line-height: 1.6;
+        }
+
+        .accordion-item.active .accordion-content {
+            max-height: 200px;
+            padding: 15px 20px;
+        }
+
+        .accordion-header svg {
+            transition: transform 0.3s;
+            width: 18px;
+            height: 18px;
+            margin-left: 10px;
+        }
+
+        .accordion-item.active .accordion-header svg {
+            transform: rotate(180deg);
+        }
+
+        @media (max-width: 600px) {
+            .accordion-header { min-width: 90%; }
+        }
     </style>
 </head>
 <body>
     <div id="scroll-progress"></div>
+    <button id="theme-toggle" class="theme-toggle-pill">☀️ LIGHT MODE</button>
 
     <header>
         <div class="logo-wrap">
@@ -55,7 +122,6 @@
             <a href="intel.html" class="active">Intel Hub</a>
             <a href="about.html">About</a>
             <a href="privacy.html">Privacy</a>
-            <button id="theme-toggle" class="theme-toggle">☀️ LIGHT MODE</button>
         </nav>
     </header>
 
@@ -71,8 +137,8 @@
                 <strong>The Stack:</strong> 400mg Alpha GPC + 200mcg Huperzine-A.<br>
                 <strong>Timing:</strong> Administer after 4-5 hours of natural sleep (WBTB Method).
             </div>
-            <a href="https://amzn.to/3PY1ehV" target="_blank" rel="noopener noreferrer" class="cta-button">Secure Huperzine-A</a>
-            <a href="https://amzn.to/4mhwkxa" target="_blank" rel="noopener noreferrer" class="cta-button">Secure Alpha GPC</a>
+            <a href="https://amzn.to/3PY1ehV" target="_blank" class="cta-button">Secure Huperzine-A</a>
+            <a href="https://amzn.to/4mhwkxa" target="_blank" class="cta-button">Secure Alpha GPC</a>
 
             <h2>2. The Visual Gate (Darius Wright Method)</h2>
             <p>Once the chemical environment is optimized, the consciousness must remain tethered. Focus on the "Hypnagogic Static" behind your eyelids without engaging the ocular muscles.</p>
@@ -84,44 +150,41 @@
 
         <div class="glow-divider"></div>
 
-        <div class="grid">
-            <!-- Neuro-Stack Builder -->
-            <div class="widget-container stack-builder" data-reveal>
-                <div class="widget-title">
-                    <svg width="24" height="24" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19.428 15.428a2 2 0 00-1.022-.547l-2.387-.477a6 6 0 00-3.86.517l-.318.158a6 6 0 01-3.86.517L6.05 15.21a2 2 0 00-1.806.547M8 4h8l-1 1v5.172a2 2 0 00.586 1.414l5 5c1.26 1.26.367 3.414-1.415 3.414H4.828c-1.782 0-2.674-2.154-1.414-3.414l5-5A2 2 0 009 10.172V5L8 4z"></path></svg>
-                    Neuro-Stack Builder
+        <div class="accordion-container" data-reveal>
+            <h2 class="section-title">Common Intel</h2>
+
+            <div class="accordion-item">
+                <div class="accordion-header">
+                    <span>What is "Cognitive Sovereignty"?</span>
+                    <svg fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"></path></svg>
                 </div>
-                <p style="font-size: 0.85rem; color: var(--text-dim); margin-bottom: 15px;">Combine elements to see synergistic effects.</p>
-                <div class="stack-options">
-                    <label class="check-item"><input type="checkbox" class="stack-input" data-effect="Focus"> <span>Caffeine</span></label>
-                    <label class="check-item"><input type="checkbox" class="stack-input" data-effect="Calm"> <span>L-Theanine</span></label>
-                    <label class="check-item"><input type="checkbox" class="stack-input" data-effect="Memory"> <span>Alpha GPC</span></label>
-                    <label class="check-item"><input type="checkbox" class="stack-input" data-effect="Neurogenesis"> <span>Lion's Mane</span></label>
-                </div>
-                <div id="stack-result" style="font-size: 0.9rem; min-height: 40px;">
-                    Select ingredients to begin...
+                <div class="accordion-content">
+                    <p>It is the right and ability of an individual to have full control over their own mental processes, including the use of technology and pharmacology to enhance or alter consciousness.</p>
                 </div>
             </div>
 
-            <!-- Deep Work Player -->
-            <div class="widget-container" data-reveal>
-                <div class="widget-title">
-                    <svg width="24" height="24" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 19V6l12-3v13M9 19c0 1.105-1.343 2-3 2s-3-.895-3-2 1.343-2 3-2 3 .895 3 2zm12-3c0 1.105-1.343 2-3 2s-3-.895-3-2 1.343-2 3-2 3 .895 3 2zM9 10l12-3"></path></svg>
-                    Deep Work Atmosphere
+            <div class="accordion-item">
+                <div class="accordion-header">
+                    <span>How do I start biohacking safely?</span>
+                    <svg fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"></path></svg>
                 </div>
-                <p style="font-size: 0.85rem; color: var(--text-dim);">Enable brown noise to mask distractions during focus blocks.</p>
-                <div class="ambient-player">
-                    <button class="play-btn" id="ambient-toggle">
-                        <svg id="play-icon" width="20" height="20" fill="currentColor" viewBox="0 0 20 20"><path d="M4.5 17.5V2.5L16.5 10L4.5 17.5Z"/></svg>
-                        <svg id="pause-icon" style="display:none" width="20" height="20" fill="currentColor" viewBox="0 0 20 20"><path d="M6 18H8V2H6V18ZM12 2V18H14V2H12Z"/></svg>
-                    </button>
-                    <span id="ambient-status" style="font-weight: 700; font-size: 0.9rem;">OFFLINE</span>
+                <div class="accordion-content">
+                    <p>Always start with the "Low Hanging Fruit": Sleep, hydration, and movement. Once the foundation is solid, introduce one supplement or protocol at a time and track the results in a log.</p>
                 </div>
-                <audio id="ambient-audio" loop>
-                    <source src="https://www.soundhelix.com/examples/mp3/SoundHelix-Song-1.mp3" type="audio/mpeg">
-                </audio>
+            </div>
+
+            <div class="accordion-item">
+                <div class="accordion-header">
+                    <span>Why the focus on local-first tech?</span>
+                    <svg fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"></path></svg>
+                </div>
+                <div class="accordion-content">
+                    <p>To ensure privacy and resilience. By running LLMs and knowledge bases (like Obsidian) locally, you ensure your data remains your own, even without an internet connection.</p>
+                </div>
             </div>
         </div>
+
+        <div class="glow-divider"></div>
 
         <div class="grid">
             <!-- Sleep Calculator Widget -->
@@ -165,54 +228,22 @@
             </div>
         </div>
 
-        <!-- FAQ Section -->
-        <section class="faq-section" data-reveal>
-            <h2 class="section-title">Common Intel</h2>
-            <div class="faq-item">
-                <button class="faq-question">
-                    What is "Cognitive Sovereignty"?
-                    <svg class="faq-icon" width="20" height="20" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"></path></svg>
-                </button>
-                <div class="faq-answer">
-                    It is the right and ability of an individual to have full control over their own mental processes, including the use of technology and pharmacology to enhance or alter consciousness.
-                </div>
-            </div>
-            <div class="faq-item">
-                <button class="faq-question">
-                    How do I start biohacking safely?
-                    <svg class="faq-icon" width="20" height="20" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"></path></svg>
-                </button>
-                <div class="faq-answer">
-                    Always start with the "Low Hanging Fruit": Sleep, hydration, and movement. Once the foundation is solid, introduce one supplement or protocol at a time and track the results in a log.
-                </div>
-            </div>
-            <div class="faq-item">
-                <button class="faq-question">
-                    Why the focus on local-first tech?
-                    <svg class="faq-icon" width="20" height="20" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"></path></svg>
-                </button>
-                <div class="faq-answer">
-                    To ensure privacy and resilience. By running LLMs and knowledge bases (like Obsidian) locally, you ensure your data remains your own, even without an internet connection.
-                </div>
-            </div>
-        </section>
-
         <h2 class="section-title" style="margin-top: 80px;" data-reveal>The Syndicate Toolkit</h2>
         <div class="grid">
             <div class="card" data-reveal>
                 <h3>Obsidian</h3>
                 <p>The premier local-first knowledge base for building your 'Second Brain'. Own your data, link your thoughts, and architect your own internal wiki.</p>
-                <a href="https://obsidian.md/" target="_blank" rel="noopener noreferrer" class="cta-button" style="font-size: 0.8rem; padding: 8px 16px;">Explore Obsidian</a>
+                <a href="https://obsidian.md/" target="_blank" class="cta-button" style="font-size: 0.8rem; padding: 8px 16px;">Explore Obsidian</a>
             </div>
             <div class="card" data-reveal>
                 <h3>Daylio</h3>
                 <p>Frictionless mood and habit tracking. Capture your daily state in seconds to identify the correlations between your protocols and your performance.</p>
-                <a href="https://daylio.net/" target="_blank" rel="noopener noreferrer" class="cta-button" style="font-size: 0.8rem; padding: 8px 16px;">Explore Daylio</a>
+                <a href="https://daylio.net/" target="_blank" class="cta-button" style="font-size: 0.8rem; padding: 8px 16px;">Explore Daylio</a>
             </div>
             <div class="card" data-reveal>
                 <h3>Calm</h3>
                 <p>Guided meditation and sleep architecture. Essential for down-regulating the nervous system after high-intensity cognitive work.</p>
-                <a href="https://www.calm.com/" target="_blank" rel="noopener noreferrer" class="cta-button" style="font-size: 0.8rem; padding: 8px 16px;">Explore Calm</a>
+                <a href="https://www.calm.com/" target="_blank" class="cta-button" style="font-size: 0.8rem; padding: 8px 16px;">Explore Calm</a>
             </div>
         </div>
 
@@ -220,12 +251,12 @@
             <div class="card" data-reveal>
                 <h3>Oura Ring</h3>
                 <p>Deep biometric insights. Track sleep stages, HRV, and readiness to ensure your biological hardware is keeping up with your digital output.</p>
-                <a href="https://ouraring.com/" target="_blank" rel="noopener noreferrer" class="cta-button" style="font-size: 0.8rem; padding: 8px 16px;">Explore Oura</a>
+                <a href="https://ouraring.com/" target="_blank" class="cta-button" style="font-size: 0.8rem; padding: 8px 16px;">Explore Oura</a>
             </div>
             <div class="card" data-reveal>
                 <h3>Garmin</h3>
                 <p>Advanced performance analytics. From VO2 Max to body battery, Garmin provides the raw data needed to optimize physical excellence.</p>
-                <a href="https://www.garmin.com/" target="_blank" rel="noopener noreferrer" class="cta-button" style="font-size: 0.8rem; padding: 8px 16px;">Explore Garmin</a>
+                <a href="https://www.garmin.com/" target="_blank" class="cta-button" style="font-size: 0.8rem; padding: 8px 16px;">Explore Garmin</a>
             </div>
         </div>
 
@@ -245,65 +276,6 @@
         </footer>
     </div>
     <script>
-        // FAQ Accordion
-        document.querySelectorAll('.faq-question').forEach(button => {
-            button.addEventListener('click', () => {
-                const item = button.parentElement;
-                item.classList.toggle('active');
-            });
-        });
-
-        // Ambient Player
-        const ambientToggle = document.getElementById('ambient-toggle');
-        const audio = document.getElementById('ambient-audio');
-        const playIcon = document.getElementById('play-icon');
-        const pauseIcon = document.getElementById('pause-icon');
-        const statusText = document.getElementById('ambient-status');
-
-        ambientToggle.addEventListener('click', () => {
-            if (audio.paused) {
-                audio.play();
-                playIcon.style.display = 'none';
-                pauseIcon.style.display = 'block';
-                statusText.textContent = 'ACTIVE';
-                statusText.style.color = 'var(--neon-blue)';
-            } else {
-                audio.pause();
-                playIcon.style.display = 'block';
-                pauseIcon.style.display = 'none';
-                statusText.textContent = 'OFFLINE';
-                statusText.style.color = 'inherit';
-            }
-        });
-
-        // Stack Builder
-        const stackInputs = document.querySelectorAll('.stack-input');
-        const stackResult = document.getElementById('stack-result');
-
-        function updateStack() {
-            const active = Array.from(stackInputs).filter(i => i.checked);
-            if (active.length === 0) {
-                stackResult.textContent = 'Select ingredients to begin...';
-                return;
-            }
-
-            const effects = active.map(i => i.getAttribute('data-effect'));
-            let summary = `Targeting: ${effects.join(', ')}.`;
-
-            // Logic for synergies
-            const names = active.map(i => i.parentElement.textContent.trim());
-            if (names.includes('Caffeine') && names.includes('L-Theanine')) {
-                summary += '<br><span class="synergy-badge">Synergy Detected: Jitter-Free Focus</span>';
-            }
-            if (names.includes('Alpha GPC') && names.includes('Lion\'s Mane')) {
-                summary += '<br><span class="synergy-badge">Synergy Detected: Neural Growth Engine</span>';
-            }
-
-            stackResult.innerHTML = summary;
-        }
-
-        stackInputs.forEach(i => i.addEventListener('change', updateStack));
-
         // Sleep Calculator Logic
         const wakeInput = document.getElementById('wake-time');
         const suggestContainer = document.getElementById('suggested-times');
@@ -330,6 +302,14 @@
 
         wakeInput.addEventListener('change', calculateSleepTimes);
         calculateSleepTimes();
+
+        // Accordion Logic
+        document.querySelectorAll('.accordion-header').forEach(header => {
+            header.addEventListener('click', () => {
+                const item = header.parentElement;
+                item.classList.toggle('active');
+            });
+        });
 
         // Checklist Logic
         const checks = document.querySelectorAll('.protocol-check');
