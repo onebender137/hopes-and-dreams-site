@@ -26,6 +26,17 @@ document.addEventListener('DOMContentLoaded', () => {
 
     document.querySelectorAll('[data-reveal]').forEach(el => observer.observe(el));
 
+    // Reading Time Estimator
+    const content = document.querySelector('article');
+    const readTimeDisplay = document.getElementById('reading-time');
+    if (content && readTimeDisplay) {
+        const text = content.innerText;
+        const wpm = 225;
+        const words = text.trim().split(/\s+/).length;
+        const time = Math.ceil(words / wpm);
+        readTimeDisplay.innerText = time;
+    }
+
     // Theme Toggle
     const themeToggle = document.getElementById('theme-toggle');
     const body = document.body;
