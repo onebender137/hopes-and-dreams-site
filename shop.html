@@ -101,6 +101,29 @@
         <h1 data-reveal>Syndicate Procurement</h1>
         <div class="subtitle" data-reveal>Vetted Tools for Cognitive Sovereignty</div>
 
+        <!-- Feature 1: Neuro-Stack Builder Quiz -->
+        <div class="widget-container" data-reveal id="stack-builder">
+            <div class="widget-title">
+                <svg width="24" height="24" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19.428 15.428a2 2 0 00-1.022-.547l-2.387-.477a6 6 0 00-3.86.517l-.318.158a6 6 0 01-3.86.517L6.05 15.21a2 2 0 00-1.806.547M8 4h8l-1 1v5.172a2 2 0 00.586 1.414l5 5c1.26 1.26.367 3.414-1.415 3.414H4.828c-1.782 0-2.674-2.154-1.414-3.414l5-5A2 2 0 009 10.172V5L8 4z"></path></svg>
+                Neuro-Stack Builder
+            </div>
+            <div id="quiz-intro">
+                <p style="color: var(--text-dim); margin-bottom: 20px;">Initialize your profile to receive a tailored optimization stack recommendation.</p>
+                <button class="buy-btn" onclick="startQuiz()" style="width: auto; padding: 12px 30px;">Begin Protocol Analysis</button>
+            </div>
+            <div id="quiz-questions" style="display: none;">
+                <p id="question-text" style="font-weight: 700; margin-bottom: 20px; color: var(--neon-gold);"></p>
+                <div id="options-container" class="grid" style="grid-template-columns: 1fr; gap: 10px;">
+                    <!-- Options injected by JS -->
+                </div>
+            </div>
+            <div id="quiz-results" class="result-box">
+                <h3 style="color: var(--neon-blue); margin-top: 0;">Recommended Stack</h3>
+                <div id="recommendation-output"></div>
+                <button class="buy-btn" onclick="resetQuiz()" style="margin-top: 20px; font-size: 0.7rem; border-color: var(--text-dim); color: var(--text-dim);">Reset Analysis</button>
+            </div>
+        </div>
+
         <div class="shop-grid">
             <!-- Item 1: Huperzine A -->
             <div class="item-card" data-reveal>
@@ -190,5 +213,88 @@
         </div>
     </div>
 
+    <script>
+        const questions = [
+            {
+                q: "What is your primary optimization target?",
+                options: [
+                    { text: "Cognitive Flux (Focus & Memory)", value: "focus" },
+                    { text: "System Recovery (Sleep & Mood)", value: "sleep" },
+                    { text: "Bio-Output (Energy & Performance)", value: "energy" }
+                ]
+            },
+            {
+                q: "Current experience level with nootropics?",
+                options: [
+                    { text: "Baseline (Beginner)", value: "base" },
+                    { text: "Augmented (Intermediate)", value: "aug" },
+                    { text: "Elite (Advanced)", value: "elite" }
+                ]
+            }
+        ];
+
+        let currentStep = 0;
+        let answers = [];
+
+        function startQuiz() {
+            document.getElementById('quiz-intro').style.display = 'none';
+            document.getElementById('quiz-questions').style.display = 'block';
+            showQuestion();
+        }
+
+        function showQuestion() {
+            const q = questions[currentStep];
+            document.getElementById('question-text').textContent = q.q;
+            const container = document.getElementById('options-container');
+            container.innerHTML = '';
+
+            q.options.forEach(opt => {
+                const btn = document.createElement('button');
+                btn.className = 'buy-btn';
+                btn.style.textAlign = 'left';
+                btn.style.padding = '15px';
+                btn.textContent = opt.text;
+                btn.onclick = () => selectOption(opt.value);
+                container.appendChild(btn);
+            });
+        }
+
+        function selectOption(val) {
+            answers.push(val);
+            currentStep++;
+            if (currentStep < questions.length) {
+                showQuestion();
+            } else {
+                showResults();
+            }
+        }
+
+        function showResults() {
+            document.getElementById('quiz-questions').style.display = 'none';
+            const resultsDiv = document.getElementById('quiz-results');
+            resultsDiv.classList.add('active');
+
+            const output = document.getElementById('recommendation-output');
+            const goal = answers[0];
+
+            let rec = "";
+            if (goal === 'focus') {
+                rec = "<strong>The Architect Stack:</strong> Alpha GPC + Huperzine-A + Citicoline. This combination optimizes acetylcholine levels for sustained deep work and neural plasticity.";
+            } else if (goal === 'sleep') {
+                rec = "<strong>The Circadian Reset:</strong> Magnesium + 5-HTP. Designed to down-regulate the nervous system and optimize REM latency.";
+            } else {
+                rec = "<strong>The Performance Engine:</strong> Agmatine Sulfate + Citicoline. Enhances blood flow and cognitive drive for high-output physical and mental sessions.";
+            }
+
+            output.innerHTML = `<p style="color: var(--text-main); line-height: 1.6;">${rec}</p>`;
+        }
+
+        function resetQuiz() {
+            currentStep = 0;
+            answers = [];
+            document.getElementById('quiz-results').classList.remove('active');
+            document.getElementById('quiz-intro').style.display = 'block';
+        }
+    </script>
 </body>
 </html>
