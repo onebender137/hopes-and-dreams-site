@@ -64,28 +64,62 @@ document.addEventListener('DOMContentLoaded', () => {
         });
     }
 
-    // 2. Soundscapes
-    window.toggleSound = function(type) {
-        if (!window.audioCtx) window.audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+    // 2. Neural Frequency Architect
+    let brownNoiseNode = null;
+    let binauralNodes = null;
+    let baseFreq = 200;
 
-        const buttons = document.querySelectorAll('.sound-btn');
+    const freqSlider = document.getElementById('freq-slider');
+    const freqValDisplay = document.getElementById('freq-val');
+    const freqType = document.getElementById('freq-type');
+    const freqDesc = document.getElementById('freq-desc');
 
-        if (window.activeNode) {
-            if (Array.isArray(window.activeNode)) {
-                window.activeNode.forEach(n => n.stop());
-            } else {
-                window.activeNode.stop();
-            }
-            window.activeNode = null;
-            buttons.forEach(b => b.classList.remove('active'));
-            return;
+    function updateFreqDisplay(val) {
+        if (!freqValDisplay) return;
+        freqValDisplay.textContent = val;
+
+        let type = "";
+        let desc = "";
+
+        if (val < 4) {
+            type = "Delta State";
+            desc = "Deep sleep, physical restoration, and restorative healing.";
+        } else if (val < 8) {
+            type = "Theta State";
+            desc = "Deep relaxation, meditation, creativity, and subconscious access.";
+        } else if (val < 14) {
+            type = "Alpha State";
+            desc = "Relaxed alertness, stress relief, calm focus, and learning.";
+        } else if (val < 30) {
+            type = "Beta State";
+            desc = "Active thinking, problem-solving, analytical tasks, and alertness.";
+        } else {
+            type = "Gamma State";
+            desc = "Peak focus, high-level cognition, memory recall, and insight.";
         }
 
-        buttons.forEach(b => {
-            if (b.innerText.toLowerCase().includes(type)) b.classList.add('active');
-        });
+        freqType.textContent = type;
+        freqDesc.textContent = desc;
 
-        if (type === 'brown') {
+        if (binauralNodes) {
+            const freq = parseFloat(val);
+            binauralNodes.oscR.frequency.setTargetAtTime(baseFreq + freq, window.audioCtx.currentTime, 0.1);
+        }
+    }
+
+    if (freqSlider) {
+        freqSlider.addEventListener('input', (e) => updateFreqDisplay(e.target.value));
+    }
+
+    window.toggleBrownNoise = function() {
+        if (!window.audioCtx) window.audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+        const btn = document.getElementById('brown-toggle');
+
+        if (brownNoiseNode) {
+            brownNoiseNode.stop();
+            brownNoiseNode = null;
+            btn.classList.remove('active');
+        } else {
             const bufferSize = 2 * window.audioCtx.sampleRate;
             const noiseBuffer = window.audioCtx.createBuffer(1, bufferSize, window.audioCtx.sampleRate);
             const output = noiseBuffer.getChannelData(0);
@@ -96,20 +130,37 @@ document.addEventListener('DOMContentLoaded', () => {
                 lastOut = output[i];
                 output[i] *= 3.5;
             }
-            const noise = window.audioCtx.createBufferSource();
-            noise.buffer = noiseBuffer;
-            noise.loop = true;
-            noise.connect(window.audioCtx.destination);
-            noise.start();
-            window.activeNode = noise;
-        } else if (type === 'binaural') {
+            brownNoiseNode = window.audioCtx.createBufferSource();
+            brownNoiseNode.buffer = noiseBuffer;
+            brownNoiseNode.loop = true;
+
+            const gainNode = window.audioCtx.createGain();
+            gainNode.gain.setValueAtTime(0.3, window.audioCtx.currentTime);
+
+            brownNoiseNode.connect(gainNode).connect(window.audioCtx.destination);
+            brownNoiseNode.start();
+            btn.classList.add('active');
+        }
+    };
+
+    window.toggleBinauralBeats = function() {
+        if (!window.audioCtx) window.audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+        const btn = document.getElementById('binaural-toggle');
+
+        if (binauralNodes) {
+            binauralNodes.oscL.stop();
+            binauralNodes.oscR.stop();
+            binauralNodes = null;
+            btn.classList.remove('active');
+        } else {
+            const freq = parseFloat(freqSlider.value);
             const oscL = window.audioCtx.createOscillator();
-            oscL.frequency.setValueAtTime(200, window.audioCtx.currentTime);
+            oscL.frequency.setValueAtTime(baseFreq, window.audioCtx.currentTime);
             const pannerL = window.audioCtx.createStereoPanner();
             pannerL.pan.setValueAtTime(-1, window.audioCtx.currentTime);
 
             const oscR = window.audioCtx.createOscillator();
-            oscR.frequency.setValueAtTime(240, window.audioCtx.currentTime);
+            oscR.frequency.setValueAtTime(baseFreq + freq, window.audioCtx.currentTime);
             const pannerR = window.audioCtx.createStereoPanner();
             pannerR.pan.setValueAtTime(1, window.audioCtx.currentTime);
 
@@ -122,7 +173,8 @@ document.addEventListener('DOMContentLoaded', () => {
 
             oscL.start();
             oscR.start();
-            window.activeNode = [oscL, oscR];
+            binauralNodes = { oscL, oscR, gain };
+            btn.classList.add('active');
         }
     };
 
