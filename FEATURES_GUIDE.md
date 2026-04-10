@@ -18,8 +18,30 @@ The Codex is a searchable technical glossary located in the Intel Hub.
 
 ### How to add new articles/terms:
 1. Open `script.js`.
-2. Find the `codexData` object.
-3. Add a new key-value pair. The key should be **lowercase**.
+2. Find the `codexData` object (near the top).
+3. Add a new key-value pair inside the curly braces `{ }`.
+   - The **key** (the word you search for) must be lowercase and inside quotes.
+   - The **value** (the definition) must be inside quotes and followed by a comma.
+
+**Example Code:**
+```javascript
+const codexData = {
+    'ache': 'Acetylcholinesterase explanation...',
+    'newterm': 'Your definition here...', // <--- Add like this!
+};
+```
+
+### Current Terms in Database:
+- **ache**: Acetylcholinesterase enzyme info.
+- **bdnf**: Brain-Derived Neurotrophic Factor.
+- **choline**: Acetylcholine precursor.
+- **gaba**: Inhibitory neurotransmitter for relaxation.
+- **glycine**: Amino acid for sleep quality.
+- **hrv**: Heart Rate Variability.
+- **l-theanine**: Relaxation without drowsiness.
+- **nootropic**: Cognitive enhancers.
+- **rem**: Rapid Eye Movement sleep stage.
+- **yuschak**: Lucid dreaming protocol.
 
 ---
 
