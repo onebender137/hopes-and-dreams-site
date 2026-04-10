@@ -9,75 +9,18 @@
     <script src="script.js" defer></script>
     <style>
         .container { max-width: 1100px; margin: 0 auto; padding: 0 24px 100px; text-align: center; }
-
         h1 { color: var(--neon-gold); text-transform: uppercase; letter-spacing: 4px; margin-bottom: 10px; font-size: 2.5rem; font-weight: 900; }
         .subtitle { color: var(--text-dim); margin-bottom: 60px; font-size: 1.1rem; text-transform: uppercase; letter-spacing: 2px; }
 
-        /* Procurement Grid */
-        .shop-grid {
-            display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
-            gap: 25px;
-        }
-
-        .item-card {
-            background-color: var(--card-bg);
-            padding: 30px;
-            border-radius: 20px;
-            border: 1px solid rgba(56, 189, 248, 0.1);
-            text-align: left;
-            transition: 0.3s;
-            display: flex;
-            flex-direction: column;
-            justify-content: space-between;
-        }
-
-        .item-card:hover {
-            border-color: var(--neon-gold);
-            transform: translateY(-5px);
-            box-shadow: 0 10px 30px -10px rgba(251, 191, 36, 0.2);
-        }
-
-        .tag {
-            font-size: 0.7rem;
-            text-transform: uppercase;
-            color: var(--neon-blue);
-            font-weight: 900;
-            letter-spacing: 1px;
-            margin-bottom: 10px;
-            display: block;
-        }
-
+        .shop-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap: 25px; }
+        .item-card { background-color: var(--card-bg); padding: 30px; border-radius: 20px; border: 1px solid rgba(56, 189, 248, 0.1); text-align: left; transition: 0.3s; display: flex; flex-direction: column; justify-content: space-between; }
+        .item-card:hover { border-color: var(--neon-gold); transform: translateY(-5px); box-shadow: 0 10px 30px -10px rgba(251, 191, 36, 0.2); }
+        .tag { font-size: 0.7rem; text-transform: uppercase; color: var(--neon-blue); font-weight: 900; letter-spacing: 1px; margin-bottom: 10px; display: block; }
         .item-card h3 { color: var(--text-main); margin: 0 0 10px 0; font-size: 1.3rem; }
         .item-card p { color: var(--text-dim); font-size: 0.95rem; margin-bottom: 20px; flex-grow: 1; }
-
-        .buy-btn {
-            display: block;
-            text-align: center;
-            background: transparent;
-            color: var(--neon-gold);
-            border: 1px solid var(--neon-gold);
-            padding: 10px;
-            border-radius: 8px;
-            text-decoration: none;
-            font-weight: 700;
-            text-transform: uppercase;
-            font-size: 0.8rem;
-            transition: 0.3s;
-        }
-
-        .buy-btn:hover {
-            background: var(--neon-gold);
-            color: var(--bg-main);
-        }
-
-        .disclaimer {
-            margin-top: 80px;
-            padding: 20px;
-            border-top: 1px solid rgba(255,255,255,0.05);
-            color: #4b5563;
-            font-size: 0.8rem;
-        }
+        .buy-btn { display: block; text-align: center; background: transparent; color: var(--neon-gold); border: 1px solid var(--neon-gold); padding: 10px; border-radius: 8px; text-decoration: none; font-weight: 700; text-transform: uppercase; font-size: 0.8rem; transition: 0.3s; }
+        .buy-btn:hover { background: var(--neon-gold); color: var(--bg-main); }
+        .disclaimer { margin-top: 80px; padding: 20px; border-top: 1px solid rgba(255,255,255,0.05); color: #4b5563; font-size: 0.8rem; }
     </style>
 </head>
 <body>
@@ -213,88 +156,5 @@
         </div>
     </div>
 
-    <script>
-        const questions = [
-            {
-                q: "What is your primary optimization target?",
-                options: [
-                    { text: "Cognitive Flux (Focus & Memory)", value: "focus" },
-                    { text: "System Recovery (Sleep & Mood)", value: "sleep" },
-                    { text: "Bio-Output (Energy & Performance)", value: "energy" }
-                ]
-            },
-            {
-                q: "Current experience level with nootropics?",
-                options: [
-                    { text: "Baseline (Beginner)", value: "base" },
-                    { text: "Augmented (Intermediate)", value: "aug" },
-                    { text: "Elite (Advanced)", value: "elite" }
-                ]
-            }
-        ];
-
-        let currentStep = 0;
-        let answers = [];
-
-        function startQuiz() {
-            document.getElementById('quiz-intro').style.display = 'none';
-            document.getElementById('quiz-questions').style.display = 'block';
-            showQuestion();
-        }
-
-        function showQuestion() {
-            const q = questions[currentStep];
-            document.getElementById('question-text').textContent = q.q;
-            const container = document.getElementById('options-container');
-            container.innerHTML = '';
-
-            q.options.forEach(opt => {
-                const btn = document.createElement('button');
-                btn.className = 'buy-btn';
-                btn.style.textAlign = 'left';
-                btn.style.padding = '15px';
-                btn.textContent = opt.text;
-                btn.onclick = () => selectOption(opt.value);
-                container.appendChild(btn);
-            });
-        }
-
-        function selectOption(val) {
-            answers.push(val);
-            currentStep++;
-            if (currentStep < questions.length) {
-                showQuestion();
-            } else {
-                showResults();
-            }
-        }
-
-        function showResults() {
-            document.getElementById('quiz-questions').style.display = 'none';
-            const resultsDiv = document.getElementById('quiz-results');
-            resultsDiv.classList.add('active');
-
-            const output = document.getElementById('recommendation-output');
-            const goal = answers[0];
-
-            let rec = "";
-            if (goal === 'focus') {
-                rec = "<strong>The Architect Stack:</strong> Alpha GPC + Huperzine-A + Citicoline. This combination optimizes acetylcholine levels for sustained deep work and neural plasticity.";
-            } else if (goal === 'sleep') {
-                rec = "<strong>The Circadian Reset:</strong> Magnesium + 5-HTP. Designed to down-regulate the nervous system and optimize REM latency.";
-            } else {
-                rec = "<strong>The Performance Engine:</strong> Agmatine Sulfate + Citicoline. Enhances blood flow and cognitive drive for high-output physical and mental sessions.";
-            }
-
-            output.innerHTML = `<p style="color: var(--text-main); line-height: 1.6;">${rec}</p>`;
-        }
-
-        function resetQuiz() {
-            currentStep = 0;
-            answers = [];
-            document.getElementById('quiz-results').classList.remove('active');
-            document.getElementById('quiz-intro').style.display = 'block';
-        }
-    </script>
 </body>
 </html>
