@@ -9,103 +9,8 @@
     <script src="script.js" defer></script>
     <style>
         .container { max-width: 900px; margin: 0 auto; padding: 0 24px 100px; }
-
-        /* Protocol Styling */
-        .protocol-card {
-            background-color: var(--card-bg);
-            padding: 50px; border-radius: 24px;
-            border: 1px solid rgba(56, 189, 248, 0.1);
-            margin-bottom: 40px; position: relative;
-            text-align: left;
-        }
-        .protocol-card::before {
-            content: ''; position: absolute; top: 0; left: 0; width: 100%; height: 4px;
-            background: linear-gradient(90deg, var(--neon-gold), transparent);
-        }
-
         h1 { color: var(--neon-gold); text-transform: uppercase; letter-spacing: 2px; font-size: 2.2rem; font-weight: 900; }
         h2 { color: var(--neon-blue); text-transform: uppercase; margin-top: 30px; font-weight: 700; }
-        
-        .step-box {
-            background: rgba(56, 189, 248, 0.05);
-            border-left: 4px solid var(--neon-blue);
-            padding: 20px; margin: 20px 0; border-radius: 0 12px 12px 0;
-        }
-
-        /* Affiliate Link Buttons */
-        .cta-button {
-            display: inline-block; background: var(--neon-gold); color: var(--bg-main);
-            padding: 12px 24px; border-radius: 50px; text-decoration: none;
-            font-weight: 900; text-transform: uppercase; letter-spacing: 1px;
-            margin-top: 15px; margin-right: 10px; transition: 0.3s;
-        }
-        .cta-button:hover { transform: scale(1.05); box-shadow: 0 0 20px rgba(251, 191, 36, 0.4); }
-
-        /* Accordion Styling */
-        .accordion-container {
-            max-width: 800px;
-            margin: 80px auto;
-            text-align: center;
-        }
-
-        .accordion-item {
-            margin-bottom: 15px;
-        }
-
-        .accordion-header {
-            background: var(--card-bg);
-            color: var(--text-main);
-            padding: 12px 20px;
-            border-radius: 8px;
-            cursor: pointer;
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            border: 1px solid rgba(56, 189, 248, 0.1);
-            transition: 0.3s;
-            font-weight: 700;
-            width: fit-content;
-            margin: 0 auto;
-            min-width: 320px;
-            font-size: 1rem;
-        }
-
-        .accordion-header:hover {
-            border-color: var(--neon-blue);
-            background: rgba(56, 189, 248, 0.05);
-        }
-
-        .accordion-content {
-            max-height: 0;
-            overflow: hidden;
-            transition: max-height 0.3s ease-out;
-            padding: 0 20px;
-            color: var(--text-dim);
-            font-size: 1rem;
-            max-width: 650px;
-            margin: 0 auto;
-            line-height: 1.6;
-        }
-
-        .accordion-item.active .accordion-content {
-            max-height: 200px;
-            padding: 15px 20px;
-        }
-
-        .accordion-header svg {
-            transition: transform 0.3s;
-            width: 18px;
-            height: 18px;
-            margin-left: 10px;
-        }
-
-        .accordion-item.active .accordion-header svg {
-            transform: rotate(180deg);
-        }
-
-        @media (max-width: 600px) {
-            .accordion-header { min-width: 90%; }
-        }
     </style>
 </head>
 <body>
@@ -263,14 +168,14 @@
                 <svg width="24" height="24" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z"></path></svg>
                 Biometric Architecture (Optimal HRV)
             </div>
-            <div class="chart-container" style="height: 150px; display: flex; align-items: flex-end; gap: 5px; padding: 20px 0;">
-                <div style="flex: 1; height: 30%; background: var(--neon-blue); border-radius: 4px 4px 0 0; opacity: 0.3;"></div>
-                <div style="flex: 1; height: 45%; background: var(--neon-blue); border-radius: 4px 4px 0 0; opacity: 0.5;"></div>
-                <div style="flex: 1; height: 80%; background: var(--neon-gold); border-radius: 4px 4px 0 0; box-shadow: 0 0 10px var(--neon-gold);"></div>
-                <div style="flex: 1; height: 60%; background: var(--neon-blue); border-radius: 4px 4px 0 0; opacity: 0.7;"></div>
-                <div style="flex: 1; height: 90%; background: var(--neon-gold); border-radius: 4px 4px 0 0; box-shadow: 0 0 10px var(--neon-gold);"></div>
-                <div style="flex: 1; height: 40%; background: var(--neon-blue); border-radius: 4px 4px 0 0; opacity: 0.4;"></div>
-                <div style="flex: 1; height: 75%; background: var(--neon-blue); border-radius: 4px 4px 0 0; opacity: 0.8;"></div>
+            <div class="chart-container">
+                <div class="chart-bar" style="height: 10%; opacity: 0.3;"></div>
+                <div class="chart-bar" style="height: 10%; opacity: 0.5;"></div>
+                <div class="chart-bar" style="height: 10%; background: var(--neon-gold); box-shadow: 0 0 10px var(--neon-gold);"></div>
+                <div class="chart-bar" style="height: 10%; opacity: 0.7;"></div>
+                <div class="chart-bar" style="height: 10%; background: var(--neon-gold); box-shadow: 0 0 10px var(--neon-gold);"></div>
+                <div class="chart-bar" style="height: 10%; opacity: 0.4;"></div>
+                <div class="chart-bar" style="height: 10%; opacity: 0.8;"></div>
             </div>
             <p style="font-size: 0.8rem; color: var(--text-dim); text-align: center;">Targeting 80ms+ HRV during deep sleep cycles.</p>
         </div>
@@ -334,169 +239,5 @@
             <p>&copy; 2026 Hopes and Dreams Syndicate. All Rights Reserved.</p>
         </footer>
     </div>
-    <script>
-        // Sleep Calculator Logic
-        const wakeInput = document.getElementById('wake-time');
-        const suggestContainer = document.getElementById('suggested-times');
-
-        function calculateSleepTimes() {
-            const wakeTime = wakeInput.value;
-            const [hours, minutes] = wakeTime.split(':').map(Number);
-            const wakeDate = new Date();
-            wakeDate.setHours(hours, minutes, 0);
-
-            suggestContainer.innerHTML = '';
-
-            // Calculate 6, 5, and 4 cycles (9, 7.5, 6 hours)
-            [6, 5, 4].forEach(cycles => {
-                const sleepDate = new Date(wakeDate.getTime() - (cycles * 90 * 60 * 1000) - (15 * 60 * 1000)); // 15 mins to fall asleep
-                const timeStr = sleepDate.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit', hour12: false });
-
-                const card = document.createElement('div');
-                card.className = 'time-card';
-                card.textContent = timeStr;
-                suggestContainer.appendChild(card);
-            });
-        }
-
-        wakeInput.addEventListener('change', calculateSleepTimes);
-        calculateSleepTimes();
-
-        // Accordion Logic
-        document.querySelectorAll('.accordion-header').forEach(header => {
-            header.addEventListener('click', () => {
-                const item = header.parentElement;
-                item.classList.toggle('active');
-            });
-        });
-
-        // Feature 2: Deep Work Soundscapes
-        let audioCtx;
-        let activeNode;
-
-        function toggleSound(type) {
-            if (!audioCtx) audioCtx = new (window.AudioContext || window.webkitAudioContext)();
-
-            if (activeNode) {
-                if (Array.isArray(activeNode)) {
-                    activeNode.forEach(n => n.stop());
-                } else {
-                    activeNode.stop();
-                }
-                activeNode = null;
-                return;
-            }
-
-            if (type === 'brown') {
-                const bufferSize = 2 * audioCtx.sampleRate;
-                const noiseBuffer = audioCtx.createBuffer(1, bufferSize, audioCtx.sampleRate);
-                const output = noiseBuffer.getChannelData(0);
-                let lastOut = 0.0;
-                for (let i = 0; i < bufferSize; i++) {
-                    const white = Math.random() * 2 - 1;
-                    output[i] = (lastOut + (0.02 * white)) / 1.02;
-                    lastOut = output[i];
-                    output[i] *= 3.5;
-                }
-                const noise = audioCtx.createBufferSource();
-                noise.buffer = noiseBuffer;
-                noise.loop = true;
-                noise.connect(audioCtx.destination);
-                noise.start();
-                activeNode = noise;
-            } else if (type === 'binaural') {
-                // True Binaural: 200Hz Left, 240Hz Right = 40Hz perceived beat
-                const merger = audioCtx.createChannelMerger(2);
-
-                const oscL = audioCtx.createOscillator();
-                oscL.frequency.setValueAtTime(200, audioCtx.currentTime);
-                const pannerL = audioCtx.createStereoPanner();
-                pannerL.pan.setValueAtTime(-1, audioCtx.currentTime);
-
-                const oscR = audioCtx.createOscillator();
-                oscR.frequency.setValueAtTime(240, audioCtx.currentTime);
-                const pannerR = audioCtx.createStereoPanner();
-                pannerR.pan.setValueAtTime(1, audioCtx.currentTime);
-
-                const gain = audioCtx.createGain();
-                gain.gain.setValueAtTime(0.1, audioCtx.currentTime);
-
-                oscL.connect(pannerL).connect(gain);
-                oscR.connect(pannerR).connect(gain);
-                gain.connect(audioCtx.destination);
-
-                oscL.start();
-                oscR.start();
-                activeNode = [oscL, oscR];
-            }
-        }
-
-        // Feature 4: Protocol Timer
-        let timerInterval;
-        function startTimer(seconds) {
-            clearInterval(timerInterval);
-            let timeLeft = seconds;
-            const display = document.getElementById('timer-display');
-
-            timerInterval = setInterval(() => {
-                const mins = Math.floor(timeLeft / 60);
-                const secs = timeLeft % 60;
-                display.textContent = `${mins.toString().padStart(2, '0')}:${secs.toString().padStart(2, '0')}`;
-
-                if (timeLeft <= 0) {
-                    clearInterval(timerInterval);
-                    display.textContent = "PROTOCOL COMPLETE";
-                }
-                timeLeft--;
-            }, 1000);
-        }
-
-        // Feature 3: Biohacking Codex
-        const codexData = {
-            'ache': 'Acetylcholinesterase: An enzyme that breaks down acetylcholine. Inhibiting this (e.g. with Huperzine-A) increases neuro-connectivity.',
-            'hrv': 'Heart Rate Variability: The variation in time between heartbeats. A higher HRV typically indicates better recovery and nervous system balance.',
-            'rem': 'Rapid Eye Movement: The sleep stage associated with vivid dreaming and memory consolidation.',
-            'nootropic': 'Compounds that enhance cognitive function, particularly executive functions, memory, creativity, or motivation.',
-            'yuschak': 'The gold-standard protocol for lucidity involving specific supplement timing during the WBTB window.'
-        };
-
-        document.getElementById('codex-search').addEventListener('input', (e) => {
-            const query = e.target.value.toLowerCase();
-            const resultBox = document.getElementById('codex-results');
-            if (query.length < 2) {
-                resultBox.innerHTML = '<em>Search for a term to initialize protocol data.</em>';
-                return;
-            }
-            const found = Object.keys(codexData).find(key => key.includes(query));
-            if (found) {
-                resultBox.innerHTML = `<strong>${found.toUpperCase()}:</strong> ${codexData[found]}`;
-            } else {
-                resultBox.innerHTML = '<em>Term not found in current database.</em>';
-            }
-        });
-
-        // Checklist Logic
-        const checks = document.querySelectorAll('.protocol-check');
-
-        // Load state
-        checks.forEach(check => {
-            const id = check.getAttribute('data-id');
-            const saved = localStorage.getItem('protocol_' + id);
-            if (saved === 'true') {
-                check.checked = true;
-                check.parentElement.classList.add('completed');
-            }
-
-            check.addEventListener('change', (e) => {
-                const isChecked = e.target.checked;
-                localStorage.setItem('protocol_' + id, isChecked);
-                if (isChecked) {
-                    check.parentElement.classList.add('completed');
-                } else {
-                    check.parentElement.classList.remove('completed');
-                }
-            });
-        });
-    </script>
 </body>
 </html>
