@@ -58,13 +58,18 @@ A multi-step recommender system on the Procurement page.
 
 ---
 
-## 3. Deep Work Soundscapes
-Generates audio locally using the Web Audio API.
+## 3. Neural Frequency Architect
+An advanced audio generation system for brainwave entrainment.
 
 ### How it works:
-- **Brown Noise:** Generates deep, low-frequency random noise via a buffer algorithm.
-- **Binaural Beats (40Hz):** Creates a "Gamma" frequency by playing 200Hz in the left ear and 240Hz in the right ear for true stereo separation.
-- Controlled via `toggleSound(type)` in `script.js`.
+- **Brown Noise Layer:** Generates deep, low-frequency random noise via a buffer algorithm to mask external distractions.
+- **Dynamic Binaural Beats:** Uses two independent oscillators (L/R) to create a perceived third tone.
+- **Real-time Frequency Scaling:** The `updateFreqDisplay` function in `script.js` updates the oscillator frequency in real-time as the slider moves.
+- **State Feedback:** Automatically maps the selected frequency (0.5Hz - 100Hz) to specific brainwave states (Delta, Theta, Alpha, Beta, Gamma) and displays their optimization target.
+
+### Maintenance:
+- The base frequency (default 200Hz) can be adjusted in `script.js` by changing the `baseFreq` variable.
+- Brainwave state descriptions can be updated within the `updateFreqDisplay` function logic.
 
 ---
 

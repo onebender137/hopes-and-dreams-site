@@ -280,6 +280,34 @@ nav a:hover {
     transition: 0.3s;
 }
 
+/* Range Slider Styling */
+input[type="range"] {
+    -webkit-appearance: none;
+    height: 6px;
+    background: rgba(56, 189, 248, 0.1);
+    border-radius: 5px;
+    background-image: linear-gradient(var(--neon-blue), var(--neon-blue));
+    background-repeat: no-repeat;
+}
+
+input[type="range"]::-webkit-slider-thumb {
+    -webkit-appearance: none;
+    height: 18px;
+    width: 18px;
+    border-radius: 50%;
+    background: var(--neon-blue);
+    cursor: pointer;
+    box-shadow: 0 0 10px var(--neon-blue);
+    transition: background .3s ease-in-out;
+}
+
+input[type="range"]::-webkit-slider-runnable-track  {
+    -webkit-appearance: none;
+    box-shadow: none;
+    border: none;
+    background: transparent;
+}
+
 .input-group input:focus, .widget-container input[type="text"]:focus {
     border-color: var(--neon-blue);
     box-shadow: 0 0 10px rgba(56, 189, 248, 0.1);

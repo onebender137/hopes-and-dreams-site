@@ -95,19 +95,34 @@
         <div class="glow-divider"></div>
 
         <div class="grid">
-            <!-- Feature 2: Deep Work Soundscapes -->
-            <div class="widget-container" data-reveal>
+            <!-- Feature 2: Neural Frequency Architect -->
+            <div class="widget-container" data-reveal style="grid-column: span 2;">
                 <div class="widget-title">
                     <svg width="24" height="24" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 19V6l12-3v13M9 19c0 1.105-1.343 2-3 2s-3-.895-3-2 1.343-2 3-2 3 .895 3 2zm12-3c0 1.105-1.343 2-3 2s-3-.895-3-2 1.343-2 3-2 3 .895 3 2zM9 10l12-3"></path></svg>
-                    Deep Work Soundscapes
+                    Neural Frequency Architect
                 </div>
-                <div class="sound-controls">
-                    <button class="buy-btn sound-btn" onclick="toggleSound('brown')">Brown Noise</button>
-                    <button class="buy-btn sound-btn" onclick="toggleSound('binaural')">Binaural (40Hz)</button>
-                </div>
-                <p style="font-size: 0.7rem; color: var(--text-dim); margin-top: 10px;">*Generated locally via Web Audio API for zero latency.</p>
-            </div>
 
+                <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 20px;">
+                    <div>
+                        <div class="input-group">
+                            <label>Target Frequency: <span id="freq-val" style="color: var(--neon-blue);">40</span> Hz</label>
+                            <input type="range" id="freq-slider" min="0.5" max="100" step="0.5" value="40" style="width: 100%;">
+                        </div>
+                        <div class="sound-controls" style="justify-content: flex-start;">
+                            <button id="brown-toggle" class="buy-btn sound-btn" onclick="toggleBrownNoise()">Layer: Brown Noise</button>
+                            <button id="binaural-toggle" class="buy-btn sound-btn" onclick="toggleBinauralBeats()">Active: Binaural</button>
+                        </div>
+                    </div>
+                    <div id="freq-info" style="background: rgba(0,0,0,0.2); padding: 15px; border-radius: 12px; border: 1px solid rgba(56, 189, 248, 0.1);">
+                        <strong id="freq-type" style="color: var(--neon-gold); text-transform: uppercase; font-size: 0.8rem;">Gamma State</strong>
+                        <p id="freq-desc" style="font-size: 0.8rem; color: var(--text-dim); margin: 5px 0 0;">Peak focus, memory, complex problem-solving, and intense concentration.</p>
+                    </div>
+                </div>
+                <p style="font-size: 0.7rem; color: var(--text-dim); margin-top: 15px;">*Use stereo headphones for maximum efficacy. Generated locally via Web Audio API.</p>
+            </div>
+        </div>
+
+        <div class="grid">
             <!-- Feature 4: Protocol Timer -->
             <div class="widget-container" data-reveal>
                 <div class="widget-title">
@@ -179,6 +194,58 @@
             </div>
             <p style="font-size: 0.8rem; color: var(--text-dim); text-align: center;">Targeting 80ms+ HRV during deep sleep cycles.</p>
         </div>
+
+        <!-- Information Section: The Science of Neural Frequencies -->
+        <article class="protocol-card" data-reveal style="margin-top: 40px; border-color: rgba(251, 191, 36, 0.2);">
+            <div style="font-size: 0.8rem; color: var(--neon-gold); margin-bottom: 10px; text-transform: uppercase; letter-spacing: 1px;">Intel Briefing: Neural Frequencies</div>
+            <h2 style="color: var(--neon-gold);">The Science of Binaural Beats</h2>
+            <p>Binaural beats occur when two slightly different frequencies are played in each ear, creating a third "perceived" tone that the brain entrains to. This phenomenon, known as Brainwave Entrainment, allows us to architect specific mental states on demand.</p>
+
+            <div style="overflow-x: auto; margin: 20px 0;">
+                <table style="width: 100%; border-collapse: collapse; font-size: 0.85rem; color: var(--text-dim); text-align: left;">
+                    <thead>
+                        <tr style="border-bottom: 2px solid var(--neon-blue); color: var(--text-main);">
+                            <th style="padding: 10px;">Frequency</th>
+                            <th style="padding: 10px;">Type</th>
+                            <th style="padding: 10px;">Primary State</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr style="border-bottom: 1px solid rgba(255,255,255,0.05);">
+                            <td style="padding: 10px; color: var(--neon-blue);">0.5 – 4 Hz</td>
+                            <td style="padding: 10px;">Delta</td>
+                            <td style="padding: 10px;">Deep Sleep & Physical Recovery</td>
+                        </tr>
+                        <tr style="border-bottom: 1px solid rgba(255,255,255,0.05);">
+                            <td style="padding: 10px; color: var(--neon-blue);">4 – 8 Hz</td>
+                            <td style="padding: 10px;">Theta</td>
+                            <td style="padding: 10px;">Meditation, Creativity & Visualization</td>
+                        </tr>
+                        <tr style="border-bottom: 1px solid rgba(255,255,255,0.05);">
+                            <td style="padding: 10px; color: var(--neon-blue);">8 – 14 Hz</td>
+                            <td style="padding: 10px;">Alpha</td>
+                            <td style="padding: 10px;">Relaxed Alertness & Stress Relief</td>
+                        </tr>
+                        <tr style="border-bottom: 1px solid rgba(255,255,255,0.05);">
+                            <td style="padding: 10px; color: var(--neon-blue);">14 – 30 Hz</td>
+                            <td style="padding: 10px;">Beta</td>
+                            <td style="padding: 10px;">Problem-solving & Analytical Productivity</td>
+                        </tr>
+                        <tr style="border-bottom: 1px solid rgba(255,255,255,0.05);">
+                            <td style="padding: 10px; color: var(--neon-blue);">30 – 100 Hz</td>
+                            <td style="padding: 10px;">Gamma</td>
+                            <td style="padding: 10px;">Peak Focus & Complex Cognition</td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+
+            <p style="font-size: 0.9rem; border-left: 2px solid var(--neon-gold); padding-left: 15px; font-style: italic;">
+                "Optimal achievement requires stereo isolation. By delivering 200Hz to the left ear and 240Hz to the right, the brain's superior olivary nucleus creates the 40Hz 'phantom' tone, driving the system into Gamma synchronization."
+            </p>
+        </article>
+
+        <div class="glow-divider"></div>
 
         <!-- Feature 3: Biohacking Codex -->
         <div class="widget-container" data-reveal>
