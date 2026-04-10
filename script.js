@@ -1,32 +1,17 @@
 // --- Shared Functionality ---
 
 document.addEventListener('DOMContentLoaded', () => {
-    // 1. Page Fade-In Effect
-    document.body.classList.add('page-fade');
-
-    // 2. Custom Neon Glow Cursor
-    const cursorDot = document.createElement('div');
-    const cursorOutline = document.createElement('div');
-    cursorDot.className = 'cursor-dot';
-    cursorOutline.className = 'cursor-outline';
-    document.body.appendChild(cursorDot);
-    document.body.appendChild(cursorOutline);
-
-    window.addEventListener('mousemove', (e) => {
-        const posX = e.clientX;
-        const posY = e.clientY;
-
-        cursorDot.style.left = `${posX}px`;
-        cursorDot.style.top = `${posY}px`;
-
-        // Smooth outline trailing
-        cursorOutline.animate({
-            left: `${posX}px`,
-            top: `${posY}px`
-        }, { duration: 500, fill: "forwards" });
+    // Scroll Progress Bar
+    const progress = document.getElementById('scroll-progress');
+    window.addEventListener('scroll', () => {
+        const winScroll = document.body.scrollTop || document.documentElement.scrollTop;
+        const height = document.documentElement.scrollHeight - document.documentElement.clientHeight;
+        const scrolled = (winScroll / height) * 100;
+        if (progress) {
+            progress.style.width = scrolled + "%";
+        }
     });
 
-    // 3. Scroll Reveal Logic
     const observerOptions = {
         threshold: 0.1,
         rootMargin: '0px 0px -50px 0px'
@@ -42,33 +27,44 @@ document.addEventListener('DOMContentLoaded', () => {
 
     document.querySelectorAll('[data-reveal]').forEach(el => observer.observe(el));
 
-    // 4. Reading Progress Bar (for intel.html)
-    const progressBar = document.getElementById('reading-progress');
-    if (progressBar) {
-        window.addEventListener('scroll', () => {
-            const winScroll = document.body.scrollTop || document.documentElement.scrollTop;
-            const height = document.documentElement.scrollHeight - document.documentElement.clientHeight;
-            const scrolled = (winScroll / height) * 100;
-            progressBar.style.width = scrolled + "%";
+    // Theme Toggle
+    const themeToggle = document.getElementById('theme-toggle');
+    const body = document.body;
+    const logo = document.querySelector('.logo-wrap img');
+
+    // Check for saved theme
+    const currentTheme = localStorage.getItem('theme');
+    if (currentTheme === 'light') {
+        body.classList.add('light-mode');
+        if (themeToggle) themeToggle.innerHTML = '🌙 DARK MODE';
+        if (logo) {
+            // Check if logo src is relative to articles
+            const isArticle = window.location.pathname.includes('/articles/');
+            logo.src = isArticle ? '../topper-inverted.png' : 'topper-inverted.png';
+        }
+    }
+
+    if (themeToggle) {
+        themeToggle.addEventListener('click', () => {
+            body.classList.toggle('light-mode');
+
+            let theme = 'dark';
+            if (body.classList.contains('light-mode')) {
+                theme = 'light';
+                themeToggle.innerHTML = '🌙 DARK MODE';
+                if (logo) {
+                    const isArticle = window.location.pathname.includes('/articles/');
+                    logo.src = isArticle ? '../topper-inverted.png' : 'topper-inverted.png';
+                }
+            } else {
+                themeToggle.innerHTML = '☀️ LIGHT MODE';
+                if (logo) {
+                    const isArticle = window.location.pathname.includes('/articles/');
+                    logo.src = isArticle ? '../topper.png' : 'topper.png';
+                }
+            }
+            localStorage.setItem('theme', theme);
         });
-    }
-
-    // 5. Hero Particle Background (for index.html)
-    const canvas = document.getElementById('particle-canvas');
-    if (canvas) {
-        initParticles(canvas);
-    }
-
-    // 6. Dynamic Quote Rotator (for index.html)
-    const quoteContainer = document.getElementById('quote-container');
-    if (quoteContainer) {
-        initQuoteRotator(quoteContainer);
-    }
-
-    // 7. Category Filtering (for shop.html)
-    const filterBtns = document.querySelectorAll('.filter-btn');
-    if (filterBtns.length > 0) {
-        initFilters(filterBtns);
     }
 });
 
