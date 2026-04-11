@@ -427,6 +427,21 @@ nav a:hover {
     transition: height 1s ease-out;
 }
 
+.chart-labels {
+    display: flex;
+    justify-content: space-between;
+    gap: 5px;
+    margin-top: 10px;
+}
+
+.chart-labels span {
+    flex: 1;
+    text-align: center;
+    font-size: 0.7rem;
+    color: var(--text-dim);
+    font-weight: 700;
+}
+
 /* Protocol Styling */
 .protocol-card {
     background-color: var(--card-bg);
