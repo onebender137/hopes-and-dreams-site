@@ -280,63 +280,40 @@ nav a:hover {
     transition: 0.3s;
 }
 
-/* Range Slider Styling */
-input[type="range"] {
-    -webkit-appearance: none;
-    width: 100%;
-    height: 10px;
-    background: rgba(56, 189, 248, 0.15);
-    border-radius: 5px;
-    background-image: linear-gradient(var(--neon-blue), var(--neon-blue));
-    background-repeat: no-repeat;
-    outline: none;
-    cursor: pointer;
-    margin: 15px 0;
-}
-
-input[type="range"]::-webkit-slider-thumb {
-    -webkit-appearance: none;
-    height: 24px;
-    width: 24px;
-    border-radius: 50%;
-    background: var(--neon-blue);
-    cursor: pointer;
-    box-shadow: 0 0 15px var(--neon-blue);
-    transition: background .3s ease-in-out, transform 0.2s;
-    border: 2px solid var(--bg-main);
-    margin-top: -7px; /* Centers thumb on track */
-}
-
-input[type="range"]::-webkit-slider-thumb:hover {
-    transform: scale(1.1);
-}
-
-input[type="range"]::-webkit-slider-runnable-track  {
-    -webkit-appearance: none;
-    box-shadow: none;
-    border: none;
+.buy-btn {
+    display: block;
+    text-align: center;
     background: transparent;
-    height: 10px;
+    color: var(--neon-gold);
+    border: 1px solid var(--neon-gold);
+    padding: 10px;
+    border-radius: 8px;
+    text-decoration: none;
+    font-weight: 700;
+    text-transform: uppercase;
+    font-size: 0.8rem;
+    transition: 0.3s;
+    cursor: pointer;
+    font-family: inherit;
 }
 
-/* Firefox Support */
-input[type="range"]::-moz-range-track {
-    background: rgba(56, 189, 248, 0.15);
-    height: 10px;
-    border-radius: 5px;
+.buy-btn:hover {
+    background: var(--neon-gold);
+    color: var(--bg-main);
 }
-input[type="range"]::-moz-range-progress {
-    background: var(--neon-blue);
-    height: 10px;
-    border-radius: 5px;
+
+.preset-btn {
+    padding: 8px !important;
+    font-size: 0.7rem !important;
+    border-color: rgba(56, 189, 248, 0.3) !important;
+    color: var(--text-dim) !important;
 }
-input[type="range"]::-moz-range-thumb {
-    height: 24px;
-    width: 24px;
-    border-radius: 50%;
-    background: var(--neon-blue);
-    border: 2px solid var(--bg-main);
-    box-shadow: 0 0 15px var(--neon-blue);
+
+.preset-btn.active {
+    background: var(--neon-blue) !important;
+    color: var(--bg-main) !important;
+    border-color: var(--neon-blue) !important;
+    box-shadow: 0 0 10px var(--neon-blue);
 }
 
 .frequency-grid {

@@ -69,59 +69,38 @@ document.addEventListener('DOMContentLoaded', () => {
     let binauralNodes = null;
     let baseFreq = 200;
 
-    const freqSlider = document.getElementById('freq-slider');
     const freqValDisplay = document.getElementById('freq-val');
     const freqType = document.getElementById('freq-type');
     const freqDesc = document.getElementById('freq-desc');
+    let currentFreq = 40;
 
-    function updateFreqDisplay(val) {
-        if (freqValDisplay) freqValDisplay.textContent = val;
+    window.setBrainwave = function(type, freq) {
+        currentFreq = freq;
+        if (freqValDisplay) freqValDisplay.textContent = freq;
 
-        let type = "";
-        let desc = "";
-
-        if (val < 4) {
-            type = "Delta State";
-            desc = "Deep sleep, physical restoration, and restorative healing.";
-        } else if (val < 8) {
-            type = "Theta State";
-            desc = "Deep relaxation, meditation, creativity, and subconscious access.";
-        } else if (val < 14) {
-            type = "Alpha State";
-            desc = "Relaxed alertness, stress relief, calm focus, and learning.";
-        } else if (val < 30) {
-            type = "Beta State";
-            desc = "Active thinking, problem-solving, analytical tasks, and alertness.";
-        } else {
-            type = "Gamma State";
-            desc = "Peak focus, high-level cognition, memory recall, and insight.";
-        }
-
-        if (freqType) freqType.textContent = type;
-        if (freqDesc) freqDesc.textContent = desc;
-
-        if (binauralNodes && window.audioCtx) {
-            const freq = parseFloat(val);
-            binauralNodes.oscR.frequency.setTargetAtTime(baseFreq + freq, window.audioCtx.currentTime, 0.1);
-        }
-    }
-
-    if (freqSlider) {
-        const setSliderGradient = (el) => {
-            const val = (el.value - el.min) / (el.max - el.min) * 100;
-            el.style.backgroundSize = val + '% 100%';
-        };
-
-        freqSlider.addEventListener('input', (e) => {
-            updateFreqDisplay(e.target.value);
-            setSliderGradient(e.target);
+        // Update Buttons
+        document.querySelectorAll('.preset-btn').forEach(btn => {
+            btn.classList.remove('active');
+            if (btn.textContent.toLowerCase() === type) {
+                btn.classList.add('active');
+            }
         });
 
-        // Ensure initialization on load
-        setSliderGradient(freqSlider);
-        // Sometimes DOM needs a moment for styles to apply
-        setTimeout(() => setSliderGradient(freqSlider), 100);
-    }
+        const stateInfo = {
+            'delta': { name: "Delta State", desc: "Deep sleep, physical restoration, and restorative healing." },
+            'theta': { name: "Theta State", desc: "Deep relaxation, meditation, creativity, and subconscious access." },
+            'alpha': { name: "Alpha State", desc: "Relaxed alertness, stress relief, calm focus, and learning." },
+            'beta': { name: "Beta State", desc: "Active thinking, problem-solving, analytical tasks, and alertness." },
+            'gamma': { name: "Gamma State", desc: "Peak focus, high-level cognition, memory recall, and insight." }
+        };
+
+        if (freqType) freqType.textContent = stateInfo[type].name;
+        if (freqDesc) freqDesc.textContent = stateInfo[type].desc;
+
+        if (binauralNodes && window.audioCtx) {
+            binauralNodes.oscR.frequency.setTargetAtTime(baseFreq + freq, window.audioCtx.currentTime, 0.1);
+        }
+    };
 
     window.toggleBrownNoise = function() {
         if (!window.audioCtx) window.audioCtx = new (window.AudioContext || window.webkitAudioContext)();
@@ -165,7 +144,7 @@ document.addEventListener('DOMContentLoaded', () => {
             binauralNodes = null;
             if (btn) btn.classList.remove('active');
         } else {
-            const freq = freqSlider ? parseFloat(freqSlider.value) : 40;
+            const freq = currentFreq;
             const oscL = window.audioCtx.createOscillator();
             oscL.frequency.setValueAtTime(baseFreq, window.audioCtx.currentTime);
             const pannerL = window.audioCtx.createStereoPanner();
