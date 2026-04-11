@@ -77,7 +77,7 @@ document.addEventListener('DOMContentLoaded', () => {
     window.setBrainwave = function(type, freq) {
         currentFreq = freq;
         if (freqValDisplay) freqValDisplay.textContent = freq;
-
+        
         // Update Buttons
         document.querySelectorAll('.preset-btn').forEach(btn => {
             btn.classList.remove('active');
@@ -124,10 +124,10 @@ document.addEventListener('DOMContentLoaded', () => {
             brownNoiseNode = window.audioCtx.createBufferSource();
             brownNoiseNode.buffer = noiseBuffer;
             brownNoiseNode.loop = true;
-
+            
             const gainNode = window.audioCtx.createGain();
             gainNode.gain.setValueAtTime(0.3, window.audioCtx.currentTime);
-
+            
             brownNoiseNode.connect(gainNode).connect(window.audioCtx.destination);
             brownNoiseNode.start();
             btn.classList.add('active');
@@ -149,12 +149,12 @@ document.addEventListener('DOMContentLoaded', () => {
             oscL.frequency.setValueAtTime(baseFreq, window.audioCtx.currentTime);
             const pannerL = window.audioCtx.createStereoPanner();
             pannerL.pan.setValueAtTime(-1, window.audioCtx.currentTime);
-
+            
             const oscR = window.audioCtx.createOscillator();
             oscR.frequency.setValueAtTime(baseFreq + freq, window.audioCtx.currentTime);
             const pannerR = window.audioCtx.createStereoPanner();
             pannerR.pan.setValueAtTime(1, window.audioCtx.currentTime);
-
+            
             const gain = window.audioCtx.createGain();
             gain.gain.setValueAtTime(0.1, window.audioCtx.currentTime);
 
@@ -175,12 +175,12 @@ document.addEventListener('DOMContentLoaded', () => {
         clearInterval(timerInterval);
         let timeLeft = seconds;
         const display = document.getElementById('timer-display');
-
+        
         timerInterval = setInterval(() => {
             const mins = Math.floor(timeLeft / 60);
             const secs = timeLeft % 60;
             display.textContent = `${mins.toString().padStart(2, '0')}:${secs.toString().padStart(2, '0')}`;
-
+            
             if (timeLeft <= 0) {
                 clearInterval(timerInterval);
                 display.textContent = "PROTOCOL COMPLETE";
@@ -301,7 +301,7 @@ document.addEventListener('DOMContentLoaded', () => {
         const q = quizQuestions[currentQuizStep];
         const textEl = document.getElementById('question-text');
         const container = document.getElementById('options-container');
-
+        
         if (textEl) textEl.textContent = q.q;
         if (container) {
             container.innerHTML = '';
@@ -337,11 +337,11 @@ document.addEventListener('DOMContentLoaded', () => {
             const goal = quizAnswers[0];
             const level = quizAnswers[1];
             const method = quizAnswers[2];
-
+            
             let rec = "";
             let stackName = "";
             let components = "";
-
+            
             if (goal === 'focus') {
                 stackName = "The Architect Stack";
                 components = "Alpha GPC + Huperzine-A + Citicoline";
@@ -361,7 +361,7 @@ document.addEventListener('DOMContentLoaded', () => {
                 if (level === 'base') rec += " Start with lower dosages to assess systemic tolerance.";
                 if (method === 'opt') rec += " Liquid suspension recommended for faster pre-workout activation.";
             }
-
+            
             if (output) {
                 output.innerHTML = `
                     <p><strong>${stackName}:</strong> ${components}</p>
