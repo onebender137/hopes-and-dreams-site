@@ -604,3 +604,137 @@ document.addEventListener('DOMContentLoaded', () => {
         });
     }
 });
+
+// --- Syndicate Chat Widget Logic ---
+document.addEventListener('DOMContentLoaded', () => {
+    const body = document.body;
+
+    // 1. Inject Chat HTML
+    const chatHTML = `
+        <div id="syndicate-chat-toggle" title="Initialize Syndicate Intelligence">
+            <svg width="30" height="30" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 10h.01M12 10h.01M16 10h.01M9 16H5a2 2 0 01-2-2V6a2 2 0 012-2h14a2 2 0 012 2v8a2 2 0 01-2 2h-5l-5 5v-5z"></path></svg>
+        </div>
+        <div id="chat-window">
+            <div class="chat-header">
+                <h4>SYNDICATE_INTEL</h4>
+                <button id="close-chat" style="background:none; border:none; color:var(--text-dim); cursor:pointer;">&times;</button>
+            </div>
+            <div class="agent-selector">
+                <span class="agent-chip active" data-agent="Ghost">Ghost</span>
+                <span class="agent-chip" data-agent="Pulse">Pulse</span>
+                <span class="agent-chip" data-agent="Spark">Spark</span>
+            </div>
+            <div class="chat-messages" id="chat-messages">
+                <div class="message bot">System initialized. Agent Ghost online. How can the Syndicate assist your optimization today?</div>
+            </div>
+            <div class="chat-input-area">
+                <input type="text" id="chat-input" placeholder="Enter transmission..." autocomplete="off">
+                <button class="chat-send-btn" id="chat-send">
+                    <svg width="20" height="20" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 5l7 7-7 7M5 5l7 7-7 7"></path></svg>
+                </button>
+            </div>
+        </div>
+    `;
+    body.insertAdjacentHTML('beforeend', chatHTML);
+
+    const toggle = document.getElementById('syndicate-chat-toggle');
+    const window = document.getElementById('chat-window');
+    const closeBtn = document.getElementById('close-chat');
+    const sendBtn = document.getElementById('chat-send');
+    const input = document.getElementById('chat-input');
+    const messagesContainer = document.getElementById('chat-messages');
+    const chips = document.querySelectorAll('.agent-chip');
+
+    let currentAgent = "Ghost";
+
+    const agentPersonas = {
+        "Ghost": "Security & Compliance Specialist. Focuses on privacy and system hardening.",
+        "Pulse": "Performance Tuner. Expert in biometric optimization and XPU acceleration.",
+        "Spark": "UI/UX Architect. Specializes in high-vibe interface design."
+    };
+
+    // Toggle Chat
+    toggle.addEventListener('click', () => window.classList.toggle('active'));
+    closeBtn.addEventListener('click', () => window.classList.remove('active'));
+
+    // Agent Selection
+    chips.forEach(chip => {
+        chip.addEventListener('click', () => {
+            chips.forEach(c => c.classList.remove('active'));
+            chip.classList.add('active');
+            currentAgent = chip.dataset.agent;
+            addMessage(`Switching to Agent ${currentAgent}. ${agentPersonas[currentAgent]}`, 'bot');
+        });
+    });
+
+    // Send Message
+    function handleSend() {
+        const text = input.value.trim();
+        if (!text) return;
+
+        addMessage(text, 'user');
+        input.value = '';
+
+        // Mock Bot Response logic (Integrated with Codex)
+        setTimeout(() => {
+            const response = getBotResponse(text);
+            addMessage(response, 'bot');
+        }, 600);
+    }
+
+    sendBtn.addEventListener('click', handleSend);
+    input.addEventListener('keypress', (e) => { if (e.key === 'Enter') handleSend(); });
+
+    function addMessage(text, side) {
+        const msg = document.createElement('div');
+        msg.className = `message ${side}`;
+        msg.textContent = text;
+        messagesContainer.appendChild(msg);
+        messagesContainer.scrollTop = messagesContainer.scrollHeight;
+    }
+
+    function getBotResponse(input) {
+        const lowerInput = input.toLowerCase();
+
+        // 1. Check Biohacking Codex (Centralized data source)
+        for (const [key, value] of Object.entries(codexData)) {
+            if (lowerInput.includes(key)) {
+                return `[${currentAgent}] Intelligence retrieved: ${value}`;
+            }
+        }
+
+        // 2. Intent-based responses
+        if (lowerInput.includes("who are you") || lowerInput.includes("syndicate")) {
+            return `[${currentAgent}] We are the Syndicate. A private research and development collective focused on neuro-optimization and biological sovereignty.`;
+        }
+
+        if (lowerInput.includes("hello") || lowerInput.includes("hi")) {
+            return `[${currentAgent}] Transmission received. Ready for protocol analysis.`;
+        }
+
+        if (lowerInput.includes("facebook") || lowerInput.includes("fb")) {
+            return `[${currentAgent}] Our official community intelligence is hosted on Facebook. Use the link in the footer to access the full research archive.`;
+        }
+
+        // 3. Fallback
+        return `[${currentAgent}] Query logged. My current intelligence parameters are limited to known protocols. Try asking about 'Alpha GPC', 'HRV', or 'The Syndicate'.`;
+    }
+});
+
+/**
+ * BRIDGE FOR FACEBOOK BOT LOGIC
+ * To integrate the external Hopes-and-Dreams-Facebook-bot:
+ * 1. Host the bot's logic as a serverless function or API.
+ * 2. Replace the 'getBotResponse' function or the logic in 'handleSend'
+ *    with a fetch() call to your API endpoint.
+ *
+ * Example:
+ * async function getExternalBotResponse(text) {
+ *    const response = await fetch('YOUR_API_ENDPOINT', {
+ *        method: 'POST',
+ *        body: JSON.stringify({ message: text, agent: currentAgent })
+ *    });
+ *    const data = await response.json();
+ *    return data.reply;
+ * }
+ */
