@@ -19,7 +19,7 @@ The Codex is a searchable technical glossary located in the Intel Hub.
 ### How to add new articles/terms:
 1. Open `script.js`.
 2. Find the `codexData` object (near the top).
-3. Add a new key-value pair inside the curly braces `{ }`.
+3. Add a new key-value pair inside the curly braces `{ }`. 
    - The **key** (the word you search for) must be lowercase and inside quotes.
    - The **value** (the definition) must be inside quotes and followed by a comma.
 
