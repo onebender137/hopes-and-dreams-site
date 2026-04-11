@@ -107,7 +107,15 @@ document.addEventListener('DOMContentLoaded', () => {
     }
 
     if (freqSlider) {
-        freqSlider.addEventListener('input', (e) => updateFreqDisplay(e.target.value));
+        freqSlider.addEventListener('input', (e) => {
+            updateFreqDisplay(e.target.value);
+            // Update slider progress gradient
+            const val = (e.target.value - e.target.min) / (e.target.max - e.target.min) * 100;
+            e.target.style.backgroundSize = val + '% 100%';
+        });
+        // Set initial background size
+        const initialVal = (freqSlider.value - freqSlider.min) / (freqSlider.max - freqSlider.min) * 100;
+        freqSlider.style.backgroundSize = initialVal + '% 100%';
     }
 
     window.toggleBrownNoise = function() {
