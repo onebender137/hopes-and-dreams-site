@@ -9,103 +9,8 @@
     <script src="script.js" defer></script>
     <style>
         .container { max-width: 900px; margin: 0 auto; padding: 0 24px 100px; }
-
-        /* Protocol Styling */
-        .protocol-card {
-            background-color: var(--card-bg);
-            padding: 50px; border-radius: 24px;
-            border: 1px solid rgba(56, 189, 248, 0.1);
-            margin-bottom: 40px; position: relative;
-            text-align: left;
-        }
-        .protocol-card::before {
-            content: ''; position: absolute; top: 0; left: 0; width: 100%; height: 4px;
-            background: linear-gradient(90deg, var(--neon-gold), transparent);
-        }
-
         h1 { color: var(--neon-gold); text-transform: uppercase; letter-spacing: 2px; font-size: 2.2rem; font-weight: 900; }
         h2 { color: var(--neon-blue); text-transform: uppercase; margin-top: 30px; font-weight: 700; }
-        
-        .step-box {
-            background: rgba(56, 189, 248, 0.05);
-            border-left: 4px solid var(--neon-blue);
-            padding: 20px; margin: 20px 0; border-radius: 0 12px 12px 0;
-        }
-
-        /* Affiliate Link Buttons */
-        .cta-button {
-            display: inline-block; background: var(--neon-gold); color: var(--bg-main);
-            padding: 12px 24px; border-radius: 50px; text-decoration: none;
-            font-weight: 900; text-transform: uppercase; letter-spacing: 1px;
-            margin-top: 15px; margin-right: 10px; transition: 0.3s;
-        }
-        .cta-button:hover { transform: scale(1.05); box-shadow: 0 0 20px rgba(251, 191, 36, 0.4); }
-
-        /* Accordion Styling */
-        .accordion-container {
-            max-width: 800px;
-            margin: 80px auto;
-            text-align: center;
-        }
-
-        .accordion-item {
-            margin-bottom: 15px;
-        }
-
-        .accordion-header {
-            background: var(--card-bg);
-            color: var(--text-main);
-            padding: 12px 20px;
-            border-radius: 8px;
-            cursor: pointer;
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            border: 1px solid rgba(56, 189, 248, 0.1);
-            transition: 0.3s;
-            font-weight: 700;
-            width: fit-content;
-            margin: 0 auto;
-            min-width: 320px;
-            font-size: 1rem;
-        }
-
-        .accordion-header:hover {
-            border-color: var(--neon-blue);
-            background: rgba(56, 189, 248, 0.05);
-        }
-
-        .accordion-content {
-            max-height: 0;
-            overflow: hidden;
-            transition: max-height 0.3s ease-out;
-            padding: 0 20px;
-            color: var(--text-dim);
-            font-size: 1rem;
-            max-width: 650px;
-            margin: 0 auto;
-            line-height: 1.6;
-        }
-
-        .accordion-item.active .accordion-content {
-            max-height: 200px;
-            padding: 15px 20px;
-        }
-
-        .accordion-header svg {
-            transition: transform 0.3s;
-            width: 18px;
-            height: 18px;
-            margin-left: 10px;
-        }
-
-        .accordion-item.active .accordion-header svg {
-            transform: rotate(180deg);
-        }
-
-        @media (max-width: 600px) {
-            .accordion-header { min-width: 90%; }
-        }
     </style>
 </head>
 <body>
@@ -191,18 +96,42 @@
 
         <div class="grid">
             <!-- Feature 2: Deep Work Soundscapes -->
-            <div class="widget-container" data-reveal>
+            <div class="widget-container" style="grid-column: span 2;">
                 <div class="widget-title">
                     <svg width="24" height="24" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 19V6l12-3v13M9 19c0 1.105-1.343 2-3 2s-3-.895-3-2 1.343-2 3-2 3 .895 3 2zm12-3c0 1.105-1.343 2-3 2s-3-.895-3-2 1.343-2 3-2 3 .895 3 2zM9 10l12-3"></path></svg>
-                    Deep Work Soundscapes
+                    DEEP WORK SOUNDSCAPES
                 </div>
-                <div class="sound-controls">
-                    <button class="buy-btn sound-btn" onclick="toggleSound('brown')">Brown Noise</button>
-                    <button class="buy-btn sound-btn" onclick="toggleSound('binaural')">Binaural (40Hz)</button>
-                </div>
-                <p style="font-size: 0.7rem; color: var(--text-dim); margin-top: 10px;">*Generated locally via Web Audio API for zero latency.</p>
-            </div>
 
+                <div class="frequency-grid">
+                    <div>
+                        <div class="input-group" style="margin-bottom: 15px;">
+                            <label style="margin-bottom: 10px; display: block;">Brainwave Target: <span id="freq-val" style="color: var(--neon-blue);">40</span> Hz</label>
+                            <div class="preset-grid" style="display: grid; grid-template-columns: repeat(auto-fit, minmax(80px, 1fr)); gap: 8px;">
+                                <button class="buy-btn preset-btn" onclick="setBrainwave('delta', 2)">Delta</button>
+                                <button class="buy-btn preset-btn" onclick="setBrainwave('theta', 6)">Theta</button>
+                                <button class="buy-btn preset-btn" onclick="setBrainwave('alpha', 10)">Alpha</button>
+                                <button class="buy-btn preset-btn" onclick="setBrainwave('beta', 20)">Beta</button>
+                                <button class="buy-btn preset-btn active" onclick="setBrainwave('gamma', 40)">Gamma</button>
+                            </div>
+                        </div>
+                        <div class="sound-controls" style="justify-content: flex-start; margin-top: 15px;">
+                            <button id="brown-toggle" class="buy-btn sound-btn" onclick="toggleBrownNoise()">Layer: Brown Noise</button>
+                            <button id="binaural-toggle" class="buy-btn sound-btn" onclick="toggleBinauralBeats()">Active: Binaural</button>
+                        </div>
+                    </div>
+                    <div id="freq-info" style="background: rgba(0,0,0,0.2); padding: 15px; border-radius: 12px; border: 1px solid rgba(56, 189, 248, 0.1);">
+                        <strong id="freq-type" style="color: var(--neon-gold); text-transform: uppercase; font-size: 0.8rem;">Gamma State</strong>
+                        <p id="freq-desc" style="font-size: 0.8rem; color: var(--text-dim); margin: 5px 0 0;">Peak focus, memory, complex problem-solving, and intense concentration.</p>
+                    </div>
+                </div>
+                <div style="font-size: 0.75rem; color: var(--text-dim); margin-top: 20px; text-align: left; line-height: 1.4; opacity: 0.8;">
+                    <p>To experience these effects, listeners must use headphones to ensure each ear receives a distinct frequency, as the brain synthesizes the third tone internally. While studies suggest potential benefits for focus, sleep, and anxiety, scientific consensus on their efficacy varies, and results can differ significantly between individuals.</p>
+                    <p style="margin-top: 10px; font-style: italic;">*Generated locally via Web Audio API.</p>
+                </div>
+            </div>
+        </div>
+
+        <div class="grid">
             <!-- Feature 4: Protocol Timer -->
             <div class="widget-container" data-reveal>
                 <div class="widget-title">
@@ -263,17 +192,69 @@
                 <svg width="24" height="24" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z"></path></svg>
                 Biometric Architecture (Optimal HRV)
             </div>
-            <div class="chart-container" style="height: 150px; display: flex; align-items: flex-end; gap: 5px; padding: 20px 0;">
-                <div style="flex: 1; height: 30%; background: var(--neon-blue); border-radius: 4px 4px 0 0; opacity: 0.3;"></div>
-                <div style="flex: 1; height: 45%; background: var(--neon-blue); border-radius: 4px 4px 0 0; opacity: 0.5;"></div>
-                <div style="flex: 1; height: 80%; background: var(--neon-gold); border-radius: 4px 4px 0 0; box-shadow: 0 0 10px var(--neon-gold);"></div>
-                <div style="flex: 1; height: 60%; background: var(--neon-blue); border-radius: 4px 4px 0 0; opacity: 0.7;"></div>
-                <div style="flex: 1; height: 90%; background: var(--neon-gold); border-radius: 4px 4px 0 0; box-shadow: 0 0 10px var(--neon-gold);"></div>
-                <div style="flex: 1; height: 40%; background: var(--neon-blue); border-radius: 4px 4px 0 0; opacity: 0.4;"></div>
-                <div style="flex: 1; height: 75%; background: var(--neon-blue); border-radius: 4px 4px 0 0; opacity: 0.8;"></div>
+            <div class="chart-container">
+                <div class="chart-bar" style="height: 10%; opacity: 0.3;"></div>
+                <div class="chart-bar" style="height: 10%; opacity: 0.5;"></div>
+                <div class="chart-bar" style="height: 10%; background: var(--neon-gold); box-shadow: 0 0 10px var(--neon-gold);"></div>
+                <div class="chart-bar" style="height: 10%; opacity: 0.7;"></div>
+                <div class="chart-bar" style="height: 10%; background: var(--neon-gold); box-shadow: 0 0 10px var(--neon-gold);"></div>
+                <div class="chart-bar" style="height: 10%; opacity: 0.4;"></div>
+                <div class="chart-bar" style="height: 10%; opacity: 0.8;"></div>
             </div>
             <p style="font-size: 0.8rem; color: var(--text-dim); text-align: center;">Targeting 80ms+ HRV during deep sleep cycles.</p>
         </div>
+
+        <!-- Information Section: The Science of Neural Frequencies -->
+        <article class="protocol-card" data-reveal style="margin-top: 40px; border-color: rgba(251, 191, 36, 0.2);">
+            <div style="font-size: 0.8rem; color: var(--neon-gold); margin-bottom: 10px; text-transform: uppercase; letter-spacing: 1px;">Intel Briefing: Neural Frequencies</div>
+            <h2 style="color: var(--neon-gold);">The Science of Binaural Beats</h2>
+            <p>Binaural beats occur when two slightly different frequencies are played in each ear, creating a third "perceived" tone that the brain entrains to. This phenomenon, known as Brainwave Entrainment, allows us to architect specific mental states on demand.</p>
+
+            <div style="overflow-x: auto; margin: 20px 0;">
+                <table style="width: 100%; border-collapse: collapse; font-size: 0.85rem; color: var(--text-dim); text-align: left;">
+                    <thead>
+                        <tr style="border-bottom: 2px solid var(--neon-blue); color: var(--text-main);">
+                            <th style="padding: 10px;">Frequency</th>
+                            <th style="padding: 10px;">Type</th>
+                            <th style="padding: 10px;">Primary State</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr style="border-bottom: 1px solid rgba(255,255,255,0.05);">
+                            <td style="padding: 10px; color: var(--neon-blue);">0.5 – 4 Hz</td>
+                            <td style="padding: 10px;">Delta</td>
+                            <td style="padding: 10px;">Deep Sleep & Physical Recovery</td>
+                        </tr>
+                        <tr style="border-bottom: 1px solid rgba(255,255,255,0.05);">
+                            <td style="padding: 10px; color: var(--neon-blue);">4 – 8 Hz</td>
+                            <td style="padding: 10px;">Theta</td>
+                            <td style="padding: 10px;">Meditation, Creativity & Visualization</td>
+                        </tr>
+                        <tr style="border-bottom: 1px solid rgba(255,255,255,0.05);">
+                            <td style="padding: 10px; color: var(--neon-blue);">8 – 14 Hz</td>
+                            <td style="padding: 10px;">Alpha</td>
+                            <td style="padding: 10px;">Relaxed Alertness & Stress Relief</td>
+                        </tr>
+                        <tr style="border-bottom: 1px solid rgba(255,255,255,0.05);">
+                            <td style="padding: 10px; color: var(--neon-blue);">14 – 30 Hz</td>
+                            <td style="padding: 10px;">Beta</td>
+                            <td style="padding: 10px;">Problem-solving & Analytical Productivity</td>
+                        </tr>
+                        <tr style="border-bottom: 1px solid rgba(255,255,255,0.05);">
+                            <td style="padding: 10px; color: var(--neon-blue);">30 – 100 Hz</td>
+                            <td style="padding: 10px;">Gamma</td>
+                            <td style="padding: 10px;">Peak Focus & Complex Cognition</td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+
+            <p style="font-size: 0.9rem; border-left: 2px solid var(--neon-gold); padding-left: 15px; font-style: italic;">
+                "Optimal achievement requires stereo isolation. By delivering 200Hz to the left ear and 240Hz to the right, the brain's superior olivary nucleus creates the 40Hz 'phantom' tone, driving the system into Gamma synchronization."
+            </p>
+        </article>
+
+        <div class="glow-divider"></div>
 
         <!-- Feature 3: Biohacking Codex -->
         <div class="widget-container" data-reveal>
@@ -334,169 +315,5 @@
             <p>&copy; 2026 Hopes and Dreams Syndicate. All Rights Reserved.</p>
         </footer>
     </div>
-    <script>
-        // Sleep Calculator Logic
-        const wakeInput = document.getElementById('wake-time');
-        const suggestContainer = document.getElementById('suggested-times');
-
-        function calculateSleepTimes() {
-            const wakeTime = wakeInput.value;
-            const [hours, minutes] = wakeTime.split(':').map(Number);
-            const wakeDate = new Date();
-            wakeDate.setHours(hours, minutes, 0);
-
-            suggestContainer.innerHTML = '';
-
-            // Calculate 6, 5, and 4 cycles (9, 7.5, 6 hours)
-            [6, 5, 4].forEach(cycles => {
-                const sleepDate = new Date(wakeDate.getTime() - (cycles * 90 * 60 * 1000) - (15 * 60 * 1000)); // 15 mins to fall asleep
-                const timeStr = sleepDate.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit', hour12: false });
-
-                const card = document.createElement('div');
-                card.className = 'time-card';
-                card.textContent = timeStr;
-                suggestContainer.appendChild(card);
-            });
-        }
-
-        wakeInput.addEventListener('change', calculateSleepTimes);
-        calculateSleepTimes();
-
-        // Accordion Logic
-        document.querySelectorAll('.accordion-header').forEach(header => {
-            header.addEventListener('click', () => {
-                const item = header.parentElement;
-                item.classList.toggle('active');
-            });
-        });
-
-        // Feature 2: Deep Work Soundscapes
-        let audioCtx;
-        let activeNode;
-
-        function toggleSound(type) {
-            if (!audioCtx) audioCtx = new (window.AudioContext || window.webkitAudioContext)();
-
-            if (activeNode) {
-                if (Array.isArray(activeNode)) {
-                    activeNode.forEach(n => n.stop());
-                } else {
-                    activeNode.stop();
-                }
-                activeNode = null;
-                return;
-            }
-
-            if (type === 'brown') {
-                const bufferSize = 2 * audioCtx.sampleRate;
-                const noiseBuffer = audioCtx.createBuffer(1, bufferSize, audioCtx.sampleRate);
-                const output = noiseBuffer.getChannelData(0);
-                let lastOut = 0.0;
-                for (let i = 0; i < bufferSize; i++) {
-                    const white = Math.random() * 2 - 1;
-                    output[i] = (lastOut + (0.02 * white)) / 1.02;
-                    lastOut = output[i];
-                    output[i] *= 3.5;
-                }
-                const noise = audioCtx.createBufferSource();
-                noise.buffer = noiseBuffer;
-                noise.loop = true;
-                noise.connect(audioCtx.destination);
-                noise.start();
-                activeNode = noise;
-            } else if (type === 'binaural') {
-                // True Binaural: 200Hz Left, 240Hz Right = 40Hz perceived beat
-                const merger = audioCtx.createChannelMerger(2);
-
-                const oscL = audioCtx.createOscillator();
-                oscL.frequency.setValueAtTime(200, audioCtx.currentTime);
-                const pannerL = audioCtx.createStereoPanner();
-                pannerL.pan.setValueAtTime(-1, audioCtx.currentTime);
-
-                const oscR = audioCtx.createOscillator();
-                oscR.frequency.setValueAtTime(240, audioCtx.currentTime);
-                const pannerR = audioCtx.createStereoPanner();
-                pannerR.pan.setValueAtTime(1, audioCtx.currentTime);
-
-                const gain = audioCtx.createGain();
-                gain.gain.setValueAtTime(0.1, audioCtx.currentTime);
-
-                oscL.connect(pannerL).connect(gain);
-                oscR.connect(pannerR).connect(gain);
-                gain.connect(audioCtx.destination);
-
-                oscL.start();
-                oscR.start();
-                activeNode = [oscL, oscR];
-            }
-        }
-
-        // Feature 4: Protocol Timer
-        let timerInterval;
-        function startTimer(seconds) {
-            clearInterval(timerInterval);
-            let timeLeft = seconds;
-            const display = document.getElementById('timer-display');
-
-            timerInterval = setInterval(() => {
-                const mins = Math.floor(timeLeft / 60);
-                const secs = timeLeft % 60;
-                display.textContent = `${mins.toString().padStart(2, '0')}:${secs.toString().padStart(2, '0')}`;
-
-                if (timeLeft <= 0) {
-                    clearInterval(timerInterval);
-                    display.textContent = "PROTOCOL COMPLETE";
-                }
-                timeLeft--;
-            }, 1000);
-        }
-
-        // Feature 3: Biohacking Codex
-        const codexData = {
-            'ache': 'Acetylcholinesterase: An enzyme that breaks down acetylcholine. Inhibiting this (e.g. with Huperzine-A) increases neuro-connectivity.',
-            'hrv': 'Heart Rate Variability: The variation in time between heartbeats. A higher HRV typically indicates better recovery and nervous system balance.',
-            'rem': 'Rapid Eye Movement: The sleep stage associated with vivid dreaming and memory consolidation.',
-            'nootropic': 'Compounds that enhance cognitive function, particularly executive functions, memory, creativity, or motivation.',
-            'yuschak': 'The gold-standard protocol for lucidity involving specific supplement timing during the WBTB window.'
-        };
-
-        document.getElementById('codex-search').addEventListener('input', (e) => {
-            const query = e.target.value.toLowerCase();
-            const resultBox = document.getElementById('codex-results');
-            if (query.length < 2) {
-                resultBox.innerHTML = '<em>Search for a term to initialize protocol data.</em>';
-                return;
-            }
-            const found = Object.keys(codexData).find(key => key.includes(query));
-            if (found) {
-                resultBox.innerHTML = `<strong>${found.toUpperCase()}:</strong> ${codexData[found]}`;
-            } else {
-                resultBox.innerHTML = '<em>Term not found in current database.</em>';
-            }
-        });
-
-        // Checklist Logic
-        const checks = document.querySelectorAll('.protocol-check');
-
-        // Load state
-        checks.forEach(check => {
-            const id = check.getAttribute('data-id');
-            const saved = localStorage.getItem('protocol_' + id);
-            if (saved === 'true') {
-                check.checked = true;
-                check.parentElement.classList.add('completed');
-            }
-
-            check.addEventListener('change', (e) => {
-                const isChecked = e.target.checked;
-                localStorage.setItem('protocol_' + id, isChecked);
-                if (isChecked) {
-                    check.parentElement.classList.add('completed');
-                } else {
-                    check.parentElement.classList.remove('completed');
-                }
-            });
-        });
-    </script>
 </body>
 </html>
