@@ -675,6 +675,21 @@ document.addEventListener('DOMContentLoaded', () => {
         });
     });
 
+    // Thinking Indicator
+    function setThinking(isThinking) {
+        const existing = document.getElementById('syndicate-thinking');
+        if (isThinking && !existing) {
+            const indicator = document.createElement('div');
+            indicator.id = 'syndicate-thinking';
+            indicator.className = 'message bot thinking';
+            indicator.innerHTML = `<span class="dot"></span><span class="dot"></span><span class="dot"></span>`;
+            messagesContainer.appendChild(indicator);
+            messagesContainer.scrollTop = messagesContainer.scrollHeight;
+        } else if (!isThinking && existing) {
+            existing.remove();
+        }
+    }
+
     // Send Message
     async function handleSend() {
         const text = input.value.trim();
@@ -682,29 +697,30 @@ document.addEventListener('DOMContentLoaded', () => {
 
         addMessage(text, 'user');
         input.value = '';
+        setThinking(true);
 
-        // Integrated with Local Bot via ngrok
+        // Integrated with Local Bot via Cloudflare Tunnel
         try {
-            const response = await fetch('https://unseeing-skinhead-stem.ngrok-free.dev/api/create', {
+            const response = await fetch('https://ai.hopes-and-dreams.ca/api/chat', {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json'
                 },
                 body: JSON.stringify({
-                    message: text,
-                    agent: currentAgent,
-                    timestamp: new Date().toISOString()
+                    message: text
                 })
             });
 
             if (!response.ok) throw new Error('Network response was not ok');
 
             const data = await response.json();
-            // Assuming the bot returns { reply: "..." } or similar. Adjust based on actual API.
-            const botReply = data.reply || data.response || getBotResponse(text);
+            setThinking(false);
+
+            const botReply = data.reply || data.response || (typeof data === 'string' ? data : getBotResponse(text));
             addMessage(botReply, 'bot');
         } catch (error) {
             console.error('Syndicate Backend Error:', error);
+            setThinking(false);
             // Fallback to local intelligence if backend is offline
             setTimeout(() => {
                 const response = getBotResponse(text);
