@@ -64,12 +64,12 @@ An advanced audio generation system for brainwave entrainment, labeled "DEEP WOR
 ### How it works:
 - **Brown Noise Layer:** Generates deep, low-frequency random noise via a buffer algorithm to mask external distractions.
 - **Dynamic Binaural Beats:** Uses two independent oscillators (L/R) to create a perceived third tone.
-- **Real-time Frequency Scaling:** The `updateFreqDisplay` function in `script.js` updates the oscillator frequency in real-time as the slider moves.
-- **State Feedback:** Automatically maps the selected frequency (0.5Hz - 100Hz) to specific brainwave states (Delta, Theta, Alpha, Beta, Gamma) and displays their optimization target.
+- **Brainwave Presets:** Users can select from five optimized frequencies (Delta, Theta, Alpha, Beta, Gamma) via a preset grid.
+- **Real-time State Mapping:** Selecting a preset updates the `currentFreq` and triggers the `setBrainwave` function, which provides dynamic feedback on the optimization target.
 
 ### Maintenance:
 - The base frequency (default 200Hz) can be adjusted in `script.js` by changing the `baseFreq` variable.
-- Brainwave state descriptions can be updated within the `updateFreqDisplay` function logic.
+- Brainwave state descriptions and specific frequency targets can be updated within the `setBrainwave` function in `script.js`.
 
 ---
 
