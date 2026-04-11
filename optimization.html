@@ -1,0 +1,219 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Optimization Command | Hopes and Dreams</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;700;900&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="style.css">
+    <script src="script.js" defer></script>
+    <style>
+        .container { max-width: 900px; margin: 0 auto; padding: 0 24px 100px; }
+        h1 { color: var(--neon-gold); text-transform: uppercase; letter-spacing: 2px; font-size: 2.2rem; font-weight: 900; }
+        h2 { color: var(--neon-blue); text-transform: uppercase; margin-top: 30px; font-weight: 700; }
+    </style>
+</head>
+<body>
+    <div id="scroll-progress"></div>
+    <button id="theme-toggle" class="theme-toggle-pill">☀️ LIGHT MODE</button>
+
+    <header>
+        <div class="logo-wrap">
+            <img src="topper.png" alt="Hopes and Dreams">
+        </div>
+        <nav>
+            <a href="index.html">Home</a>
+            <a href="shop.html">Procurement</a>
+            <a href="optimization.html" class="active">Optimization</a>
+            <a href="intel.html">Intel Hub</a>
+            <a href="about.html">About</a>
+            <a href="privacy.html">Privacy</a>
+        </nav>
+    </header>
+
+    <div class="container">
+        <h1 data-reveal>Neural & Biological Optimization</h1>
+        <p data-reveal style="color: var(--text-dim);">Execute the protocols. Architect the future.</p>
+
+        <div class="glow-divider"></div>
+
+        <div class="grid">
+            <!-- Feature 2: Deep Work Soundscapes -->
+            <div class="widget-container" style="grid-column: span 2;">
+                <div class="widget-title">
+                    <svg width="24" height="24" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 19V6l12-3v13M9 19c0 1.105-1.343 2-3 2s-3-.895-3-2 1.343-2 3-2 3 .895 3 2zm12-3c0 1.105-1.343 2-3 2s-3-.895-3-2 1.343-2 3-2 3 .895 3 2zM9 10l12-3"></path></svg>
+                    DEEP WORK SOUNDSCAPES
+                </div>
+
+                <div class="frequency-grid">
+                    <div>
+                        <div class="input-group" style="margin-bottom: 15px;">
+                            <label style="margin-bottom: 10px; display: block;">Brainwave Target: <span id="freq-val" style="color: var(--neon-blue);">40</span> Hz</label>
+                            <div class="preset-grid" style="display: grid; grid-template-columns: repeat(auto-fit, minmax(80px, 1fr)); gap: 8px;">
+                                <button class="buy-btn preset-btn" onclick="setBrainwave('delta', 2)">Delta</button>
+                                <button class="buy-btn preset-btn" onclick="setBrainwave('theta', 6)">Theta</button>
+                                <button class="buy-btn preset-btn" onclick="setBrainwave('alpha', 10)">Alpha</button>
+                                <button class="buy-btn preset-btn" onclick="setBrainwave('beta', 20)">Beta</button>
+                                <button class="buy-btn preset-btn active" onclick="setBrainwave('gamma', 40)">Gamma</button>
+                            </div>
+                        </div>
+                        <div class="sound-controls" style="justify-content: flex-start; margin-top: 15px;">
+                            <button id="brown-toggle" class="buy-btn sound-btn" onclick="toggleBrownNoise()">Layer: Brown Noise</button>
+                            <button id="binaural-toggle" class="buy-btn sound-btn" onclick="toggleBinauralBeats()">Active: Binaural</button>
+                        </div>
+                    </div>
+                    <div id="freq-info" style="background: rgba(0,0,0,0.2); padding: 15px; border-radius: 12px; border: 1px solid rgba(56, 189, 248, 0.1);">
+                        <strong id="freq-type" style="color: var(--neon-gold); text-transform: uppercase; font-size: 0.8rem;">Gamma State</strong>
+                        <p id="freq-desc" style="font-size: 0.8rem; color: var(--text-dim); margin: 5px 0 0;">Peak focus, memory, complex problem-solving, and intense concentration.</p>
+                    </div>
+                </div>
+                <div style="font-size: 0.75rem; color: var(--text-dim); margin-top: 20px; text-align: left; line-height: 1.4; opacity: 0.8;">
+                    <p>To experience these effects, listeners must use headphones to ensure each ear receives a distinct frequency, as the brain synthesizes the third tone internally. While studies suggest potential benefits for focus, sleep, and anxiety, scientific consensus on their efficacy varies, and results can differ significantly between individuals.</p>
+                    <p style="margin-top: 10px; font-style: italic;">*Generated locally via Web Audio API.</p>
+                </div>
+            </div>
+        </div>
+
+        <!-- Information Section: The Science of Neural Frequencies -->
+        <article class="protocol-card" data-reveal style="border-color: rgba(251, 191, 36, 0.2); margin-top: 0;">
+            <div style="font-size: 0.8rem; color: var(--neon-gold); margin-bottom: 10px; text-transform: uppercase; letter-spacing: 1px;">Intel Briefing: Neural Frequencies</div>
+            <h2 style="color: var(--neon-gold); margin-top: 10px;">The Science of Binaural Beats</h2>
+            <p>Binaural beats occur when two slightly different frequencies are played in each ear, creating a third "perceived" tone that the brain entrains to. This phenomenon, known as Brainwave Entrainment, allows us to architect specific mental states on demand.</p>
+
+            <div style="overflow-x: auto; margin: 20px 0;">
+                <table style="width: 100%; border-collapse: collapse; font-size: 0.85rem; color: var(--text-dim); text-align: left;">
+                    <thead>
+                        <tr style="border-bottom: 2px solid var(--neon-blue); color: var(--text-main);">
+                            <th style="padding: 10px;">Frequency</th>
+                            <th style="padding: 10px;">Type</th>
+                            <th style="padding: 10px;">Primary State</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr style="border-bottom: 1px solid rgba(255,255,255,0.05);">
+                            <td style="padding: 10px; color: var(--neon-blue);">0.5 – 4 Hz</td>
+                            <td style="padding: 10px;">Delta</td>
+                            <td style="padding: 10px;">Deep Sleep & Physical Recovery</td>
+                        </tr>
+                        <tr style="border-bottom: 1px solid rgba(255,255,255,0.05);">
+                            <td style="padding: 10px; color: var(--neon-blue);">4 – 8 Hz</td>
+                            <td style="padding: 10px;">Theta</td>
+                            <td style="padding: 10px;">Meditation, Creativity & Visualization</td>
+                        </tr>
+                        <tr style="border-bottom: 1px solid rgba(255,255,255,0.05);">
+                            <td style="padding: 10px; color: var(--neon-blue);">8 – 14 Hz</td>
+                            <td style="padding: 10px;">Alpha</td>
+                            <td style="padding: 10px;">Relaxed Alertness & Stress Relief</td>
+                        </tr>
+                        <tr style="border-bottom: 1px solid rgba(255,255,255,0.05);">
+                            <td style="padding: 10px; color: var(--neon-blue);">14 – 30 Hz</td>
+                            <td style="padding: 10px;">Beta</td>
+                            <td style="padding: 10px;">Problem-solving & Analytical Productivity</td>
+                        </tr>
+                        <tr style="border-bottom: 1px solid rgba(255,255,255,0.05);">
+                            <td style="padding: 10px; color: var(--neon-blue);">30 – 100 Hz</td>
+                            <td style="padding: 10px;">Gamma</td>
+                            <td style="padding: 10px;">Peak Focus & Complex Cognition</td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+
+            <p style="font-size: 0.9rem; border-left: 2px solid var(--neon-gold); padding-left: 15px; font-style: italic;">
+                "Optimal achievement requires stereo isolation. By delivering 200Hz to the left ear and 240Hz to the right, the brain's superior olivary nucleus creates the 40Hz 'phantom' tone, driving the system into Gamma synchronization."
+            </p>
+        </article>
+
+        <div class="glow-divider"></div>
+
+        <div class="grid">
+            <!-- Feature 4: Protocol Timer -->
+            <div class="widget-container" data-reveal>
+                <div class="widget-title">
+                    <svg width="24" height="24" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg>
+                    Protocol Timer
+                </div>
+                <div id="timer-display" style="font-size: 2rem; font-weight: 900; color: var(--neon-blue); text-align: center; margin-bottom: 10px;">02:00</div>
+                <div class="timer-controls" style="display: flex; gap: 10px; justify-content: center;">
+                    <button class="buy-btn" onclick="startTimer(120)" style="font-size: 0.7rem;">Cold Plunge (2m)</button>
+                    <button class="buy-btn" onclick="startTimer(600)" style="font-size: 0.7rem;">Meditation (10m)</button>
+                </div>
+            </div>
+
+            <!-- Sleep Calculator Widget -->
+            <div class="widget-container" data-reveal>
+                <div class="widget-title">
+                    <svg width="24" height="24" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg>
+                    Sleep Cycle Architect
+                </div>
+                <div class="input-group">
+                    <label>Desired Wake-up Time</label>
+                    <input type="time" id="wake-time" value="07:00">
+                </div>
+                <div class="result-box active" id="sleep-results">
+                    <p style="margin-top: 0; font-size: 0.9rem; color: var(--text-dim);">To wake up refreshed, aim to fall asleep at one of these times:</p>
+                    <div class="time-grid" id="suggested-times">
+                        <!-- Times injected by JS -->
+                    </div>
+                </div>
+            </div>
+
+            <!-- Protocol Checklist Widget -->
+            <div class="widget-container" data-reveal>
+                <div class="widget-title">
+                    <svg width="24" height="24" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2m-6 9l2 2 4-4"></path></svg>
+                    Daily Optimization Log
+                </div>
+                <div class="check-list">
+                    <label class="check-item">
+                        <input type="checkbox" class="protocol-check" data-id="cold-plunge">
+                        <span>Vagus Nerve Cold Exposure</span>
+                    </label>
+                    <label class="check-item">
+                        <input type="checkbox" class="protocol-check" data-id="alpha-gpc">
+                        <span>Cholinergic Loading (Alpha-GPC)</span>
+                    </label>
+                    <label class="check-item">
+                        <input type="checkbox" class="protocol-check" data-id="meditation">
+                        <span>Cortisol Down-Regulation</span>
+                    </label>
+                </div>
+            </div>
+        </div>
+
+        <!-- Feature 6: Biometric Visualizer -->
+        <div class="widget-container" data-reveal>
+            <div class="widget-title">
+                <svg width="24" height="24" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z"></path></svg>
+                Biometric Architecture (Optimal HRV)
+            </div>
+            <div class="chart-container">
+                <div class="chart-bar" style="height: 10%; opacity: 0.3;"></div>
+                <div class="chart-bar" style="height: 10%; opacity: 0.5;"></div>
+                <div class="chart-bar" style="height: 10%; background: var(--neon-gold); box-shadow: 0 0 10px var(--neon-gold);"></div>
+                <div class="chart-bar" style="height: 10%; opacity: 0.7;"></div>
+                <div class="chart-bar" style="height: 10%; background: var(--neon-gold); box-shadow: 0 0 10px var(--neon-gold);"></div>
+                <div class="chart-bar" style="height: 10%; opacity: 0.4;"></div>
+                <div class="chart-bar" style="height: 10%; opacity: 0.8;"></div>
+            </div>
+            <div class="chart-labels">
+                <span>C1</span>
+                <span>C2</span>
+                <span>C3</span>
+                <span>C4</span>
+                <span>C5</span>
+                <span>C6</span>
+                <span>C7</span>
+            </div>
+            <div style="font-size: 0.8rem; color: var(--text-dim); text-align: left; margin-top: 20px; line-height: 1.5;">
+                <p><strong>Intel:</strong> The bars above (C1-C7) represent the 90-minute sleep cycles that comprise a full rest period. Heart Rate Variability (HRV) typically peaks during the transition into Deep Sleep and REM stages.</p>
+                <p style="margin-top: 10px;"><strong>Application:</strong> Use a wearable (Oura/Garmin) to track your HRV across these cycles. If your HRV is consistently low during C3-C5, your system isn't recovering; consider increasing magnesium intake or extending your meditation protocol before bed.</p>
+            </div>
+        </div>
+
+        <footer>
+            <p>&copy; 2026 Hopes and Dreams Syndicate. All Rights Reserved.</p>
+        </footer>
+    </div>
+</body>
+</html>
