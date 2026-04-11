@@ -1,3 +1,24 @@
+// Biohacking Codex Data
+const codexData = {
+    'ache': 'Acetylcholinesterase: An enzyme that breaks down acetylcholine. Inhibiting this (e.g. with Huperzine-A) increases neuro-connectivity.',
+    'alpha gpc': 'A high-bioavailability choline source that crosses the blood-brain barrier, essential for memory and cognitive fluidity.',
+    'ashwagandha': 'An adaptogenic herb that helps the body manage stress by down-regulating cortisol levels.',
+    'autophagy': 'The body\'s way of cleaning out damaged cells, in order to regenerate newer, healthier cells.',
+    'bdnf': 'Brain-Derived Neurotrophic Factor: A protein that supports the survival of existing neurons and encourages the growth of new ones.',
+    'binaural beats': 'An auditory illusion created by playing two slightly different frequencies in each ear, used for brainwave entrainment.',
+    'choline': 'A precursor to acetylcholine, essential for memory, mood, and muscle control.',
+    'gaba': 'Gamma-Aminobutyric Acid: The primary inhibitory neurotransmitter in the CNS, crucial for reducing neuronal excitability and promoting relaxation.',
+    'glycine': 'An amino acid that acts as a neurotransmitter, improving sleep quality and lowering core body temperature.',
+    'hrv': 'Heart Rate Variability: The variation in time between heartbeats. A higher HRV typically indicates better recovery and nervous system balance.',
+    'huperzine': 'A potent AChE inhibitor that prevents the breakdown of acetylcholine, often used in lucid dreaming protocols.',
+    'l-theanine': 'An amino acid found in tea that promotes relaxation without drowsiness, often stacked with caffeine for "calm focus".',
+    'lion\'s mane': 'A medicinal mushroom known for its neuroprotective properties and ability to stimulate Nerve Growth Factor (NGF).',
+    'nootropic': 'Compounds that enhance cognitive function, particularly executive functions, memory, creativity, or motivation.',
+    'rem': 'Rapid Eye Movement: The sleep stage associated with vivid dreaming and memory consolidation.',
+    'uridine': 'A nucleotide that supports synaptic plasticity and works synergistically with choline for brain health.',
+    'yuschak': 'The gold-standard protocol for lucidity involving specific supplement timing during the WBTB window.'
+};
+
 // Scroll Reveal Logic
 document.addEventListener('DOMContentLoaded', () => {
     // Scroll Progress Bar
@@ -136,19 +157,6 @@ document.addEventListener('DOMContentLoaded', () => {
     }
 
     // 1. Biohacking Codex
-    const codexData = {
-        'ache': 'Acetylcholinesterase: An enzyme that breaks down acetylcholine. Inhibiting this (e.g. with Huperzine-A) increases neuro-connectivity.',
-        'bdnf': 'Brain-Derived Neurotrophic Factor: A protein that supports the survival of existing neurons and encourages the growth of new ones.',
-        'choline': 'A precursor to acetylcholine, essential for memory, mood, and muscle control.',
-        'gaba': 'Gamma-Aminobutyric Acid: The primary inhibitory neurotransmitter in the CNS, crucial for reducing neuronal excitability and promoting relaxation.',
-        'glycine': 'An amino acid that acts as a neurotransmitter, improving sleep quality and lowering core body temperature.',
-        'hrv': 'Heart Rate Variability: The variation in time between heartbeats. A higher HRV typically indicates better recovery and nervous system balance.',
-        'l-theanine': 'An amino acid found in tea that promotes relaxation without drowsiness, often stacked with caffeine for "calm focus".',
-        'nootropic': 'Compounds that enhance cognitive function, particularly executive functions, memory, creativity, or motivation.',
-        'rem': 'Rapid Eye Movement: The sleep stage associated with vivid dreaming and memory consolidation.',
-        'yuschak': 'The gold-standard protocol for lucidity involving specific supplement timing during the WBTB window.'
-    };
-
     const codexSearch = document.getElementById('codex-search');
     if (codexSearch) {
         codexSearch.addEventListener('input', (e) => {
@@ -508,7 +516,7 @@ document.addEventListener('DOMContentLoaded', () => {
         if (logo) {
             // Check if logo src is relative to articles
             const isArticle = window.location.pathname.includes('/articles/');
-            logo.src = isArticle ? '../topper-inverted.png' : 'topper-inverted.png';
+            logo.src = isArticle ? '../topper-inverted.webp' : 'topper-inverted.webp';
         }
     }
 
@@ -522,13 +530,13 @@ document.addEventListener('DOMContentLoaded', () => {
                 themeToggle.textContent = '🌙 DARK MODE';
                 if (logo) {
                     const isArticle = window.location.pathname.includes('/articles/');
-                    logo.src = isArticle ? '../topper-inverted.png' : 'topper-inverted.png';
+                    logo.src = isArticle ? '../topper-inverted.webp' : 'topper-inverted.webp';
                 }
             } else {
                 themeToggle.textContent = '☀️ LIGHT MODE';
                 if (logo) {
                     const isArticle = window.location.pathname.includes('/articles/');
-                    logo.src = isArticle ? '../topper.png' : 'topper.png';
+                    logo.src = isArticle ? '../topper.webp' : 'topper.webp';
                 }
             }
             localStorage.setItem('theme', theme);
@@ -638,7 +646,7 @@ document.addEventListener('DOMContentLoaded', () => {
     body.insertAdjacentHTML('beforeend', chatHTML);
 
     const toggle = document.getElementById('syndicate-chat-toggle');
-    const window = document.getElementById('chat-window');
+    const chatWindow = document.getElementById('chat-window');
     const closeBtn = document.getElementById('close-chat');
     const sendBtn = document.getElementById('chat-send');
     const input = document.getElementById('chat-input');
@@ -654,8 +662,8 @@ document.addEventListener('DOMContentLoaded', () => {
     };
 
     // Toggle Chat
-    toggle.addEventListener('click', () => window.classList.toggle('active'));
-    closeBtn.addEventListener('click', () => window.classList.remove('active'));
+    toggle.addEventListener('click', () => chatWindow.classList.toggle('active'));
+    closeBtn.addEventListener('click', () => chatWindow.classList.remove('active'));
 
     // Agent Selection
     chips.forEach(chip => {
@@ -668,18 +676,41 @@ document.addEventListener('DOMContentLoaded', () => {
     });
 
     // Send Message
-    function handleSend() {
+    async function handleSend() {
         const text = input.value.trim();
         if (!text) return;
 
         addMessage(text, 'user');
         input.value = '';
 
-        // Mock Bot Response logic (Integrated with Codex)
-        setTimeout(() => {
-            const response = getBotResponse(text);
-            addMessage(response, 'bot');
-        }, 600);
+        // Integrated with Local Bot via ngrok
+        try {
+            const response = await fetch('https://unseeing-skinhead-stem.ngrok-free.dev/api/create', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify({
+                    message: text,
+                    agent: currentAgent,
+                    timestamp: new Date().toISOString()
+                })
+            });
+
+            if (!response.ok) throw new Error('Network response was not ok');
+
+            const data = await response.json();
+            // Assuming the bot returns { reply: "..." } or similar. Adjust based on actual API.
+            const botReply = data.reply || data.response || getBotResponse(text);
+            addMessage(botReply, 'bot');
+        } catch (error) {
+            console.error('Syndicate Backend Error:', error);
+            // Fallback to local intelligence if backend is offline
+            setTimeout(() => {
+                const response = getBotResponse(text);
+                addMessage(`[LOCAL_MODE] ${response}`, 'bot');
+            }, 600);
+        }
     }
 
     sendBtn.addEventListener('click', handleSend);

@@ -652,7 +652,7 @@ nav a:hover {
 .theme-toggle-pill {
     position: fixed;
     bottom: 30px;
-    right: 30px;
+    left: 30px;
     background: var(--card-bg);
     border: 2px solid var(--neon-blue);
     color: var(--neon-blue);
@@ -685,7 +685,7 @@ body.light-mode .theme-toggle-pill {
 @media (max-width: 600px) {
     .theme-toggle-pill {
         bottom: 20px;
-        right: 20px;
+        left: 20px;
         padding: 10px 16px;
         font-size: 0.7rem;
     }
