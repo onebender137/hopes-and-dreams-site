@@ -38,6 +38,23 @@
         <div class="glow-divider"></div>
 
         <div class="grid">
+            <!-- Feature: Hormetic Dose Intel -->
+            <div class="widget-container" style="grid-column: span 2;" data-reveal>
+                <div class="widget-title">
+                    <svg width="24" height="24" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z"></path></svg>
+                    Hormetic Optimization Metrics
+                </div>
+                <div class="frequency-grid">
+                    <div id="hormetic-intel" style="background: rgba(0,0,0,0.2); padding: 15px; border-radius: 12px; border: 1px solid rgba(251, 191, 36, 0.1);">
+                        <strong style="color: var(--neon-gold); text-transform: uppercase; font-size: 0.8rem;">Sauna Hyperthermia</strong>
+                        <p style="font-size: 0.8rem; color: var(--text-dim); margin: 5px 0 0;">20 mins at 80°C (176°F) triggers a 2x Growth Hormone spike. 60 mins (2 sessions) can trigger up to 16x.</p>
+                    </div>
+                    <div id="hormetic-intel-2" style="background: rgba(0,0,0,0.2); padding: 15px; border-radius: 12px; border: 1px solid rgba(56, 189, 248, 0.1);">
+                        <strong style="color: var(--neon-blue); text-transform: uppercase; font-size: 0.8rem;">Cold Thermogenesis</strong>
+                        <p style="font-size: 0.8rem; color: var(--text-dim); margin: 5px 0 0;">Optimal Weekly Dose: 11 mins total. Increases dopamine by 250% for up to 4 hours post-exposure.</p>
+                    </div>
+                </div>
+            </div>
             <!-- Feature 2: Deep Work Soundscapes -->
             <div class="widget-container" style="grid-column: span 2;">
                 <div class="widget-title">
@@ -127,6 +144,32 @@
         <div class="glow-divider"></div>
 
         <div class="grid">
+            <!-- Feature: Caffeine Fade Visualizer -->
+            <div class="widget-container" data-reveal>
+                <div class="widget-title">
+                    <svg width="24" height="24" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 10V3L4 14h7v7l9-11h-7z"></path></svg>
+                    Caffeine Fade Visualizer
+                </div>
+                <div class="input-group">
+                    <label>Amount Ingested (mg)</label>
+                    <input type="number" id="caff-mg" value="200" step="10" min="0">
+                </div>
+                <div class="input-group">
+                    <label>Hours Since Ingestion</label>
+                    <input type="number" id="caff-hours" value="0" step="0.5" min="0">
+                </div>
+                <div class="input-group">
+                    <label>Hours Until Bedtime</label>
+                    <input type="number" id="caff-bedtime" value="10" step="0.5" min="0">
+                </div>
+                <div id="caff-risk-box" class="result-box active" style="border-left-color: var(--neon-gold);">
+                    <div style="font-size: 0.8rem; text-transform: uppercase; color: var(--text-dim);">Residual at Bedtime</div>
+                    <div id="caff-residual" style="font-size: 1.8rem; font-weight: 900; color: var(--neon-gold);">50.0 mg</div>
+                    <div id="caff-status" style="font-size: 0.9rem; margin-top: 5px;">Risk: <span style="color: var(--neon-gold);">MODERATE</span></div>
+                    <p id="caff-advice" style="font-size: 0.8rem; margin-top: 10px; color: var(--text-dim);">Sleep quality may be compromised. Residual exceeds the 50mg disruption threshold.</p>
+                </div>
+            </div>
+
             <!-- Feature 4: Protocol Timer -->
             <div class="widget-container" data-reveal>
                 <div class="widget-title">
@@ -134,9 +177,11 @@
                     Protocol Timer
                 </div>
                 <div id="timer-display" style="font-size: 2rem; font-weight: 900; color: var(--neon-blue); text-align: center; margin-bottom: 10px;">02:00</div>
-                <div class="timer-controls" style="display: flex; gap: 10px; justify-content: center;">
+                <div class="timer-controls" style="display: grid; grid-template-columns: 1fr 1fr; gap: 10px; justify-content: center;">
                     <button class="buy-btn" onclick="startTimer(120)" style="font-size: 0.7rem;">Cold Plunge (2m)</button>
                     <button class="buy-btn" onclick="startTimer(600)" style="font-size: 0.7rem;">Meditation (10m)</button>
+                    <button class="buy-btn" onclick="startTimer(1200)" style="font-size: 0.7rem; border-color: #ef4444; color: #ef4444;">Sauna: GH Spike (20m)</button>
+                    <button class="buy-btn" onclick="startTimer(3600)" style="font-size: 0.7rem; border-color: #8b5cf6; color: #8b5cf6;">Sauna: Elite (60m)</button>
                 </div>
             </div>
 
@@ -155,6 +200,23 @@
                     <div class="time-grid" id="suggested-times">
                         <!-- Times injected by JS -->
                     </div>
+                </div>
+            </div>
+
+            <!-- Feature: Autophagy Milestone Tracker -->
+            <div class="widget-container" data-reveal>
+                <div class="widget-title">
+                    <svg width="24" height="24" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4.318 6.318a4.5 4.5 0 000 6.364L12 20.364l7.682-7.682a4.5 4.5 0 00-6.364-6.364L12 7.636l-1.318-1.318a4.5 4.5 0 00-6.364 0z"></path></svg>
+                    Autophagy Milestone Tracker
+                </div>
+                <div class="input-group">
+                    <label>Fasting Duration (Hours)</label>
+                    <input type="range" id="fast-range" min="0" max="72" value="16" style="width: 100%; margin: 15px 0;">
+                    <div id="fast-display" style="text-align: center; font-weight: 900; color: var(--neon-blue); font-size: 1.2rem;">16 Hours</div>
+                </div>
+                <div id="fast-milestone-box" class="result-box active" style="transition: all 0.5s ease;">
+                    <div id="fast-milestone" style="font-size: 0.9rem; font-weight: 900; color: var(--neon-gold); text-transform: uppercase;">Early Autophagy</div>
+                    <p id="fast-desc" style="font-size: 0.8rem; margin-top: 5px; color: var(--text-dim);">AMPK pathway activated. Cellular cleanup initiated. Insulin levels at baseline.</p>
                 </div>
             </div>
 

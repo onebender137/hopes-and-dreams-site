@@ -32,6 +32,109 @@ document.addEventListener('DOMContentLoaded', () => {
 
     // --- Interactive Feature Logic ---
 
+    // 0. Caffeine Fade Visualizer
+    const caffMg = document.getElementById('caff-mg');
+    const caffHours = document.getElementById('caff-hours');
+    const caffBedtime = document.getElementById('caff-bedtime');
+
+    function updateCaffeine() {
+        if (!caffMg || !caffHours || !caffBedtime) return;
+        
+        const initial = parseFloat(caffMg.value) || 0;
+        const elapsed = parseFloat(caffHours.value) || 0;
+        const tillBed = parseFloat(caffBedtime.value) || 0;
+        
+        const halfLife = 5.7; // average hours
+        const totalHours = elapsed + tillBed;
+        
+        const residual = initial * Math.pow(0.5, totalHours / halfLife);
+        
+        const residualEl = document.getElementById('caff-residual');
+        const statusEl = document.getElementById('caff-status');
+        const adviceEl = document.getElementById('caff-advice');
+        const riskBox = document.getElementById('caff-risk-box');
+        
+        if (residualEl) residualEl.textContent = residual.toFixed(1) + " mg";
+        
+        let risk = "OPTIMAL";
+        let color = "var(--neon-blue)";
+        let advice = "System cleared. Minimal sleep disruption architecture.";
+        
+        if (residual > 50) {
+            risk = "CRITICAL";
+            color = "#ef4444";
+            advice = "EEG studies show measurable deep-sleep suppression at this level. Recommend immediate L-Theanine buffer.";
+        } else if (residual > 20) {
+            risk = "MODERATE";
+            color = "var(--neon-gold)";
+            advice = "Sleep architecture may be compromised. Residual exceeds the 20mg metabolic noise threshold.";
+        }
+        
+        if (statusEl) statusEl.innerHTML = `Risk: <span style="color: ${color};">${risk}</span>`;
+        if (adviceEl) adviceEl.textContent = advice;
+        if (riskBox) riskBox.style.borderLeftColor = color;
+    }
+
+    if (caffMg) {
+        [caffMg, caffHours, caffBedtime].forEach(el => el.addEventListener('input', updateCaffeine));
+        updateCaffeine();
+    }
+
+    // 0.1 Autophagy Milestone Tracker
+    const fastRange = document.getElementById('fast-range');
+    const fastDisplay = document.getElementById('fast-display');
+
+    function updateAutophagy() {
+        if (!fastRange || !fastDisplay) return;
+        
+        const hours = parseInt(fastRange.value);
+        fastDisplay.textContent = hours + " Hours";
+        
+        const milestoneEl = document.getElementById('fast-milestone');
+        const descEl = document.getElementById('fast-desc');
+        const boxEl = document.getElementById('fast-milestone-box');
+        
+        let milestone = "Post-Absorptive State";
+        let desc = "Blood sugar levels normal. System utilizing dietary energy.";
+        let color = "var(--text-dim)";
+        let bgColor = "rgba(148, 163, 184, 0.05)";
+        
+        if (hours >= 48) {
+            milestone = "Peak Stem Cell Regeneration";
+            desc = "Prolonged autophagy and immune cell turnover. Maximum system reboot.";
+            color = "#8b5cf6"; // Purple
+            bgColor = "rgba(139, 92, 246, 0.1)";
+        } else if (hours >= 24) {
+            milestone = "Deep Autophagy Transition";
+            desc = "300% increase in autophagy markers. Body-wide cellular recycling accelerated.";
+            color = "var(--neon-gold)";
+            bgColor = "rgba(251, 191, 36, 0.1)";
+        } else if (hours >= 16) {
+            milestone = "Early Autophagy";
+            desc = "AMPK pathway activated. Cellular cleanup initiated. Insulin levels at baseline.";
+            color = "var(--neon-blue)";
+            bgColor = "rgba(56, 189, 248, 0.1)";
+        } else if (hours >= 12) {
+            milestone = "Ketosis Threshold";
+            desc = "Fat oxidation begins. Liver glycogen depleted. Metabolic shift starting.";
+            color = "var(--neon-blue)";
+            bgColor = "rgba(56, 189, 248, 0.05)";
+        }
+        
+        if (milestoneEl) milestoneEl.textContent = milestone;
+        if (milestoneEl) milestoneEl.style.color = color;
+        if (descEl) descEl.textContent = desc;
+        if (boxEl) {
+            boxEl.style.borderLeftColor = color;
+            boxEl.style.backgroundColor = bgColor;
+        }
+    }
+
+    if (fastRange) {
+        fastRange.addEventListener('input', updateAutophagy);
+        updateAutophagy();
+    }
+
     // 1. Biohacking Codex
     const codexData = {
         'ache': 'Acetylcholinesterase: An enzyme that breaks down acetylcholine. Inhibiting this (e.g. with Huperzine-A) increases neuro-connectivity.',
