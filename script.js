@@ -75,8 +75,7 @@ document.addEventListener('DOMContentLoaded', () => {
     const freqDesc = document.getElementById('freq-desc');
 
     function updateFreqDisplay(val) {
-        if (!freqValDisplay) return;
-        freqValDisplay.textContent = val;
+        if (freqValDisplay) freqValDisplay.textContent = val;
 
         let type = "";
         let desc = "";
@@ -98,10 +97,10 @@ document.addEventListener('DOMContentLoaded', () => {
             desc = "Peak focus, high-level cognition, memory recall, and insight.";
         }
 
-        freqType.textContent = type;
-        freqDesc.textContent = desc;
+        if (freqType) freqType.textContent = type;
+        if (freqDesc) freqDesc.textContent = desc;
 
-        if (binauralNodes) {
+        if (binauralNodes && window.audioCtx) {
             const freq = parseFloat(val);
             binauralNodes.oscR.frequency.setTargetAtTime(baseFreq + freq, window.audioCtx.currentTime, 0.1);
         }
@@ -148,12 +147,12 @@ document.addEventListener('DOMContentLoaded', () => {
         const btn = document.getElementById('binaural-toggle');
 
         if (binauralNodes) {
-            binauralNodes.oscL.stop();
-            binauralNodes.oscR.stop();
+            if (binauralNodes.oscL) binauralNodes.oscL.stop();
+            if (binauralNodes.oscR) binauralNodes.oscR.stop();
             binauralNodes = null;
-            btn.classList.remove('active');
+            if (btn) btn.classList.remove('active');
         } else {
-            const freq = parseFloat(freqSlider.value);
+            const freq = freqSlider ? parseFloat(freqSlider.value) : 40;
             const oscL = window.audioCtx.createOscillator();
             oscL.frequency.setValueAtTime(baseFreq, window.audioCtx.currentTime);
             const pannerL = window.audioCtx.createStereoPanner();
@@ -174,7 +173,7 @@ document.addEventListener('DOMContentLoaded', () => {
             oscL.start();
             oscR.start();
             binauralNodes = { oscL, oscR, gain };
-            btn.classList.add('active');
+            if (btn) btn.classList.add('active');
         }
     };
 
