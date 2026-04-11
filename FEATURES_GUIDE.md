@@ -58,8 +58,8 @@ A multi-step recommender system on the Procurement page.
 
 ---
 
-## 3. Neural Frequency Architect
-An advanced audio generation system for brainwave entrainment.
+## 3. DEEP WORK SOUNDSCAPES (Neural Frequency Architect)
+An advanced audio generation system for brainwave entrainment, labeled "DEEP WORK SOUNDSCAPES" on the Intel Hub for clarity.
 
 ### How it works:
 - **Brown Noise Layer:** Generates deep, low-frequency random noise via a buffer algorithm to mask external distractions.

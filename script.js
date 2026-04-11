@@ -107,15 +107,20 @@ document.addEventListener('DOMContentLoaded', () => {
     }
 
     if (freqSlider) {
+        const setSliderGradient = (el) => {
+            const val = (el.value - el.min) / (el.max - el.min) * 100;
+            el.style.backgroundSize = val + '% 100%';
+        };
+
         freqSlider.addEventListener('input', (e) => {
             updateFreqDisplay(e.target.value);
-            // Update slider progress gradient
-            const val = (e.target.value - e.target.min) / (e.target.max - e.target.min) * 100;
-            e.target.style.backgroundSize = val + '% 100%';
+            setSliderGradient(e.target);
         });
-        // Set initial background size
-        const initialVal = (freqSlider.value - freqSlider.min) / (freqSlider.max - freqSlider.min) * 100;
-        freqSlider.style.backgroundSize = initialVal + '% 100%';
+
+        // Ensure initialization on load
+        setSliderGradient(freqSlider);
+        // Sometimes DOM needs a moment for styles to apply
+        setTimeout(() => setSliderGradient(freqSlider), 100);
     }
 
     window.toggleBrownNoise = function() {
@@ -395,6 +400,7 @@ document.addEventListener('DOMContentLoaded', () => {
         if (results) results.classList.remove('active');
         if (intro) intro.style.display = 'block';
     };
+
 
     // Reading Time Estimator
     const content = document.querySelector('article');
