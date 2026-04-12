@@ -756,20 +756,22 @@ document.addEventListener('DOMContentLoaded', () => {
     }
 });
 
-/**
- * BRIDGE FOR FACEBOOK BOT LOGIC
- * To integrate the external Hopes-and-Dreams-Facebook-bot:
- * 1. Host the bot's logic as a serverless function or API.
- * 2. Replace the 'getBotResponse' function or the logic in 'handleSend'
- *    with a fetch() call to your API endpoint.
- *
- * Example:
- * async function getExternalBotResponse(text) {
- *    const response = await fetch('YOUR_API_ENDPOINT', {
- *        method: 'POST',
- *        body: JSON.stringify({ message: text, agent: currentAgent })
- *    });
- *    const data = await response.json();
- *    return data.reply;
- * }
- */
+async function getBotResponse(text, currentAgent) {
+    try {
+        // This is the wire pointing directly to your MSI Claw tunnel
+        const response = await fetch('https://ai.hopes-and-dreams.ca/api/chat', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json'
+            },
+            body: JSON.stringify({ message: text })
+        });
+        
+        const data = await response.json();
+        return data.reply;
+        
+    } catch (error) {
+        console.error("Tunnel connection failed:", error);
+        return "[LOCAL_MODE] Syndicate Uplink Severed. The MSI Claw is unreachable.";
+    }
+}
