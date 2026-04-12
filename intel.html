@@ -198,6 +198,30 @@
 
         <div class="glow-divider"></div>
 
+        <!-- Feature 2.5: Interactive Neural Map -->
+        <div class="widget-container" data-reveal id="neural-map-container">
+            <div class="widget-title">
+                <svg width="24" height="24" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9.663 17h4.673M12 3v1m6.364 1.636l-.707.707M21 12h-1M4 12H3m3.343-5.657l-.707-.707m2.828 9.9a5 5 0 117.072 0l-.548.547A3.374 3.374 0 0014 18.469V19a2 2 0 11-4 0v-.531c0-.895-.356-1.754-.988-2.386l-.548-.547z"></path></svg>
+                Interactive Neural Mapping
+            </div>
+            <p style="font-size: 0.85rem; color: var(--text-dim); margin-bottom: 20px;">Select a neural region to initialize deep intelligence retrieval.</p>
+            <div class="neural-map-wrapper">
+                <svg viewBox="0 0 400 300" class="brain-svg">
+                    <!-- Prefrontal Cortex -->
+                    <path class="brain-region" data-region="prefrontal cortex" d="M120,50 C80,70 60,120 70,180 L140,180 L150,50 Z" />
+                    <!-- Thalamus (Central) -->
+                    <circle class="brain-region" data-region="thalamus" cx="200" cy="150" r="30" />
+                    <!-- Vagus Nerve (Connecting down) -->
+                    <path class="brain-region" data-region="vagus nerve" d="M190,180 L190,280 L210,280 L210,180 Z" />
+
+                    <!-- Simplified Brain Outline -->
+                    <path fill="none" stroke="var(--neon-blue)" stroke-width="2" d="M200,30 C100,30 50,100 50,180 C50,250 120,270 200,270 C280,270 350,250 350,180 C350,100 300,30 200,30" opacity="0.2" />
+                </svg>
+            </div>
+        </div>
+
+        <div class="glow-divider"></div>
+
         <!-- Feature 3: Biohacking Codex -->
         <div class="widget-container" data-reveal>
             <div class="widget-title">
