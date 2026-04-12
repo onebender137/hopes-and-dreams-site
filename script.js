@@ -76,13 +76,87 @@ document.addEventListener('DOMContentLoaded', () => {
     }
 
     if (caffMg) {
-        [caffMg, caffHours, caffBedtime].forEach(el => el.addEventListener('input', updateCaffeine));
+        [caffMg, caffHours, caffBedtime].forEach(el => el.addEventListener('input', () => {
+            updateCaffeine();
+            calculateReadinessScore();
+        }));
         updateCaffeine();
     }
 
     // 0.1 Autophagy Milestone Tracker
     const fastRange = document.getElementById('fast-range');
     const fastDisplay = document.getElementById('fast-display');
+
+    // 0.2 Neural Readiness Logic
+    function calculateReadinessScore() {
+        const progress = document.getElementById('readiness-progress');
+        const valueDisplay = document.getElementById('readiness-value');
+        const adviceEl = document.getElementById('readiness-advice');
+        if (!progress || !valueDisplay) return;
+
+        let score = 0;
+        const factors = {
+            caffeine: 25,
+            fasting: 25,
+            sleep: 25,
+            protocols: 25
+        };
+
+        // 1. Caffeine Factor (Residual)
+        const initial = parseFloat(document.getElementById('caff-mg')?.value) || 0;
+        const elapsed = parseFloat(document.getElementById('caff-hours')?.value) || 0;
+        const tillBed = parseFloat(document.getElementById('caff-bedtime')?.value) || 0;
+        const halfLife = 5.7;
+        const residual = initial * Math.pow(0.5, (elapsed + tillBed) / halfLife);
+
+        // Lower residual = better readiness
+        let caffScore = 100;
+        if (residual > 50) caffScore = 0;
+        else if (residual > 0) caffScore = 100 - (residual * 2);
+        factors.caffeine = (caffScore / 100) * 25;
+
+        // 2. Fasting Factor
+        const fastHours = parseInt(document.getElementById('fast-range')?.value) || 0;
+        let fastScore = (fastHours / 48) * 100;
+        if (fastScore > 100) fastScore = 100;
+        factors.fasting = (fastScore / 100) * 25;
+
+        // 3. Sleep Factor
+        const wakeInput = document.getElementById('wake-time');
+        factors.sleep = wakeInput && wakeInput.value ? 25 : 0;
+
+        // 4. Protocols Factor (Checklist)
+        const checks = document.querySelectorAll('.protocol-check');
+        const checked = document.querySelectorAll('.protocol-check:checked');
+        let protocolScore = checks.length > 0 ? (checked.length / checks.length) * 100 : 0;
+        factors.protocols = (protocolScore / 100) * 25;
+
+        score = Math.round(factors.caffeine + factors.fasting + factors.sleep + factors.protocols);
+
+        // Update UI
+        progress.setAttribute('stroke-dasharray', `${score}, 100`);
+        valueDisplay.textContent = score + "%";
+
+        // Update bars
+        const caffBar = document.querySelector('#factor-caffeine .factor-fill');
+        const fastBar = document.querySelector('#factor-fasting .factor-fill');
+        const sleepBar = document.querySelector('#factor-sleep .factor-fill');
+        const protocolBar = document.querySelector('#factor-protocols .factor-fill');
+
+        if (caffBar) caffBar.style.width = (factors.caffeine * 4) + "%";
+        if (fastBar) fastBar.style.width = (factors.fasting * 4) + "%";
+        if (sleepBar) sleepBar.style.width = (factors.sleep * 4) + "%";
+        if (protocolBar) protocolBar.style.width = (factors.protocols * 4) + "%";
+
+        // Update Advice
+        let advice = "System online. Initialize protocols to calculate performance readiness.";
+        if (score >= 90) advice = "EXTREME READINESS. All neural systems optimized. Deploy high-value cognitive tasks.";
+        else if (score >= 70) advice = "OPTIMAL STATE. Neuro-chemical balance achieved. Proceed with building.";
+        else if (score >= 50) advice = "NOMINAL OPERATING CAPACITY. Moderate biological noise detected.";
+        else advice = "SYSTEM CRITICAL. Prioritize recovery and metabolic clearing protocols.";
+
+        if (adviceEl) adviceEl.textContent = `"${advice}"`;
+    }
 
     function updateAutophagy() {
         if (!fastRange || !fastDisplay) return;
@@ -131,9 +205,35 @@ document.addEventListener('DOMContentLoaded', () => {
     }
 
     if (fastRange) {
-        fastRange.addEventListener('input', updateAutophagy);
+        fastRange.addEventListener('input', () => {
+            updateAutophagy();
+            calculateReadinessScore();
+        });
         updateAutophagy();
     }
+
+    // 0.3 Interactive Neural Map Logic
+    const brainRegions = document.querySelectorAll('.brain-region');
+    const codexResults = document.getElementById('codex-results');
+
+    brainRegions.forEach(region => {
+        region.addEventListener('click', () => {
+            const targetRegion = region.getAttribute('data-region');
+
+            // Toggle active class
+            brainRegions.forEach(r => r.classList.remove('active'));
+            region.classList.add('active');
+
+            if (typeof codexData !== 'undefined' && codexResults) {
+                const info = codexData[targetRegion];
+                if (info) {
+                    codexResults.innerHTML = `<strong>${targetRegion.toUpperCase()}:</strong> ${info}`;
+                    // Scroll to codex for visibility on mobile
+                    codexResults.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+                }
+            }
+        });
+    });
 
     // 1. Biohacking Codex Search
     const codexSearch = document.getElementById('codex-search');
@@ -310,7 +410,10 @@ document.addEventListener('DOMContentLoaded', () => {
     }
 
     if (wakeInput) {
-        wakeInput.addEventListener('change', calculateSleepTimes);
+        wakeInput.addEventListener('change', () => {
+            calculateSleepTimes();
+            calculateReadinessScore();
+        });
         calculateSleepTimes();
     }
 
@@ -332,6 +435,7 @@ document.addEventListener('DOMContentLoaded', () => {
             } else {
                 check.parentElement.classList.remove('completed');
             }
+            calculateReadinessScore();
         });
     });
 
@@ -575,6 +679,11 @@ document.addEventListener('DOMContentLoaded', () => {
         });
     }
 
+    // Initial Score Calculation
+    if (typeof calculateReadinessScore === 'function') {
+        calculateReadinessScore();
+    }
+
     // Custom Cursor Logic
     if (window.innerWidth >= 1024) {
         const cursor = document.createElement('div');
@@ -668,6 +777,9 @@ document.addEventListener('DOMContentLoaded', () => {
                 <div class="message bot">System initialized. Agent Ghost online. How can the Syndicate assist your optimization today?</div>
             </div>
             <div class="chat-input-area">
+                <button class="chat-send-btn" id="chat-mic" title="Voice Input">
+                    <svg width="20" height="20" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 11a7 7 0 01-7 7m0 0a7 7 0 01-7-7m7 7v4m0 0H8m4 0h4m-4-8a3 3 0 01-3-3V5a3 3 0 116 0v6a3 3 0 01-3 3z"></path></svg>
+                </button>
                 <input type="text" id="chat-input" placeholder="Enter transmission..." autocomplete="off">
                 <button class="chat-send-btn" id="chat-send">
                     <svg width="20" height="20" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 5l7 7-7 7M5 5l7 7-7 7"></path></svg>
@@ -681,6 +793,7 @@ document.addEventListener('DOMContentLoaded', () => {
     const chatWindow = document.getElementById('chat-window');
     const closeBtn = document.getElementById('close-chat');
     const sendBtn = document.getElementById('chat-send');
+    const micBtn = document.getElementById('chat-mic');
     const input = document.getElementById('chat-input');
     const messagesContainer = document.getElementById('chat-messages');
     const chips = document.querySelectorAll('.agent-chip');
@@ -783,6 +896,36 @@ document.addEventListener('DOMContentLoaded', () => {
 
     sendBtn.addEventListener('click', handleSend);
     input.addEventListener('keypress', (e) => { if (e.key === 'Enter') handleSend(); });
+
+    // Voice Input Logic
+    if ('webkitSpeechRecognition' in window || 'SpeechRecognition' in window) {
+        const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
+        const recognition = new SpeechRecognition();
+        recognition.continuous = false;
+        recognition.interimResults = false;
+
+        recognition.onstart = () => {
+            micBtn.style.color = 'var(--neon-blue)';
+            micBtn.classList.add('pulse');
+        };
+
+        recognition.onresult = (event) => {
+            const transcript = event.results[0][0].transcript;
+            input.value = transcript;
+            handleSend();
+        };
+
+        recognition.onend = () => {
+            micBtn.style.color = 'var(--neon-gold)';
+            micBtn.classList.remove('pulse');
+        };
+
+        micBtn.addEventListener('click', () => {
+            recognition.start();
+        });
+    } else {
+        micBtn.style.display = 'none';
+    }
 
     function addMessage(text, side) {
         const msg = document.createElement('div');
