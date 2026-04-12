@@ -662,17 +662,37 @@ document.addEventListener('DOMContentLoaded', () => {
     });
 
     // Thinking Indicator
+    let thinkingTimeout;
     function setThinking(isThinking) {
         const existing = document.getElementById('syndicate-thinking');
+        const statusMsg = document.getElementById('syndicate-status');
+
         if (isThinking && !existing) {
             const indicator = document.createElement('div');
             indicator.id = 'syndicate-thinking';
             indicator.className = 'message bot thinking';
             indicator.innerHTML = `<span class="dot"></span><span class="dot"></span><span class="dot"></span>`;
             messagesContainer.appendChild(indicator);
+
+            // UX for slow MSI Claw inference
+            thinkingTimeout = setTimeout(() => {
+                const status = document.createElement('div');
+                status.id = 'syndicate-status';
+                status.style.fontSize = '0.7rem';
+                status.style.color = 'var(--neon-gold)';
+                status.style.opacity = '0.6';
+                status.style.marginTop = '-10px';
+                status.style.marginLeft = '15px';
+                status.textContent = "Indexing neural chunks via MSI Claw...";
+                messagesContainer.appendChild(status);
+                messagesContainer.scrollTop = messagesContainer.scrollHeight;
+            }, 4000);
+
             messagesContainer.scrollTop = messagesContainer.scrollHeight;
-        } else if (!isThinking && existing) {
-            existing.remove();
+        } else if (!isThinking) {
+            if (existing) existing.remove();
+            if (statusMsg) statusMsg.remove();
+            clearTimeout(thinkingTimeout);
         }
     }
 
