@@ -103,9 +103,13 @@ document.addEventListener('DOMContentLoaded', () => {
         };
 
         // 1. Caffeine Factor (Residual)
-        const initial = parseFloat(document.getElementById('caff-mg')?.value) || 0;
-        const elapsed = parseFloat(document.getElementById('caff-hours')?.value) || 0;
-        const tillBed = parseFloat(document.getElementById('caff-bedtime')?.value) || 0;
+        const caffMgEl = document.getElementById('caff-mg');
+        const caffHoursEl = document.getElementById('caff-hours');
+        const caffBedtimeEl = document.getElementById('caff-bedtime');
+
+        const initial = caffMgEl ? parseFloat(caffMgEl.value) : 0;
+        const elapsed = caffHoursEl ? parseFloat(caffHoursEl.value) : 0;
+        const tillBed = caffBedtimeEl ? parseFloat(caffBedtimeEl.value) : 10;
         const halfLife = 5.7;
         const residual = initial * Math.pow(0.5, (elapsed + tillBed) / halfLife);
 
@@ -116,7 +120,8 @@ document.addEventListener('DOMContentLoaded', () => {
         factors.caffeine = (caffScore / 100) * 25;
 
         // 2. Fasting Factor
-        const fastHours = parseInt(document.getElementById('fast-range')?.value) || 0;
+        const fastRangeEl = document.getElementById('fast-range');
+        const fastHours = fastRangeEl ? parseInt(fastRangeEl.value) : 0;
         let fastScore = (fastHours / 48) * 100;
         if (fastScore > 100) fastScore = 100;
         factors.fasting = (fastScore / 100) * 25;
@@ -777,7 +782,7 @@ document.addEventListener('DOMContentLoaded', () => {
                 <div class="message bot">System initialized. Agent Ghost online. How can the Syndicate assist your optimization today?</div>
             </div>
             <div class="chat-input-area">
-                <button class="chat-send-btn" id="chat-mic" title="Voice Input">
+                <button class="chat-send-btn" id="chat-mic" title="Voice Input (Requires Chrome/Brave permissions)">
                     <svg width="20" height="20" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 11a7 7 0 01-7 7m0 0a7 7 0 01-7-7m7 7v4m0 0H8m4 0h4m-4-8a3 3 0 01-3-3V5a3 3 0 116 0v6a3 3 0 01-3 3z"></path></svg>
                 </button>
                 <input type="text" id="chat-input" placeholder="Enter transmission..." autocomplete="off">
@@ -898,7 +903,7 @@ document.addEventListener('DOMContentLoaded', () => {
     input.addEventListener('keypress', (e) => { if (e.key === 'Enter') handleSend(); });
 
     // Voice Input Logic
-    if ('webkitSpeechRecognition' in window || 'SpeechRecognition' in window) {
+    if (micBtn && ('webkitSpeechRecognition' in window || 'SpeechRecognition' in window)) {
         const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
         const recognition = new SpeechRecognition();
         recognition.continuous = false;
@@ -923,7 +928,7 @@ document.addEventListener('DOMContentLoaded', () => {
         micBtn.addEventListener('click', () => {
             recognition.start();
         });
-    } else {
+    } else if (micBtn) {
         micBtn.style.display = 'none';
     }
 
