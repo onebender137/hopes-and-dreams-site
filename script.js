@@ -359,13 +359,22 @@ document.addEventListener('DOMContentLoaded', () => {
         {
             q: "What is your primary optimization target?",
             options: [
-                { text: "Cognitive Flux (Focus & Memory)", value: "focus" },
+                { text: "Cognitive Flux (Deep Work & Memory)", value: "focus" },
                 { text: "System Recovery (Sleep & Mood)", value: "sleep" },
-                { text: "Bio-Output (Energy & Performance)", value: "energy" }
+                { text: "Bio-Output (Energy & Performance)", value: "energy" },
+                { text: "Subconscious Exploration (Lucid Dreaming)", value: "dream" }
             ]
         },
         {
-            q: "Current experience level with nootropics?",
+            q: "How would you describe your current stress levels?",
+            options: [
+                { text: "Baseline (Stable)", value: "low" },
+                { text: "Elevated (High Pressure)", value: "high" },
+                { text: "Critical (Burnout Risk)", value: "critical" }
+            ]
+        },
+        {
+            q: "Experience level with neuro-augmentations?",
             options: [
                 { text: "Baseline (Beginner)", value: "base" },
                 { text: "Augmented (Intermediate)", value: "aug" },
@@ -373,10 +382,10 @@ document.addEventListener('DOMContentLoaded', () => {
             ]
         },
         {
-            q: "Preferred intake method?",
+            q: "Primary delivery method preference?",
             options: [
                 { text: "Standard (Capsules/Powder)", value: "std" },
-                { text: "Optimized (Sublingual/Fast-Acting)", value: "opt" }
+                { text: "Rapid-Onset (Liquid/Sublingual)", value: "fast" }
             ]
         }
     ];
@@ -431,41 +440,77 @@ document.addEventListener('DOMContentLoaded', () => {
         if (resultsDiv) {
             resultsDiv.classList.add('active');
             const output = document.getElementById('recommendation-output');
+
             const goal = quizAnswers[0];
-            const level = quizAnswers[1];
-            const method = quizAnswers[2];
+            const stress = quizAnswers[1];
+            const level = quizAnswers[2];
+            const method = quizAnswers[3];
             
-            let rec = "";
             let stackName = "";
-            let components = "";
+            let components = [];
+            let details = "";
+            let dosage = "";
             
+            // Logic for Stack Recommendation
             if (goal === 'focus') {
-                stackName = "The Architect Stack";
-                components = "Alpha GPC + Huperzine-A + Citicoline";
-                rec = "This combination optimizes acetylcholine levels for sustained deep work and neural plasticity.";
-                if (level === 'elite') rec += " Pro-tip: Cycle with Agmatine for neuro-protection.";
-                if (method === 'opt') rec += " Consider sublingual administration for immediate cholinergic response.";
+                stackName = "The Architect Protocol";
+                components = ["alpha-gpc", "citicoline", "nicotine"];
+                dosage = "Alpha GPC: 300mg, Citicoline: 250mg, Nicotine: 2mg patch.";
+                details = "Designed for sustained neural plasticity and linguistic fluidity. The cholinergic foundation ensures the brain has the raw materials for heavy data processing.";
+                if (stress !== 'low') {
+                    components.push("magnesium");
+                    dosage += " Magnesium: 200mg (Glycinate).";
+                    details += " Added Magnesium buffers the cortisol response from high-intensity focus sessions.";
+                }
             } else if (goal === 'sleep') {
                 stackName = "The Circadian Reset";
-                components = "Magnesium + 5-HTP";
-                rec = "Designed to down-regulate the nervous system and optimize REM latency.";
-                if (level === 'elite') rec += " Ideal for recovering from high-intensity cognitive flux.";
-                if (method === 'opt') rec += " Use high-absorption magnesium glycinate for better CNS penetration.";
-            } else {
-                stackName = "The Performance Engine";
-                components = "Agmatine Sulfate + Citicoline";
-                rec = "Enhances blood flow and cognitive drive for high-output physical and mental sessions.";
-                if (level === 'base') rec += " Start with lower dosages to assess systemic tolerance.";
-                if (method === 'opt') rec += " Liquid suspension recommended for faster pre-workout activation.";
+                components = ["magnesium", "5-htp"];
+                dosage = "Magnesium: 400mg, 5-HTP: 100mg-200mg.";
+                details = "Optimizes the transition into deep sleep. 5-HTP acts as a precursor to serotonin and melatonin, while Magnesium relaxes the CNS.";
+            } else if (goal === 'energy') {
+                stackName = "The Kinetic Engine";
+                components = ["agmatine", "alpha-gpc"];
+                dosage = "Agmatine Sulfate: 500mg, Alpha GPC: 150mg.";
+                details = "Focused on nitric oxide modulation and rapid cognitive drive. Ideal for high-stakes execution windows.";
+            } else if (goal === 'dream') {
+                stackName = "The Oneironaut Stack";
+                components = ["huperzine", "alpha-gpc"];
+                dosage = "Huperzine-A: 200mcg, Alpha GPC: 300mg (Take during WBTB window).";
+                details = "Maximizes acetylcholine concentration during the REM-dominant hours of early morning. Specifically tuned for the Yuschak Protocol.";
             }
-            
+
             if (output) {
                 output.innerHTML = `
-                    <p><strong>${stackName}:</strong> ${components}</p>
-                    <p style="color: var(--text-dim); font-size: 0.9rem;">${rec}</p>
+                    <p style="color: var(--neon-gold); font-size: 1.2rem; font-weight: 900; text-transform: uppercase;">${stackName}</p>
+                    <p style="margin-bottom: 15px;"><strong>Stack Components:</strong> ${components.join(', ')}</p>
+                    <div style="background: rgba(255,255,255,0.03); padding: 15px; border-radius: 10px; margin-bottom: 15px; text-align: left;">
+                        <p style="font-size: 0.85rem; color: var(--neon-blue); margin-bottom: 5px;"><strong>RECOMMENDED DOSAGE:</strong></p>
+                        <p style="font-size: 0.9rem; margin-bottom: 10px;">${dosage}</p>
+                        <p style="font-size: 0.85rem; color: var(--neon-blue); margin-bottom: 5px;"><strong>PROTOCOL DETAILS:</strong></p>
+                        <p style="font-size: 0.9rem; color: var(--text-dim); line-height: 1.4;">${details}</p>
+                    </div>
+                    <p style="font-size: 0.8rem; font-style: italic; color: var(--neon-gold);">Note: Recommended products in the procurement list have been highlighted below.</p>
                 `;
             }
+
+            // Highlight Cards
+            highlightShopCards(components);
         }
+    }
+
+    function highlightShopCards(productIds) {
+        // Clear previous highlights
+        document.querySelectorAll('.item-card').forEach(card => card.classList.remove('highlight-card'));
+
+        // Add new highlights
+        productIds.forEach(id => {
+            const card = document.querySelector(`.item-card[data-product="${id}"]`);
+            if (card) {
+                card.classList.add('highlight-card');
+                // Optional: Scroll to the grid after a short delay
+                // card.scrollIntoView({ behavior: 'smooth', block: 'center' });
+            }
+        });
     }
 
     window.resetQuiz = function() {
@@ -475,6 +520,7 @@ document.addEventListener('DOMContentLoaded', () => {
         const intro = document.getElementById('quiz-intro');
         if (results) results.classList.remove('active');
         if (intro) intro.style.display = 'block';
+        document.querySelectorAll('.item-card').forEach(card => card.classList.remove('highlight-card'));
     };
 
 
