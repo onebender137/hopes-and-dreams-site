@@ -69,6 +69,44 @@
         <div class="glow-divider"></div>
 
         <div class="grid">
+            <!-- Feature: Neural Readiness Command -->
+            <div class="widget-container" style="grid-column: span 2;" data-reveal id="readiness-command">
+                <div class="widget-title">
+                    <svg width="24" height="24" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 10V3L4 14h7v7l9-11h-7z"></path></svg>
+                    Neural Readiness Command
+                </div>
+                <div class="readiness-grid">
+                    <div class="readiness-score-container">
+                        <div class="readiness-circle">
+                            <svg viewBox="0 0 36 36" class="circular-chart">
+                                <path class="circle-bg" d="M18 2.0845 a 15.9155 15.9155 0 0 1 0 31.831 a 15.9155 15.9155 0 0 1 0 -31.831" />
+                                <path class="circle" id="readiness-progress" stroke-dasharray="0, 100" d="M18 2.0845 a 15.9155 15.9155 0 0 1 0 31.831 a 15.9155 15.9155 0 0 1 0 -31.831" />
+                                <text x="18" y="20.35" class="percentage" id="readiness-value">0%</text>
+                            </svg>
+                        </div>
+                    </div>
+                    <div class="readiness-details">
+                        <div class="readiness-factor" id="factor-caffeine">
+                            <span class="factor-label">Metabolic Buffer (Caffeine)</span>
+                            <div class="factor-bar"><div class="factor-fill" style="width: 100%;"></div></div>
+                        </div>
+                        <div class="readiness-factor" id="factor-fasting">
+                            <span class="factor-label">Cellular Cleanliness (Autophagy)</span>
+                            <div class="factor-bar"><div class="factor-fill" style="width: 0%;"></div></div>
+                        </div>
+                        <div class="readiness-factor" id="factor-sleep">
+                            <span class="factor-label">Neural Architecture (Sleep)</span>
+                            <div class="factor-bar"><div class="factor-fill" style="width: 100%;"></div></div>
+                        </div>
+                        <div class="readiness-factor" id="factor-protocols">
+                            <span class="factor-label">System Optimization (Checklist)</span>
+                            <div class="factor-bar"><div class="factor-fill" style="width: 0%;"></div></div>
+                        </div>
+                    </div>
+                </div>
+                <p id="readiness-advice" style="font-size: 0.85rem; color: var(--text-dim); margin-top: 20px; text-align: center; font-style: italic;">"System online. Initialize protocols to calculate performance readiness."</p>
+            </div>
+
             <!-- Feature: Hormetic Dose Intel -->
             <div class="widget-container" style="grid-column: span 2;" data-reveal>
                 <div class="widget-title">

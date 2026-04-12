@@ -14,7 +14,10 @@ const codexData = {
     'l-theanine': 'An amino acid found in tea that promotes relaxation without drowsiness, often stacked with caffeine for "calm focus".',
     'lion\'s mane': 'A medicinal mushroom known for its neuroprotective properties and ability to stimulate Nerve Growth Factor (NGF).',
     'nootropic': 'Compounds that enhance cognitive function, particularly executive functions, memory, creativity, or motivation.',
+    'prefrontal cortex': 'The brain region responsible for complex cognitive behavior, personality expression, decision making, and moderating social behavior.',
     'rem': 'Rapid Eye Movement: The sleep stage associated with vivid dreaming and memory consolidation.',
+    'thalamus': 'A relay station for sensory information, crucial for motor control and sleep/wake cycles.',
     'uridine': 'A nucleotide that supports synaptic plasticity and works synergistically with choline for brain health.',
+    'vagus nerve': 'The main component of the parasympathetic nervous system, responsible for the "rest and digest" state.',
     'yuschak': 'The gold-standard protocol for lucidity involving specific supplement timing during the WBTB window.'
 };
