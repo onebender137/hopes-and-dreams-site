@@ -662,17 +662,37 @@ document.addEventListener('DOMContentLoaded', () => {
     });
 
     // Thinking Indicator
+    let thinkingTimeout;
     function setThinking(isThinking) {
         const existing = document.getElementById('syndicate-thinking');
+        const statusMsg = document.getElementById('syndicate-status');
+
         if (isThinking && !existing) {
             const indicator = document.createElement('div');
             indicator.id = 'syndicate-thinking';
             indicator.className = 'message bot thinking';
             indicator.innerHTML = `<span class="dot"></span><span class="dot"></span><span class="dot"></span>`;
             messagesContainer.appendChild(indicator);
+
+            // UX for slow MSI Claw inference
+            thinkingTimeout = setTimeout(() => {
+                const status = document.createElement('div');
+                status.id = 'syndicate-status';
+                status.style.fontSize = '0.7rem';
+                status.style.color = 'var(--neon-gold)';
+                status.style.opacity = '0.6';
+                status.style.marginTop = '-10px';
+                status.style.marginLeft = '15px';
+                status.textContent = "Indexing neural chunks via MSI Claw...";
+                messagesContainer.appendChild(status);
+                messagesContainer.scrollTop = messagesContainer.scrollHeight;
+            }, 4000);
+
             messagesContainer.scrollTop = messagesContainer.scrollHeight;
-        } else if (!isThinking && existing) {
-            existing.remove();
+        } else if (!isThinking) {
+            if (existing) existing.remove();
+            if (statusMsg) statusMsg.remove();
+            clearTimeout(thinkingTimeout);
         }
     }
 
@@ -755,23 +775,3 @@ document.addEventListener('DOMContentLoaded', () => {
         return `[${currentAgent}] Query logged. My current intelligence parameters are limited to known protocols. Try asking about 'Alpha GPC', 'HRV', or 'The Syndicate'.`;
     }
 });
-
-async function getBotResponse(text, currentAgent) {
-    try {
-        // This is the wire pointing directly to your MSI Claw tunnel
-        const response = await fetch('https://ai.hopes-and-dreams.ca/api/chat', {
-            method: 'POST',
-            headers: {
-                'Content-Type': 'application/json'
-            },
-            body: JSON.stringify({ message: text })
-        });
-        
-        const data = await response.json();
-        return data.reply;
-        
-    } catch (error) {
-        console.error("Tunnel connection failed:", error);
-        return "[LOCAL_MODE] Syndicate Uplink Severed. The MSI Claw is unreachable.";
-    }
-}
