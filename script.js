@@ -755,23 +755,3 @@ document.addEventListener('DOMContentLoaded', () => {
         return `[${currentAgent}] Query logged. My current intelligence parameters are limited to known protocols. Try asking about 'Alpha GPC', 'HRV', or 'The Syndicate'.`;
     }
 });
-
-async function getBotResponse(text, currentAgent) {
-    try {
-        // This is the wire pointing directly to your MSI Claw tunnel
-        const response = await fetch('https://ai.hopes-and-dreams.ca/api/chat', {
-            method: 'POST',
-            headers: {
-                'Content-Type': 'application/json'
-            },
-            body: JSON.stringify({ message: text })
-        });
-        
-        const data = await response.json();
-        return data.reply;
-        
-    } catch (error) {
-        console.error("Tunnel connection failed:", error);
-        return "[LOCAL_MODE] Syndicate Uplink Severed. The MSI Claw is unreachable.";
-    }
-}
