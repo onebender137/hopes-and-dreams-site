@@ -1,24 +1,3 @@
-// Biohacking Codex Data
-const codexData = {
-    'ache': 'Acetylcholinesterase: An enzyme that breaks down acetylcholine. Inhibiting this (e.g. with Huperzine-A) increases neuro-connectivity.',
-    'alpha gpc': 'A high-bioavailability choline source that crosses the blood-brain barrier, essential for memory and cognitive fluidity.',
-    'ashwagandha': 'An adaptogenic herb that helps the body manage stress by down-regulating cortisol levels.',
-    'autophagy': 'The body\'s way of cleaning out damaged cells, in order to regenerate newer, healthier cells.',
-    'bdnf': 'Brain-Derived Neurotrophic Factor: A protein that supports the survival of existing neurons and encourages the growth of new ones.',
-    'binaural beats': 'An auditory illusion created by playing two slightly different frequencies in each ear, used for brainwave entrainment.',
-    'choline': 'A precursor to acetylcholine, essential for memory, mood, and muscle control.',
-    'gaba': 'Gamma-Aminobutyric Acid: The primary inhibitory neurotransmitter in the CNS, crucial for reducing neuronal excitability and promoting relaxation.',
-    'glycine': 'An amino acid that acts as a neurotransmitter, improving sleep quality and lowering core body temperature.',
-    'hrv': 'Heart Rate Variability: The variation in time between heartbeats. A higher HRV typically indicates better recovery and nervous system balance.',
-    'huperzine': 'A potent AChE inhibitor that prevents the breakdown of acetylcholine, often used in lucid dreaming protocols.',
-    'l-theanine': 'An amino acid found in tea that promotes relaxation without drowsiness, often stacked with caffeine for "calm focus".',
-    'lion\'s mane': 'A medicinal mushroom known for its neuroprotective properties and ability to stimulate Nerve Growth Factor (NGF).',
-    'nootropic': 'Compounds that enhance cognitive function, particularly executive functions, memory, creativity, or motivation.',
-    'rem': 'Rapid Eye Movement: The sleep stage associated with vivid dreaming and memory consolidation.',
-    'uridine': 'A nucleotide that supports synaptic plasticity and works synergistically with choline for brain health.',
-    'yuschak': 'The gold-standard protocol for lucidity involving specific supplement timing during the WBTB window.'
-};
-
 // Scroll Reveal Logic
 document.addEventListener('DOMContentLoaded', () => {
     // Scroll Progress Bar
@@ -156,7 +135,7 @@ document.addEventListener('DOMContentLoaded', () => {
         updateAutophagy();
     }
 
-    // 1. Biohacking Codex
+    // 1. Biohacking Codex Search
     const codexSearch = document.getElementById('codex-search');
     if (codexSearch) {
         codexSearch.addEventListener('input', (e) => {
@@ -166,6 +145,13 @@ document.addEventListener('DOMContentLoaded', () => {
                 resultBox.innerHTML = '<em>Search for a term to initialize protocol data.</em>';
                 return;
             }
+
+            // Resilience check for codexData
+            if (typeof codexData === 'undefined') {
+                resultBox.innerHTML = '<em>Error: Codex intelligence not loaded.</em>';
+                return;
+            }
+
             const found = Object.keys(codexData).find(key => key.includes(query));
             if (found) {
                 resultBox.innerHTML = `<strong>${found.toUpperCase()}:</strong> ${codexData[found]}`;
@@ -743,10 +729,12 @@ document.addEventListener('DOMContentLoaded', () => {
     function getBotResponse(input) {
         const lowerInput = input.toLowerCase();
 
-        // 1. Check Biohacking Codex (Centralized data source)
-        for (const [key, value] of Object.entries(codexData)) {
-            if (lowerInput.includes(key)) {
-                return `[${currentAgent}] Intelligence retrieved: ${value}`;
+        // 1. Check Biohacking Codex (Resilience check)
+        if (typeof codexData !== 'undefined') {
+            for (const [key, value] of Object.entries(codexData)) {
+                if (lowerInput.includes(key)) {
+                    return `[${currentAgent}] Intelligence retrieved: ${value}`;
+                }
             }
         }
 
