@@ -1,5 +1,6 @@
 import os
 import random
+import re
 
 # --- CRITICAL WSL/LINUX FIX ---
 # Must be set BEFORE moviepy is imported to ensure the backend is found
@@ -24,12 +25,18 @@ class VideoCreator:
             os.makedirs(output_dir)
 
     async def generate_voiceover(self, text: str, output_name: str = "voiceover.mp3"):
-        """Generates high-quality human-like voiceover using Microsoft Edge-TTS."""
-        # GuyNeural provides the authoritative, gritty tone required for the Syndicate
-        voice = "en-US-GuyNeural" 
-        communicate = edge_tts.Communicate(text, voice)
+        """Generates high-quality human-like voiceover using Andrew (Natural)."""
+        # Andrew provides a smoother, more authoritative cadence for research intel
+        voice = "en-US-AndrewNeural" 
+        
+        # PHONETIC PATCH: Force 'Lead' to be pronounced like 'Leader' (not the metal)
+        # We replace "Lead Researcher" with "Leed Researcher" in the audio ONLY
+        audio_text = re.sub(r'\bLead researcher\b', 'Leed researcher', text, flags=re.IGNORECASE)
+        audio_text = re.sub(r'\bLead Researcher\b', 'Leed Researcher', audio_text)
+
+        communicate = edge_tts.Communicate(audio_text, voice)
         output_path = os.path.join(self.output_dir, output_name)
-        print(f"Generating voiceover: {output_path}...")
+        print(f"Generating voiceover with Andrew: {output_path}...")
         await communicate.save(output_path)
         return output_path
 
@@ -76,7 +83,7 @@ class VideoCreator:
             # Load the 'wild' image, resize for vertical (1080x1920), and center it
             bg = ImageClip(bg_image_path).set_duration(duration)
             bg = bg.resize(height=1920) 
-            bg = bg.set_position('center')
+            bg = bg.set_pos('center')
             
             # Dark overlay to make white text pop against busy images
             overlay = ColorClip(size=(1080, 1920), color=(0, 0, 0)).set_opacity(0.4).set_duration(duration)
@@ -112,7 +119,7 @@ class VideoCreator:
 
         video.audio = audio
 
-        # 6. Production Render (Optimized for your MSI CPU)
+        # 6. Production Render (Optimized for MSI threads)
         video.write_videofile(
             output_path, 
             fps=24, 
@@ -141,9 +148,10 @@ class VideoCreator:
             return audio_path
 
 if __name__ == "__main__":
+    # Internal Test Harness
     async def test():
         creator = VideoCreator()
-        test_text = "Syndicate Protocol Alpha: Nicotine patches combined with Huperzine-A."
-        await creator.generate_biohacking_snippet("nicotine", test_text)
+        test_text = "Lead researcher protocols indicate that Nicotine and Huperzine-A stacking is optimal."
+        await creator.generate_biohacking_snippet("test", test_text)
 
     asyncio.run(test())
