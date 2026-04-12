@@ -14,7 +14,6 @@ from llm_client import LLMClient
 from telegram_bot import TelegramBot
 from knowledge_client import KnowledgeClient
 from research_client import ResearchClient
-from affiliate_client import AffiliateClient
 
 # Files for persistent storage
 REPLIED_COMMENTS_FILE = "replied_comments.json"
@@ -27,7 +26,6 @@ class HopesAndDreamsBot:
         self.llm = LLMClient()
         self.knowledge = KnowledgeClient()
         self.research = ResearchClient()
-        self.affiliate = AffiliateClient()
 
         self.replied_comment_ids = self._load_replied_comments()
         self.initial_startup = not os.path.exists(REPLIED_COMMENTS_FILE)
@@ -50,34 +48,64 @@ class HopesAndDreamsBot:
         except IOError as e:
             print(f"Error saving replied comments: {e}")
 
-    def get_recent_topics_from_memory(self):
-        """Extracts potential topics from the Telegram chat history."""
+    def get_recent_topics_from_memory(self, slot=None):
+        """Extracts potential topics from the Telegram chat history, prioritizing the Admin."""
         if os.path.exists(CHAT_MEMORY_FILE):
             try:
                 with open(CHAT_MEMORY_FILE, 'r') as f:
                     history = json.load(f)
-                    all_messages = []
-                    for user_id in history:
-                        all_messages.extend([m['content'] for m in history[user_id][-20:] if m['role'] == 'user'])
+                    
+                    admin_id = str(Config.ADMIN_TELEGRAM_ID)
+                    relevant_messages = []
+                    
+                    # Prioritize Admin messages
+                    if admin_id in history:
+                        relevant_messages = [m['content'] for m in history[admin_id][-20:] if m['role'] == 'user']
+                    
+                    # If admin has no messages, check others
+                    if not relevant_messages:
+                        for user_id in history:
+                            if user_id != admin_id:
+                                relevant_messages.extend([m['content'] for m in history[user_id][-20:] if m['role'] == 'user'])
 
-                    if all_messages:
-                        combined = " | ".join(all_messages[-10:])
-                        prompt = f"Identify a specific biohacking topic or supplement discussed recently: {combined}"
-                        system_msg = "You are a content strategist for the Hopes and Dreams Syndicate."
+                    if relevant_messages:
+                        combined = " | ".join(relevant_messages[-15:])
+                        
+                        slot_context = f" for the {slot} post" if slot else ""
+                        prompt = (
+                            f"Analyze these recent messages from the CEO: {combined}\n\n"
+                            f"Identify the specific topic or supplement he wants to post about{slot_context}. "
+                            "He often mentions topics like lucid dreaming, astral projection, or specific supplements. "
+                            "If he explicitly requested a topic for a specific time, prioritize that. "
+                            "Return ONLY the topic name (e.g., 'Lucid Dreaming' or 'Magnesium L-Threonate'). "
+                            "If no specific topic is found, return 'RANDOM'."
+                        )
+                        
+                        system_msg = "You are an expert content strategist for the Hopes and Dreams Syndicate. You listen to the CEO's specific requests."
                         topic = self.llm.generate_response(prompt, system_msg)
-                        if topic and len(topic) < 100:
-                            return topic.strip()
+                        
+                        if topic and "RANDOM" not in topic.upper() and len(topic) < 100:
+                            return topic.strip().replace("'", "").replace("\"", "")
             except (json.JSONDecodeError, IOError, Exception) as e:
                 print(f"Error reading chat memory for topics: {e}")
 
-        return random.choice(["Nicotine as a Nootropic", "Magnesium for Sleep", "Kratom Safety", "The Perfect Supplement Stack"])
+        # Expanded fallback list
+        fallbacks = [
+            "Lucid Dreaming Techniques", 
+            "Astral Projection Guide", 
+            "Nicotine as a Nootropic", 
+            "Magnesium for Sleep", 
+            "Kratom Safety", 
+            "The Perfect Supplement Stack"
+        ]
+        return random.choice(fallbacks)
 
-    def generate_and_post_daily_tip(self, topic=None):
+    def generate_and_post_daily_tip(self, topic=None, slot=None):
         """Generates a daily Syndicate Masterclass and posts it to the Facebook Page."""
         try:
             if not topic:
-                print(f"[{datetime.now()}] EXECUTIVE EXECUTION: Identifying topic from chat memory...")
-                topic = self.get_recent_topics_from_memory()
+                print(f"[{datetime.now()}] EXECUTIVE EXECUTION: Identifying topic from chat memory for slot {slot}...")
+                topic = self.get_recent_topics_from_memory(slot=slot)
 
             print(f"[{datetime.now()}] EXECUTIVE EXECUTION: Triggering scheduled Masterclass for topic: {topic}...")
 
@@ -111,13 +139,7 @@ class HopesAndDreamsBot:
                 print(f"[{datetime.now()}] EXECUTIVE EXECUTION: Hitting FB Graph API for daily tip (Content length: {len(tip_content)}).")
                 result = self.fb.post_to_page(tip_content, image_path=image_path)
                 if result:
-                    post_id = result.get('id')
-                    print(f"Syndicate Masterclass posted successfully at {datetime.now()}! (ID: {post_id})")
-
-                    # 5. Automated Affiliate Comment Drop
-                    if post_id:
-                        self._drop_affiliate_comment(post_id, tip_content)
-
+                    print(f"Syndicate Masterclass posted successfully at {datetime.now()}!")
                     return result
                 else:
                     print(f"[{datetime.now()}] EXECUTIVE EXECUTION ERROR: Facebook API call failed.")
@@ -212,35 +234,6 @@ class HopesAndDreamsBot:
         report = self.llm.generate_response(prompt, system_msg)
         return report
 
-    def _drop_affiliate_comment(self, post_id, content):
-        """Automated Affiliate Comment Drop logic."""
-        print(f"[{datetime.now()}] EXECUTIVE EXECUTION: Triggering Automated Affiliate Comment Drop...")
-        try:
-            # Use LLM to identify a relevant affiliate keyword
-            keyword_prompt = f"Based on this content: '{content[:200]}...', suggest one specific product keyword for an Amazon search (e.g., 'magnesium glycinate'). Respond with ONLY the keyword."
-            affiliate_keyword = self.llm.generate_response(keyword_prompt, "You are a tactical monetization assistant.")
-            
-            if affiliate_keyword:
-                affiliate_keyword = affiliate_keyword.strip().strip("'\"")
-                print(f"[{datetime.now()}] EXECUTIVE EXECUTION: Affiliate keyword identified: {affiliate_keyword}")
-                
-                # Generate pitch from Dink
-                pitch_prompt = f"Provide a quick 2-sentence Syndicate-style pitch for why biohackers need this item: {affiliate_keyword}."
-                pitch = self.llm.generate_response(pitch_prompt, "You are Dink, the Lead Technical Assistant for the Hopes and Dreams Syndicate.")
-                
-                if pitch:
-                    link = self.affiliate.generate_canadian_link(affiliate_keyword)
-                    affiliate_payload = self.affiliate.format_affiliate_payload(pitch, link)
-                    
-                    # Drop the comment
-                    comment_result = self.fb.reply_to_comment(post_id, affiliate_payload)
-                    if comment_result:
-                        print(f"[{datetime.now()}] EXECUTIVE EXECUTION: Affiliate comment dropped successfully.")
-                    else:
-                        print(f"[{datetime.now()}] EXECUTIVE EXECUTION ERROR: Affiliate comment drop failed.")
-        except Exception as e:
-            print(f"[{datetime.now()}] EXECUTIVE EXECUTION ERROR: Failed in affiliate comment drop logic: {e}")
-
     def run_fb_loop(self, interval_seconds=3600):
         """Main Facebook bot loop for polling comments."""
         print("Facebook comment monitor loop started.")
@@ -283,17 +276,27 @@ def main():
     # Initialize Scheduler with misfire grace time to allow retries of missed jobs
     scheduler = BackgroundScheduler(timezone=pytz_timezone('America/Halifax'))
 
-    # Schedule daily tip at 7:00 AM ADT
-    # misfire_grace_time=3600 (1 hour) allows the job to run if the bot starts within an hour of 7:00 AM
-    scheduler.add_job(
-        bot.generate_and_post_daily_tip,
-        CronTrigger(hour=7, minute=0),
-        misfire_grace_time=3600,
-        coalesce=True
-    )
+    # Schedule daily tips at 7:00 AM, 12:00 PM, and 3:00 PM ADT
+    # misfire_grace_time=3600 (1 hour) allows the job to run if the bot starts within an hour of the scheduled time
+    slots = [
+        (7, 0),
+        (12, 0),
+        (15, 0)
+    ]
+
+    for hour, minute in slots:
+        slot_str = f"{hour:02d}:{minute:02d}"
+        scheduler.add_job(
+            bot.generate_and_post_daily_tip,
+            CronTrigger(hour=hour, minute=minute),
+            kwargs={'slot': slot_str},
+            misfire_grace_time=3600,
+            coalesce=True,
+            id=f"daily_tip_{slot_str}"
+        )
 
     scheduler.start()
-    print("Scheduler started: Daily Syndicate Masterclass scheduled for 07:00 AM ADT (1hr misfire grace active).")
+    print("Scheduler started: Daily Syndicate Masterclasses scheduled for 07:00, 12:00, and 15:00 ADT.")
 
     if args.post_tip:
         bot.generate_and_post_daily_tip(args.post_tip)
