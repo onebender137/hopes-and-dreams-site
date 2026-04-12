@@ -46,6 +46,17 @@
         .shop-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap: 25px; }
         .item-card { background-color: var(--card-bg); padding: 30px; border-radius: 20px; border: 1px solid rgba(56, 189, 248, 0.1); text-align: left; transition: 0.3s; display: flex; flex-direction: column; justify-content: space-between; }
         .item-card:hover { border-color: var(--neon-gold); transform: translateY(-5px); box-shadow: 0 10px 30px -10px rgba(251, 191, 36, 0.2); }
+
+        .item-card.highlight-card {
+            background-color: rgba(251, 191, 36, 0.08);
+            border: 2px solid var(--neon-gold);
+            box-shadow: 0 0 30px rgba(251, 191, 36, 0.3);
+            transform: scale(1.02);
+        }
+
+        body.light-mode .item-card.highlight-card {
+            background-color: rgba(251, 191, 36, 0.15);
+        }
         .tag { font-size: 0.7rem; text-transform: uppercase; color: var(--neon-blue); font-weight: 900; letter-spacing: 1px; margin-bottom: 10px; display: block; }
         .item-card h3 { color: var(--text-main); margin: 0 0 10px 0; font-size: 1.3rem; }
         .item-card p { color: var(--text-dim); font-size: 0.95rem; margin-bottom: 20px; flex-grow: 1; }
@@ -99,7 +110,7 @@
 
         <div class="shop-grid">
             <!-- Item 1: Huperzine A -->
-            <div class="item-card" data-reveal>
+            <div class="item-card" data-reveal data-product="huperzine">
                 <div>
                     <span class="tag">Lucid Dreaming / AChE</span>
                     <h3>Huperzine-A</h3>
@@ -109,7 +120,7 @@
             </div>
 
             <!-- Item 2: Alpha GPC -->
-            <div class="item-card" data-reveal>
+            <div class="item-card" data-reveal data-product="alpha-gpc">
                 <div>
                     <span class="tag">Neuro-Optimization</span>
                     <h3>Alpha GPC Choline</h3>
@@ -119,7 +130,7 @@
             </div>
 
             <!-- Item 3: 5-HTP -->
-            <div class="item-card" data-reveal>
+            <div class="item-card" data-reveal data-product="5-htp">
                 <div>
                     <span class="tag">Sleep / Mood</span>
                     <h3>5-HTP (200mg)</h3>
@@ -129,7 +140,7 @@
             </div>
 
             <!-- Item 4: Agmatine Sulfate -->
-            <div class="item-card" data-reveal>
+            <div class="item-card" data-reveal data-product="agmatine">
                 <div>
                     <span class="tag">Focus / Pump</span>
                     <h3>Agmatine Sulfate</h3>
@@ -139,7 +150,7 @@
             </div>
 
              <!-- Item 5: Magnesium -->
-            <div class="item-card" data-reveal>
+            <div class="item-card" data-reveal data-product="magnesium">
                 <div>
                     <span class="tag">Focus / Health</span>
                     <h3>Magnesium</h3>
@@ -149,7 +160,7 @@
             </div>
 
             <!-- Item 6: Nicotine Patches -->
-            <div class="item-card" data-reveal>
+            <div class="item-card" data-reveal data-product="nicotine">
                 <div>
                     <span class="tag">Focus / Noo Tropic</span>
                     <h3>Nicotine Patches</h3>
@@ -158,8 +169,8 @@
                 <a href="https://amzn.to/4sXg6vD" target="_blank" class="buy-btn">Acquire via Amazon.ca</a>
             </div>
 
-              <!-- Item 6: Citicoline (CDP-Choline -->
-            <div class="item-card" data-reveal>
+              <!-- Item 7: Citicoline (CDP-Choline) -->
+            <div class="item-card" data-reveal data-product="citicoline">
                 <div>
                     <span class="tag">Memory / Neuro Recovery</span>
                     <h3>Citicoline (CDP-Choline)</h3>
