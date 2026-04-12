@@ -1,0 +1,190 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Procurement | Hopes and Dreams Syndicate Biohacking Shop</title>
+    <link rel="canonical" href="https://hopes-and-dreams.ca/shop.html" />
+    <meta name="description" content="Shop vetted biohacking tools and nootropics at Hopes and Dreams. From Alpha GPC to Huperzine-A, get the equipment for your optimization stack.">
+    <meta name="keywords" content="buy nootropics Canada, biohacking supplies, Alpha GPC, Huperzine-A, neuro-optimization tools">
+
+    <!-- Open Graph / Facebook -->
+    <meta property="og:type" content="website">
+    <meta property="og:url" content="https://hopes-and-dreams.ca/shop.html">
+    <meta property="og:title" content="Procurement | Hopes and Dreams Syndicate Biohacking Shop">
+    <meta property="og:description" content="Vetted tools for cognitive sovereignty and biological excellence.">
+    <meta property="og:image" content="https://hopes-and-dreams.ca/topper.webp">
+
+    <!-- Breadcrumb Schema -->
+    <script type="application/ld+json">
+    {
+      "@context": "https://schema.org",
+      "@type": "BreadcrumbList",
+      "itemListElement": [{
+        "@type": "ListItem",
+        "position": 1,
+        "name": "Home",
+        "item": "https://hopes-and-dreams.ca/"
+      },{
+        "@type": "ListItem",
+        "position": 2,
+        "name": "Procurement",
+        "item": "https://hopes-and-dreams.ca/shop.html"
+      }]
+    }
+    </script>
+
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;700;900&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="style.css">
+    <script src="codex.js" defer></script>
+    <script src="script.js" defer></script>
+    <style>
+        .container { max-width: 1100px; margin: 0 auto; padding: 0 24px 100px; text-align: center; }
+        h1 { color: var(--neon-gold); text-transform: uppercase; letter-spacing: 4px; margin-bottom: 10px; font-size: 2.5rem; font-weight: 900; }
+        .subtitle { color: var(--text-dim); margin-bottom: 60px; font-size: 1.1rem; text-transform: uppercase; letter-spacing: 2px; }
+
+        .shop-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap: 25px; }
+        .item-card { background-color: var(--card-bg); padding: 30px; border-radius: 20px; border: 1px solid rgba(56, 189, 248, 0.1); text-align: left; transition: 0.3s; display: flex; flex-direction: column; justify-content: space-between; }
+        .item-card:hover { border-color: var(--neon-gold); transform: translateY(-5px); box-shadow: 0 10px 30px -10px rgba(251, 191, 36, 0.2); }
+        .tag { font-size: 0.7rem; text-transform: uppercase; color: var(--neon-blue); font-weight: 900; letter-spacing: 1px; margin-bottom: 10px; display: block; }
+        .item-card h3 { color: var(--text-main); margin: 0 0 10px 0; font-size: 1.3rem; }
+        .item-card p { color: var(--text-dim); font-size: 0.95rem; margin-bottom: 20px; flex-grow: 1; }
+        .disclaimer { margin-top: 80px; padding: 20px; border-top: 1px solid rgba(255,255,255,0.05); color: #4b5563; font-size: 0.8rem; }
+    </style>
+</head>
+<body>
+    <div id="scroll-progress"></div>
+    <button id="theme-toggle" class="theme-toggle-pill">☀️ LIGHT MODE</button>
+
+    <header>
+        <div class="logo-wrap">
+            <img src="topper.webp" alt="Hopes and Dreams">
+        </div>
+        <nav>
+            <a href="index.html">Home</a>
+            <a href="shop.html" class="active">Procurement</a>
+            <a href="optimization.html">Optimization</a>
+            <a href="intel.html">Intel Hub</a>
+            <a href="about.html">About</a>
+            <a href="privacy.html">Privacy</a>
+        </nav>
+    </header>
+
+    <div class="container">
+        <h1 data-reveal>Syndicate Procurement</h1>
+        <div class="subtitle" data-reveal>Vetted Tools for Cognitive Sovereignty</div>
+
+        <!-- Feature 1: Neuro-Stack Builder Quiz -->
+        <div class="widget-container" data-reveal id="stack-builder">
+            <div class="widget-title">
+                <svg width="24" height="24" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19.428 15.428a2 2 0 00-1.022-.547l-2.387-.477a6 6 0 00-3.86.517l-.318.158a6 6 0 01-3.86.517L6.05 15.21a2 2 0 00-1.806.547M8 4h8l-1 1v5.172a2 2 0 00.586 1.414l5 5c1.26 1.26.367 3.414-1.415 3.414H4.828c-1.782 0-2.674-2.154-1.414-3.414l5-5A2 2 0 009 10.172V5L8 4z"></path></svg>
+                Neuro-Stack Builder
+            </div>
+            <div id="quiz-intro">
+                <p style="color: var(--text-dim); margin-bottom: 20px;">Initialize your profile to receive a tailored optimization stack recommendation.</p>
+                <button class="buy-btn" onclick="startQuiz()" style="width: auto; padding: 12px 30px;">Begin Protocol Analysis</button>
+            </div>
+            <div id="quiz-questions" style="display: none;">
+                <p id="question-text" style="font-weight: 700; margin-bottom: 20px; color: var(--neon-gold);"></p>
+                <div id="options-container" class="grid" style="grid-template-columns: 1fr; gap: 10px;">
+                    <!-- Options injected by JS -->
+                </div>
+            </div>
+            <div id="quiz-results" class="result-box">
+                <h3 style="color: var(--neon-blue); margin-top: 0;">Recommended Stack</h3>
+                <div id="recommendation-output"></div>
+                <button class="buy-btn" onclick="resetQuiz()" style="margin-top: 20px; font-size: 0.7rem; border-color: var(--text-dim); color: var(--text-dim);">Reset Analysis</button>
+            </div>
+        </div>
+
+        <div class="shop-grid">
+            <!-- Item 1: Huperzine A -->
+            <div class="item-card" data-reveal>
+                <div>
+                    <span class="tag">Lucid Dreaming / AChE</span>
+                    <h3>Huperzine-A</h3>
+                    <p>The core of the Yuschak Protocol. Essential for maintaining high acetylcholine levels during REM cycles.</p>
+                </div>
+                <a href="https://amzn.to/3PY1ehV" target="_blank" class="buy-btn">Acquire via Amazon.ca</a>
+            </div>
+
+            <!-- Item 2: Alpha GPC -->
+            <div class="item-card" data-reveal>
+                <div>
+                    <span class="tag">Neuro-Optimization</span>
+                    <h3>Alpha GPC Choline</h3>
+                    <p>High-bioavailability choline source for memory retention and neurotransmitter synthesis.</p>
+                </div>
+                <a href="https://amzn.to/4mhwkxa" target="_blank" class="buy-btn">Acquire via Amazon.ca</a>
+            </div>
+
+            <!-- Item 3: 5-HTP -->
+            <div class="item-card" data-reveal>
+                <div>
+                    <span class="tag">Sleep / Mood</span>
+                    <h3>5-HTP (200mg)</h3>
+                    <p>Serotonin precursor to optimize deep sleep stages and emotional resilience.</p>
+                </div>
+                <a href="https://amzn.to/4ttDRuZ" target="_blank" class="buy-btn">Acquire via Amazon.ca</a>
+            </div>
+
+            <!-- Item 4: Agmatine Sulfate -->
+            <div class="item-card" data-reveal>
+                <div>
+                    <span class="tag">Focus / Pump</span>
+                    <h3>Agmatine Sulfate</h3>
+                    <p>Neuromodulator for focus and physical output. High purity for peak systemic performance.</p>
+                </div>
+                <a href="https://amzn.to/4t5ObKc" target="_blank" class="buy-btn">Acquire via Amazon.ca</a>
+            </div>
+
+             <!-- Item 5: Magnesium -->
+            <div class="item-card" data-reveal>
+                <div>
+                    <span class="tag">Focus / Health</span>
+                    <h3>Magnesium</h3>
+                    <p>Essential mineral to optimize sleep, reduce stress, and enhance cognitive function.</p>
+                </div>
+                <a href="https://amzn.to/4sXg6vD" target="_blank" class="buy-btn">Acquire via Amazon.ca</a>
+            </div>
+
+            <!-- Item 6: Nicotine Patches -->
+            <div class="item-card" data-reveal>
+                <div>
+                    <span class="tag">Focus / Noo Tropic</span>
+                    <h3>Nicotine Patches</h3>
+                    <p>Nicotine has been shown to improve concentration, memory, motivation, and mood.</p>
+                </div>
+                <a href="https://amzn.to/4sXg6vD" target="_blank" class="buy-btn">Acquire via Amazon.ca</a>
+            </div>
+
+              <!-- Item 6: Citicoline (CDP-Choline -->
+            <div class="item-card" data-reveal>
+                <div>
+                    <span class="tag">Memory / Neuro Recovery</span>
+                    <h3>Citicoline (CDP-Choline)</h3>
+                    <p>Naturally occuring compound supports memory and brain health</p>
+                </div>
+                <a href="https://amzn.to/4ceXr7f" target="_blank" class="buy-btn">Acquire via Amazon.ca</a>
+            </div>
+            
+        </div>
+
+<section class="newsletter-section" data-reveal>
+            <div class="newsletter-box">
+                <h3>Join the Syndicate</h3>
+                <p>Initialize your subscription for weekly intelligence on neuro-optimization, biological hacking, and technical stack evolution.</p>
+                <form action="https://formspree.io/f/xqegvale" method="POST" class="newsletter-form">
+                    <input type="email" name="email" placeholder="Enter your email address" required>
+                    <button type="submit">Secure Entry</button>
+                </form>
+            </div>
+        </section>
+
+        <div class="disclaimer">
+            *As an Amazon Associate, I earn from qualifying purchases. This procurement hub supports Syndicate infrastructure. Not medical advice.
+        </div>
+    </div>
+
+</body>
+</html>
