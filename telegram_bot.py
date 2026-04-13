@@ -47,6 +47,7 @@ class TelegramBot:
         self.affiliate = AffiliateClient()
         self.video = VideoCreator()
         self.knowledge = KnowledgeClient()
+        self.last_topic = None
 
         self.chat_persona = (
             "You are Buddy, the Lead Technical Assistant for the Hopes and Dreams Syndicate. You are talking in a PRIVATE chat with Bender, your CEO. "
@@ -126,6 +127,7 @@ class TelegramBot:
         local_context = self.knowledge.query_knowledge(topic)
         draft = await asyncio.to_thread(self.llm.create_biohacking_post, topic, local_context)
         self.last_draft = draft
+        self.last_topic = topic
 
         if draft:
             await update.message.reply_text(f"📝 **SYNDICATE MASTERCLASS DRAFT:**\n\n{draft}\n\nType /confirm to post.")
@@ -149,6 +151,10 @@ class TelegramBot:
             result = self.hdbot.fb.post_to_page(content)
             if result:
                 await update.message.reply_text(f"🚀 **LIVE ON FACEBOOK (SYNDICATE MASTERCLASS):**\n\n{content}")
+
+                # Add affiliate recommendation (non-blocking)
+                post_id = result.get('id')
+                asyncio.create_task(asyncio.to_thread(self.hdbot._add_affiliate_comment, post_id, topic))
             else:
                 await update.message.reply_text("❌ Failed to post.")
         else:
@@ -186,7 +192,13 @@ class TelegramBot:
 
         if result:
             await update.message.reply_text("🚀 Syndicate Masterclass LIVE.")
+
+            # Add affiliate recommendation (non-blocking)
+            post_id = result.get('id')
+            asyncio.create_task(asyncio.to_thread(self.hdbot._add_affiliate_comment, post_id, self.last_topic))
+
             self.last_draft = None
+            self.last_topic = None
         else:
             await update.message.reply_text("❌ Failed to post.")
 
