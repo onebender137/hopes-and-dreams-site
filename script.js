@@ -219,7 +219,18 @@ document.addEventListener('DOMContentLoaded', () => {
 
     // 0.3 Interactive Neural Map Logic
     const brainRegions = document.querySelectorAll('.brain-region');
-    const codexResults = document.getElementById('codex-results');
+    const neuralInfoBox = document.getElementById('neural-info-box');
+    const neuralStatus = document.getElementById('neural-status');
+
+    const regionProtocols = {
+        'prefrontal cortex': 'Focus Stack (Alpha GPC + Uridine)',
+        'thalamus': 'Sleep Architecture (Magnesium + 5-HTP)',
+        'vagus nerve': 'Resilience Protocol (Ashwagandha + Rhodiola)',
+        'hippocampus': 'Memory Stack (Lion\'s Mane + Bacopa)',
+        'amygdala': 'Zen Protocol (L-Theanine + Magnesium)',
+        'pineal gland': 'Circadian Reset (Magnesium Bisglycinate)',
+        'cerebellum': 'Flow State Engine (Creatine + NALT)'
+    };
 
     brainRegions.forEach(region => {
         region.addEventListener('click', () => {
@@ -229,12 +240,49 @@ document.addEventListener('DOMContentLoaded', () => {
             brainRegions.forEach(r => r.classList.remove('active'));
             region.classList.add('active');
 
-            if (typeof codexData !== 'undefined' && codexResults) {
+            if (neuralStatus) {
+                neuralStatus.textContent = `DEEP ANALYSIS: ${targetRegion.toUpperCase()}`;
+                neuralStatus.style.color = 'var(--neon-blue)';
+            }
+
+            if (typeof codexData !== 'undefined' && neuralInfoBox) {
                 const info = codexData[targetRegion];
+                const protocol = regionProtocols[targetRegion];
+
                 if (info) {
-                    codexResults.innerHTML = `<strong>${targetRegion.toUpperCase()}:</strong> ${info}`;
-                    // Scroll to codex for visibility on mobile
-                    codexResults.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+                    neuralInfoBox.innerHTML = `
+                        <p style="color: var(--neon-gold); font-weight: 900; margin-bottom: 10px; text-transform: uppercase;">${targetRegion}</p>
+                        <p style="font-size: 0.9rem; margin-bottom: 15px;">${info}</p>
+                        <div style="background: rgba(56, 189, 248, 0.1); padding: 10px; border-radius: 8px; border-left: 3px solid var(--neon-blue);">
+                            <p style="font-size: 0.75rem; color: var(--neon-blue); text-transform: uppercase; letter-spacing: 1px; margin-bottom: 5px; font-weight: 700;">Targeted Protocol:</p>
+                            <p style="font-size: 0.85rem; font-weight: 700;">${protocol || 'Consult Syndicate Shop'}</p>
+                            <a href="shop.html" style="font-size: 0.7rem; color: var(--neon-gold); text-decoration: none; display: inline-block; margin-top: 5px; text-transform: uppercase; font-weight: 900;">Access Procurement &rarr;</a>
+                        </div>
+                    `;
+                    neuralInfoBox.classList.add('active');
+                    // Scroll to info for visibility on mobile
+                    neuralInfoBox.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+                }
+            }
+        });
+
+        region.addEventListener('mouseenter', () => {
+            const targetRegion = region.getAttribute('data-region');
+            if (neuralStatus) {
+                neuralStatus.textContent = `INITIALIZING [${targetRegion.toUpperCase()}]...`;
+                neuralStatus.style.color = 'var(--neon-gold)';
+            }
+        });
+
+        region.addEventListener('mouseleave', () => {
+            if (neuralStatus && !document.querySelector('.brain-region.active')) {
+                neuralStatus.textContent = 'Interface Ready';
+                neuralStatus.style.color = 'var(--neon-gold)';
+            } else if (neuralStatus) {
+                const activeRegion = document.querySelector('.brain-region.active');
+                if (activeRegion) {
+                    neuralStatus.textContent = `DEEP ANALYSIS: ${activeRegion.getAttribute('data-region').toUpperCase()}`;
+                    neuralStatus.style.color = 'var(--neon-blue)';
                 }
             }
         });
