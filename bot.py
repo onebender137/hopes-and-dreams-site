@@ -14,6 +14,7 @@ from llm_client import LLMClient
 from telegram_bot import TelegramBot
 from knowledge_client import KnowledgeClient
 from research_client import ResearchClient
+from affiliate_client import AffiliateClient
 
 # Files for persistent storage
 REPLIED_COMMENTS_FILE = "replied_comments.json"
@@ -26,6 +27,7 @@ class HopesAndDreamsBot:
         self.llm = LLMClient()
         self.knowledge = KnowledgeClient()
         self.research = ResearchClient()
+        self.affiliate = AffiliateClient()
 
         self.replied_comment_ids = self._load_replied_comments()
         self.initial_startup = not os.path.exists(REPLIED_COMMENTS_FILE)
@@ -140,6 +142,11 @@ class HopesAndDreamsBot:
                 result = self.fb.post_to_page(tip_content, image_path=image_path)
                 if result:
                     print(f"Syndicate Masterclass posted successfully at {datetime.now()}!")
+
+                    # Add affiliate recommendation in the comments
+                    post_id = result.get('id')
+                    self._add_affiliate_comment(post_id, topic)
+
                     return result
                 else:
                     print(f"[{datetime.now()}] EXECUTIVE EXECUTION ERROR: Facebook API call failed.")
@@ -149,6 +156,32 @@ class HopesAndDreamsBot:
             print(f"[{datetime.now()}] EXECUTIVE EXECUTION CRITICAL FAILURE: {e}")
 
         return None
+
+    def _add_affiliate_comment(self, post_id, topic):
+        """Searches for a product related to the topic and posts it as a comment."""
+        if not post_id or not topic:
+            return
+
+        print(f"[{datetime.now()}] EXECUTIVE EXECUTION: Adding affiliate recommendation for {topic} to post {post_id}...")
+
+        # Give FB a few seconds to index the post
+        time.sleep(5)
+
+        products = self.affiliate.search_products(topic, limit=1)
+
+        if products:
+            recommendation = self.affiliate.format_product_as_recommendation(products[0])
+        else:
+            # Fallback to manual link
+            manual_link = self.affiliate.generate_canadian_link(topic)
+            pitch = f"For those looking to optimize their protocol with {topic}, here is the top-vetted option on Amazon.ca."
+            recommendation = self.affiliate.format_affiliate_payload(pitch, manual_link)
+
+        result = self.fb.reply_to_comment(post_id, recommendation)
+        if result:
+            print(f"Affiliate recommendation posted to post {post_id} successfully.")
+        else:
+            print(f"Failed to post affiliate recommendation to post {post_id}.")
 
     def _process_page_comments(self, is_first_iteration=False):
         """Processes comments for all posts in the Page feed."""
