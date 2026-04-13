@@ -6,6 +6,9 @@
     --text-main: #f8fafc;
     --text-dim: #94a3b8;
     --transition-speed: 0.3s;
+    --chat-window-bg: rgba(10, 10, 15, 0.95);
+    --chat-bot-msg-bg: rgba(255, 255, 255, 0.05);
+    --chat-secondary-bg: rgba(0, 0, 0, 0.2);
 }
 
 body.light-mode {
@@ -15,6 +18,9 @@ body.light-mode {
     --neon-gold: #b45309;
     --text-main: #0f172a;
     --text-dim: #475569;
+    --chat-window-bg: rgba(248, 250, 252, 0.98);
+    --chat-bot-msg-bg: rgba(15, 23, 42, 0.05);
+    --chat-secondary-bg: rgba(0, 0, 0, 0.05);
 }
 
 body {
@@ -914,7 +920,7 @@ footer a:hover {
     right: 30px;
     width: 350px;
     height: 500px;
-    background: rgba(10, 10, 15, 0.95);
+    background: var(--chat-window-bg);
     border: 1px solid var(--neon-gold);
     border-radius: 20px;
     display: flex;
@@ -970,7 +976,7 @@ footer a:hover {
 }
 
 .message.bot {
-    background: rgba(255, 255, 255, 0.05);
+    background: var(--chat-bot-msg-bg);
     color: var(--text-main);
     align-self: flex-start;
     border-left: 2px solid var(--neon-gold);
@@ -1007,7 +1013,7 @@ footer a:hover {
 
 .chat-input-area {
     padding: 15px;
-    background: rgba(0, 0, 0, 0.3);
+    background: var(--chat-secondary-bg);
     border-top: 1px solid rgba(251, 191, 36, 0.1);
     display: flex;
     gap: 10px;
@@ -1029,6 +1035,11 @@ footer a:hover {
     border-color: var(--neon-gold);
 }
 
+#chat-input::placeholder {
+    color: var(--text-dim);
+    opacity: 0.7;
+}
+
 .chat-send-btn {
     background: none;
     border: none;
@@ -1048,7 +1059,7 @@ footer a:hover {
     display: flex;
     gap: 5px;
     padding: 10px 20px;
-    background: rgba(0,0,0,0.2);
+    background: var(--chat-secondary-bg);
 }
 
 .agent-chip {
