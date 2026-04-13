@@ -565,38 +565,38 @@ document.addEventListener('DOMContentLoaded', () => {
             // Logic for Stack Recommendation
             if (goal === 'focus') {
                 stackName = "The Architect Protocol";
-                components = ["alpha-gpc", "citicoline", "l-theanine"];
-                dosage = "Alpha GPC: 300mg, Citicoline: 250mg, L-Theanine: 200mg.";
-                details = "Designed for sustained neural plasticity and linguistic fluidity. The cholinergic foundation paired with L-Theanine ensures sharp focus without the jittery 'edge'.";
+                components = ["alpha-gpc", "citicoline", "l-theanine", "bacopa"];
+                dosage = "Alpha GPC: 300mg, Citicoline: 250mg, L-Theanine: 200mg, Bacopa: 300mg.";
+                details = "Designed for sustained neural plasticity and linguistic fluidity. The cholinergic foundation paired with L-Theanine ensures sharp focus, while Bacopa supports long-term memory consolidation.";
                 if (level === 'elite') {
                     components.push("nicotine");
                     dosage += " Nicotine: 2mg patch (optional for high-stakes windows).";
                 }
             } else if (goal === 'sleep') {
                 stackName = "The Circadian Reset";
-                components = ["magnesium", "5-htp", "l-theanine"];
-                dosage = "Magnesium Bisglycinate: 400mg, 5-HTP: 100mg, L-Theanine: 200mg.";
-                details = "Optimizes the transition into deep sleep. L-Theanine increases alpha-wave activity, while 5-HTP and Magnesium manage serotonin and CNS relaxation.";
+                components = ["magnesium", "5-htp", "l-theanine", "phosphatidylserine"];
+                dosage = "Magnesium Bisglycinate: 400mg, 5-HTP: 100mg, L-Theanine: 200mg, Phosphatidylserine: 100mg.";
+                details = "Optimizes the transition into deep sleep. Phosphatidylserine helps lower nocturnal cortisol, while L-Theanine increases alpha-wave activity for restorative rest.";
             } else if (goal === 'energy') {
                 stackName = "The Kinetic Engine";
-                components = ["agmatine", "alpha-gpc", "omega-3"];
-                dosage = "Agmatine Sulfate: 500mg, Alpha GPC: 150mg, Omega-3: 1000mg.";
-                details = "Focused on nitric oxide modulation and rapid cognitive drive. Omega-3 supports membrane fluidity for faster neurotransmission.";
+                components = ["agmatine", "alpha-gpc", "nalt", "creatine"];
+                dosage = "Agmatine: 500mg, Alpha GPC: 150mg, N-Acetyl L-Tyrosine: 350mg, Creatine: 5g.";
+                details = "Focused on dopamine synthesis and cellular energy. NALT provides the precursor for drive, while Creatine ensures ATP availability for high-output neural sessions.";
             } else if (goal === 'dream') {
                 stackName = "The Oneironaut Stack";
-                components = ["huperzine", "alpha-gpc", "citicoline"];
-                dosage = "Huperzine-A: 200mcg, Alpha GPC: 300mg, Citicoline: 250mg (Take during WBTB window).";
-                details = "Maximizes acetylcholine concentration during the REM-dominant hours of early morning. Specifically tuned for the Yuschak Protocol.";
+                components = ["huperzine", "alpha-gpc", "citicoline", "uridine"];
+                dosage = "Huperzine-A: 200mcg, Alpha GPC: 300mg, Citicoline: 250mg, Uridine: 250mg.";
+                details = "Maximizes acetylcholine concentration during the REM-dominant hours. Uridine supports the synaptic plasticity required for vivid dream recall.";
             } else if (goal === 'resilience') {
                 stackName = "The Zen Master";
-                components = ["ashwagandha", "l-theanine", "magnesium"];
-                dosage = "Ashwagandha (KSM-66): 600mg, L-Theanine: 200mg, Magnesium: 200mg.";
-                details = "Built for high-cortisol environments. This stack down-regulates the sympathetic nervous system and enhances emotional stability.";
+                components = ["ashwagandha", "rhodiola", "l-theanine", "magnesium"];
+                dosage = "Ashwagandha (KSM-66): 600mg, Rhodiola: 300mg, L-Theanine: 200mg, Magnesium: 200mg.";
+                details = "The ultimate shield against burnout. Rhodiola provides acute anti-fatigue effects, while Ashwagandha and Magnesium manage systemic stress loads.";
             } else if (goal === 'maintenance') {
                 stackName = "The Neuro-Vanguard";
-                components = ["lions-mane", "omega-3", "citicoline"];
-                dosage = "Lion's Mane: 1000mg, Omega-3: 2000mg (High EPA/DHA), Citicoline: 250mg.";
-                details = "The ultimate foundation for long-term brain health. Focuses on neuro-genesis, inflammation reduction, and structural integrity.";
+                components = ["lions-mane", "omega-3", "citicoline", "uridine", "creatine"];
+                dosage = "Lion's Mane: 1000mg, Omega-3: 2000mg, Citicoline: 250mg, Uridine: 250mg, Creatine: 3g.";
+                details = "The ultimate foundation for long-term brain health. This stack focuses on neuro-genesis (Lion's Mane), membrane integrity (Omega-3/Citicoline/Uridine), and metabolic support (Creatine).";
             }
 
             if (output) {
