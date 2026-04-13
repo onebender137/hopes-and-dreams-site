@@ -219,7 +219,18 @@ document.addEventListener('DOMContentLoaded', () => {
 
     // 0.3 Interactive Neural Map Logic
     const brainRegions = document.querySelectorAll('.brain-region');
-    const codexResults = document.getElementById('codex-results');
+    const neuralInfoBox = document.getElementById('neural-info-box');
+    const neuralStatus = document.getElementById('neural-status');
+
+    const regionProtocols = {
+        'prefrontal cortex': 'Focus Stack (Alpha GPC + Uridine)',
+        'thalamus': 'Sleep Architecture (Magnesium + 5-HTP)',
+        'vagus nerve': 'Resilience Protocol (Ashwagandha + Rhodiola)',
+        'hippocampus': 'Memory Stack (Lion\'s Mane + Bacopa)',
+        'amygdala': 'Zen Protocol (L-Theanine + Magnesium)',
+        'pineal gland': 'Circadian Reset (Magnesium Bisglycinate)',
+        'cerebellum': 'Flow State Engine (Creatine + NALT)'
+    };
 
     brainRegions.forEach(region => {
         region.addEventListener('click', () => {
@@ -229,12 +240,49 @@ document.addEventListener('DOMContentLoaded', () => {
             brainRegions.forEach(r => r.classList.remove('active'));
             region.classList.add('active');
 
-            if (typeof codexData !== 'undefined' && codexResults) {
+            if (neuralStatus) {
+                neuralStatus.textContent = `DEEP ANALYSIS: ${targetRegion.toUpperCase()}`;
+                neuralStatus.style.color = 'var(--neon-blue)';
+            }
+
+            if (typeof codexData !== 'undefined' && neuralInfoBox) {
                 const info = codexData[targetRegion];
+                const protocol = regionProtocols[targetRegion];
+
                 if (info) {
-                    codexResults.innerHTML = `<strong>${targetRegion.toUpperCase()}:</strong> ${info}`;
-                    // Scroll to codex for visibility on mobile
-                    codexResults.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+                    neuralInfoBox.innerHTML = `
+                        <p style="color: var(--neon-gold); font-weight: 900; margin-bottom: 10px; text-transform: uppercase;">${targetRegion}</p>
+                        <p style="font-size: 0.9rem; margin-bottom: 15px;">${info}</p>
+                        <div style="background: rgba(56, 189, 248, 0.1); padding: 10px; border-radius: 8px; border-left: 3px solid var(--neon-blue);">
+                            <p style="font-size: 0.75rem; color: var(--neon-blue); text-transform: uppercase; letter-spacing: 1px; margin-bottom: 5px; font-weight: 700;">Targeted Protocol:</p>
+                            <p style="font-size: 0.85rem; font-weight: 700;">${protocol || 'Consult Syndicate Shop'}</p>
+                            <a href="shop.html" style="font-size: 0.7rem; color: var(--neon-gold); text-decoration: none; display: inline-block; margin-top: 5px; text-transform: uppercase; font-weight: 900;">Access Procurement &rarr;</a>
+                        </div>
+                    `;
+                    neuralInfoBox.classList.add('active');
+                    // Scroll to info for visibility on mobile
+                    neuralInfoBox.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+                }
+            }
+        });
+
+        region.addEventListener('mouseenter', () => {
+            const targetRegion = region.getAttribute('data-region');
+            if (neuralStatus) {
+                neuralStatus.textContent = `INITIALIZING [${targetRegion.toUpperCase()}]...`;
+                neuralStatus.style.color = 'var(--neon-gold)';
+            }
+        });
+
+        region.addEventListener('mouseleave', () => {
+            if (neuralStatus && !document.querySelector('.brain-region.active')) {
+                neuralStatus.textContent = 'Interface Ready';
+                neuralStatus.style.color = 'var(--neon-gold)';
+            } else if (neuralStatus) {
+                const activeRegion = document.querySelector('.brain-region.active');
+                if (activeRegion) {
+                    neuralStatus.textContent = `DEEP ANALYSIS: ${activeRegion.getAttribute('data-region').toUpperCase()}`;
+                    neuralStatus.style.color = 'var(--neon-blue)';
                 }
             }
         });
@@ -471,7 +519,9 @@ document.addEventListener('DOMContentLoaded', () => {
                 { text: "Cognitive Flux (Deep Work & Memory)", value: "focus" },
                 { text: "System Recovery (Sleep & Mood)", value: "sleep" },
                 { text: "Bio-Output (Energy & Performance)", value: "energy" },
-                { text: "Subconscious Exploration (Lucid Dreaming)", value: "dream" }
+                { text: "Subconscious Exploration (Lucid Dreaming)", value: "dream" },
+                { text: "Neural Resilience (Stress Management)", value: "resilience" },
+                { text: "Long-Term Maintenance (Brain Health)", value: "maintenance" }
             ]
         },
         {
@@ -563,29 +613,38 @@ document.addEventListener('DOMContentLoaded', () => {
             // Logic for Stack Recommendation
             if (goal === 'focus') {
                 stackName = "The Architect Protocol";
-                components = ["alpha-gpc", "citicoline", "nicotine"];
-                dosage = "Alpha GPC: 300mg, Citicoline: 250mg, Nicotine: 2mg patch.";
-                details = "Designed for sustained neural plasticity and linguistic fluidity. The cholinergic foundation ensures the brain has the raw materials for heavy data processing.";
-                if (stress !== 'low') {
-                    components.push("magnesium");
-                    dosage += " Magnesium: 200mg (Glycinate).";
-                    details += " Added Magnesium buffers the cortisol response from high-intensity focus sessions.";
+                components = ["alpha-gpc", "citicoline", "l-theanine", "bacopa"];
+                dosage = "Alpha GPC: 300mg, Citicoline: 250mg, L-Theanine: 200mg, Bacopa: 300mg.";
+                details = "Designed for sustained neural plasticity and linguistic fluidity. The cholinergic foundation paired with L-Theanine ensures sharp focus, while Bacopa supports long-term memory consolidation.";
+                if (level === 'elite') {
+                    components.push("nicotine");
+                    dosage += " Nicotine: 2mg patch (optional for high-stakes windows).";
                 }
             } else if (goal === 'sleep') {
                 stackName = "The Circadian Reset";
-                components = ["magnesium", "5-htp"];
-                dosage = "Magnesium: 400mg, 5-HTP: 100mg-200mg.";
-                details = "Optimizes the transition into deep sleep. 5-HTP acts as a precursor to serotonin and melatonin, while Magnesium relaxes the CNS.";
+                components = ["magnesium", "5-htp", "l-theanine", "phosphatidylserine"];
+                dosage = "Magnesium Bisglycinate: 400mg, 5-HTP: 100mg, L-Theanine: 200mg, Phosphatidylserine: 100mg.";
+                details = "Optimizes the transition into deep sleep. Phosphatidylserine helps lower nocturnal cortisol, while L-Theanine increases alpha-wave activity for restorative rest.";
             } else if (goal === 'energy') {
                 stackName = "The Kinetic Engine";
-                components = ["agmatine", "alpha-gpc"];
-                dosage = "Agmatine Sulfate: 500mg, Alpha GPC: 150mg.";
-                details = "Focused on nitric oxide modulation and rapid cognitive drive. Ideal for high-stakes execution windows.";
+                components = ["agmatine", "alpha-gpc", "nalt", "creatine"];
+                dosage = "Agmatine: 500mg, Alpha GPC: 150mg, N-Acetyl L-Tyrosine: 350mg, Creatine: 5g.";
+                details = "Focused on dopamine synthesis and cellular energy. NALT provides the precursor for drive, while Creatine ensures ATP availability for high-output neural sessions.";
             } else if (goal === 'dream') {
                 stackName = "The Oneironaut Stack";
-                components = ["huperzine", "alpha-gpc"];
-                dosage = "Huperzine-A: 200mcg, Alpha GPC: 300mg (Take during WBTB window).";
-                details = "Maximizes acetylcholine concentration during the REM-dominant hours of early morning. Specifically tuned for the Yuschak Protocol.";
+                components = ["huperzine", "alpha-gpc", "citicoline", "uridine"];
+                dosage = "Huperzine-A: 200mcg, Alpha GPC: 300mg, Citicoline: 250mg, Uridine: 250mg.";
+                details = "Maximizes acetylcholine concentration during the REM-dominant hours. Uridine supports the synaptic plasticity required for vivid dream recall.";
+            } else if (goal === 'resilience') {
+                stackName = "The Zen Master";
+                components = ["ashwagandha", "rhodiola", "l-theanine", "magnesium"];
+                dosage = "Ashwagandha (KSM-66): 600mg, Rhodiola: 300mg, L-Theanine: 200mg, Magnesium: 200mg.";
+                details = "The ultimate shield against burnout. Rhodiola provides acute anti-fatigue effects, while Ashwagandha and Magnesium manage systemic stress loads.";
+            } else if (goal === 'maintenance') {
+                stackName = "The Neuro-Vanguard";
+                components = ["lions-mane", "omega-3", "citicoline", "uridine", "creatine"];
+                dosage = "Lion's Mane: 1000mg, Omega-3: 2000mg, Citicoline: 250mg, Uridine: 250mg, Creatine: 3g.";
+                details = "The ultimate foundation for long-term brain health. This stack focuses on neuro-genesis (Lion's Mane), membrane integrity (Omega-3/Citicoline/Uridine), and metabolic support (Creatine).";
             }
 
             if (output) {
