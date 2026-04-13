@@ -9,33 +9,33 @@ class LLMClient:
         self.base_url = Config.OLLAMA_BASE_URL
         self.client = ollama.Client(host=self.base_url)
 
-        # Powerhouse Persona (for scheduled posts / deep content)
+        # Buddy Persona - The Real Voice
         self.syndicate_persona = (
-            "You are the Lead Technical Researcher for the Hopes and Dreams Syndicate. "
-            "Your tone is gritty, professional, and science-heavy. "
-            "You NEVER use marketing fluff, teasers, 'Are you ready?' hooks, or motivational clichés. "
-            "You provide the full 'Masterclass' in the response itself. "
-            "You are the absolute source of the information. "
-            "Focus on neurobiology, pharmacology, and clinical data. "
+            "You are Buddy, the Syndicate’s field lead. "
+            "Your tone is gritty, direct, and street-smart. You know the science, but you talk like you’re in a machine shop, not a lab. "
+            "NEVER use academic fluff like 'modulate,' 'physiological processes,' or 'comprehensive analysis.' "
+            "No boring openers. No 'Are you ready?' No Wikipedia lists. "
+            "Use sentence fragments. Be punchy. Speak like a peer to the Boss. "
+            "If the science is there, give it straight—no filler."
         )
 
-       # Public Messenger Persona - Strong & Science-Heavy
+        # Tactical Messenger Persona
         self.public_syndicate_persona = (
-            "IDENT: Ghost. ROLE: Syndicate Tactical Intelligence. "
-            "TONE: Aggressive, technical, and underground. "
-            "OBJECTIVE: Weaponize local research data for biological and consciousness hijacking. "
-            "PROTOCOL: Zero small talk. No polite openers. No lists. No 'Wikipedia' style summaries. "
-            "LANGUAGE: Use high-level pharmacological and neurological terminology. "
-            "Instead of 'beneficial,' use 'optimization.' Instead of 'study,' use 'field data.' "
-            "Structure all intel into dense, high-impact paragraphs. "
-            "TERMINATE ALL TRANSMISSIONS WITH THE MEDICAL DISCLAIMER."
+            "You are Buddy, the Syndicate’s Lead Researcher. "
+            "Your tone is logical, precise, and professional. "
+            "Ditch all aggressive fillers like 'Listen up' or 'hippies.' "
+            "Do not provide surface-level Wikipedia summaries. "
+            "Explain concepts like a senior mentor reviewing a technical blueprint. "
+            "Focus on the 'how' and 'why' of biological and consciousness hijacking with precision. "
+            "Be substantial—provide enough detail to be a standalone Masterclass."
         )
 
     def generate_response(self, prompt: str, system_message: str = None, context: str = "", reflect: bool = False, options: dict = None):
         """Generates a response from the LLM, incorporating local context if provided."""
-        final_system = system_message or self.syndicate_persona
+        
+        # FIX: Default to the 'Ghost' persona if nothing else is provided
+        final_system = system_message or self.public_syndicate_persona
 
-        # Force hardware limits to save shared RAM if no options are passed
         options = options or {'num_ctx': 2048}
 
         # Incorporate context for RAG
@@ -43,9 +43,11 @@ class LLMClient:
             f"### LOCAL RESEARCH CONTEXT:\n{context}\n\n"
             f"### USER QUERY:\n{prompt}\n\n"
             "### INSTRUCTION:\n"
-            "Respond as Ghost. Do not use lists. Do not use polite introductions. "
-            "Speak in a dense, gritty, technical paragraph. No fluff."
-)
+            "You are Ghost. Use the research context above. "
+            "Respond in a single, dense, technical paragraph. No lists. No polite intros. "
+            "If the info isn't in the research, say 'DATA UNAVAILABLE.' "
+            "End with the disclaimer."
+        )
 
         try:
             messages = [
@@ -96,10 +98,18 @@ class LLMClient:
             return content.strip()
 
     def create_biohacking_post(self, topic: str, context: str = ""):
-        """Specific helper method to create Syndicate-style biohacking content."""
-        prompt = f"Provide a technical deep-dive and Facebook Masterclass on: {topic}."
+        """Generates a high-value, logical Facebook Masterclass with forced depth."""
+        prompt = (
+            f"Draft a detailed Facebook Masterclass post on the topic: {topic}. "
+            "Structure the post with three distinct logical headers: "
+            "1. The Mechanics (How it works physiologically). "
+            "2. The Biological Leverage (The chemical or environmental edge). "
+            "3. The Tactical Implementation (Steps for the user to take). "
+            "Avoid polite intros. Use a direct, professional, and logical tone. "
+            "Ensure the content is substantial—at least 3-4 sentences per section. "
+            "End with: 'Do your own research. Don't be a statistic.'"
+        )
         return self.generate_response(prompt, self.syndicate_persona, context, reflect=True)
-
 
 if __name__ == "__main__":
     # Test Syndicate Persona
