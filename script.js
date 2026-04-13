@@ -471,7 +471,9 @@ document.addEventListener('DOMContentLoaded', () => {
                 { text: "Cognitive Flux (Deep Work & Memory)", value: "focus" },
                 { text: "System Recovery (Sleep & Mood)", value: "sleep" },
                 { text: "Bio-Output (Energy & Performance)", value: "energy" },
-                { text: "Subconscious Exploration (Lucid Dreaming)", value: "dream" }
+                { text: "Subconscious Exploration (Lucid Dreaming)", value: "dream" },
+                { text: "Neural Resilience (Stress Management)", value: "resilience" },
+                { text: "Long-Term Maintenance (Brain Health)", value: "maintenance" }
             ]
         },
         {
@@ -563,29 +565,38 @@ document.addEventListener('DOMContentLoaded', () => {
             // Logic for Stack Recommendation
             if (goal === 'focus') {
                 stackName = "The Architect Protocol";
-                components = ["alpha-gpc", "citicoline", "nicotine"];
-                dosage = "Alpha GPC: 300mg, Citicoline: 250mg, Nicotine: 2mg patch.";
-                details = "Designed for sustained neural plasticity and linguistic fluidity. The cholinergic foundation ensures the brain has the raw materials for heavy data processing.";
-                if (stress !== 'low') {
-                    components.push("magnesium");
-                    dosage += " Magnesium: 200mg (Glycinate).";
-                    details += " Added Magnesium buffers the cortisol response from high-intensity focus sessions.";
+                components = ["alpha-gpc", "citicoline", "l-theanine"];
+                dosage = "Alpha GPC: 300mg, Citicoline: 250mg, L-Theanine: 200mg.";
+                details = "Designed for sustained neural plasticity and linguistic fluidity. The cholinergic foundation paired with L-Theanine ensures sharp focus without the jittery 'edge'.";
+                if (level === 'elite') {
+                    components.push("nicotine");
+                    dosage += " Nicotine: 2mg patch (optional for high-stakes windows).";
                 }
             } else if (goal === 'sleep') {
                 stackName = "The Circadian Reset";
-                components = ["magnesium", "5-htp"];
-                dosage = "Magnesium: 400mg, 5-HTP: 100mg-200mg.";
-                details = "Optimizes the transition into deep sleep. 5-HTP acts as a precursor to serotonin and melatonin, while Magnesium relaxes the CNS.";
+                components = ["magnesium", "5-htp", "l-theanine"];
+                dosage = "Magnesium Bisglycinate: 400mg, 5-HTP: 100mg, L-Theanine: 200mg.";
+                details = "Optimizes the transition into deep sleep. L-Theanine increases alpha-wave activity, while 5-HTP and Magnesium manage serotonin and CNS relaxation.";
             } else if (goal === 'energy') {
                 stackName = "The Kinetic Engine";
-                components = ["agmatine", "alpha-gpc"];
-                dosage = "Agmatine Sulfate: 500mg, Alpha GPC: 150mg.";
-                details = "Focused on nitric oxide modulation and rapid cognitive drive. Ideal for high-stakes execution windows.";
+                components = ["agmatine", "alpha-gpc", "omega-3"];
+                dosage = "Agmatine Sulfate: 500mg, Alpha GPC: 150mg, Omega-3: 1000mg.";
+                details = "Focused on nitric oxide modulation and rapid cognitive drive. Omega-3 supports membrane fluidity for faster neurotransmission.";
             } else if (goal === 'dream') {
                 stackName = "The Oneironaut Stack";
-                components = ["huperzine", "alpha-gpc"];
-                dosage = "Huperzine-A: 200mcg, Alpha GPC: 300mg (Take during WBTB window).";
+                components = ["huperzine", "alpha-gpc", "citicoline"];
+                dosage = "Huperzine-A: 200mcg, Alpha GPC: 300mg, Citicoline: 250mg (Take during WBTB window).";
                 details = "Maximizes acetylcholine concentration during the REM-dominant hours of early morning. Specifically tuned for the Yuschak Protocol.";
+            } else if (goal === 'resilience') {
+                stackName = "The Zen Master";
+                components = ["ashwagandha", "l-theanine", "magnesium"];
+                dosage = "Ashwagandha (KSM-66): 600mg, L-Theanine: 200mg, Magnesium: 200mg.";
+                details = "Built for high-cortisol environments. This stack down-regulates the sympathetic nervous system and enhances emotional stability.";
+            } else if (goal === 'maintenance') {
+                stackName = "The Neuro-Vanguard";
+                components = ["lions-mane", "omega-3", "citicoline"];
+                dosage = "Lion's Mane: 1000mg, Omega-3: 2000mg (High EPA/DHA), Citicoline: 250mg.";
+                details = "The ultimate foundation for long-term brain health. Focuses on neuro-genesis, inflammation reduction, and structural integrity.";
             }
 
             if (output) {
