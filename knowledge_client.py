@@ -56,7 +56,7 @@ class KnowledgeClient:
         self.vector_store.save_local(VECTOR_DB_DIR)
         print("Knowledge index built and saved successfully.")
 
-    def query_knowledge(self, query: str, limit: int = 3):
+    def query_knowledge(self, query: str, limit: int = 15):
         """Retrieves the most relevant chunks from the local knowledge base."""
         if not self.vector_store:
             return ""
@@ -64,7 +64,12 @@ class KnowledgeClient:
         print(f"Querying knowledge base for: {query}...")
         results = self.vector_store.similarity_search(query, k=limit)
         
-        context = "\n---\n".join([doc.page_content for doc in results])
+        context_chunks = []
+        for doc in results:
+            source = os.path.basename(doc.metadata.get('source', 'unknown'))
+            context_chunks.append(f"[SOURCE: {source}]\n{doc.page_content}")
+
+        context = "\n---\n".join(context_chunks)
         return context
 
 if __name__ == "__main__":
