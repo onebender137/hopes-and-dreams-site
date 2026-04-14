@@ -78,6 +78,10 @@
     }
     </script>
 
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link rel="dns-prefetch" href="https://fonts.googleapis.com">
+    <link rel="dns-prefetch" href="https://fonts.gstatic.com">
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;700;900&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="style.css">
     <script src="codex.js" defer></script>
@@ -90,11 +94,11 @@
 </head>
 <body>
     <div id="scroll-progress"></div>
-    <button id="theme-toggle" class="theme-toggle-pill">☀️ LIGHT MODE</button>
+    <button id="theme-toggle" class="theme-toggle-pill" aria-label="Toggle between dark and light mode">☀️ LIGHT MODE</button>
 
     <header>
         <div class="logo-wrap">
-            <img src="topper.webp" alt="Hopes and Dreams">
+            <img src="topper.webp" alt="Hopes and Dreams" width="1780" height="1050" fetchpriority="high">
         </div>
         <nav>
             <a href="index.html">Home</a>
@@ -211,25 +215,25 @@
             <div class="neural-map-wrapper">
                 <svg viewBox="0 0 400 300" class="brain-svg">
                     <!-- Prefrontal Cortex (Front) -->
-                    <path class="brain-region" data-region="prefrontal cortex" d="M100,60 C70,80 60,140 70,200 L140,200 C140,150 130,80 100,60 Z" />
+                    <path class="brain-region" data-region="prefrontal cortex" d="M100,60 C70,80 60,140 70,200 L140,200 C140,150 130,80 100,60 Z" tabindex="0" role="button" aria-label="Prefrontal Cortex" />
 
                     <!-- Thalamus (Central) -->
-                    <circle class="brain-region" data-region="thalamus" cx="200" cy="150" r="25" />
+                    <circle class="brain-region" data-region="thalamus" cx="200" cy="150" r="25" tabindex="0" role="button" aria-label="Thalamus" />
 
                     <!-- Hippocampus (Arcing around Thalamus) -->
-                    <path class="brain-region" data-region="hippocampus" d="M185,175 C165,195 195,225 225,205 C245,185 215,155 185,175 Z" />
+                    <path class="brain-region" data-region="hippocampus" d="M185,175 C165,195 195,225 225,205 C245,185 215,155 185,175 Z" tabindex="0" role="button" aria-label="Hippocampus" />
 
                     <!-- Amygdala (Small, near Hippocampus end) -->
-                    <circle class="brain-region" data-region="amygdala" cx="175" cy="195" r="10" />
+                    <circle class="brain-region" data-region="amygdala" cx="175" cy="195" r="10" tabindex="0" role="button" aria-label="Amygdala" />
 
                     <!-- Pineal Gland (Small, central back) -->
-                    <circle class="brain-region" data-region="pineal gland" cx="230" cy="145" r="7" />
+                    <circle class="brain-region" data-region="pineal gland" cx="230" cy="145" r="7" tabindex="0" role="button" aria-label="Pineal Gland" />
 
                     <!-- Cerebellum (Lower Back) -->
-                    <path class="brain-region" data-region="cerebellum" d="M250,210 C300,210 330,240 310,270 C280,280 240,270 240,240 Z" />
+                    <path class="brain-region" data-region="cerebellum" d="M250,210 C300,210 330,240 310,270 C280,280 240,270 240,240 Z" tabindex="0" role="button" aria-label="Cerebellum" />
 
                     <!-- Vagus Nerve (Connecting down) -->
-                    <path class="brain-region" data-region="vagus nerve" d="M195,220 L195,280 L205,280 L205,220 Z" />
+                    <path class="brain-region" data-region="vagus nerve" d="M195,220 L195,280 L205,280 L205,220 Z" tabindex="0" role="button" aria-label="Vagus Nerve" />
 
                     <!-- Simplified Brain Outline -->
                     <path fill="none" stroke="var(--neon-blue)" stroke-width="2" d="M200,30 C100,30 50,100 50,180 C50,250 120,270 200,270 C280,270 350,250 350,180 C350,100 300,30 200,30" opacity="0.1" />

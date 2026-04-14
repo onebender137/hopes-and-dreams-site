@@ -1,4 +1,0 @@
-chat_memory.json
-.env
-__pycache__/
-*.log
