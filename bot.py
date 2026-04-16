@@ -19,6 +19,39 @@ from affiliate_client import AffiliateClient
 # Files for persistent storage
 REPLIED_COMMENTS_FILE = "replied_comments.json"
 CHAT_MEMORY_FILE = "chat_memory.json"
+POSTED_TOPICS_FILE = "posted_topics.json"
+
+# Extensive Syndicate Topic Pool for high-variety autonomous brainstorming
+SYNDICATE_TOPIC_POOL = [
+    "Huperzine-A", "Alpha GPC", "5-HTP", "Agmatine Sulfate", "Magnesium Bisglycinate",
+    "Nicotine Patches", "Citicoline (CDP-Choline)", "L-Theanine", "Lion's Mane Mushroom",
+    "Ashwagandha (KSM-66)", "Omega-3 Fish Oil", "Rhodiola Rosea", "Bacopa Monnieri",
+    "Phosphatidylserine", "N-Acetyl L-Tyrosine", "Uridine Monophosphate", "Creatine Monohydrate",
+    "Astral Projection", "Lucid Dreaming", "Kratom", "Autophagy induction", "BDNF optimization",
+    "Binaural Beats", "GABA for anxiety", "Glycine for sleep", "Heart Rate Variability (HRV)",
+    "Vagus Nerve Stimulation", "Prefrontal Cortex Optimization", "Circadian Rhythm alignment",
+    "Cold Exposure / Ice Baths", "Sauna Therapy / Heat Shock Proteins", "Dopamine Fasting",
+    "Intermittent Fasting", "Deep Sleep Optimization", "Neurogenesis", "Sleep Hygiene",
+    "Melatonin alternatives", "L-Dopa / Mucuna Pruriens", "Sulbutiamine", "Noopept",
+    "Aniracetam", "Phenylpiracetam", "Sunlight Exposure", "Earthing / Grounding",
+    "Red Light Therapy", "Methylene Blue", "NAD+ Boosters", "Resveratrol & NMN",
+    "Brain Training", "Meditation Protocols", "Flow State triggers", "Ketosis / Exogenous Ketones",
+    "Microdosing (Educational)", "Caffeine Optimization", "Yoga Nidra / NSDR", "Polyphasic Sleep",
+    "Blue Light Blocking", "Cordyceps for energy", "Reishi for immunity", "Peptides (BPC-157/TB-500)",
+    "Testosterone Optimization", "Cortisol Management", "Gut Microbiome / Probiotics",
+    "Breathwork (Wim Hof/Box Breathing)", "Hypnotherapy", "Galantamine Protocol",
+    "Calea Zacatechichi (Dream Herb)", "Valerian Root", "Kava Kava", "Mitochondrial Health / PQQ",
+    "Senolytics (Quercetin/Fisetin)", "Blood Glucose Monitoring (CGM)", "Inflammation Control",
+    "Glutathione / NAC", "Vitamin D3 & K2 Synergy", "Heavy Metal Detox", "Neurofeedback",
+    "tDCS / Transcranial Stimulation", "PEMF Therapy", "Sensory Deprivation / Float Tanks",
+    "Quantified Self / Biometric Tracking", "Nutrigenomics", "Deep Work / Productivity biohacks",
+    "Hormetic Stressors", "Synaptic Plasticity", "The Yuschak Method", "WBTB / MILD / WILD techniques",
+    "Remote Viewing (Speculative)", "Qi / Bio-energy optimization", "Blood Flow Restriction (BFR)",
+    "Stem Cell Regeneration", "Telomere maintenance", "HPA Axis balance", "Endocannabinoid System",
+    "Liposomal delivery systems", "Cerebrolysin / Semax / Selank (Technical)", "Memory Palaces / Loci",
+    "Spaced Repetition / Anki", "Identity Shifting", "Stress Inoculation",
+    "Social Connection biohacking", "Altruism & Neurobiology", "Stoicism for Resilience"
+]
 
 class HopesAndDreamsBot:
     def __init__(self):
@@ -30,7 +63,35 @@ class HopesAndDreamsBot:
         self.affiliate = AffiliateClient()
 
         self.replied_comment_ids = self._load_replied_comments()
+        self.posted_topics = self._load_posted_topics()
         self.initial_startup = not os.path.exists(REPLIED_COMMENTS_FILE)
+
+    def _load_posted_topics(self):
+        """Loads the list of recently posted topics from a JSON file."""
+        if os.path.exists(POSTED_TOPICS_FILE):
+            try:
+                with open(POSTED_TOPICS_FILE, 'r') as f:
+                    return json.load(f)
+            except (json.JSONDecodeError, IOError):
+                return []
+        return []
+
+    def _save_posted_topics(self):
+        """Saves the current list of posted topics to a JSON file."""
+        try:
+            with open(POSTED_TOPICS_FILE, 'w') as f:
+                json.dump(self.posted_topics, f)
+        except IOError as e:
+            print(f"Error saving posted topics: {e}")
+
+    def _record_posted_topic(self, topic):
+        """Records a new posted topic, keeping only the last 50 to avoid staleness."""
+        if topic in self.posted_topics:
+            self.posted_topics.remove(topic)
+        self.posted_topics.append(topic)
+        if len(self.posted_topics) > 50:
+            self.posted_topics.pop(0)
+        self._save_posted_topics()
 
     def _load_replied_comments(self):
         """Loads the set of comment IDs already replied to from a JSON file."""
@@ -91,16 +152,48 @@ class HopesAndDreamsBot:
             except (json.JSONDecodeError, IOError, Exception) as e:
                 print(f"Error reading chat memory for topics: {e}")
 
-        # Expanded fallback list
-        fallbacks = [
-            "Lucid Dreaming Techniques", 
-            "Astral Projection Guide", 
-            "Nicotine as a Nootropic", 
-            "Magnesium for Sleep", 
-            "Kratom Safety", 
-            "The Perfect Supplement Stack"
-        ]
-        return random.choice(fallbacks)
+        # No explicit request found or error occurred; brainstorm an autonomous topic
+        return self.brainstorm_autonomous_topic()
+
+    def brainstorm_autonomous_topic(self):
+        """Uses the LLM to brainstorm a fresh, diverse biohacking topic from the Syndicate Pool."""
+        print(f"[{datetime.now()}] EXECUTIVE BRAINSTORM: Generating fresh intelligence...")
+
+        # Filter pool to avoid very recent repeats
+        available_pool = [t for t in SYNDICATE_TOPIC_POOL if t not in self.posted_topics]
+        if not available_pool:
+            available_pool = SYNDICATE_TOPIC_POOL # Reset if somehow exhausted
+
+        # Sample a subset to give the LLM choices without overwhelming context
+        sample_size = min(30, len(available_pool))
+        candidates = random.sample(available_pool, sample_size)
+
+        system_msg = (
+            "You are the Syndicate's Lead Content Strategist. Your goal is to keep the community engaged "
+            "by providing fresh, diverse, and cutting-edge biohacking intel. You avoid repeating yourself."
+        )
+
+        prompt = (
+            f"Brainstorm a specific, compelling topic for today's Facebook Masterclass.\n\n"
+            f"RECENTLY POSTED TOPICS: {', '.join(self.posted_topics[-10:])}\n\n"
+            f"POTENTIAL SEED KEYWORDS: {', '.join(candidates)}\n\n"
+            "INSTRUCTIONS:\n"
+            "1. Pick a keyword from the seed list OR brainstorm a closely related alternative biohack/supplement.\n"
+            "2. Ensure it has NOT been posted recently.\n"
+            "3. The topic should be punchy and professional (e.g., 'The Neurobiology of Sulbutiamine' or 'Optimizing HRV with Cold Thermogenesis').\n"
+            "4. Return ONLY the topic name. No fluff. No punctuation."
+        )
+
+        try:
+            topic = self.llm.generate_response(prompt, system_msg)
+            if topic and len(topic) < 100:
+                final_topic = topic.strip().replace("'", "").replace("\"", "")
+                return final_topic
+        except Exception as e:
+            print(f"Brainstorming failed: {e}")
+
+        # Ultimate fallback from the pool
+        return random.choice(available_pool)
 
     def generate_and_post_daily_tip(self, topic=None, slot=None):
         """Generates a daily Syndicate Masterclass and posts it to the Facebook Page."""
@@ -142,6 +235,9 @@ class HopesAndDreamsBot:
                 result = self.fb.post_to_page(tip_content, image_path=image_path)
                 if result:
                     print(f"Syndicate Masterclass posted successfully at {datetime.now()}!")
+
+                    # Record the topic as posted to avoid repeats
+                    self._record_posted_topic(topic)
 
                     # Add affiliate recommendation in the comments
                     post_id = result.get('id')
