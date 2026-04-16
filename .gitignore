@@ -34,6 +34,7 @@ vector_db/
 *.log
 replied_comments.json
 chat_memory.json
+posted_topics.json
 nohup.out
 
 # --- TEMPORARY ASSETS ---
