@@ -1,4 +1,6 @@
 import os
+import subprocess
+import re
 import json
 import time
 import argparse
@@ -234,6 +236,9 @@ class HopesAndDreamsBot:
                 print(f"[{datetime.now()}] EXECUTIVE EXECUTION: Hitting FB Graph API for daily tip (Content length: {len(tip_content)}).")
                 result = self.fb.post_to_page(tip_content, image_path=image_path)
                 if result:
+                    # 5. Website Transmission Uplink
+                    print(f"[{datetime.now()}] EXECUTIVE EXECUTION: Initiating website transmission uplink...")
+                    self._post_to_website(tip_content, topic, image_path)
                     print(f"Syndicate Masterclass posted successfully at {datetime.now()}!")
 
                     # Record the topic as posted to avoid repeats
@@ -363,6 +368,199 @@ class HopesAndDreamsBot:
         report = self.llm.generate_response(prompt, system_msg)
         return report
 
+
+    def _post_to_website(self, content, topic, image_path=None):
+        """Beautifies the content and posts it to the website (articles/ and intel.html)."""
+        os.makedirs("articles", exist_ok=True)
+        print(f"[{datetime.now()}] WEBSITE UPLINK: Initializing Syndicate Transmission for {topic}...")
+
+        # 1. Beautify content using LLM
+        beautified_html = self._beautify_for_blog(content, topic, image_path)
+
+        # 2. Generate slug and filename
+        date_str = datetime.now().strftime("%Y-%m-%d")
+        slug = re.sub(r'[^a-z0-9]+', '-', topic.lower()).strip('-')
+        filename = f"{date_str}-{slug}.html"
+        filepath = os.path.join("articles", filename)
+
+        # 3. Save the article
+        try:
+            with open(filepath, 'w') as f:
+                f.write(beautified_html)
+            print(f"[{datetime.now()}] WEBSITE UPLINK: Article saved to {filepath}")
+        except Exception as e:
+            print(f"[{datetime.now()}] WEBSITE UPLINK ERROR: Failed to save article: {e}")
+            return False
+
+        # 4. Update intel.html (Latest 3)
+        self._update_intel_html(topic, filename, date_str)
+
+        # 5. Update transmissions.html (Archive)
+        self._update_transmissions_html(topic, filename, date_str)
+
+        # 6. Git Commit and Push
+        self._git_push_changes(f"Syndicate Transmission: {topic}")
+
+        return True
+
+    def _beautify_for_blog(self, content, topic, image_path):
+        """Uses the LLM to wrap the raw content in the beautiful blog template."""
+        system_msg = (
+            "You are the Syndicate's Digital Architect. Your job is to take raw biohacking intel "
+            "and format it into a high-end HTML article template."
+        )
+
+        # Load template
+        template_path = "articles/template.html"
+        try:
+            with open(template_path, 'r') as f:
+                template = f.read()
+        except:
+            template = "<h1>{{TITLE}}</h1><p>{{CONTENT}}</p>" # Fallback
+
+        prompt = (
+            f"I have a new Syndicate Masterclass about '{topic}'.\n\n"
+            f"RAW CONTENT:\n{content}\n\n"
+            "INSTRUCTIONS:\n"
+            "1. Rewrite the content to be more 'beautified' for a blog post. Use engaging headers.\n"
+            "2. Identify the most actionable advice and mark it for a 'Prostar Life Hack' box.\n"
+            "3. Return the FINAL HTML by injecting this content into the provided template.\n"
+            "4. Use the following placeholders in the template (if they exist or create a structure that fits):\n"
+            "   - Replace the title tag and H1 with the topic title.\n"
+            "   - Use <span class='meta-data'> for the date and category.\n"
+            "   - Put the main content in the <article> section.\n"
+            "   - Ensure the 'Prostar Life Hack' is in a <div class='hack-box'>.\n"
+            f"   - If an image is provided ({image_path}), ensure the src attribute is prefixed with '../' (e.g., src='../{image_path}') since this article lives in the articles/ subfolder, use it in an <img> tag with class 'article-img'. "
+            "     If image_path is None, do NOT include an <img> tag for the featured image.\n"
+            "5. Return ONLY the full HTML code. No talk."
+        )
+        return self.llm.generate_response(prompt, system_msg, context=template, reflect=True, options={'num_ctx': 4096})
+        # We use a higher context window and reflection for better HTML generation
+        html_response = self.llm.generate_response(prompt, system_msg, context=template, reflect=True, options={'num_ctx': 4096})
+
+        # Cleanup: Strip markdown code blocks if present
+        if "```" in html_response:
+            # Match content between ```html and ``` or just ``` and ```
+            match = re.search(r'```(?:html)?\n?(.*?)\n?```', html_response, re.DOTALL)
+            if match:
+                html_response = match.group(1).strip()
+
+        return html_response
+    def _update_intel_html(self, topic, filename, date_str):
+        """Updates the intel.html file with the latest 3 posts."""
+        print(f"[{datetime.now()}] WEBSITE UPLINK: Syncing intel.html...")
+        try:
+            with open("intel.html", 'r') as f:
+                html = f.read()
+
+            new_card = (
+                f'                <div class="card">\n'
+                f'                    <div class="meta-data" style="font-size: 0.7rem; color: var(--neon-gold); margin-bottom: 10px;">TRANSMISSION: {date_str}</div>\n'
+                f'                    <h3>{topic}</h3>\n'
+                f'                    <p>{topic} protocol initialized. Access the full intel burst below.</p>\n'
+                f'                    <a href="articles/{filename}" class="buy-btn" style="font-size: 0.7rem; padding: 8px 16px;">View Intel →</a>\n'
+                f'                </div>'
+            )
+
+            # Find the posts block
+            start_marker = "<!-- LATEST_3_POSTS_START -->"
+            end_marker = "<!-- LATEST_3_POSTS_END -->"
+
+            pattern = re.compile(f"{start_marker}.*?{end_marker}", re.DOTALL)
+            match = pattern.search(html)
+
+            if match:
+                current_posts_block = match.group(0)
+                # Extract individual cards
+                cards = re.findall(r'<div class="card">.*?</div>', current_posts_block, re.DOTALL)
+
+                # Filter out the "Initializing Feed" placeholder if this is the first real post
+                cards = [c for c in cards if "Initializing Feed" not in c and "Waiting for Uplink" not in c and "Data Stream Alpha" not in c]
+
+                # Add new card to the beginning
+                cards.insert(0, new_card)
+
+                # Keep only latest 3
+                cards = cards[:3]
+
+                new_posts_block = f"{start_marker}\n" + "\n".join(cards) + f"\n                {end_marker}"
+                html = html.replace(current_posts_block, new_posts_block)
+
+                # Also update the archive preview list in intel.html
+                archive_start = "<!-- OLDER_POSTS_START -->"
+                archive_end = "<!-- OLDER_POSTS_END -->"
+                archive_pattern = re.compile(f"{archive_start}.*?{archive_end}", re.DOTALL)
+                archive_match = archive_pattern.search(html)
+
+                if archive_match:
+                    current_archive_block = archive_match.group(0)
+                    new_archive_item = f'<li style="margin-bottom: 10px;"><a href="articles/{filename}" style="color: var(--text-dim); text-decoration: none; font-size: 0.85rem;">[{date_str}] {topic}</a></li>'
+
+                    archive_items = re.findall(r'<li.*?>.*?</li>', current_archive_block, re.DOTALL)
+                    archive_items = [i for i in archive_items if "No archived transmissions found" not in i]
+
+                    archive_items.insert(0, new_archive_item)
+                    archive_items = archive_items[:5] # Show only last 5 in the sidebar list
+
+                    new_archive_block = f"{archive_start}\n                    " + "\n                    ".join(archive_items) + f"\n                    {archive_end}"
+                    html = html.replace(current_archive_block, new_archive_block)
+
+                with open("intel.html", 'w') as f:
+                    f.write(html)
+        except Exception as e:
+            print(f"[{datetime.now()}] WEBSITE UPLINK ERROR: Failed to update intel.html: {e}")
+
+    def _update_transmissions_html(self, topic, filename, date_str):
+        """Updates the transmissions.html archive page."""
+        print(f"[{datetime.now()}] WEBSITE UPLINK: Syncing transmissions.html...")
+        try:
+            with open("transmissions.html", 'r') as f:
+                html = f.read()
+
+            new_item = (
+                f'            <a href="articles/{filename}" class="archive-item">\n'
+                f'                <span class="title">{topic}</span>\n'
+                f'                <span class="date">{date_str}</span>\n'
+                f'            </a>'
+            )
+
+            start_marker = "<!-- ARCHIVE_POSTS_START -->"
+            end_marker = "<!-- ARCHIVE_POSTS_END -->"
+
+            pattern = re.compile(f"{start_marker}.*?{end_marker}", re.DOTALL)
+            match = pattern.search(html)
+
+            if match:
+                current_block = match.group(0)
+                items = re.findall(r'<a.*?class="archive-item">.*?</a>', current_block, re.DOTALL)
+
+                # Filter placeholder
+                items = [i for i in items if "Initializing deep archive retrieval" not in i]
+
+                items.insert(0, new_item)
+
+                new_block = f"{start_marker}\n" + "\n".join(items) + f"\n            {end_marker}"
+                html = html.replace(current_block, new_block)
+
+                with open("transmissions.html", 'w') as f:
+                    f.write(html)
+        except Exception as e:
+            print(f"[{datetime.now()}] WEBSITE UPLINK ERROR: Failed to update transmissions.html: {e}")
+
+    def _git_push_changes(self, commit_message):
+        """Automates the git workflow to push changes to the repository."""
+        print(f"[{datetime.now()}] GIT AUTOMATION: Committing changes...")
+        try:
+            # Safely add only relevant files
+            subprocess.run(["git", "add", "intel.html", "transmissions.html", "articles/"], check=True)
+            subprocess.run(["git", "commit", "-m", commit_message], check=True)
+            print(f"[{datetime.now()}] GIT AUTOMATION: Pushing to remote...")
+            subprocess.run(["git", "push"], check=True)
+            print(f"[{datetime.now()}] GIT AUTOMATION: Uplink successful.")
+        except subprocess.CalledProcessError as e:
+            print(f"[{datetime.now()}] GIT AUTOMATION ERROR: Command failed: {e}")
+        except Exception as e:
+            print(f"[{datetime.now()}] GIT AUTOMATION ERROR: {e}")
     def run_fb_loop(self, interval_seconds=3600):
         """Main Facebook bot loop for polling comments."""
         print("Facebook comment monitor loop started.")

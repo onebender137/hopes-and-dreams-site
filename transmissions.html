@@ -1,0 +1,97 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Syndicate Transmissions | Hopes and Dreams Intelligence Archive</title>
+    <link rel="canonical" href="https://hopes-and-dreams.ca/transmissions.html" />
+    <meta name="description" content="Access the full archive of Syndicate Transmissions. High-impact biohacking intelligence, neuro-optimization protocols, and technical stack evolution.">
+
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;700;900&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="style.css">
+    <script src="codex.js" defer></script>
+    <script src="script.js" defer></script>
+    <style>
+        .container { max-width: 900px; margin: 0 auto; padding: 0 24px 100px; }
+        .archive-list {
+            text-align: left;
+            margin-top: 40px;
+        }
+        .archive-item {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 20px;
+            background: var(--card-bg);
+            border: 1px solid rgba(56, 189, 248, 0.1);
+            border-radius: 16px;
+            margin-bottom: 15px;
+            transition: 0.3s;
+            text-decoration: none;
+        }
+        .archive-item:hover {
+            border-color: var(--neon-blue);
+            transform: translateX(10px);
+            box-shadow: 0 0 20px rgba(56, 189, 248, 0.1);
+        }
+        .archive-item .title {
+            color: var(--text-main);
+            font-weight: 700;
+            font-size: 1.1rem;
+        }
+        .archive-item .date {
+            color: var(--neon-gold);
+            font-size: 0.8rem;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            font-weight: 900;
+        }
+        @media (max-width: 600px) {
+            .archive-item { flex-direction: column; align-items: flex-start; gap: 10px; }
+        }
+    </style>
+</head>
+<body>
+    <div id="scroll-progress"></div>
+    <button id="theme-toggle" class="theme-toggle-pill" aria-label="Toggle between dark and light mode">☀️ LIGHT MODE</button>
+
+    <header>
+        <div class="logo-wrap">
+            <img src="topper.webp" alt="Hopes and Dreams" width="1780" height="1050" fetchpriority="high">
+        </div>
+        <nav>
+            <a href="index.html">Home</a>
+            <a href="shop.html">Procurement</a>
+            <a href="optimization.html">Optimization</a>
+            <a href="intel.html">Intel Hub</a>
+            <a href="about.html">About</a>
+            <a href="privacy.html">Privacy</a>
+        </nav>
+    </header>
+
+    <div class="container">
+        <h1 class="section-title">Syndicate Transmissions</h1>
+        <p style="color: var(--text-dim); margin-bottom: 40px;">The complete archive of high-frequency biohacking intelligence and protocol updates.</p>
+
+        <div class="archive-list" id="full-archive-list">
+            <!-- ARCHIVE_POSTS_START -->
+            <div style="text-align: center; padding: 40px; color: var(--text-dim);">
+                <p>Initializing deep archive retrieval...</p>
+                <div class="thinking" style="justify-content: center;">
+                    <div class="dot"></div>
+                    <div class="dot"></div>
+                    <div class="dot"></div>
+                </div>
+            </div>
+            <!-- ARCHIVE_POSTS_END -->
+        </div>
+
+        <footer>
+            <p>&copy; 2026 Hopes and Dreams. All Rights Reserved.</p>
+            <p style="font-size: 0.7rem; color: var(--text-dim); margin-top: 10px;">Location: Saint John, New Brunswick, Canada</p>
+        </footer>
+    </div>
+</body>
+</html>
