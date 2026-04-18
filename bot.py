@@ -17,6 +17,8 @@ from telegram_bot import TelegramBot
 from knowledge_client import KnowledgeClient
 from research_client import ResearchClient
 from affiliate_client import AffiliateClient
+from database_client import SyndicateDatabase
+from crew_brain import SyndicateCrew
 
 # Files for persistent storage
 REPLIED_COMMENTS_FILE = "replied_comments.json"
@@ -63,55 +65,46 @@ class HopesAndDreamsBot:
         self.knowledge = KnowledgeClient()
         self.research = ResearchClient()
         self.affiliate = AffiliateClient()
+        # Check for DB existence BEFORE initializing SyndicateDatabase
+        db_exists = os.path.exists("syndicate_memory.db")
+        self.db = SyndicateDatabase()
+        self.crew = SyndicateCrew()
+
+        # Perform one-time migration if JSON files exist
+        if os.path.exists(REPLIED_COMMENTS_FILE) or os.path.exists(POSTED_TOPICS_FILE):
+            print(f"[{datetime.now()}] DATA LAYER: Detected legacy JSON storage. Migrating to SQLite...")
+            self.db.migrate_from_json(POSTED_TOPICS_FILE, REPLIED_COMMENTS_FILE)
+
+            # Backup and remove legacy files
+            for f in [POSTED_TOPICS_FILE, REPLIED_COMMENTS_FILE]:
+                if os.path.exists(f):
+                    os.rename(f, f + ".bak")
 
         self.replied_comment_ids = self._load_replied_comments()
         self.posted_topics = self._load_posted_topics()
-        self.initial_startup = not os.path.exists(REPLIED_COMMENTS_FILE)
+        self.initial_startup = not db_exists
 
     def _load_posted_topics(self):
-        """Loads the list of recently posted topics from a JSON file."""
-        if os.path.exists(POSTED_TOPICS_FILE):
-            try:
-                with open(POSTED_TOPICS_FILE, 'r') as f:
-                    return json.load(f)
-            except (json.JSONDecodeError, IOError):
-                return []
-        return []
+        """Loads the list of recently posted topics from SQLite."""
+        return self.db.get_recent_topics(limit=50)
 
     def _save_posted_topics(self):
-        """Saves the current list of posted topics to a JSON file."""
-        try:
-            with open(POSTED_TOPICS_FILE, 'w') as f:
-                json.dump(self.posted_topics, f)
-        except IOError as e:
-            print(f"Error saving posted topics: {e}")
+        """Deprecated: SQLite saves automatically."""
+        pass
 
     def _record_posted_topic(self, topic):
-        """Records a new posted topic, keeping only the last 50 to avoid staleness."""
-        if topic in self.posted_topics:
-            self.posted_topics.remove(topic)
-        self.posted_topics.append(topic)
-        if len(self.posted_topics) > 50:
-            self.posted_topics.pop(0)
-        self._save_posted_topics()
+        """Records a new posted topic to SQLite."""
+        self.db.add_posted_topic(topic)
+        # Update local cache for immediate use if needed
+        self.posted_topics = self._load_posted_topics()
 
     def _load_replied_comments(self):
-        """Loads the set of comment IDs already replied to from a JSON file."""
-        if os.path.exists(REPLIED_COMMENTS_FILE):
-            try:
-                with open(REPLIED_COMMENTS_FILE, 'r') as f:
-                    return set(json.load(f))
-            except (json.JSONDecodeError, IOError):
-                return set()
-        return set()
+        """Loads the set of comment IDs already replied to from SQLite."""
+        return self.db.get_all_replied_comments()
 
     def _save_replied_comments(self):
-        """Saves the current set of replied comment IDs to a JSON file."""
-        try:
-            with open(REPLIED_COMMENTS_FILE, 'w') as f:
-                json.dump(list(self.replied_comment_ids), f)
-        except IOError as e:
-            print(f"Error saving replied comments: {e}")
+        """Deprecated: SQLite saves automatically."""
+        pass
 
     def get_recent_topics_from_memory(self, slot=None):
         """Extracts potential topics from the Telegram chat history, prioritizing the Admin."""
@@ -217,13 +210,13 @@ class HopesAndDreamsBot:
 
             combined_context = f"{local_context}\n\n### PUBMED RESEARCH:\n{research_context}"
 
-            # 3. Generate Masterclass Content (with ReAct/Reflect)
-            print(f"[{datetime.now()}] EXECUTIVE EXECUTION: Generating and reflecting on content...")
+            # 3. Generate Masterclass Content (via Sequential CrewAI)
+            print(f"[{datetime.now()}] EXECUTIVE EXECUTION: Orchestrating multi-agent brain for {topic}...")
             try:
-                tip_content = self.llm.create_biohacking_post(topic, combined_context)
+                tip_content = self.crew.run(topic, combined_context)
             except Exception as inner_e:
-                print(f"[{datetime.now()}] EXECUTIVE EXECUTION: Content generation (with reflection) failed: {inner_e}. Retrying without reflection...")
-                tip_content = self.llm.generate_response(f"Provide a technical deep-dive and Facebook Masterclass on: {topic}.", context=combined_context, reflect=False)
+                print(f"[{datetime.now()}] EXECUTIVE EXECUTION: Multi-agent generation failed: {inner_e}. Falling back to legacy LLM generation...")
+                tip_content = self.llm.generate_response(f"Provide a technical deep-dive and Facebook Masterclass on: {topic}.", context=combined_context, reflect=True)
 
             if tip_content:
                 # 4. Handle Media Attachment
@@ -326,8 +319,8 @@ class HopesAndDreamsBot:
                 if reply_msg:
                     print("EXECUTIVE EXECUTION: Replying to FB comment.")
                     self.fb.reply_to_comment(comment_id, reply_msg)
+                    self.db.add_replied_comment(comment_id)
                     self.replied_comment_ids.add(comment_id)
-                    self._save_replied_comments()
                     print(f"Replied to comment {comment_id}")
 
     def _get_random_media(self):
