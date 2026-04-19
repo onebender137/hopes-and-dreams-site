@@ -207,9 +207,11 @@ class HopesAndDreamsBot:
             f"POTENTIAL SEED KEYWORDS: {', '.join(candidates)}\n\n"
             "INSTRUCTIONS:\n"
             "1. Pick a keyword from the seed list OR brainstorm a closely related alternative biohack/supplement.\n"
-            "2. Ensure it has NOT been posted recently.\n"
-            "3. The topic should be punchy and professional (e.g., 'The Neurobiology of Sulbutiamine' or 'Optimizing HRV with Cold Thermogenesis').\n"
-            "4. Return ONLY the topic name. No fluff. No punctuation."
+            "2. STICK TO TECHNICAL PHARMACOLOGY AND PHYSIOLOGY. No 'wellness', 'mindfulness', or 'spirituality'.\n"
+            "3. DO NOT mix unrelated topics (e.g., do NOT link astral projection with telomeres).\n"
+            "4. Ensure it has NOT been posted recently.\n"
+            "5. The topic should be punchy and professional (e.g., 'The Neurobiology of Sulbutiamine' or 'Optimizing HRV with Cold Thermogenesis').\n"
+            "6. Return ONLY the topic name. No fluff. No punctuation."
         )
 
         try:
@@ -460,7 +462,7 @@ class HopesAndDreamsBot:
             "     If image_path is None, do NOT include an <img> tag for the featured image.\n"
             "5. Return ONLY the full HTML code. No talk."
         )
-        return self.llm.generate_response(prompt, system_msg, context=template, reflect=True, options={'num_ctx': 4096})
+
         # We use a higher context window and reflection for better HTML generation
         html_response = self.llm.generate_response(prompt, system_msg, context=template, reflect=True, options={'num_ctx': 4096})
 
