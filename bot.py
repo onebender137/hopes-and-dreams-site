@@ -1,24 +1,15 @@
-import os
-import subprocess
-import re
-import json
-import time
-import argparse
-import threading
-import random
-from datetime import datetime, timedelta, timezone
-
 # --- PHOENIX OBSERVABILITY INITIALIZATION ---
 import os
+# Set environment variables BEFORE any other imports to lock in Phoenix project
+os.environ["PHOENIX_PROJECT_NAME"] = "syndicate-intelligence"
+# Use OTLP HTTP collector to avoid gRPC binding conflicts on MSI Claw hardware
+os.environ["PHOENIX_COLLECTOR_ENDPOINT"] = "http://localhost:6006"
+
 import phoenix as px
 from phoenix.otel import register
 from openinference.instrumentation.langchain import LangChainInstrumentor
 from openinference.instrumentation.crewai import CrewAIInstrumentor
-
-# Explicitly set Phoenix project name
-os.environ["PHOENIX_PROJECT_NAME"] = "syndicate-intelligence"
-# Use OTLP HTTP collector to avoid gRPC binding conflicts on MSI Claw hardware
-os.environ["PHOENIX_COLLECTOR_ENDPOINT"] = "http://localhost:6006"
+from openinference.instrumentation.litellm import LiteLLMInstrumentor
 
 # Start Phoenix in the background
 try:
@@ -34,11 +25,20 @@ tracer_provider = register(
     auto_instrument=True
 )
 
-# Instrument LangChain and CrewAI
-# We pass the tracer_provider to ensure they use our registered provider
+# Instrument LangChain, CrewAI, and LiteLLM (for local Ollama traces)
 LangChainInstrumentor().instrument(tracer_provider=tracer_provider)
 CrewAIInstrumentor().instrument(tracer_provider=tracer_provider)
+LiteLLMInstrumentor().instrument(tracer_provider=tracer_provider)
 # ---------------------------------------------
+
+import subprocess
+import re
+import json
+import time
+import argparse
+import threading
+import random
+from datetime import datetime, timedelta, timezone
 
 from apscheduler.schedulers.background import BackgroundScheduler
 from apscheduler.triggers.cron import CronTrigger
