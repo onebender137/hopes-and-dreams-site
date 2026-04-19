@@ -64,7 +64,7 @@ SYNDICATE_TOPIC_POOL = [
     "Nicotine Patches", "Citicoline (CDP-Choline)", "L-Theanine", "Lion's Mane Mushroom",
     "Ashwagandha (KSM-66)", "Omega-3 Fish Oil", "Rhodiola Rosea", "Bacopa Monnieri",
     "Phosphatidylserine", "N-Acetyl L-Tyrosine", "Uridine Monophosphate", "Creatine Monohydrate",
-    "Astral Projection", "Lucid Dreaming", "Kratom", "Autophagy induction", "BDNF optimization",
+    "Lucid Dreaming", "Kratom", "Autophagy induction", "BDNF optimization",
     "Binaural Beats", "GABA for anxiety", "Glycine for sleep", "Heart Rate Variability (HRV)",
     "Vagus Nerve Stimulation", "Prefrontal Cortex Optimization", "Circadian Rhythm alignment",
     "Cold Exposure / Ice Baths", "Sauna Therapy / Heat Shock Proteins", "Dopamine Fasting",
@@ -209,9 +209,10 @@ class HopesAndDreamsBot:
             "1. Pick a keyword from the seed list OR brainstorm a closely related alternative biohack/supplement.\n"
             "2. STICK TO TECHNICAL PHARMACOLOGY AND PHYSIOLOGY. No 'wellness', 'mindfulness', or 'spirituality'.\n"
             "3. DO NOT mix unrelated topics (e.g., do NOT link astral projection with telomeres).\n"
-            "4. Ensure it has NOT been posted recently.\n"
-            "5. The topic should be punchy and professional (e.g., 'The Neurobiology of Sulbutiamine' or 'Optimizing HRV with Cold Thermogenesis').\n"
-            "6. Return ONLY the topic name. No fluff. No punctuation."
+            "4. AVOID esoteric topics unless they are being analyzed through a strictly biological/pharmacological lens.\n"
+            "5. Ensure it has NOT been posted recently.\n"
+            "6. The topic should be punchy and professional (e.g., 'The Neurobiology of Sulbutiamine' or 'Optimizing HRV with Cold Thermogenesis').\n"
+            "7. Return ONLY the topic name. No fluff. No punctuation."
         )
 
         try:
@@ -462,7 +463,6 @@ class HopesAndDreamsBot:
             "     If image_path is None, do NOT include an <img> tag for the featured image.\n"
             "5. Return ONLY the full HTML code. No talk."
         )
-
         # We use a higher context window and reflection for better HTML generation
         html_response = self.llm.generate_response(prompt, system_msg, context=template, reflect=True, options={'num_ctx': 4096})
 
