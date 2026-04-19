@@ -7,6 +7,28 @@ import argparse
 import threading
 import random
 from datetime import datetime, timedelta, timezone
+
+# --- PHOENIX OBSERVABILITY INITIALIZATION ---
+import phoenix as px
+from phoenix.otel import register
+from openinference.instrumentation.langchain import LangChainInstrumentor
+from openinference.instrumentation.crewai import CrewAIInstrumentor
+
+# Start Phoenix in the background
+session = px.launch_app()
+print(f"Phoenix Observability Dashboard launched at: {session.url}")
+
+# Register the tracer provider
+tracer_provider = register(
+    project_name="syndicate-intelligence",
+    auto_instrument=True
+)
+
+# Instrument LangChain and CrewAI
+LangChainInstrumentor().instrument(tracer_provider=tracer_provider)
+CrewAIInstrumentor().instrument(tracer_provider=tracer_provider)
+# ---------------------------------------------
+
 from apscheduler.schedulers.background import BackgroundScheduler
 from apscheduler.triggers.cron import CronTrigger
 from pytz import timezone as pytz_timezone
