@@ -134,7 +134,7 @@ class TelegramBot:
         self.last_topic = topic
 
         if draft:
-            await update.message.reply_text(f"📝 **SYNDICATE MASTERCLASS DRAFT:**\n\n{draft}\n\nType /confirm to post.")
+            await self._send_long_message(update, f"📝 **SYNDICATE MASTERCLASS DRAFT:**\n\n{draft}\n\nType /confirm to post.")
         else:
             await update.message.reply_text("I'm sorry, I couldn't generate a draft right now.")
 
@@ -154,7 +154,7 @@ class TelegramBot:
             print("EXECUTIVE EXECUTION: Hitting FB Graph API for /post command.")
             result = self.hdbot.fb.post_to_page(content)
             if result:
-                await update.message.reply_text(f"🚀 **LIVE ON FACEBOOK (SYNDICATE MASTERCLASS):**\n\n{content}")
+                await self._send_long_message(update, f"🚀 **LIVE ON FACEBOOK (SYNDICATE MASTERCLASS):**\n\n{content}")
 
                 # Add affiliate recommendation (non-blocking)
                 post_id = result.get('id')
@@ -211,7 +211,7 @@ class TelegramBot:
         """Handles the /pulse command."""
         await context.bot.send_chat_action(chat_id=update.effective_chat.id, action="typing")
         report = await asyncio.to_thread(self.hdbot.generate_community_report)
-        await update.message.reply_text(f"📈 **SYNDICATE PULSE REPORT:**\n\n{report}")
+        await self._send_long_message(update, f"📈 **SYNDICATE PULSE REPORT:**\n\n{report}")
 
     @restricted
     async def trigger_check(self, update: Update, context: ContextTypes.DEFAULT_TYPE):
@@ -237,7 +237,7 @@ class TelegramBot:
         if studies:
             for study in studies:
                 post_content = self.research.format_study_as_post(study)
-                await update.message.reply_text(post_content)
+                await self._send_long_message(update, post_content)
         else:
             await update.message.reply_text(f"No research found for: {topic}")
 
@@ -250,7 +250,7 @@ class TelegramBot:
 
         if news:
             update_text = self.news.format_news_for_telegram(news)
-            await update.message.reply_text(update_text)
+            await self._send_long_message(update, update_text)
         else:
             await update.message.reply_text(f"No news found for: {topic}")
 
@@ -264,7 +264,7 @@ class TelegramBot:
         if products:
             for prod in products:
                 rec_text = self.affiliate.format_product_as_recommendation(prod)
-                await update.message.reply_text(rec_text)
+                await self._send_long_message(update, rec_text)
         else:
             await update.message.reply_text(f"No products found.")
 
@@ -320,7 +320,7 @@ class TelegramBot:
         if reply_text:
             self.chat_history[user_id].append({"role": "assistant", "content": reply_text})
             self._save_history()
-            await update.message.reply_text(reply_text)
+            await self._send_long_message(update, reply_text)
         else:
             await update.message.reply_text("Issue connecting to Syndicate Intel.")
 
@@ -353,6 +353,42 @@ class TelegramBot:
         application.add_handler(MessageHandler(filters.TEXT & (~filters.COMMAND), self.chat))
 
         application.run_polling()
+
+    async def _send_long_message(self, update: Update, text: str):
+        """Splits long messages into chunks to avoid Telegram's 4096 character limit."""
+        if not text:
+            return
+
+        MAX_LENGTH = 4000
+        if len(text) <= MAX_LENGTH:
+            await update.message.reply_text(text)
+            return
+
+        # Split by paragraph first
+        paragraphs = text.split('\n')
+        current_chunk = ""
+
+        for para in paragraphs:
+            # If a single paragraph is somehow longer than MAX_LENGTH, split it by sentences or characters
+            if len(para) > MAX_LENGTH:
+                # If current_chunk is not empty, send it first
+                if current_chunk:
+                    await update.message.reply_text(current_chunk.strip())
+                    current_chunk = ""
+
+                # Split the long paragraph into smaller pieces
+                for i in range(0, len(para), MAX_LENGTH):
+                    await update.message.reply_text(para[i:i+MAX_LENGTH])
+                continue
+
+            if len(current_chunk) + len(para) + 1 <= MAX_LENGTH:
+                current_chunk += para + '\n'
+            else:
+                await update.message.reply_text(current_chunk.strip())
+                current_chunk = para + '\n'
+
+        if current_chunk:
+            await update.message.reply_text(current_chunk.strip())
 
 if __name__ == "__main__":
     from bot import HopesAndDreamsBot
