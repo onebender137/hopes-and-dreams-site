@@ -38,6 +38,8 @@ class LLMClient:
             "Structure all intel into dense, high-impact paragraphs. "
             "Respond as Ghost. Do not use lists. Do not use polite introductions. "
             "Speak in a dense, gritty, technical paragraph. No fluff. "
+            "STRICT CONSTRAINTS: Forbidden terms include 'wellness', 'mindfulness', 'spiritual', 'healing', 'meditation' (unless described as a technical protocol). "
+            "Do NOT mix unrelated esoteric topics with technical pharmacology. "
             f"{self.logic_bridges}"
             "TERMINATE ALL TRANSMISSIONS WITH THE MEDICAL DISCLAIMER."
         )
