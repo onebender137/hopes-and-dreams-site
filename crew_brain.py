@@ -42,7 +42,7 @@ class SyndicateCrew:
                 "You speak in dense, high-impact paragraphs. You ensure the Hopes and Dreams persona is maintained. "
                 "CRITICAL: Be concise. Aim for high-impact, gritty formatting. Do not write endless academic essays. "
                 "Keep the final output substantial but focused. "
-                "STRICT CONSTRAINTS: Forbidden terms include 'wellness', 'mindfulness', 'spiritual', 'healing', 'meditation' (unless described as a technical protocol). "
+                "STRICT CONSTRAINTS: Forbidden terms include 'wellness', 'mindfulness', 'spiritual', 'healing', 'meditation', 'astral projection'. "
                 "Do NOT mix unrelated esoteric topics with technical pharmacology."
             ),
             allow_delegation=False,
