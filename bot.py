@@ -9,22 +9,33 @@ import random
 from datetime import datetime, timedelta, timezone
 
 # --- PHOENIX OBSERVABILITY INITIALIZATION ---
+import os
 import phoenix as px
 from phoenix.otel import register
 from openinference.instrumentation.langchain import LangChainInstrumentor
 from openinference.instrumentation.crewai import CrewAIInstrumentor
 
-# Start Phoenix in the background
-session = px.launch_app()
-print(f"Phoenix Observability Dashboard launched at: {session.url}")
+# Explicitly set Phoenix project name
+os.environ["PHOENIX_PROJECT_NAME"] = "syndicate-intelligence"
+# Use OTLP HTTP collector to avoid gRPC binding conflicts on MSI Claw hardware
+os.environ["PHOENIX_COLLECTOR_ENDPOINT"] = "http://localhost:6006"
 
-# Register the tracer provider
+# Start Phoenix in the background
+try:
+    session = px.launch_app()
+    print(f"Phoenix Observability Dashboard launched at: {session.url}")
+except Exception as e:
+    print(f"Warning: Failed to launch Phoenix app: {e}")
+
+# Register the tracer provider - explicitly using HTTP exporter
 tracer_provider = register(
     project_name="syndicate-intelligence",
+    endpoint="http://localhost:6006/v1/traces",
     auto_instrument=True
 )
 
 # Instrument LangChain and CrewAI
+# We pass the tracer_provider to ensure they use our registered provider
 LangChainInstrumentor().instrument(tracer_provider=tracer_provider)
 CrewAIInstrumentor().instrument(tracer_provider=tracer_provider)
 # ---------------------------------------------
