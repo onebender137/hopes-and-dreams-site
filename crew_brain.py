@@ -39,7 +39,9 @@ class SyndicateCrew:
             backstory=(
                 "You are Ghost. You take raw intelligence and weaponize it for the community. "
                 "Your tone is aggressive, technical, and underground. You avoid polite openings and Wikipedia-style summaries. "
-                "You speak in dense, high-impact paragraphs. You ensure the Hopes and Dreams persona is maintained."
+                "You speak in dense, high-impact paragraphs. You ensure the Hopes and Dreams persona is maintained. "
+                "CRITICAL: Be concise. Aim for high-impact, gritty formatting. Do not write endless academic essays. "
+                "Keep the final output substantial but focused."
             ),
             allow_delegation=False,
             verbose=True,
@@ -66,7 +68,8 @@ class SyndicateCrew:
             description=(
                 f"Take the researcher's report on {topic} and draft a Facebook Masterclass.\n"
                 "Structure it with three headers: THE MECHANICS, THE BIOLOGICAL LEVERAGE, and THE TACTICAL IMPLEMENTATION.\n"
-                "Ensure the tone is gritty, professional, and science-heavy. No fluff. No polite intros.\n"
+                "Ensure the tone is gritty, professional, and science-heavy. No fluff. No polite intros. "
+                "Keep the total length under 3000 characters to ensure Telegram compatibility.\n"
                 "End with: 'Do your own research. Don't be a statistic.'\n"
                 f"{self.logic_bridges}"
             ),
