@@ -577,11 +577,22 @@ class HopesAndDreamsBot:
 
     def _git_push_changes(self, commit_message):
         """Automates the git workflow to push changes to the repository."""
-        print(f"[{datetime.now()}] GIT AUTOMATION: Committing changes...")
+        print(f"[{datetime.now()}] GIT AUTOMATION: Synchronizing repository...")
         try:
             # Safely add only relevant files
             subprocess.run(["git", "add", "intel.html", "transmissions.html", "articles/"], check=True)
+
+            # Check if there are changes to commit
+            status = subprocess.run(["git", "status", "--porcelain"], capture_output=True, text=True)
+            if not status.stdout.strip():
+                print(f"[{datetime.now()}] GIT AUTOMATION: No changes detected. Skipping commit/push.")
+                return
+
             subprocess.run(["git", "commit", "-m", commit_message], check=True)
+
+            print(f"[{datetime.now()}] GIT AUTOMATION: Pulling latest changes (rebase)...")
+            subprocess.run(["git", "pull", "--rebase"], check=True)
+
             print(f"[{datetime.now()}] GIT AUTOMATION: Pushing to remote...")
             subprocess.run(["git", "push"], check=True)
             print(f"[{datetime.now()}] GIT AUTOMATION: Uplink successful.")
