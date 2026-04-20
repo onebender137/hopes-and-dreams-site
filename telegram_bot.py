@@ -2,6 +2,7 @@ import os
 import json
 import asyncio
 import logging
+from datetime import datetime
 from functools import wraps
 from telegram import Update
 from telegram.ext import ApplicationBuilder, CommandHandler, MessageHandler, filters, ContextTypes
@@ -156,6 +157,13 @@ class TelegramBot:
             if result:
                 await self._send_long_message(update, f"🚀 **LIVE ON FACEBOOK (SYNDICATE MASTERCLASS):**\n\n{content}")
 
+                # 5. Website Transmission Uplink
+                print(f"[{datetime.now()}] EXECUTIVE EXECUTION: Initiating website transmission uplink via Telegram...")
+                asyncio.create_task(asyncio.to_thread(self.hdbot._post_to_website, content, topic))
+
+                # Record the topic as posted to avoid repeats
+                self.hdbot._record_posted_topic(topic)
+
                 # Add affiliate recommendation (non-blocking)
                 post_id = result.get('id')
                 asyncio.create_task(asyncio.to_thread(self.hdbot._add_affiliate_comment, post_id, topic))
@@ -196,6 +204,13 @@ class TelegramBot:
 
         if result:
             await update.message.reply_text("🚀 Syndicate Masterclass LIVE.")
+
+            # 5. Website Transmission Uplink
+            print(f"[{datetime.now()}] EXECUTIVE EXECUTION: Initiating website transmission uplink via Telegram (Confirm)...")
+            asyncio.create_task(asyncio.to_thread(self.hdbot._post_to_website, self.last_draft, self.last_topic))
+
+            # Record the topic as posted to avoid repeats
+            self.hdbot._record_posted_topic(self.last_topic)
 
             # Add affiliate recommendation (non-blocking)
             post_id = result.get('id')
