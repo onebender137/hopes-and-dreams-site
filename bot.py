@@ -593,27 +593,47 @@ class HopesAndDreamsBot:
         """Automates the git workflow to push changes to the repository."""
         self._log_uplink("GIT: Synchronizing repository...")
         try:
-            # Safely add only relevant files
+            # 1. Ensure we only stage the intended files
             subprocess.run(["git", "add", "intel.html", "transmissions.html", "articles/"], check=True, capture_output=True, text=True)
 
-            # Check if there are changes to commit
+            # 2. Check if there are staged changes to commit
+            # We use --staged to only look at what we just added
             status = subprocess.run(["git", "status", "--porcelain"], capture_output=True, text=True)
-            if not status.stdout.strip():
-                self._log_uplink("GIT: No changes detected. Skipping commit/push.")
+            staged_changes = [line for line in status.stdout.splitlines() if line.startswith(('A', 'M', 'D', 'R', 'C'))]
+
+            if not staged_changes:
+                self._log_uplink("GIT: No relevant changes staged. Skipping commit/push.")
                 return
 
+            # 3. Commit the staged changes
             subprocess.run(["git", "commit", "-m", commit_message], check=True, capture_output=True, text=True)
 
-            self._log_uplink("GIT: Pulling latest changes from origin main...")
-            pull_res = subprocess.run(["git", "pull", "origin", "main", "--rebase"], check=True, capture_output=True, text=True)
-            self._log_uplink(f"GIT PULL OUTPUT: {pull_res.stdout}")
+            # 4. Handle remote sync with stashing to avoid 'unstaged changes' errors during pull
+            # Detect current branch dynamically
+            branch_res = subprocess.run(["git", "rev-parse", "--abbrev-ref", "HEAD"], capture_output=True, text=True)
+            current_branch = branch_res.stdout.strip() or "main"
+            self._log_uplink(f"GIT: Syncing with origin {current_branch}...")
 
-            self._log_uplink("GIT: Pushing to origin main...")
-            push_res = subprocess.run(["git", "push", "origin", "main"], check=True, capture_output=True, text=True)
-            self._log_uplink(f"GIT PUSH OUTPUT: {push_res.stdout}")
+            # Stash any remaining noise (untracked or modified files not in our set)
+            subprocess.run(["git", "stash", "push", "--include-untracked", "-m", "Syndicate Autostash"], capture_output=True)
+
+            try:
+                # Pull and push
+                pull_res = subprocess.run(["git", "pull", "origin", current_branch, "--rebase"], check=True, capture_output=True, text=True)
+                self._log_uplink(f"GIT PULL: {pull_res.stdout.strip()}")
+
+                push_res = subprocess.run(["git", "push", "origin", current_branch], check=True, capture_output=True, text=True)
+                self._log_uplink(f"GIT PUSH: {push_res.stdout.strip()}")
+            finally:
+                # Always try to restore the stash
+                # We check if a stash was actually created to avoid 'No stash entries found' noise
+                stash_list = subprocess.run(["git", "stash", "list"], capture_output=True, text=True)
+                if "Syndicate Autostash" in stash_list.stdout:
+                    subprocess.run(["git", "stash", "pop"], capture_output=True)
+
             self._log_uplink("GIT: Uplink successful.")
         except subprocess.CalledProcessError as e:
-            err_msg = f"GIT ERROR in command '{' '.join(e.cmd)}': {e.stderr}"
+            err_msg = f"GIT ERROR in '{' '.join(e.cmd)}': {e.stderr}"
             self._log_uplink(err_msg)
         except Exception as e:
             self._log_uplink(f"GIT CRITICAL ERROR: {str(e)}")
