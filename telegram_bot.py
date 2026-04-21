@@ -189,6 +189,91 @@ class TelegramBot:
             await update.message.reply_text("❌ Forced post failed. Check FB API connectivity.")
 
     @restricted
+    async def get_status(self, update: Update, context: ContextTypes.DEFAULT_TYPE):
+        """Handles the /status command."""
+        from bot import SYNDICATE_VERSION
+        import subprocess
+
+        # Get git info
+        try:
+            branch = subprocess.check_output(["git", "rev-parse", "--abbrev-ref", "HEAD"]).decode().strip()
+            remote = subprocess.check_output(["git", "remote", "-v"]).decode().strip().split('\n')[0]
+        except:
+            branch = "Unknown"
+            remote = "Unknown"
+
+        status_msg = (
+            f"🛰 **SYNDICATE STATUS REPORT**\n"
+            f"Version: {SYNDICATE_VERSION}\n"
+            f"Ollama: {Config.OLLAMA_MODEL}\n"
+            f"FB Page: {Config.FB_PAGE_ID}\n"
+            f"Branch: {branch}\n"
+            f"Remote: {remote}\n"
+            f"Time: {datetime.now().strftime('%Y-%m-%d %H:%M:%S')}"
+        )
+        await update.message.reply_text(status_msg)
+
+    @restricted
+    async def get_debug_log(self, update: Update, context: ContextTypes.DEFAULT_TYPE):
+        """Handles the /debug command."""
+        from bot import UPLINK_LOG_FILE
+        if os.path.exists(UPLINK_LOG_FILE):
+            with open(UPLINK_LOG_FILE, 'r') as f:
+                lines = f.readlines()
+                log_content = "".join(lines[-20:])
+                await self._send_long_message(update, f"📄 **UPLINK DEBUG LOG (Last 20):**\n\n{log_content}")
+        else:
+            await update.message.reply_text("Uplink log file not found.")
+
+    @restricted
+    async def repair_git(self, update: Update, context: ContextTypes.DEFAULT_TYPE):
+        """Handles the /fix_git command."""
+        await update.message.reply_text("🛠 Initializing Emergency Git Repair...")
+        try:
+            import subprocess
+            # Clean up potential locks or messy states
+            subprocess.run(["git", "stash", "push", "--include-untracked", "-m", "Repair Backup"], capture_output=True)
+            subprocess.run(["git", "reset", "--hard", "HEAD"], capture_output=True)
+            subprocess.run(["git", "clean", "-fd"], capture_output=True)
+
+            # Re-sync with origin
+            branch_res = subprocess.run(["git", "rev-parse", "--abbrev-ref", "HEAD"], capture_output=True, text=True)
+            current_branch = branch_res.stdout.strip() or "main"
+            res = subprocess.run(["git", "pull", "origin", current_branch], capture_output=True, text=True)
+
+            if res.returncode == 0:
+                await update.message.reply_text(f"✅ Repository restored and synced.\nOutput: {res.stdout[:200]}")
+            else:
+                await update.message.reply_text(f"❌ Pull failed: {res.stderr[:200]}")
+        except Exception as e:
+            await update.message.reply_text(f"❌ Repair failed: {str(e)}")
+
+    @restricted
+    async def trigger_sync(self, update: Update, context: ContextTypes.DEFAULT_TYPE):
+        """Handles the /sync command."""
+        await update.message.reply_text("🔄 Manually triggering Syndicate repository sync...")
+        try:
+            # We use the bot's internal method
+            await asyncio.to_thread(self.hdbot._git_push_changes, "Manual Syndicate Synchronization")
+            await update.message.reply_text("✅ Repository sync protocol complete. Check /debug for results.")
+        except Exception as e:
+            await update.message.reply_text(f"❌ Sync failed: {str(e)}")
+
+    @restricted
+    async def test_uplink(self, update: Update, context: ContextTypes.DEFAULT_TYPE):
+        """Handles the /test_uplink command."""
+        await update.message.reply_text("🧪 Initializing diagnostic website uplink...")
+        test_topic = f"Diagnostic Test {datetime.now().strftime('%H%M%S')}"
+        test_content = "This is a diagnostic transmission to verify website uplink functionality."
+
+        success = await asyncio.to_thread(self.hdbot._post_to_website, test_content, test_topic)
+
+        if success:
+            await update.message.reply_text("✅ Diagnostic Uplink Signal: SUCCESS. Check the website and /debug log.")
+        else:
+            await update.message.reply_text("❌ Diagnostic Uplink Signal: FAILED. Use /debug to see the error log.")
+
+    @restricted
     async def confirm_post(self, update: Update, context: ContextTypes.DEFAULT_TYPE):
         """Handles the /confirm command to push the last draft to Facebook."""
         if not self.hdbot:
@@ -355,6 +440,11 @@ class TelegramBot:
         application.add_handler(CommandHandler('draft', self.draft_post_cmd))
         application.add_handler(CommandHandler('confirm', self.confirm_post))
         application.add_handler(CommandHandler('post', self.post_immediate))
+        application.add_handler(CommandHandler('status', self.get_status))
+        application.add_handler(CommandHandler('debug', self.get_debug_log))
+        application.add_handler(CommandHandler('test_uplink', self.test_uplink))
+        application.add_handler(CommandHandler('sync', self.trigger_sync))
+        application.add_handler(CommandHandler('fix_git', self.repair_git))
         application.add_handler(CommandHandler('force_post', self.force_post_direct)) # New command
         application.add_handler(CommandHandler('pulse', self.get_pulse))
         application.add_handler(CommandHandler('check', self.trigger_check))
