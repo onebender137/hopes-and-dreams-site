@@ -57,6 +57,8 @@ from crew_brain import SyndicateCrew
 REPLIED_COMMENTS_FILE = "replied_comments.json"
 CHAT_MEMORY_FILE = "chat_memory.json"
 POSTED_TOPICS_FILE = "posted_topics.json"
+UPLINK_LOG_FILE = "syndicate_uplink.log"
+SYNDICATE_VERSION = "2.2.0"
 
 # Extensive Syndicate Topic Pool for high-variety autonomous brainstorming
 SYNDICATE_TOPIC_POOL = [
@@ -91,6 +93,14 @@ SYNDICATE_TOPIC_POOL = [
 ]
 
 class HopesAndDreamsBot:
+    def _log_uplink(self, message):
+        """Logs a message to the uplink log file."""
+        timestamp = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
+        log_entry = f"[{timestamp}] {message}\n"
+        with open(UPLINK_LOG_FILE, "a") as f:
+            f.write(log_entry)
+        print(log_entry.strip())
+
     def __init__(self):
         """Initializes the Hopes and Dreams Syndicate Bot with all its agents."""
         self.fb = FBClient()
@@ -401,10 +411,17 @@ class HopesAndDreamsBot:
     def _post_to_website(self, content, topic, image_path=None):
         """Beautifies the content and posts it to the website (articles/ and intel.html)."""
         os.makedirs("articles", exist_ok=True)
-        print(f"[{datetime.now()}] WEBSITE UPLINK: Initializing Syndicate Transmission for {topic}...")
+        self._log_uplink(f"WEBSITE: Initializing Syndicate Transmission for {topic}...")
 
         # 1. Beautify content using LLM
-        beautified_html = self._beautify_for_blog(content, topic, image_path)
+        try:
+            beautified_html = self._beautify_for_blog(content, topic, image_path)
+            if not beautified_html or len(beautified_html) < 100:
+                self._log_uplink("WEBSITE ERROR: Beautification returned empty or suspiciously short HTML.")
+                return False
+        except Exception as e:
+            self._log_uplink(f"WEBSITE ERROR: Beautification failed: {str(e)}")
+            return False
 
         # 2. Generate slug and filename
         date_str = datetime.now().strftime("%Y-%m-%d")
@@ -416,9 +433,9 @@ class HopesAndDreamsBot:
         try:
             with open(filepath, 'w') as f:
                 f.write(beautified_html)
-            print(f"[{datetime.now()}] WEBSITE UPLINK: Article saved to {filepath}")
+            self._log_uplink(f"WEBSITE: Article saved to {filepath}")
         except Exception as e:
-            print(f"[{datetime.now()}] WEBSITE UPLINK ERROR: Failed to save article: {e}")
+            self._log_uplink(f"WEBSITE ERROR: Failed to save article file: {e}")
             return False
 
         # 4. Update intel.html (Latest 3)
@@ -577,29 +594,32 @@ class HopesAndDreamsBot:
 
     def _git_push_changes(self, commit_message):
         """Automates the git workflow to push changes to the repository."""
-        print(f"[{datetime.now()}] GIT AUTOMATION: Synchronizing repository...")
+        self._log_uplink("GIT: Synchronizing repository...")
         try:
             # Safely add only relevant files
-            subprocess.run(["git", "add", "intel.html", "transmissions.html", "articles/"], check=True)
+            subprocess.run(["git", "add", "intel.html", "transmissions.html", "articles/"], check=True, capture_output=True, text=True)
 
             # Check if there are changes to commit
             status = subprocess.run(["git", "status", "--porcelain"], capture_output=True, text=True)
             if not status.stdout.strip():
-                print(f"[{datetime.now()}] GIT AUTOMATION: No changes detected. Skipping commit/push.")
+                self._log_uplink("GIT: No changes detected. Skipping commit/push.")
                 return
 
-            subprocess.run(["git", "commit", "-m", commit_message], check=True)
+            subprocess.run(["git", "commit", "-m", commit_message], check=True, capture_output=True, text=True)
 
-            print(f"[{datetime.now()}] GIT AUTOMATION: Pulling latest changes (rebase)...")
-            subprocess.run(["git", "pull", "--rebase"], check=True)
+            self._log_uplink("GIT: Pulling latest changes (rebase)...")
+            pull_res = subprocess.run(["git", "pull", "--rebase"], check=True, capture_output=True, text=True)
+            self._log_uplink(f"GIT PULL OUTPUT: {pull_res.stdout}")
 
-            print(f"[{datetime.now()}] GIT AUTOMATION: Pushing to remote...")
-            subprocess.run(["git", "push"], check=True)
-            print(f"[{datetime.now()}] GIT AUTOMATION: Uplink successful.")
+            self._log_uplink("GIT: Pushing to remote...")
+            push_res = subprocess.run(["git", "push"], check=True, capture_output=True, text=True)
+            self._log_uplink(f"GIT PUSH OUTPUT: {push_res.stdout}")
+            self._log_uplink("GIT: Uplink successful.")
         except subprocess.CalledProcessError as e:
-            print(f"[{datetime.now()}] GIT AUTOMATION ERROR: Command failed: {e}")
+            err_msg = f"GIT ERROR in command '{' '.join(e.cmd)}': {e.stderr}"
+            self._log_uplink(err_msg)
         except Exception as e:
-            print(f"[{datetime.now()}] GIT AUTOMATION ERROR: {e}")
+            self._log_uplink(f"GIT CRITICAL ERROR: {str(e)}")
     def run_fb_loop(self, interval_seconds=3600):
         """Main Facebook bot loop for polling comments."""
         print("Facebook comment monitor loop started.")
