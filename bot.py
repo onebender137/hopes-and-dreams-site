@@ -57,6 +57,8 @@ from crew_brain import SyndicateCrew
 REPLIED_COMMENTS_FILE = "replied_comments.json"
 CHAT_MEMORY_FILE = "chat_memory.json"
 POSTED_TOPICS_FILE = "posted_topics.json"
+UPLINK_LOG_FILE = "syndicate_uplink.log"
+SYNDICATE_VERSION = "2.2.0"
 
 # Extensive Syndicate Topic Pool for high-variety autonomous brainstorming
 SYNDICATE_TOPIC_POOL = [
@@ -91,6 +93,14 @@ SYNDICATE_TOPIC_POOL = [
 ]
 
 class HopesAndDreamsBot:
+    def _log_uplink(self, message):
+        """Logs a message to the uplink log file."""
+        timestamp = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
+        log_entry = f"[{timestamp}] {message}\n"
+        with open(UPLINK_LOG_FILE, "a") as f:
+            f.write(log_entry)
+        print(log_entry.strip())
+
     def __init__(self):
         """Initializes the Hopes and Dreams Syndicate Bot with all its agents."""
         self.fb = FBClient()
@@ -405,10 +415,17 @@ class HopesAndDreamsBot:
     def _post_to_website(self, content, topic, image_path=None):
         """Beautifies the content and posts it to the website (articles/ and intel.html)."""
         os.makedirs("articles", exist_ok=True)
-        print(f"[{datetime.now()}] WEBSITE UPLINK: Initializing Syndicate Transmission for {topic}...")
+        self._log_uplink(f"WEBSITE: Initializing Syndicate Transmission for {topic}...")
 
         # 1. Beautify content using LLM
-        beautified_html = self._beautify_for_blog(content, topic, image_path)
+        try:
+            beautified_html = self._beautify_for_blog(content, topic, image_path)
+            if not beautified_html or len(beautified_html) < 100:
+                self._log_uplink("WEBSITE ERROR: Beautification returned empty or suspiciously short HTML.")
+                return False
+        except Exception as e:
+            self._log_uplink(f"WEBSITE ERROR: Beautification failed: {str(e)}")
+            return False
 
         # 2. Generate slug and filename
         date_str = datetime.now().strftime("%Y-%m-%d")
@@ -420,9 +437,9 @@ class HopesAndDreamsBot:
         try:
             with open(filepath, 'w') as f:
                 f.write(beautified_html)
-            print(f"[{datetime.now()}] WEBSITE UPLINK: Article saved to {filepath}")
+            self._log_uplink(f"WEBSITE: Article saved to {filepath}")
         except Exception as e:
-            print(f"[{datetime.now()}] WEBSITE UPLINK ERROR: Failed to save article: {e}")
+            self._log_uplink(f"WEBSITE ERROR: Failed to save article file: {e}")
             return False
 
         # 4. Update intel.html (Latest 3)
@@ -480,7 +497,7 @@ class HopesAndDreamsBot:
         return html_response
     def _update_intel_html(self, topic, filename, date_str):
         """Updates the intel.html file with the latest 3 posts."""
-        print(f"[{datetime.now()}] WEBSITE UPLINK: Syncing intel.html...")
+        self._log_uplink("WEBSITE: Syncing intel.html...")
         try:
             with open("intel.html", 'r') as f:
                 html = f.read()
@@ -498,53 +515,50 @@ class HopesAndDreamsBot:
             start_marker = "<!-- LATEST_3_POSTS_START -->"
             end_marker = "<!-- LATEST_3_POSTS_END -->"
 
-            pattern = re.compile(f"{start_marker}.*?{end_marker}", re.DOTALL)
-            match = pattern.search(html)
+            if start_marker in html and end_marker in html:
+                parts = html.split(start_marker)
+                pre_block = parts[0]
+                post_parts = parts[1].split(end_marker)
+                current_block = post_parts[0]
+                after_block = post_parts[1]
 
-            if match:
-                current_posts_block = match.group(0)
-                # Extract individual cards
-                cards = re.findall(r'<div class="card">.*?</div>', current_posts_block, re.DOTALL)
-
-                # Filter out the "Initializing Feed" placeholder if this is the first real post
+                # Extract cards using regex but handle the block more safely
+                cards = re.findall(r'<div class="card">.*?</div>', current_block, re.DOTALL)
                 cards = [c for c in cards if "Initializing Feed" not in c and "Waiting for Uplink" not in c and "Data Stream Alpha" not in c]
-
-                # Add new card to the beginning
                 cards.insert(0, new_card)
-
-                # Keep only latest 3
                 cards = cards[:3]
 
-                new_posts_block = f"{start_marker}\n" + "\n".join(cards) + f"\n                {end_marker}"
-                html = html.replace(current_posts_block, new_posts_block)
+                new_block = "\n" + "\n".join(cards) + "\n                "
+                html = pre_block + start_marker + new_block + end_marker + after_block
 
-                # Also update the archive preview list in intel.html
-                archive_start = "<!-- OLDER_POSTS_START -->"
-                archive_end = "<!-- OLDER_POSTS_END -->"
-                archive_pattern = re.compile(f"{archive_start}.*?{archive_end}", re.DOTALL)
-                archive_match = archive_pattern.search(html)
+            # Update archive preview
+            archive_start = "<!-- OLDER_POSTS_START -->"
+            archive_end = "<!-- OLDER_POSTS_END -->"
+            if archive_start in html and archive_end in html:
+                parts = html.split(archive_start)
+                pre_archive = parts[0]
+                archive_parts = parts[1].split(archive_end)
+                current_archive = archive_parts[0]
+                after_archive = archive_parts[1]
 
-                if archive_match:
-                    current_archive_block = archive_match.group(0)
-                    new_archive_item = f'<li style="margin-bottom: 10px;"><a href="articles/{filename}" style="color: var(--text-dim); text-decoration: none; font-size: 0.85rem;">[{date_str}] {topic}</a></li>'
+                new_archive_item = f'<li style="margin-bottom: 10px;"><a href="articles/{filename}" style="color: var(--text-dim); text-decoration: none; font-size: 0.85rem;">[{date_str}] {topic}</a></li>'
+                archive_items = re.findall(r'<li.*?>.*?</li>', current_archive, re.DOTALL)
+                archive_items = [i for i in archive_items if "No archived transmissions found" not in i]
+                archive_items.insert(0, new_archive_item)
+                archive_items = archive_items[:5]
 
-                    archive_items = re.findall(r'<li.*?>.*?</li>', current_archive_block, re.DOTALL)
-                    archive_items = [i for i in archive_items if "No archived transmissions found" not in i]
+                new_archive_block = "\n                    " + "\n                    ".join(archive_items) + "\n                    "
+                html = pre_archive + archive_start + new_archive_block + archive_end + after_archive
 
-                    archive_items.insert(0, new_archive_item)
-                    archive_items = archive_items[:5] # Show only last 5 in the sidebar list
-
-                    new_archive_block = f"{archive_start}\n                    " + "\n                    ".join(archive_items) + f"\n                    {archive_end}"
-                    html = html.replace(current_archive_block, new_archive_block)
-
-                with open("intel.html", 'w') as f:
-                    f.write(html)
+            with open("intel.html", 'w') as f:
+                f.write(html)
+            self._log_uplink("WEBSITE: intel.html synced successfully.")
         except Exception as e:
-            print(f"[{datetime.now()}] WEBSITE UPLINK ERROR: Failed to update intel.html: {e}")
+            self._log_uplink(f"WEBSITE ERROR: Failed to update intel.html: {e}")
 
     def _update_transmissions_html(self, topic, filename, date_str):
         """Updates the transmissions.html archive page."""
-        print(f"[{datetime.now()}] WEBSITE UPLINK: Syncing transmissions.html...")
+        self._log_uplink("WEBSITE: Syncing transmissions.html...")
         try:
             with open("transmissions.html", 'r') as f:
                 html = f.read()
@@ -559,51 +573,74 @@ class HopesAndDreamsBot:
             start_marker = "<!-- ARCHIVE_POSTS_START -->"
             end_marker = "<!-- ARCHIVE_POSTS_END -->"
 
-            pattern = re.compile(f"{start_marker}.*?{end_marker}", re.DOTALL)
-            match = pattern.search(html)
+            if start_marker in html and end_marker in html:
+                parts = html.split(start_marker)
+                pre_block = parts[0]
+                post_parts = parts[1].split(end_marker)
+                current_block = post_parts[0]
+                after_block = post_parts[1]
 
-            if match:
-                current_block = match.group(0)
                 items = re.findall(r'<a.*?class="archive-item">.*?</a>', current_block, re.DOTALL)
-
-                # Filter placeholder
                 items = [i for i in items if "Initializing deep archive retrieval" not in i]
-
                 items.insert(0, new_item)
 
-                new_block = f"{start_marker}\n" + "\n".join(items) + f"\n            {end_marker}"
-                html = html.replace(current_block, new_block)
+                new_block = "\n" + "\n".join(items) + "\n            "
+                html = pre_block + start_marker + new_block + end_marker + after_block
 
                 with open("transmissions.html", 'w') as f:
                     f.write(html)
+                self._log_uplink("WEBSITE: transmissions.html synced successfully.")
         except Exception as e:
-            print(f"[{datetime.now()}] WEBSITE UPLINK ERROR: Failed to update transmissions.html: {e}")
+            self._log_uplink(f"WEBSITE ERROR: Failed to update transmissions.html: {e}")
 
     def _git_push_changes(self, commit_message):
         """Automates the git workflow to push changes to the repository."""
-        print(f"[{datetime.now()}] GIT AUTOMATION: Synchronizing repository...")
+        self._log_uplink("GIT: Synchronizing repository...")
         try:
-            # Safely add only relevant files
-            subprocess.run(["git", "add", "intel.html", "transmissions.html", "articles/"], check=True)
+            # 1. Ensure we only stage the intended files
+            subprocess.run(["git", "add", "intel.html", "transmissions.html", "articles/"], check=True, capture_output=True, text=True)
 
-            # Check if there are changes to commit
+            # 2. Check if there are staged changes to commit
+            # We use --staged to only look at what we just added
             status = subprocess.run(["git", "status", "--porcelain"], capture_output=True, text=True)
-            if not status.stdout.strip():
-                print(f"[{datetime.now()}] GIT AUTOMATION: No changes detected. Skipping commit/push.")
+            staged_changes = [line for line in status.stdout.splitlines() if line.startswith(('A', 'M', 'D', 'R', 'C'))]
+
+            if not staged_changes:
+                self._log_uplink("GIT: No relevant changes staged. Skipping commit/push.")
                 return
 
-            subprocess.run(["git", "commit", "-m", commit_message], check=True)
+            # 3. Commit the staged changes
+            subprocess.run(["git", "commit", "-m", commit_message], check=True, capture_output=True, text=True)
 
-            print(f"[{datetime.now()}] GIT AUTOMATION: Pulling latest changes (rebase)...")
-            subprocess.run(["git", "pull", "--rebase"], check=True)
+            # 4. Handle remote sync with stashing to avoid 'unstaged changes' errors during pull
+            # Detect current branch dynamically
+            branch_res = subprocess.run(["git", "rev-parse", "--abbrev-ref", "HEAD"], capture_output=True, text=True)
+            current_branch = branch_res.stdout.strip() or "main"
+            self._log_uplink(f"GIT: Syncing with origin {current_branch}...")
 
-            print(f"[{datetime.now()}] GIT AUTOMATION: Pushing to remote...")
-            subprocess.run(["git", "push"], check=True)
-            print(f"[{datetime.now()}] GIT AUTOMATION: Uplink successful.")
+            # Stash any remaining noise (untracked or modified files not in our set)
+            subprocess.run(["git", "stash", "push", "--include-untracked", "-m", "Syndicate Autostash"], capture_output=True)
+
+            try:
+                # Pull and push
+                pull_res = subprocess.run(["git", "pull", "origin", current_branch, "--rebase"], check=True, capture_output=True, text=True)
+                self._log_uplink(f"GIT PULL: {pull_res.stdout.strip()}")
+
+                push_res = subprocess.run(["git", "push", "origin", current_branch], check=True, capture_output=True, text=True)
+                self._log_uplink(f"GIT PUSH: {push_res.stdout.strip()}")
+            finally:
+                # Always try to restore the stash
+                # We check if a stash was actually created to avoid 'No stash entries found' noise
+                stash_list = subprocess.run(["git", "stash", "list"], capture_output=True, text=True)
+                if "Syndicate Autostash" in stash_list.stdout:
+                    subprocess.run(["git", "stash", "pop"], capture_output=True)
+
+            self._log_uplink("GIT: Uplink successful.")
         except subprocess.CalledProcessError as e:
-            print(f"[{datetime.now()}] GIT AUTOMATION ERROR: Command failed: {e}")
+            err_msg = f"GIT ERROR in '{' '.join(e.cmd)}': {e.stderr}"
+            self._log_uplink(err_msg)
         except Exception as e:
-            print(f"[{datetime.now()}] GIT AUTOMATION ERROR: {e}")
+            self._log_uplink(f"GIT CRITICAL ERROR: {str(e)}")
     def run_fb_loop(self, interval_seconds=3600):
         """Main Facebook bot loop for polling comments."""
         print("Facebook comment monitor loop started.")
