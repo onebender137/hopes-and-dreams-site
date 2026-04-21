@@ -57,8 +57,8 @@ from crew_brain import SyndicateCrew
 REPLIED_COMMENTS_FILE = "replied_comments.json"
 CHAT_MEMORY_FILE = "chat_memory.json"
 POSTED_TOPICS_FILE = "posted_topics.json"
-UPLINK_LOG_FILE = "syndicate_uplink.log"
-SYNDICATE_VERSION = "2.2.0"
+# Imported from telegram_bot to maintain consistency and avoid circular imports
+from telegram_bot import UPLINK_LOG_FILE, SYNDICATE_VERSION
 
 # Extensive Syndicate Topic Pool for high-variety autonomous brainstorming
 SYNDICATE_TOPIC_POOL = [

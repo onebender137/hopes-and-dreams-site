@@ -16,6 +16,8 @@ from knowledge_client import KnowledgeClient
 
 # File for simple persistent storage of conversation memory
 CHAT_MEMORY_FILE = "chat_memory.json"
+UPLINK_LOG_FILE = "syndicate_uplink.log"
+SYNDICATE_VERSION = "2.2.3"
 
 # Set up logging for Telegram bot
 logging.basicConfig(
@@ -191,7 +193,6 @@ class TelegramBot:
     @restricted
     async def get_status(self, update: Update, context: ContextTypes.DEFAULT_TYPE):
         """Handles the /status command."""
-        from bot import SYNDICATE_VERSION
         import subprocess
 
         # Get git info
@@ -216,7 +217,6 @@ class TelegramBot:
     @restricted
     async def get_debug_log(self, update: Update, context: ContextTypes.DEFAULT_TYPE):
         """Handles the /debug command."""
-        from bot import UPLINK_LOG_FILE
         if os.path.exists(UPLINK_LOG_FILE):
             with open(UPLINK_LOG_FILE, 'r') as f:
                 lines = f.readlines()
@@ -228,23 +228,38 @@ class TelegramBot:
     @restricted
     async def repair_git(self, update: Update, context: ContextTypes.DEFAULT_TYPE):
         """Handles the /fix_git command."""
-        await update.message.reply_text("🛠 Initializing Emergency Git Repair...")
+        await update.message.reply_text("🛠 Initializing Emergency Git Repair Protocol...")
         try:
             import subprocess
-            # Clean up potential locks or messy states
-            subprocess.run(["git", "stash", "push", "--include-untracked", "-m", "Repair Backup"], capture_output=True)
+            import os
+
+            # 1. Kill any stuck rebase or merge
+            subprocess.run(["git", "rebase", "--abort"], capture_output=True)
+            subprocess.run(["git", "merge", "--abort"], capture_output=True)
+
+            # 2. Force remove the offending database if it's untracked and causing issues
+            if os.path.exists("syndicate_memory.db"):
+                await update.message.reply_text("🧹 Removing local database conflict...")
+                os.rename("syndicate_memory.db", f"syndicate_memory.db.bak_{int(time.time())}")
+
+            # 3. Clean up the state
             subprocess.run(["git", "reset", "--hard", "HEAD"], capture_output=True)
             subprocess.run(["git", "clean", "-fd"], capture_output=True)
 
-            # Re-sync with origin
+            # 4. Re-sync with origin
             branch_res = subprocess.run(["git", "rev-parse", "--abbrev-ref", "HEAD"], capture_output=True, text=True)
-            current_branch = branch_res.stdout.strip() or "main"
+            current_branch = branch_res.stdout.strip() or "master"
+
+            await update.message.reply_text(f"📡 Force pulling from origin {current_branch}...")
             res = subprocess.run(["git", "pull", "origin", current_branch], capture_output=True, text=True)
 
             if res.returncode == 0:
                 await update.message.reply_text(f"✅ Repository restored and synced.\nOutput: {res.stdout[:200]}")
             else:
-                await update.message.reply_text(f"❌ Pull failed: {res.stderr[:200]}")
+                # Last ditch effort: Fetch and reset
+                subprocess.run(["git", "fetch", "origin", current_branch], capture_output=True)
+                subprocess.run(["git", "reset", "--hard", f"origin/{current_branch}"], capture_output=True)
+                await update.message.reply_text(f"⚠️ Standard pull failed, performed Hard Reset to origin/{current_branch}.")
         except Exception as e:
             await update.message.reply_text(f"❌ Repair failed: {str(e)}")
 
