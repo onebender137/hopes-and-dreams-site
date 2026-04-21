@@ -226,6 +226,29 @@ class TelegramBot:
             await update.message.reply_text("Uplink log file not found.")
 
     @restricted
+    async def repair_git(self, update: Update, context: ContextTypes.DEFAULT_TYPE):
+        """Handles the /fix_git command."""
+        await update.message.reply_text("🛠 Initializing Emergency Git Repair...")
+        try:
+            import subprocess
+            # Clean up potential locks or messy states
+            subprocess.run(["git", "stash", "push", "--include-untracked", "-m", "Repair Backup"], capture_output=True)
+            subprocess.run(["git", "reset", "--hard", "HEAD"], capture_output=True)
+            subprocess.run(["git", "clean", "-fd"], capture_output=True)
+
+            # Re-sync with origin
+            branch_res = subprocess.run(["git", "rev-parse", "--abbrev-ref", "HEAD"], capture_output=True, text=True)
+            current_branch = branch_res.stdout.strip() or "main"
+            res = subprocess.run(["git", "pull", "origin", current_branch], capture_output=True, text=True)
+
+            if res.returncode == 0:
+                await update.message.reply_text(f"✅ Repository restored and synced.\nOutput: {res.stdout[:200]}")
+            else:
+                await update.message.reply_text(f"❌ Pull failed: {res.stderr[:200]}")
+        except Exception as e:
+            await update.message.reply_text(f"❌ Repair failed: {str(e)}")
+
+    @restricted
     async def trigger_sync(self, update: Update, context: ContextTypes.DEFAULT_TYPE):
         """Handles the /sync command."""
         await update.message.reply_text("🔄 Manually triggering Syndicate repository sync...")
@@ -421,6 +444,7 @@ class TelegramBot:
         application.add_handler(CommandHandler('debug', self.get_debug_log))
         application.add_handler(CommandHandler('test_uplink', self.test_uplink))
         application.add_handler(CommandHandler('sync', self.trigger_sync))
+        application.add_handler(CommandHandler('fix_git', self.repair_git))
         application.add_handler(CommandHandler('force_post', self.force_post_direct)) # New command
         application.add_handler(CommandHandler('pulse', self.get_pulse))
         application.add_handler(CommandHandler('check', self.trigger_check))
