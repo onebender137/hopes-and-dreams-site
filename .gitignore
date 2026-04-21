@@ -32,10 +32,12 @@ vector_db/
 # --- LOGS & MEMORY ---
 # Keep your personal chat history and logs out of the public cloud
 *.log
+syndicate_uplink.log
 replied_comments.json
 chat_memory.json
 posted_topics.json
 nohup.out
+syndicate_memory.db
 
 # --- TEMPORARY ASSETS ---
 temp/
