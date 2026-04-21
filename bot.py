@@ -493,7 +493,7 @@ class HopesAndDreamsBot:
         return html_response
     def _update_intel_html(self, topic, filename, date_str):
         """Updates the intel.html file with the latest 3 posts."""
-        print(f"[{datetime.now()}] WEBSITE UPLINK: Syncing intel.html...")
+        self._log_uplink("WEBSITE: Syncing intel.html...")
         try:
             with open("intel.html", 'r') as f:
                 html = f.read()
@@ -511,53 +511,50 @@ class HopesAndDreamsBot:
             start_marker = "<!-- LATEST_3_POSTS_START -->"
             end_marker = "<!-- LATEST_3_POSTS_END -->"
 
-            pattern = re.compile(f"{start_marker}.*?{end_marker}", re.DOTALL)
-            match = pattern.search(html)
+            if start_marker in html and end_marker in html:
+                parts = html.split(start_marker)
+                pre_block = parts[0]
+                post_parts = parts[1].split(end_marker)
+                current_block = post_parts[0]
+                after_block = post_parts[1]
 
-            if match:
-                current_posts_block = match.group(0)
-                # Extract individual cards
-                cards = re.findall(r'<div class="card">.*?</div>', current_posts_block, re.DOTALL)
-
-                # Filter out the "Initializing Feed" placeholder if this is the first real post
+                # Extract cards using regex but handle the block more safely
+                cards = re.findall(r'<div class="card">.*?</div>', current_block, re.DOTALL)
                 cards = [c for c in cards if "Initializing Feed" not in c and "Waiting for Uplink" not in c and "Data Stream Alpha" not in c]
-
-                # Add new card to the beginning
                 cards.insert(0, new_card)
-
-                # Keep only latest 3
                 cards = cards[:3]
 
-                new_posts_block = f"{start_marker}\n" + "\n".join(cards) + f"\n                {end_marker}"
-                html = html.replace(current_posts_block, new_posts_block)
+                new_block = "\n" + "\n".join(cards) + "\n                "
+                html = pre_block + start_marker + new_block + end_marker + after_block
 
-                # Also update the archive preview list in intel.html
-                archive_start = "<!-- OLDER_POSTS_START -->"
-                archive_end = "<!-- OLDER_POSTS_END -->"
-                archive_pattern = re.compile(f"{archive_start}.*?{archive_end}", re.DOTALL)
-                archive_match = archive_pattern.search(html)
+            # Update archive preview
+            archive_start = "<!-- OLDER_POSTS_START -->"
+            archive_end = "<!-- OLDER_POSTS_END -->"
+            if archive_start in html and archive_end in html:
+                parts = html.split(archive_start)
+                pre_archive = parts[0]
+                archive_parts = parts[1].split(archive_end)
+                current_archive = archive_parts[0]
+                after_archive = archive_parts[1]
 
-                if archive_match:
-                    current_archive_block = archive_match.group(0)
-                    new_archive_item = f'<li style="margin-bottom: 10px;"><a href="articles/{filename}" style="color: var(--text-dim); text-decoration: none; font-size: 0.85rem;">[{date_str}] {topic}</a></li>'
+                new_archive_item = f'<li style="margin-bottom: 10px;"><a href="articles/{filename}" style="color: var(--text-dim); text-decoration: none; font-size: 0.85rem;">[{date_str}] {topic}</a></li>'
+                archive_items = re.findall(r'<li.*?>.*?</li>', current_archive, re.DOTALL)
+                archive_items = [i for i in archive_items if "No archived transmissions found" not in i]
+                archive_items.insert(0, new_archive_item)
+                archive_items = archive_items[:5]
 
-                    archive_items = re.findall(r'<li.*?>.*?</li>', current_archive_block, re.DOTALL)
-                    archive_items = [i for i in archive_items if "No archived transmissions found" not in i]
+                new_archive_block = "\n                    " + "\n                    ".join(archive_items) + "\n                    "
+                html = pre_archive + archive_start + new_archive_block + archive_end + after_archive
 
-                    archive_items.insert(0, new_archive_item)
-                    archive_items = archive_items[:5] # Show only last 5 in the sidebar list
-
-                    new_archive_block = f"{archive_start}\n                    " + "\n                    ".join(archive_items) + f"\n                    {archive_end}"
-                    html = html.replace(current_archive_block, new_archive_block)
-
-                with open("intel.html", 'w') as f:
-                    f.write(html)
+            with open("intel.html", 'w') as f:
+                f.write(html)
+            self._log_uplink("WEBSITE: intel.html synced successfully.")
         except Exception as e:
-            print(f"[{datetime.now()}] WEBSITE UPLINK ERROR: Failed to update intel.html: {e}")
+            self._log_uplink(f"WEBSITE ERROR: Failed to update intel.html: {e}")
 
     def _update_transmissions_html(self, topic, filename, date_str):
         """Updates the transmissions.html archive page."""
-        print(f"[{datetime.now()}] WEBSITE UPLINK: Syncing transmissions.html...")
+        self._log_uplink("WEBSITE: Syncing transmissions.html...")
         try:
             with open("transmissions.html", 'r') as f:
                 html = f.read()
@@ -572,25 +569,25 @@ class HopesAndDreamsBot:
             start_marker = "<!-- ARCHIVE_POSTS_START -->"
             end_marker = "<!-- ARCHIVE_POSTS_END -->"
 
-            pattern = re.compile(f"{start_marker}.*?{end_marker}", re.DOTALL)
-            match = pattern.search(html)
+            if start_marker in html and end_marker in html:
+                parts = html.split(start_marker)
+                pre_block = parts[0]
+                post_parts = parts[1].split(end_marker)
+                current_block = post_parts[0]
+                after_block = post_parts[1]
 
-            if match:
-                current_block = match.group(0)
                 items = re.findall(r'<a.*?class="archive-item">.*?</a>', current_block, re.DOTALL)
-
-                # Filter placeholder
                 items = [i for i in items if "Initializing deep archive retrieval" not in i]
-
                 items.insert(0, new_item)
 
-                new_block = f"{start_marker}\n" + "\n".join(items) + f"\n            {end_marker}"
-                html = html.replace(current_block, new_block)
+                new_block = "\n" + "\n".join(items) + "\n            "
+                html = pre_block + start_marker + new_block + end_marker + after_block
 
                 with open("transmissions.html", 'w') as f:
                     f.write(html)
+                self._log_uplink("WEBSITE: transmissions.html synced successfully.")
         except Exception as e:
-            print(f"[{datetime.now()}] WEBSITE UPLINK ERROR: Failed to update transmissions.html: {e}")
+            self._log_uplink(f"WEBSITE ERROR: Failed to update transmissions.html: {e}")
 
     def _git_push_changes(self, commit_message):
         """Automates the git workflow to push changes to the repository."""
@@ -607,12 +604,12 @@ class HopesAndDreamsBot:
 
             subprocess.run(["git", "commit", "-m", commit_message], check=True, capture_output=True, text=True)
 
-            self._log_uplink("GIT: Pulling latest changes (rebase)...")
-            pull_res = subprocess.run(["git", "pull", "--rebase"], check=True, capture_output=True, text=True)
+            self._log_uplink("GIT: Pulling latest changes from origin main...")
+            pull_res = subprocess.run(["git", "pull", "origin", "main", "--rebase"], check=True, capture_output=True, text=True)
             self._log_uplink(f"GIT PULL OUTPUT: {pull_res.stdout}")
 
-            self._log_uplink("GIT: Pushing to remote...")
-            push_res = subprocess.run(["git", "push"], check=True, capture_output=True, text=True)
+            self._log_uplink("GIT: Pushing to origin main...")
+            push_res = subprocess.run(["git", "push", "origin", "main"], check=True, capture_output=True, text=True)
             self._log_uplink(f"GIT PUSH OUTPUT: {push_res.stdout}")
             self._log_uplink("GIT: Uplink successful.")
         except subprocess.CalledProcessError as e:

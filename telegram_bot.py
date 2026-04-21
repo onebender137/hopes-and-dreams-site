@@ -192,11 +192,23 @@ class TelegramBot:
     async def get_status(self, update: Update, context: ContextTypes.DEFAULT_TYPE):
         """Handles the /status command."""
         from bot import SYNDICATE_VERSION
+        import subprocess
+
+        # Get git info
+        try:
+            branch = subprocess.check_output(["git", "rev-parse", "--abbrev-ref", "HEAD"]).decode().strip()
+            remote = subprocess.check_output(["git", "remote", "-v"]).decode().strip().split('\n')[0]
+        except:
+            branch = "Unknown"
+            remote = "Unknown"
+
         status_msg = (
             f"🛰 **SYNDICATE STATUS REPORT**\n"
             f"Version: {SYNDICATE_VERSION}\n"
             f"Ollama: {Config.OLLAMA_MODEL}\n"
             f"FB Page: {Config.FB_PAGE_ID}\n"
+            f"Branch: {branch}\n"
+            f"Remote: {remote}\n"
             f"Time: {datetime.now().strftime('%Y-%m-%d %H:%M:%S')}"
         )
         await update.message.reply_text(status_msg)
@@ -212,6 +224,17 @@ class TelegramBot:
                 await self._send_long_message(update, f"📄 **UPLINK DEBUG LOG (Last 20):**\n\n{log_content}")
         else:
             await update.message.reply_text("Uplink log file not found.")
+
+    @restricted
+    async def trigger_sync(self, update: Update, context: ContextTypes.DEFAULT_TYPE):
+        """Handles the /sync command."""
+        await update.message.reply_text("🔄 Manually triggering Syndicate repository sync...")
+        try:
+            # We use the bot's internal method
+            await asyncio.to_thread(self.hdbot._git_push_changes, "Manual Syndicate Synchronization")
+            await update.message.reply_text("✅ Repository sync protocol complete. Check /debug for results.")
+        except Exception as e:
+            await update.message.reply_text(f"❌ Sync failed: {str(e)}")
 
     @restricted
     async def test_uplink(self, update: Update, context: ContextTypes.DEFAULT_TYPE):
@@ -397,6 +420,7 @@ class TelegramBot:
         application.add_handler(CommandHandler('status', self.get_status))
         application.add_handler(CommandHandler('debug', self.get_debug_log))
         application.add_handler(CommandHandler('test_uplink', self.test_uplink))
+        application.add_handler(CommandHandler('sync', self.trigger_sync))
         application.add_handler(CommandHandler('force_post', self.force_post_direct)) # New command
         application.add_handler(CommandHandler('pulse', self.get_pulse))
         application.add_handler(CommandHandler('check', self.trigger_check))
