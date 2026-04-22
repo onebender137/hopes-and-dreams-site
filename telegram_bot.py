@@ -233,34 +233,39 @@ class TelegramBot:
         try:
             import subprocess
             import os
+            import shutil
 
             # 1. Kill any stuck rebase or merge
             subprocess.run(["git", "rebase", "--abort"], capture_output=True)
             subprocess.run(["git", "merge", "--abort"], capture_output=True)
 
+            # Manually delete .git/rebase-merge if it still exists
+            rebase_path = os.path.join(".git", "rebase-merge")
+            if os.path.exists(rebase_path):
+                shutil.rmtree(rebase_path)
+
             # 2. Force remove the offending database if it's untracked and causing issues
             if os.path.exists("syndicate_memory.db"):
-                await update.message.reply_text("🧹 Removing local database conflict...")
+                await update.message.reply_text("🧹 Clearing local state conflicts...")
                 os.rename("syndicate_memory.db", f"syndicate_memory.db.bak_{int(time.time())}")
 
-            # 3. Clean up the state
-            subprocess.run(["git", "reset", "--hard", "HEAD"], capture_output=True)
+            # 3. Detect target branch
+            branch_res = subprocess.run(["git", "rev-parse", "--abbrev-ref", "HEAD"], capture_output=True, text=True)
+            current_branch = branch_res.stdout.strip()
+            if current_branch == "HEAD":
+                branches = subprocess.run(["git", "branch"], capture_output=True, text=True).stdout
+                current_branch = "master" if "master" in branches else "main"
+
+            # 4. Nuclear Option: Hard reset to origin
+            await update.message.reply_text(f"📡 Performing Hard Reset to origin/{current_branch}...")
+            subprocess.run(["git", "fetch", "origin", current_branch], capture_output=True)
+            res = subprocess.run(["git", "reset", "--hard", f"origin/{current_branch}"], capture_output=True, text=True)
             subprocess.run(["git", "clean", "-fd"], capture_output=True)
 
-            # 4. Re-sync with origin
-            branch_res = subprocess.run(["git", "rev-parse", "--abbrev-ref", "HEAD"], capture_output=True, text=True)
-            current_branch = branch_res.stdout.strip() or "master"
-
-            await update.message.reply_text(f"📡 Force pulling from origin {current_branch}...")
-            res = subprocess.run(["git", "pull", "origin", current_branch], capture_output=True, text=True)
-
             if res.returncode == 0:
-                await update.message.reply_text(f"✅ Repository restored and synced.\nOutput: {res.stdout[:200]}")
+                await update.message.reply_text(f"✅ Repository restored and synced to origin/{current_branch}.")
             else:
-                # Last ditch effort: Fetch and reset
-                subprocess.run(["git", "fetch", "origin", current_branch], capture_output=True)
-                subprocess.run(["git", "reset", "--hard", f"origin/{current_branch}"], capture_output=True)
-                await update.message.reply_text(f"⚠️ Standard pull failed, performed Hard Reset to origin/{current_branch}.")
+                await update.message.reply_text(f"❌ Hard reset failed: {res.stderr}")
         except Exception as e:
             await update.message.reply_text(f"❌ Repair failed: {str(e)}")
 

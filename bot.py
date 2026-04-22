@@ -317,8 +317,6 @@ class HopesAndDreamsBot:
             pitch = f"For those looking to optimize their protocol with {topic}, here is the top-vetted option on Amazon.ca."
             recommendation = self.affiliate.format_affiliate_payload(pitch, manual_link)
 
-        # Sanitize recommendation to ensure correct tagging and limit to 1 link
-        recommendation = self.affiliate.sanitize_text(recommendation, link_limit=1)
         result = self.fb.reply_to_comment(post_id, recommendation)
         if result:
             print(f"Affiliate recommendation posted to post {post_id} successfully.")
@@ -343,7 +341,7 @@ class HopesAndDreamsBot:
                 comment_author_id = comment_from.get('id')
                 comment_created_time_str = comment.get('created_time')
 
-                if str(comment_author_id) == str(Config.FB_PAGE_ID) or comment_id in self.replied_comment_ids:
+                if comment_author_id == Config.FB_PAGE_ID or comment_id in self.replied_comment_ids:
                     continue
 
                 if is_first_iteration and comment_created_time_str:
@@ -366,8 +364,6 @@ class HopesAndDreamsBot:
 
                 if reply_msg:
                     print("EXECUTIVE EXECUTION: Replying to FB comment.")
-                    # Sanitize LLM reply to ensure correct tagging
-                    reply_msg = self.affiliate.sanitize_text(reply_msg)
                     self.fb.reply_to_comment(comment_id, reply_msg)
                     self.db.add_replied_comment(comment_id)
                     self.replied_comment_ids.add(comment_id)
@@ -619,11 +615,20 @@ class HopesAndDreamsBot:
         """Automates the git workflow to push changes to the repository."""
         self._log_uplink("GIT: Synchronizing repository...")
         try:
+            # 0. Emergency Cleanup: Ensure we aren't in a broken state from a previous run
+            # Check for rebase/merge markers
+            git_dir = ".git"
+            if os.path.exists(os.path.join(git_dir, "rebase-merge")) or os.path.exists(os.path.join(git_dir, "rebase-apply")):
+                self._log_uplink("GIT: Detected stuck rebase. Aborting...")
+                subprocess.run(["git", "rebase", "--abort"], capture_output=True)
+            if os.path.exists(os.path.join(git_dir, "MERGE_HEAD")):
+                self._log_uplink("GIT: Detected stuck merge. Aborting...")
+                subprocess.run(["git", "merge", "--abort"], capture_output=True)
+
             # 1. Ensure we only stage the intended files
             subprocess.run(["git", "add", "intel.html", "transmissions.html", "articles/"], check=True, capture_output=True, text=True)
 
             # 2. Check if there are staged changes to commit
-            # We use --staged to only look at what we just added
             status = subprocess.run(["git", "status", "--porcelain"], capture_output=True, text=True)
             staged_changes = [line for line in status.stdout.splitlines() if line.startswith(('A', 'M', 'D', 'R', 'C'))]
 
@@ -634,25 +639,36 @@ class HopesAndDreamsBot:
             # 3. Commit the staged changes
             subprocess.run(["git", "commit", "-m", commit_message], check=True, capture_output=True, text=True)
 
-            # 4. Handle remote sync with stashing to avoid 'unstaged changes' errors during pull
-            # Detect current branch dynamically
+            # 4. Handle remote sync
+            # Detect current branch - handle 'HEAD' case by checking master/main
             branch_res = subprocess.run(["git", "rev-parse", "--abbrev-ref", "HEAD"], capture_output=True, text=True)
-            current_branch = branch_res.stdout.strip() or "main"
+            current_branch = branch_res.stdout.strip()
+            if current_branch == "HEAD":
+                # Fallback to checking master or main
+                branches = subprocess.run(["git", "branch"], capture_output=True, text=True).stdout
+                current_branch = "master" if "master" in branches else "main"
+
             self._log_uplink(f"GIT: Syncing with origin {current_branch}...")
 
             # Stash any remaining noise (untracked or modified files not in our set)
             subprocess.run(["git", "stash", "push", "--include-untracked", "-m", "Syndicate Autostash"], capture_output=True)
 
             try:
-                # Pull and push
-                pull_res = subprocess.run(["git", "pull", "origin", current_branch, "--rebase"], check=True, capture_output=True, text=True)
+                # Pull with rebase
+                pull_res = subprocess.run(["git", "pull", "origin", current_branch, "--rebase"], capture_output=True, text=True)
+                if pull_res.returncode != 0:
+                    self._log_uplink(f"GIT PULL ERROR: {pull_res.stderr}")
+                    # If rebase fails, abort it to keep the repo clean
+                    subprocess.run(["git", "rebase", "--abort"], capture_output=True)
+                    return
+
                 self._log_uplink(f"GIT PULL: {pull_res.stdout.strip()}")
 
+                # Push
                 push_res = subprocess.run(["git", "push", "origin", current_branch], check=True, capture_output=True, text=True)
                 self._log_uplink(f"GIT PUSH: {push_res.stdout.strip()}")
             finally:
-                # Always try to restore the stash
-                # We check if a stash was actually created to avoid 'No stash entries found' noise
+                # Restore the stash
                 stash_list = subprocess.run(["git", "stash", "list"], capture_output=True, text=True)
                 if "Syndicate Autostash" in stash_list.stdout:
                     subprocess.run(["git", "stash", "pop"], capture_output=True)
