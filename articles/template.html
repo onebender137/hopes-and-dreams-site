@@ -3,13 +3,17 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Article Title | Hopes and Dreams</title>
+    <title>{{SYNDICATE_TITLE}} | Hopes and Dreams</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link rel="dns-prefetch" href="https://fonts.googleapis.com">
+    <link rel="dns-prefetch" href="https://fonts.gstatic.com">
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;700;900&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="../style.css">
     <style>
         :root {
-            --bg-main: #03091f; 
-            --card-bg: #0d162d; 
+            --bg-main: #03091f;
+            --card-bg: #0d162d;
             --neon-blue: #38bdf8;
             --neon-gold: #fbbf24;
             --text-main: #f8fafc;
@@ -22,11 +26,11 @@
             font-family: 'Inter', sans-serif;
             margin: 0;
             padding: 0;
-            line-height: 1.8; /* Slightly more space for readability */
+            line-height: 1.8;
             overflow-x: hidden;
         }
 
-        /* --- HEADER & NAV (Locked in from Home) --- */
+        /* --- HEADER & NAV --- */
         header {
             display: flex;
             flex-direction: column;
@@ -50,7 +54,7 @@
         }
 
         nav {
-            margin-top: 40px; 
+            margin-top: 40px;
             padding-bottom: 60px;
             z-index: 10;
             position: relative;
@@ -61,8 +65,8 @@
         nav a {
             color: var(--neon-blue);
             text-decoration: none;
-            font-size: 1.3rem; 
-            font-weight: 800; 
+            font-size: 1.3rem;
+            font-weight: 800;
             text-transform: uppercase;
             letter-spacing: 4px;
             transition: all 0.3s ease;
@@ -76,7 +80,7 @@
 
         /* --- ARTICLE CONTENT AREA --- */
         .article-container {
-            max-width: 800px; /* Narrower for better reading speed */
+            max-width: 800px;
             margin: 0 auto;
             padding: 0 24px 100px;
         }
@@ -89,7 +93,6 @@
             margin-bottom: 60px;
         }
 
-        /* Typography */
         h1 {
             color: var(--text-main);
             font-size: 3rem;
@@ -126,7 +129,6 @@
             font-weight: 700;
         }
 
-        /* Special Callout Box for "Hacks" */
         .hack-box {
             background-color: var(--card-bg);
             border-left: 4px solid var(--neon-gold);
@@ -142,7 +144,6 @@
             letter-spacing: 1px;
         }
 
-        /* Image Placeholder Style */
         .article-img {
             width: 100%;
             border-radius: 24px;
@@ -150,7 +151,6 @@
             margin: 40px 0;
         }
 
-        /* Lists */
         ul {
             color: var(--text-dim);
             font-size: 1.1rem;
@@ -161,7 +161,6 @@
             margin-bottom: 10px;
         }
 
-        /* Final Sign-off */
         .syndicate-footer {
             margin-top: 80px;
             padding: 40px;
@@ -203,15 +202,15 @@
         }
     </style>
 </head>
-<body>
+<body class="dark-mode">
     <div id="scroll-progress"></div>
-    <button id="theme-toggle" class="theme-toggle-pill">☀️ LIGHT MODE</button>
+    <button id="theme-toggle" class="theme-toggle-pill" aria-label="Toggle between dark and light mode">☀️ LIGHT MODE</button>
 
     <header>
         <div class="logo-wrap">
-            <img src="../topper.webp" alt="Hopes and Dreams">
+            <img src="../topper.webp" alt="Hopes and Dreams" width="1780" height="1050" fetchpriority="high">
         </div>
-        
+
         <nav>
             <a href="../index.html">Home</a>
             <a href="../shop.html">Procurement</a>
@@ -225,37 +224,26 @@
     <div class="container">
         <div class="glow-divider"></div>
 
-        <article class="article-container">
-            <span class="meta-data">Life Hacks // April 2026</span>
-            <h1>The Title of Your High-Impact Article Goes Here</h1>
-            
-            <p>Start your article with a punchy intro. Explain the <strong>problem</strong> you are solving and why the Syndicate needs to pay attention. This text is styled for maximum readability.</p>
+        <article class="article-container" data-reveal>
+            <span class="meta-data">Transmission // {{SYNDICATE_DATE}}</span>
+            <h1>{{SYNDICATE_TITLE}}</h1>
 
-            <img src="https://via.placeholder.com/800x400/0d162d/38bdf8?text=Featured+Image" alt="Descriptive Alt Text" class="article-img">
+            {{SYNDICATE_IMAGE}}
 
-            <h2>The Core Concept</h2>
-            <p>Break your content down into sections using H2 headers. This makes it "scannable" for people reading on their phones in Saint John or while on their lunch break.</p>
-
-            <div class="hack-box">
-                <h4>Prostar Life Hack</h4>
-                <p>This is a special callout box for your most actionable advice. It stands out from the rest of the text so users can find the value instantly.</p>
+            <div class="intel-burst">
+                {{SYNDICATE_CONTENT}}
             </div>
 
-            <h2>Next Steps</h2>
-            <ul>
-                <li><strong>Identify:</strong> Find the bottleneck in your routine.</li>
-                <li><strong>Execute:</strong> Use the tool recommended above.</li>
-                <li><strong>Refine:</strong> Adjust until the habit sticks.</li>
-            </ul>
+            {{SYNDICATE_HACK}}
 
             <div class="syndicate-footer">
                 <h3>Join the Conversation</h3>
-                <p>Discuss this hack and share your results with the rest of the builders in our private community.</p>
+                <p>Discuss this transmission and share your results with the rest of the builders in our private community.</p>
                 <a href="https://www.facebook.com/profile.php?id=61581034972328" class="btn-fb" target="_blank" rel="noopener noreferrer">Connect on Facebook →</a>
             </div>
         </article>
 
-<section class="newsletter-section" data-reveal>
+        <section class="newsletter-section" data-reveal>
             <div class="newsletter-box">
                 <h3>Join the Syndicate</h3>
                 <p>Initialize your subscription for weekly intelligence on neuro-optimization, biological hacking, and technical stack evolution.</p>
@@ -271,7 +259,7 @@
         </footer>
     </div>
 
-<script src="../codex.js" defer></script>
+    <script src="../codex.js" defer></script>
     <script src="../script.js" defer></script>
 </body>
 </html>
