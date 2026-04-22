@@ -454,47 +454,69 @@ class HopesAndDreamsBot:
         return True
 
     def _beautify_for_blog(self, content, topic, image_path):
-        """Uses the LLM to wrap the raw content in the beautiful blog template."""
+        """Uses the LLM to beautify content and then injects it into the HTML template."""
         system_msg = (
             "You are the Syndicate's Digital Architect. Your job is to take raw biohacking intel "
-            "and format it into a high-end HTML article template."
+            "and format it for a high-end article."
         )
 
-        # Load template
+        # 1. Load the template
         template_path = "articles/template.html"
         try:
             with open(template_path, 'r') as f:
                 template = f.read()
-        except:
-            template = "<h1>{{TITLE}}</h1><p>{{CONTENT}}</p>" # Fallback
+        except Exception as e:
+            self._log_uplink(f"WEBSITE ERROR: Template not found at {template_path}: {e}")
+            return f"<h1>{topic}</h1><p>{content}</p>" # Minimal fallback
 
+        # 2. Ask LLM to generate the beautified body and the hack box separately
         prompt = (
             f"I have a new Syndicate Masterclass about '{topic}'.\n\n"
             f"RAW CONTENT:\n{content}\n\n"
             "INSTRUCTIONS:\n"
-            "1. Rewrite the content to be more 'beautified' for a blog post. Use engaging headers.\n"
-            "2. Identify the most actionable advice and mark it for a 'Prostar Life Hack' box.\n"
-            "3. Return the FINAL HTML by injecting this content into the provided template.\n"
-            "4. Use the following placeholders in the template (if they exist or create a structure that fits):\n"
-            "   - Replace the title tag and H1 with the topic title.\n"
-            "   - Use <span class='meta-data'> for the date and category.\n"
-            "   - Put the main content in the <article> section.\n"
-            "   - Ensure the 'Prostar Life Hack' is in a <div class='hack-box'>.\n"
-            f"   - If an image is provided ({image_path}), ensure the src attribute is prefixed with '../' (e.g., src='../{image_path}') since this article lives in the articles/ subfolder, use it in an <img> tag with class 'article-img'. "
-            "     If image_path is None, do NOT include an <img> tag for the featured image.\n"
-            "5. Return ONLY the full HTML code. No talk."
+            "1. Rewrite the content to be more 'beautified' for a blog post. Use engaging H2 headers.\n"
+            "2. Identify the most actionable advice and create a 'Prostar Life Hack' section.\n"
+            "3. Return the result as a JSON object with two keys: 'body' (the HTML formatted content) and 'hack' (the HTML for the hack-box).\n"
+            "4. Return ONLY the JSON object. No talk."
         )
-        # We use a higher context window and reflection for better HTML generation
-        html_response = self.llm.generate_response(prompt, system_msg, context=template, reflect=True, options={'num_ctx': 4096})
+
+        json_response = self.llm.generate_response(prompt, system_msg, reflect=True, options={'num_ctx': 4096})
 
         # Cleanup: Strip markdown code blocks if present
-        if "```" in html_response:
-            # Match content between ```html and ``` or just ``` and ```
-            match = re.search(r'```(?:html)?\n?(.*?)\n?```', html_response, re.DOTALL)
+        if "```" in json_response:
+            match = re.search(r'```(?:json)?\n?(.*?)\n?```', json_response, re.DOTALL)
             if match:
-                html_response = match.group(1).strip()
+                json_response = match.group(1).strip()
 
-        return html_response
+        try:
+            data = json.loads(json_response)
+            beautified_body = data.get('body', content)
+            hack_content = data.get('hack', "")
+        except:
+            # Fallback if JSON fails
+            beautified_body = content
+            hack_content = ""
+
+        # 3. Construct the Hack Box HTML if content exists
+        hack_html = ""
+        if hack_content:
+            hack_html = f'<div class="hack-box"><h4>Prostar Life Hack</h4><p>{hack_content}</p></div>'
+
+        # 4. Handle the Image HTML
+        image_html = ""
+        if image_path:
+            image_html = f'<img src="../{image_path}" alt="{topic}" class="article-img">'
+
+        # 5. Inject into template using placeholders
+        date_str = datetime.now().strftime("%B %Y")
+
+        final_html = template.replace("{{SYNDICATE_TITLE}}", topic)
+        final_html = final_html.replace("{{SYNDICATE_DATE}}", date_str)
+        final_html = final_html.replace("{{SYNDICATE_CONTENT}}", beautified_body)
+        final_html = final_html.replace("{{SYNDICATE_HACK}}", hack_html)
+        final_html = final_html.replace("{{SYNDICATE_IMAGE}}", image_html)
+
+        return final_html
     def _update_intel_html(self, topic, filename, date_str):
         """Updates the intel.html file with the latest 3 posts."""
         self._log_uplink("WEBSITE: Syncing intel.html...")
