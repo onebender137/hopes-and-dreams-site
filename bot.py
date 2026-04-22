@@ -317,6 +317,8 @@ class HopesAndDreamsBot:
             pitch = f"For those looking to optimize their protocol with {topic}, here is the top-vetted option on Amazon.ca."
             recommendation = self.affiliate.format_affiliate_payload(pitch, manual_link)
 
+        # Sanitize recommendation to ensure correct tagging and limit to 1 link
+        recommendation = self.affiliate.sanitize_text(recommendation, link_limit=1)
         result = self.fb.reply_to_comment(post_id, recommendation)
         if result:
             print(f"Affiliate recommendation posted to post {post_id} successfully.")
@@ -341,7 +343,7 @@ class HopesAndDreamsBot:
                 comment_author_id = comment_from.get('id')
                 comment_created_time_str = comment.get('created_time')
 
-                if comment_author_id == Config.FB_PAGE_ID or comment_id in self.replied_comment_ids:
+                if str(comment_author_id) == str(Config.FB_PAGE_ID) or comment_id in self.replied_comment_ids:
                     continue
 
                 if is_first_iteration and comment_created_time_str:
@@ -364,6 +366,8 @@ class HopesAndDreamsBot:
 
                 if reply_msg:
                     print("EXECUTIVE EXECUTION: Replying to FB comment.")
+                    # Sanitize LLM reply to ensure correct tagging
+                    reply_msg = self.affiliate.sanitize_text(reply_msg)
                     self.fb.reply_to_comment(comment_id, reply_msg)
                     self.db.add_replied_comment(comment_id)
                     self.replied_comment_ids.add(comment_id)
