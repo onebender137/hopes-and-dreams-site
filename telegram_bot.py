@@ -254,7 +254,7 @@ class TelegramBot:
             current_branch = branch_res.stdout.strip()
             if current_branch == "HEAD":
                 branches = subprocess.run(["git", "branch"], capture_output=True, text=True).stdout
-                current_branch = "master" if "master" in branches else "main"
+                current_branch = "main" if "main" in branches else "master"
 
             # 4. Nuclear Option: Hard reset to origin
             await update.message.reply_text(f"📡 Performing Hard Reset to origin/{current_branch}...")

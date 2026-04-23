@@ -541,7 +541,7 @@ class HopesAndDreamsBot:
                 after_block = post_parts[1]
 
                 # Extract cards using regex but handle the block more safely
-                cards = re.findall(r'<div class="card">.*?</div>', current_block, re.DOTALL)
+                cards = re.findall(r'<div class="card">.*?</a>\s*</div>', current_block, re.DOTALL)
                 cards = [c for c in cards if "Initializing Feed" not in c and "Waiting for Uplink" not in c and "Data Stream Alpha" not in c]
                 cards.insert(0, new_card)
                 cards = cards[:3]
@@ -646,7 +646,7 @@ class HopesAndDreamsBot:
             if current_branch == "HEAD":
                 # Fallback to checking master or main
                 branches = subprocess.run(["git", "branch"], capture_output=True, text=True).stdout
-                current_branch = "master" if "master" in branches else "main"
+                current_branch = "main" if "main" in branches else "master"
 
             self._log_uplink(f"GIT: Syncing with origin {current_branch}...")
 
