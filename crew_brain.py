@@ -1,4 +1,5 @@
 from crewai import Agent, Task, Crew, Process
+from crewai.utilities.i18n import I18N
 from config import Config
 import os
 
@@ -31,6 +32,8 @@ class SyndicateCrew:
             verbose=True,
             llm=self.llm
         )
+        # Bypassing Pydantic's restriction on dynamic attribute assignment for i18n
+        object.__setattr__(self.researcher, "i18n", I18N())
 
         # Agent 2: Ghost Copywriter
         self.writer = Agent(
@@ -49,6 +52,8 @@ class SyndicateCrew:
             verbose=True,
             llm=self.llm
         )
+        # Bypassing Pydantic's restriction on dynamic attribute assignment for i18n
+        object.__setattr__(self.writer, "i18n", I18N())
 
     def run(self, topic, context):
         """Executes the multi-agent workflow sequentially to save memory."""

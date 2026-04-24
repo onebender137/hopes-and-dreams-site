@@ -616,7 +616,6 @@ class HopesAndDreamsBot:
         self._log_uplink("GIT: Synchronizing repository...")
         try:
             # 0. Emergency Cleanup: Ensure we aren't in a broken state from a previous run
-            # Check for rebase/merge markers
             git_dir = ".git"
             if os.path.exists(os.path.join(git_dir, "rebase-merge")) or os.path.exists(os.path.join(git_dir, "rebase-apply")):
                 self._log_uplink("GIT: Detected stuck rebase. Aborting...")
@@ -625,28 +624,11 @@ class HopesAndDreamsBot:
                 self._log_uplink("GIT: Detected stuck merge. Aborting...")
                 subprocess.run(["git", "merge", "--abort"], capture_output=True)
 
-            # 1. Ensure we only stage the intended files
-            subprocess.run(["git", "add", "intel.html", "transmissions.html", "articles/"], check=True, capture_output=True, text=True)
-
-            # 2. Check if there are staged changes to commit
-            status = subprocess.run(["git", "status", "--porcelain"], capture_output=True, text=True)
-            staged_changes = [line for line in status.stdout.splitlines() if line.startswith(('A', 'M', 'D', 'R', 'C'))]
-
-            if not staged_changes:
-                self._log_uplink("GIT: No relevant changes staged. Skipping commit/push.")
-                return
-
-            # 3. Commit the staged changes
-            subprocess.run(["git", "commit", "-m", commit_message], check=True, capture_output=True, text=True)
-
-            # 4. Handle remote sync
+            # 1. Detect target branch reliably
             self._log_uplink("GIT: Fetching from origin...")
             subprocess.run(["git", "fetch", "origin"], capture_output=True)
-
-            # Detect target branch reliably
             remote_branches = subprocess.run(["git", "ls-remote", "--heads", "origin"], capture_output=True, text=True).stdout
 
-            # Priority: 1. Remote main, 2. Remote master, 3. Local current branch
             if "refs/heads/main" in remote_branches:
                 target_branch = "main"
             elif "refs/heads/master" in remote_branches:
@@ -655,23 +637,50 @@ class HopesAndDreamsBot:
                 branch_res = subprocess.run(["git", "rev-parse", "--abbrev-ref", "HEAD"], capture_output=True, text=True)
                 target_branch = branch_res.stdout.strip()
                 if target_branch == "HEAD":
-                    target_branch = "main" # Final fallback
+                    target_branch = "main"
 
-            self._log_uplink(f"GIT: Syncing with origin {target_branch}...")
+            # 2. Sync with remote BEFORE applying local changes to minimize conflicts
+            self._log_uplink(f"GIT: Syncing with origin {target_branch} (Pre-sync)...")
+            subprocess.run(["git", "stash", "push", "--include-untracked", "-m", "Syndicate Pre-Sync Stash"], capture_output=True)
+            try:
+                subprocess.run(["git", "pull", "origin", target_branch, "--rebase"], capture_output=True)
+            finally:
+                stash_list = subprocess.run(["git", "stash", "list"], capture_output=True, text=True)
+                if "Syndicate Pre-Sync Stash" in stash_list.stdout:
+                    subprocess.run(["git", "stash", "pop"], capture_output=True)
 
-            # Stash any remaining noise (untracked or modified files not in our set)
-            subprocess.run(["git", "stash", "push", "--include-untracked", "-m", "Syndicate Autostash"], capture_output=True)
+            # 3. Ensure we only stage the intended files
+            subprocess.run(["git", "add", "intel.html", "transmissions.html", "articles/"], check=True, capture_output=True, text=True)
+
+            # 4. Check if there are staged changes to commit
+            status = subprocess.run(["git", "status", "--porcelain"], capture_output=True, text=True)
+            staged_changes = [line for line in status.stdout.splitlines() if line.startswith(('A', 'M', 'D', 'R', 'C'))]
+
+            if not staged_changes:
+                self._log_uplink("GIT: No relevant changes staged. Skipping commit/push.")
+                return
+
+            # 5. Commit the staged changes
+            subprocess.run(["git", "commit", "-m", commit_message], check=True, capture_output=True, text=True)
+
+            # 6. Final Push with Rebase handling
+            self._log_uplink(f"GIT: Final sync and push to {target_branch}...")
+
+            # Stash any remaining noise
+            subprocess.run(["git", "stash", "push", "--include-untracked", "-m", "Syndicate Final Stash"], capture_output=True)
 
             try:
                 # Pull with rebase
                 pull_res = subprocess.run(["git", "pull", "origin", target_branch, "--rebase"], capture_output=True, text=True)
                 if pull_res.returncode != 0:
-                    self._log_uplink(f"GIT PULL ERROR: {pull_res.stderr}")
-                    # If rebase fails, abort it to keep the repo clean
+                    self._log_uplink(f"GIT REBASE CONFLICT: {pull_res.stderr}")
                     subprocess.run(["git", "rebase", "--abort"], capture_output=True)
-                    return
 
-                self._log_uplink(f"GIT PULL: {pull_res.stdout.strip()}")
+                    self._log_uplink("GIT: Falling back to merge strategy...")
+                    merge_res = subprocess.run(["git", "pull", "origin", target_branch, "--no-rebase", "--no-edit"], capture_output=True, text=True)
+                    if merge_res.returncode != 0:
+                        self._log_uplink(f"GIT MERGE ERROR: {merge_res.stderr}")
+                        return
 
                 # Push explicitly to the target branch
                 push_res = subprocess.run(["git", "push", "origin", f"HEAD:{target_branch}"], check=True, capture_output=True, text=True)
@@ -679,7 +688,7 @@ class HopesAndDreamsBot:
             finally:
                 # Restore the stash
                 stash_list = subprocess.run(["git", "stash", "list"], capture_output=True, text=True)
-                if "Syndicate Autostash" in stash_list.stdout:
+                if "Syndicate Final Stash" in stash_list.stdout:
                     subprocess.run(["git", "stash", "pop"], capture_output=True)
 
             self._log_uplink("GIT: Uplink successful.")
