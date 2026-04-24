@@ -1,7 +1,6 @@
 # --- SYNDICATE CORE (Private) ---
 .env
 .env.template
-config.py
 auth/
 tokens.json
 
