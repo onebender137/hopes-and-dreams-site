@@ -3,93 +3,21 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Article Title | Hopes and Dreams</title>
+    <title>Circadian Entrainment: Low-Dose Melatonin Protocols | Hopes and Dreams</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link rel="dns-prefetch" href="https://fonts.googleapis.com">
+    <link rel="dns-prefetch" href="https://fonts.gstatic.com">
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;700;900&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="../style.css">
     <style>
-        :root {
-            --bg-main: #03091f; 
-            --card-bg: #0d162d; 
-            --neon-blue: #38bdf8;
-            --neon-gold: #fbbf24;
-            --text-main: #f8fafc;
-            --text-dim: #94a3b8;
-        }
-
-        body {
-            background-color: var(--bg-main);
-            color: var(--text-main);
-            font-family: 'Inter', sans-serif;
-            margin: 0;
-            padding: 0;
-            line-height: 1.8; /* Slightly more space for readability */
-            overflow-x: hidden;
-        }
-
-        /* --- HEADER & NAV (Locked in from Home) --- */
-        header {
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            width: 100%;
-            padding: 40px 0 20px 0;
-            background-color: var(--bg-main);
-        }
-
-        .logo-wrap {
-            width: 95%;
-            max-width: 700px;
-            position: relative;
-            line-height: 0;
-        }
-
-        .logo-wrap img {
-            width: 100%;
-            height: auto;
-            display: block;
-        }
-
-        nav {
-            margin-top: 40px; 
-            padding-bottom: 60px;
-            z-index: 10;
-            position: relative;
-            display: flex;
-            gap: 40px;
-        }
-
-        nav a {
-            color: var(--neon-blue);
-            text-decoration: none;
-            font-size: 1.3rem; 
-            font-weight: 800; 
-            text-transform: uppercase;
-            letter-spacing: 4px;
-            transition: all 0.3s ease;
-            opacity: 0.9;
-        }
-
-        nav a:hover {
-            color: var(--neon-gold);
-            text-shadow: 0 0 20px var(--neon-blue);
-        }
-
         /* --- ARTICLE CONTENT AREA --- */
         .article-container {
-            max-width: 800px; /* Narrower for better reading speed */
+            max-width: 800px;
             margin: 0 auto;
             padding: 0 24px 100px;
         }
 
-        .glow-divider {
-            width: 100%;
-            height: 1px;
-            background: radial-gradient(circle, var(--neon-blue) 0%, transparent 70%);
-            opacity: 0.2;
-            margin-bottom: 60px;
-        }
-
-        /* Typography */
         h1 {
             color: var(--text-main);
             font-size: 3rem;
@@ -126,7 +54,6 @@
             font-weight: 700;
         }
 
-        /* Special Callout Box for "Hacks" */
         .hack-box {
             background-color: var(--card-bg);
             border-left: 4px solid var(--neon-gold);
@@ -142,26 +69,6 @@
             letter-spacing: 1px;
         }
 
-        /* Image Placeholder Style */
-        .article-img {
-            width: 100%;
-            border-radius: 24px;
-            border: 1px solid rgba(56, 189, 248, 0.2);
-            margin: 40px 0;
-        }
-
-        /* Lists */
-        ul {
-            color: var(--text-dim);
-            font-size: 1.1rem;
-            margin-bottom: 30px;
-        }
-
-        li {
-            margin-bottom: 10px;
-        }
-
-        /* Final Sign-off */
         .syndicate-footer {
             margin-top: 80px;
             padding: 40px;
@@ -199,19 +106,18 @@
 
         @media (max-width: 600px) {
             h1 { font-size: 2rem; }
-            nav { flex-direction: column; gap: 20px; align-items: center; }
         }
     </style>
 </head>
 <body>
     <div id="scroll-progress"></div>
-    <button id="theme-toggle" class="theme-toggle-pill">☀️ LIGHT MODE</button>
+    <button id="theme-toggle" class="theme-toggle-pill" aria-label="Toggle between dark and light mode">☀️ LIGHT MODE</button>
 
     <header>
         <div class="logo-wrap">
-            <img src="../topper.webp" alt="Hopes and Dreams">
+            <img src="../topper.webp" alt="Hopes and Dreams" width="1780" height="1050" fetchpriority="high">
         </div>
-        
+
         <nav>
             <a href="../index.html">Home</a>
             <a href="../shop.html">Procurement</a>
@@ -223,39 +129,36 @@
     </header>
 
     <div class="container">
-        <div class="glow-divider"></div>
+        <article class="article-container" data-reveal>
+            <span class="meta-data">Transmission // April 2026</span>
+            <h1>Circadian Entrainment: Low-Dose Melatonin Protocols</h1>
 
-        <article class="article-container">
-            <span class="meta-data">Life Hacks // April 2026</span>
-            <h1>The Title of Your High-Impact Article Goes Here</h1>
-            
-            <p>Start your article with a punchy intro. Explain the <strong>problem</strong> you are solving and why the Syndicate needs to pay attention. This text is styled for maximum readability.</p>
+            <div class="intel-burst">
+                <p>The human circadian rhythm is a 24-hour biological cycle regulated by the suprachiasmatic nucleus. Melatonin, a hormone produced by the pineal gland, serves as the primary signal for "biological night." However, standard high-dose supplementation often results in receptor desensitization and morning lethargy.</p>
 
-            <img src="https://via.placeholder.com/800x400/0d162d/38bdf8?text=Featured+Image" alt="Descriptive Alt Text" class="article-img">
+                <h2>The Phase-Shift Protocol</h2>
+                <p>Melatonin is not a sedative in the traditional sense; it is a <strong>chronobiotic</strong>. To successfully shift the circadian phase (e.g., to combat jet lag or shift work), timing is more critical than dosage. Administering melatonin in the late afternoon or early evening can advance the clock, while early morning administration can delay it.</p>
 
-            <h2>The Core Concept</h2>
-            <p>Break your content down into sections using H2 headers. This makes it "scannable" for people reading on their phones in Saint John or while on their lunch break.</p>
+                <h2>The Efficacy of Low-Dose (0.3mg)</h2>
+                <p>Research indicates that the brain's melatonin receptors (MT1 and MT2) are most responsive to physiological doses, typically around <strong>0.3mg to 0.5mg</strong>. Standard pharmacy doses of 5mg-10mg are pharmacological megadoses that can disrupt natural hormone production and lead to vivid, often disruptive, dream cycles without improving sleep quality.</p>
 
-            <div class="hack-box">
-                <h4>Prostar Life Hack</h4>
-                <p>This is a special callout box for your most actionable advice. It stands out from the rest of the text so users can find the value instantly.</p>
+                <h2>Light: The Master Switch</h2>
+                <p>Melatonin production is acutely suppressed by blue light (450-480nm). For effective circadian entrainment, supplementation must be paired with <strong>blue light blocking</strong> protocols 2 hours before the target sleep time. This ensures that the supplemental melatonin works in harmony with the body's natural rising levels.</p>
             </div>
 
-            <h2>Next Steps</h2>
-            <ul>
-                <li><strong>Identify:</strong> Find the bottleneck in your routine.</li>
-                <li><strong>Execute:</strong> Use the tool recommended above.</li>
-                <li><strong>Refine:</strong> Adjust until the habit sticks.</li>
-            </ul>
+            <div class="hack-box">
+                <h4>Syndicate Entrainment Hack</h4>
+                <p>Use a liquid melatonin dropper to achieve a precise 0.3mg dose. Administer sublingually 90 minutes before your target sleep time. Pair this with a total blackout of digital screens to initialize the pineal gland's natural production cycle.</p>
+            </div>
 
             <div class="syndicate-footer">
                 <h3>Join the Conversation</h3>
-                <p>Discuss this hack and share your results with the rest of the builders in our private community.</p>
+                <p>Discuss this transmission and share your results with the rest of the builders in our private community.</p>
                 <a href="https://www.facebook.com/profile.php?id=61581034972328" class="btn-fb" target="_blank" rel="noopener noreferrer">Connect on Facebook →</a>
             </div>
         </article>
 
-<section class="newsletter-section" data-reveal>
+        <section class="newsletter-section" data-reveal>
             <div class="newsletter-box">
                 <h3>Join the Syndicate</h3>
                 <p>Initialize your subscription for weekly intelligence on neuro-optimization, biological hacking, and technical stack evolution.</p>
@@ -271,7 +174,7 @@
         </footer>
     </div>
 
-<script src="../codex.js" defer></script>
+    <script src="../codex.js" defer></script>
     <script src="../script.js" defer></script>
 </body>
 </html>
