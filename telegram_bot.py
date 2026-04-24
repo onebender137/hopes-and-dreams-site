@@ -263,13 +263,15 @@ class TelegramBot:
                 if target_branch == "HEAD":
                     target_branch = "main"
 
-            # 4. Nuclear Option: Hard reset to origin
-            await update.message.reply_text(f"📡 Performing Hard Reset to origin/{target_branch}...")
-            res = subprocess.run(["git", "reset", "--hard", f"origin/{target_branch}"], capture_output=True, text=True)
-            subprocess.run(["git", "clean", "-fd"], capture_output=True)
+            # 4. Recovery Option: Soft reset to origin to keep local articles staged
+            await update.message.reply_text(f"📡 Performing Soft Reset to origin/{target_branch} to salvage articles...")
+            res = subprocess.run(["git", "reset", "--soft", f"origin/{target_branch}"], capture_output=True, text=True)
+
+            # Clean up non-article junk but keep new articles
+            subprocess.run(["git", "clean", "-f", "-e", "articles/", "-e", "intel.html", "-e", "transmissions.html"], capture_output=True)
 
             if res.returncode == 0:
-                await update.message.reply_text(f"✅ Repository restored and synced to origin/{target_branch}.")
+                await update.message.reply_text(f"✅ Repository restored. Local changes are staged. Use /sync to push salvaged intel to origin/{target_branch}.")
             else:
                 await update.message.reply_text(f"❌ Hard reset failed: {res.stderr}")
         except Exception as e:
