@@ -685,6 +685,12 @@ class HopesAndDreamsBot:
                 # Push explicitly to the target branch
                 push_res = subprocess.run(["git", "push", "origin", f"HEAD:{target_branch}"], check=True, capture_output=True, text=True)
                 self._log_uplink(f"GIT PUSH: {push_res.stdout.strip()}")
+                # Also push to website remote (serves hopes-and-dreams.ca)
+                try:
+                    website_push = subprocess.run(["git", "push", "website", f"HEAD:{target_branch}"], check=True, capture_output=True, text=True)
+                    self._log_uplink(f"GIT PUSH (website): Success - site updating")
+                except subprocess.CalledProcessError as e:
+                    self._log_uplink(f"GIT PUSH (website) FAILED: {e.stderr.strip() if e.stderr else 'unknown error'}")
             finally:
                 # Restore the stash
                 stash_list = subprocess.run(["git", "stash", "list"], capture_output=True, text=True)
