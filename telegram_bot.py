@@ -249,21 +249,27 @@ class TelegramBot:
                 await update.message.reply_text("🧹 Clearing local state conflicts...")
                 os.rename("syndicate_memory.db", f"syndicate_memory.db.bak_{int(time.time())}")
 
-            # 3. Detect target branch
-            branch_res = subprocess.run(["git", "rev-parse", "--abbrev-ref", "HEAD"], capture_output=True, text=True)
-            current_branch = branch_res.stdout.strip()
-            if current_branch == "HEAD":
-                branches = subprocess.run(["git", "branch"], capture_output=True, text=True).stdout
-                current_branch = "main" if "main" in branches else "master"
+            # 3. Detect target branch reliably
+            subprocess.run(["git", "fetch", "origin"], capture_output=True)
+            remote_branches = subprocess.run(["git", "ls-remote", "--heads", "origin"], capture_output=True, text=True).stdout
+
+            if "refs/heads/main" in remote_branches:
+                target_branch = "main"
+            elif "refs/heads/master" in remote_branches:
+                target_branch = "master"
+            else:
+                branch_res = subprocess.run(["git", "rev-parse", "--abbrev-ref", "HEAD"], capture_output=True, text=True)
+                target_branch = branch_res.stdout.strip()
+                if target_branch == "HEAD":
+                    target_branch = "main"
 
             # 4. Nuclear Option: Hard reset to origin
-            await update.message.reply_text(f"📡 Performing Hard Reset to origin/{current_branch}...")
-            subprocess.run(["git", "fetch", "origin", current_branch], capture_output=True)
-            res = subprocess.run(["git", "reset", "--hard", f"origin/{current_branch}"], capture_output=True, text=True)
+            await update.message.reply_text(f"📡 Performing Hard Reset to origin/{target_branch}...")
+            res = subprocess.run(["git", "reset", "--hard", f"origin/{target_branch}"], capture_output=True, text=True)
             subprocess.run(["git", "clean", "-fd"], capture_output=True)
 
             if res.returncode == 0:
-                await update.message.reply_text(f"✅ Repository restored and synced to origin/{current_branch}.")
+                await update.message.reply_text(f"✅ Repository restored and synced to origin/{target_branch}.")
             else:
                 await update.message.reply_text(f"❌ Hard reset failed: {res.stderr}")
         except Exception as e:

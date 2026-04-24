@@ -640,22 +640,31 @@ class HopesAndDreamsBot:
             subprocess.run(["git", "commit", "-m", commit_message], check=True, capture_output=True, text=True)
 
             # 4. Handle remote sync
-            # Detect current branch - handle 'HEAD' case by checking master/main
-            branch_res = subprocess.run(["git", "rev-parse", "--abbrev-ref", "HEAD"], capture_output=True, text=True)
-            current_branch = branch_res.stdout.strip()
-            if current_branch == "HEAD":
-                # Fallback to checking master or main
-                branches = subprocess.run(["git", "branch"], capture_output=True, text=True).stdout
-                current_branch = "main" if "main" in branches else "master"
+            self._log_uplink("GIT: Fetching from origin...")
+            subprocess.run(["git", "fetch", "origin"], capture_output=True)
 
-            self._log_uplink(f"GIT: Syncing with origin {current_branch}...")
+            # Detect target branch reliably
+            remote_branches = subprocess.run(["git", "ls-remote", "--heads", "origin"], capture_output=True, text=True).stdout
+
+            # Priority: 1. Remote main, 2. Remote master, 3. Local current branch
+            if "refs/heads/main" in remote_branches:
+                target_branch = "main"
+            elif "refs/heads/master" in remote_branches:
+                target_branch = "master"
+            else:
+                branch_res = subprocess.run(["git", "rev-parse", "--abbrev-ref", "HEAD"], capture_output=True, text=True)
+                target_branch = branch_res.stdout.strip()
+                if target_branch == "HEAD":
+                    target_branch = "main" # Final fallback
+
+            self._log_uplink(f"GIT: Syncing with origin {target_branch}...")
 
             # Stash any remaining noise (untracked or modified files not in our set)
             subprocess.run(["git", "stash", "push", "--include-untracked", "-m", "Syndicate Autostash"], capture_output=True)
 
             try:
                 # Pull with rebase
-                pull_res = subprocess.run(["git", "pull", "origin", current_branch, "--rebase"], capture_output=True, text=True)
+                pull_res = subprocess.run(["git", "pull", "origin", target_branch, "--rebase"], capture_output=True, text=True)
                 if pull_res.returncode != 0:
                     self._log_uplink(f"GIT PULL ERROR: {pull_res.stderr}")
                     # If rebase fails, abort it to keep the repo clean
@@ -664,8 +673,8 @@ class HopesAndDreamsBot:
 
                 self._log_uplink(f"GIT PULL: {pull_res.stdout.strip()}")
 
-                # Push
-                push_res = subprocess.run(["git", "push", "origin", current_branch], check=True, capture_output=True, text=True)
+                # Push explicitly to the target branch
+                push_res = subprocess.run(["git", "push", "origin", f"HEAD:{target_branch}"], check=True, capture_output=True, text=True)
                 self._log_uplink(f"GIT PUSH: {push_res.stdout.strip()}")
             finally:
                 # Restore the stash
