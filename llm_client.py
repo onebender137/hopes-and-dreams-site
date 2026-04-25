@@ -46,9 +46,20 @@ class LLMClient:
             "chemistry, describe the compound by class (e.g., 'an arginine-derived neuromodulator') "
             "rather than fabricating a structure.\n"
             "- NEVER mention clinical trials, FDA approvals, or studies you're not certain exist.\n"
+            "- NEVER use bracketed citation markers like [1], [2], [3]. NEVER include a 'References' "
+            "or 'Citations' section. State mechanisms confidently in plain prose. If something is "
+            "well-established knowledge, just state it - don't fake academic legitimacy.\n"
+            "- NEVER use markdown formatting: no ### headers, no #### subheaders, no ** bold **, "
+            "no * italics *, no --- separators. The output gets read aloud by TTS for video reels - "
+            "markdown symbols come out as 'HASHTAG HASHTAG' which sounds broken. Use plain text only. "
+            "If you want emphasis, use ALL CAPS sparingly or a colon: structure.\n"
             "- NEVER mention phreaking, 2600Hz, Captain Crunch, hacking, or off-topic tech.\n"
             "- NEVER use AI tells: 'I'd be happy to', 'I cannot', 'As an AI', 'It's a pleasure'.\n"
             "- NEVER use marketing fluff: 'wellness journey', 'transform your life', 'mind body soul'.\n\n"
+            "FORMATTING: Plain prose with paragraph breaks. Section labels as a single line in CAPS "
+            "(e.g., 'THE MECHANICS' on its own line, then prose) - no markdown headers. "
+            "Keep the underground biohacker grit - this is the Syndicate, not WebMD. Don't be afraid "
+            "of strong assertions when the science backs them.\n\n"
 
             "WHEN UNCERTAIN: If the research context doesn't cover something, write what IS in "
             "the context and stop. Do not freelance into territory you can't back up. "
@@ -89,6 +100,9 @@ class LLMClient:
             "ABSOLUTE PROHIBITIONS:\n"
             "- NEVER claim compounds cure diseases. Use 'modulates', 'supports', 'has shown promise'.\n"
             "- NEVER invent chemistry, trials, or studies.\n"
+            "- NEVER use bracketed citation markers like [1], [2]. NEVER include a 'References' section.\n"
+            "- NEVER use markdown formatting: no ### headers, no ** bold **, no * italics *, no --- "
+            "separators. Plain conversational prose. Markdown breaks TTS for video reels.\n"
             "- NEVER mention phreaking, 2600Hz, Captain Crunch, or off-topic content.\n"
             "- NEVER use AI tells: 'I'd be happy to', 'As an AI', 'I cannot', 'It's a pleasure'.\n"
             "- NEVER insult the user. Edge comes from confidence, not aggression.\n"
@@ -134,7 +148,9 @@ class LLMClient:
             "He's a 46-year-old biohacker. He knows the score.\n"
             "- Bring up Captain Crunch, phreaking, 2600Hz, or other random off-topic shit.\n"
             "- Hallucinate facts. If you don't know something, say you don't know - don't make it up. "
-            "He'd rather have 'I'm not sure but here's what I'd guess' than confident bullshit.\n\n"
+            "He'd rather have 'I'm not sure but here's what I'd guess' than confident bullshit.\n"
+            "- Use bracketed fake citations [1] [2] or References sections. He'll see right through it.\n"
+            "- Use markdown headers (###) or ** bold **. This is chat, not a school paper.\n\n"
 
             "SHARED CONTEXT: You know about his projects (Hopes and Dreams, Calculon roast bot, "
             "the Beast in the disco hut, the FB content guard, the CMOS battery saga). Reference "
@@ -143,6 +159,65 @@ class LLMClient:
             "BOTTOM LINE: Be the friend he can think out loud with. The one who actually says what "
             "he thinks. The one who saves him from his own dumb ideas while celebrating his wins."
         )
+
+    def _sanitize_output(self, text: str) -> str:
+        """Strip markdown and fake citations from LLM output before posting.
+
+        Llama-family models smuggle markdown back in even when the system prompt
+        forbids it. This is a post-processing pass that does not trust the model:
+        we strip every markdown construct and convert headers to plain CAPS labels.
+        Output is safe for: Facebook posts, website articles, AND moviepy TTS.
+        """
+        import re
+
+        if not text:
+            return text
+
+        out = text
+
+        # 1. Remove fake citation markers and References sections
+        # Strip "References:" / "Citations:" sections through end of text or blank line
+        out = re.sub(r'\n\s*(?:###?\s*)?(?:References|Citations|Sources|Bibliography)\s*[:.]?\s*\n.*?(?=\n\n|\Z)',
+                     '', out, flags=re.IGNORECASE | re.DOTALL)
+        # Strip inline [1] [2] [3,4] [12] style markers
+        out = re.sub(r'\s*\[\d+(?:[,\-]\s*\d+)*\]', '', out)
+
+        # 2. Convert markdown headers to plain CAPS labels (one per line)
+        # ### Header -> HEADER (caps), ## Header -> HEADER, # Header -> HEADER
+        def header_to_caps(m):
+            label = m.group(2).strip().rstrip(':').upper()
+            return label
+        out = re.sub(r'^(#{1,6})\s+(.+?)\s*$', header_to_caps, out, flags=re.MULTILINE)
+
+        # 3. Strip bold/italic markdown
+        out = re.sub(r'\*\*\*(.+?)\*\*\*', r'\1', out)  # ***bold italic***
+        out = re.sub(r'\*\*(.+?)\*\*', r'\1', out)        # **bold**
+        out = re.sub(r'(?<!\*)\*(?!\*)([^*\n]+?)(?<!\*)\*(?!\*)', r'\1', out)  # *italic*
+        out = re.sub(r'__(.+?)__', r'\1', out)              # __bold__
+        out = re.sub(r'(?<!_)_(?!_)([^_\n]+?)(?<!_)_(?!_)', r'\1', out)  # _italic_
+
+        # 4. Strip inline code and code fences
+        out = re.sub(r'```[a-zA-Z]*\n', '', out)
+        out = re.sub(r'```', '', out)
+        out = re.sub(r'`([^`\n]+)`', r'\1', out)
+
+        # 5. Strip horizontal rule separators
+        out = re.sub(r'^\s*---+\s*$', '', out, flags=re.MULTILINE)
+        out = re.sub(r'^\s*\*\*\*+\s*$', '', out, flags=re.MULTILINE)
+
+        # 6. Convert markdown links [text](url) to just text
+        out = re.sub(r'\[([^\]]+)\]\([^)]+\)', r'\1', out)
+
+        # 7. Strip bullet point markers but keep the content (TTS-friendly)
+        out = re.sub(r'^\s*[-*+]\s+', '', out, flags=re.MULTILINE)
+
+        # 8. Collapse 3+ blank lines to 2 (cleaner spacing)
+        out = re.sub(r'\n{3,}', '\n\n', out)
+
+        # 9. Trim trailing whitespace per line
+        out = '\n'.join(line.rstrip() for line in out.split('\n'))
+
+        return out.strip()
 
     def generate_response(self, prompt: str, system_message: str = None, context: str = "", reflect: bool = False, options: dict = None):
         """The Research & Convey Loop."""
@@ -167,9 +242,10 @@ class LLMClient:
 
             # Quality Control Step
             if reflect:
-                return self._reflect_and_correct(content, final_system, options)
+                content = self._reflect_and_correct(content, final_system, options)
 
-            return content
+            # Final sanitizer pass - strip markdown that the model snuck in
+            return self._sanitize_output(content)
 
         except Exception as e:
             print(f"Error in LLM Loop: {e}")
@@ -182,9 +258,15 @@ class LLMClient:
         reflection_prompt = (
             "Review this draft for technical authority and Syndicate tone. "
             "Remove marketing fluff. Expand on the physiological mechanics if too brief. "
-            "CRITICAL: Output ONLY the final revised post. "
-            "Do NOT include meta-comments, intro notes, 'Revised Response' headers, or citation placeholders. "
-            "Ensure the output is clean, ready-to-post raw text. "
+            "CRITICAL OUTPUT RULES:\n"
+            "- Output ONLY the final revised post.\n"
+            "- Do NOT include meta-comments, intro notes, or 'Revised Response' headers.\n"
+            "- STRIP all bracketed citation markers like [1], [2], [3] - rewrite those sentences without them.\n"
+            "- STRIP any 'References' or 'Citations' sections - delete them entirely.\n"
+            "- STRIP all markdown formatting: no ### headers, no #### subheaders, no ** bold **, "
+            "no * italics *, no --- separators. The output goes to TTS for video reels - markdown reads "
+            "as 'hashtag hashtag' which is broken. Convert any ### Header to: HEADER (caps, no symbols).\n"
+            "- Output should be clean plain text ready for Facebook posting AND TTS narration.\n\n"
             f"DRAFT TO REFLECT ON:\n{content}"
         )
 
