@@ -265,7 +265,7 @@ class HopesAndDreamsBot:
                 print(f"[{datetime.now()}] EXECUTIVE EXECUTION: Multi-agent generation failed: {inner_e}. Falling back to legacy LLM generation...")
                 tip_content = self.llm.generate_response(f"Provide a technical deep-dive and Facebook Masterclass on: {topic}.", context=combined_context, reflect=True)
 
-            if tip_content:
+            if tip_content and not self._is_bad_content(tip_content):
                 # 4. Handle Media Attachment
                 image_path = self._get_random_media()
                 if image_path:
@@ -408,6 +408,42 @@ class HopesAndDreamsBot:
         report = self.llm.generate_response(prompt, system_msg)
         return report
 
+    def _is_bad_content(self, content):
+        """Detect LLM refusals, errors, or low-quality output before posting.
+        Returns True if content should NOT be posted."""
+        if not content:
+            self._log_uplink("CONTENT GUARD: Empty content rejected.")
+            return True
+
+        if len(content.strip()) < 150:
+            self._log_uplink(f"CONTENT GUARD: Content too short ({len(content.strip())} chars). Rejected.")
+            return True
+
+        refusal_patterns = [
+            "i cannot provide",
+            "i can't provide",
+            "i cannot create",
+            "i'm not able to",
+            "i am not able to",
+            "i'm sorry, but",
+            "i must decline",
+            "i cannot assist",
+            "i won't be able",
+            "i don't feel comfortable",
+            "promotes the use of",
+            "promtos the use",
+            "as an ai language model",
+            "as an ai assistant",
+            "against my guidelines",
+            "against my programming",
+        ]
+        content_lower = content.lower()
+        for pattern in refusal_patterns:
+            if pattern in content_lower:
+                self._log_uplink(f"CONTENT GUARD: Refusal pattern detected ('{pattern}'). Rejected.")
+                return True
+
+        return False
 
     def _post_to_website(self, content, topic, image_path=None):
         """Beautifies the content and posts it to the website (articles/ and intel.html)."""
