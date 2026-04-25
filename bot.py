@@ -490,7 +490,7 @@ class HopesAndDreamsBot:
         """Uses the LLM to beautify content and then injects it into the HTML template."""
         system_msg = (
             "You are the Syndicate's Digital Architect. Your job is to take raw biohacking intel "
-            "and format it for a high-end article."
+            "and format it for a high-end article for our website."
         )
 
         # 1. Load the template
@@ -507,33 +507,45 @@ class HopesAndDreamsBot:
             f"I have a new Syndicate Masterclass about '{topic}'.\n\n"
             f"RAW CONTENT:\n{content}\n\n"
             "INSTRUCTIONS:\n"
-            "1. Rewrite the content to be more 'beautified' for a blog post. Use engaging H2 headers.\n"
-            "2. Identify the most actionable advice and create a 'Prostar Life Hack' section.\n"
-            "3. Return the result as a JSON object with two keys: 'body' (the HTML formatted content) and 'hack' (the HTML for the hack-box).\n"
-            "4. Return ONLY the JSON object. No talk."
+            "1. Rewrite the content to be more 'beautified' for a blog post. \n"
+            "2. Use PROPER HTML tags for structure: <h2> for section headers, <p> for paragraphs, and <strong> for emphasis.\n"
+            "3. Identify the most actionable advice and create a 'Prostar Life Hack' section.\n"
+            "4. Return the result as a JSON object with two keys: 'body' (the HTML formatted content) and 'hack' (the HTML for the hack-box contents - NO H4 TAG, just the <p> text).\n"
+            "5. Return ONLY the JSON object. No talk, no markdown code blocks around the JSON."
         )
 
-        json_response = self.llm.generate_response(prompt, system_msg, reflect=True, options={'num_ctx': 4096})
+        # We need a longer context for beautification to handle the template and content
+        json_response = self.llm.generate_response(prompt, system_msg, reflect=True, options={'num_ctx': 8192})
 
-        # Cleanup: Strip markdown code blocks if present
-        if "```" in json_response:
-            match = re.search(r'```(?:json)?\n?(.*?)\n?```', json_response, re.DOTALL)
+        # Cleanup: Robustly extract JSON if the LLM ignores the "no markdown" instruction
+        json_clean = json_response.strip()
+        if "```" in json_clean:
+            match = re.search(r'```(?:json)?\n?(.*?)\n?```', json_clean, re.DOTALL)
             if match:
-                json_response = match.group(1).strip()
+                json_clean = match.group(1).strip()
+
+        # Further cleanup to remove any potential non-JSON noise before/after the object
+        match = re.search(r'(\{.*\})', json_clean, re.DOTALL)
+        if match:
+            json_clean = match.group(1).strip()
 
         try:
-            data = json.loads(json_response)
-            beautified_body = data.get('body', content)
+            data = json.loads(json_clean)
+            beautified_body = data.get('body', f"<p>{content.replace('\n', '<br>')}</p>")
             hack_content = data.get('hack', "")
-        except:
+        except Exception as e:
+            self._log_uplink(f"WEBSITE ERROR: JSON parsing failed: {e}. Falling back to raw content.")
             # Fallback if JSON fails
-            beautified_body = content
+            beautified_body = f"<p>{content.replace('\n', '<br>')}</p>"
             hack_content = ""
 
         # 3. Construct the Hack Box HTML if content exists
         hack_html = ""
         if hack_content:
-            hack_html = f'<div class="hack-box"><h4>Prostar Life Hack</h4><p>{hack_content}</p></div>'
+            # Ensure hack_content has <p> tags if it doesn't already
+            if "<p>" not in hack_content.lower():
+                hack_content = f"<p>{hack_content}</p>"
+            hack_html = f'<div class="hack-box"><h4>Prostar Life Hack</h4>{hack_content}</div>'
 
         # 4. Handle the Image HTML
         image_html = ""
