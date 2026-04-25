@@ -34,7 +34,7 @@ tmux send-keys -t $SESSION:'Webhook' "cd $PROJECT_DIR && source $VENV_PATH/bin/a
 # 4. Start Cloudflare Tunnel using the Token
 tmux new-window -t $SESSION -n 'Tunnel'
 set -a; source "$PROJECT_DIR/.env"; set +a
-tmux send-keys -t $SESSION:'Tunnel' "sleep 12 && cloudflared tunnel run --token \$CLOUDFLARE_TUNNEL_TOKEN" C-m
+tmux send-keys -t $SESSION:'Tunnel' "sleep 12 && cloudflared tunnel run --token $CLOUDFLARE_TUNNEL_TOKEN" C-m
 
 # Attach to the session so you can see it's working
 tmux attach-session -t $SESSION

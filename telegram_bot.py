@@ -433,7 +433,7 @@ class TelegramBot:
 
         await context.bot.send_chat_action(chat_id=update.effective_chat.id, action="typing")
 
-        local_context = self.knowledge.query_knowledge(user_message)
+        local_context = self.knowledge.query_knowledge(user_message) if any(kw in user_message.lower() for kw in ["agmatine","kratom","nicotine","nootropic","biohack","supplement","dosage","stack","protocol","melatonin","galantamine","yuschak","astral","lucid","mitochondria","nmda","gaba","dopamine","serotonin","acetylcholine"]) else ""
 
         if user_id not in self.chat_history:
             self.chat_history[user_id] = []
