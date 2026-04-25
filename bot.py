@@ -723,11 +723,34 @@ class HopesAndDreamsBot:
                 push_res = subprocess.run(["git", "push", "origin", f"HEAD:{target_branch}"], check=True, capture_output=True, text=True)
                 self._log_uplink(f"GIT PUSH: {push_res.stdout.strip()}")
                 # Also push to website remote (serves hopes-and-dreams.ca)
+                # Self-healing: pull from website FIRST to absorb any divergent commits, then push
                 try:
-                    website_push = subprocess.run(["git", "push", "website", f"HEAD:{target_branch}"], check=True, capture_output=True, text=True)
+                    self._log_uplink("GIT: Pre-syncing with website remote...")
+                    subprocess.run(["git", "fetch", "website"], capture_output=True, timeout=30)
+                    # Pull with merge (no-rebase) to absorb any commits website has that we don't
+                    subprocess.run(
+                        ["git", "pull", "website", target_branch, "--no-rebase", "--no-edit"],
+                        capture_output=True, text=True, timeout=60
+                    )
+                    # Now push - should succeed since we just synced
+                    website_push = subprocess.run(
+                        ["git", "push", "website", f"HEAD:{target_branch}"],
+                        check=True, capture_output=True, text=True, timeout=60
+                    )
                     self._log_uplink(f"GIT PUSH (website): Success - site updating")
+                    # Push the merge commit back to origin too so they stay in lockstep
+                    try:
+                        subprocess.run(
+                            ["git", "push", "origin", f"HEAD:{target_branch}"],
+                            check=True, capture_output=True, text=True, timeout=60
+                        )
+                        self._log_uplink("GIT: origin re-synced with website merge")
+                    except subprocess.CalledProcessError:
+                        pass  # not critical if this fails
                 except subprocess.CalledProcessError as e:
                     self._log_uplink(f"GIT PUSH (website) FAILED: {e.stderr.strip() if e.stderr else 'unknown error'}")
+                except Exception as e:
+                    self._log_uplink(f"GIT PUSH (website) FAILED (unexpected): {str(e)}")
             finally:
                 # Restore the stash
                 stash_list = subprocess.run(["git", "stash", "list"], capture_output=True, text=True)
