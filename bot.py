@@ -112,6 +112,7 @@ class HopesAndDreamsBot:
         db_exists = os.path.exists("syndicate_memory.db")
         self.db = SyndicateDatabase()
         self.crew = SyndicateCrew()
+        self.website_path = "."
 
         # Perform one-time migration if JSON files exist
         if os.path.exists(REPLIED_COMMENTS_FILE) or os.path.exists(POSTED_TOPICS_FILE):
