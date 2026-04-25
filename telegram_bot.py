@@ -101,21 +101,26 @@ class TelegramBot:
     async def help_cmd(self, update: Update, context: ContextTypes.DEFAULT_TYPE):
         """Handles the /help command."""
         help_text = (
-            "📊 **SYNDICATE INTEL HUB - COMMAND DIRECTORY**\n\n"
-            "**/clear** - Reset memory\n"
-            "**/draft [topic]** - Generate Masterclass draft\n"
-            "**/confirm** - Post draft to FB\n"
-            "**/post [topic]** - Immediate FB post\n"
-            "**/force_post [text]** - Direct raw FB post\n"
-            "**/pulse** - Activity report\n"
-            "**/check** - Monitor FB comments\n"
-            "**/research [topic]** - PubMed search\n"
-            "**/news [topic]** - RSS search\n"
-            "**/affiliate [keyword]** - Amazon search\n"
-            "**/video [topic]** - Video generation\n"
-            "**/index** - Rebuild knowledge index"
+            "<b>📊 SYNDICATE INTEL HUB - COMMAND DIRECTORY</b>\n\n"
+            "<b>/clear</b> - Reset memory\n"
+            "<b>/draft [topic]</b> - Generate Masterclass draft\n"
+            "<b>/confirm</b> - Post draft to FB\n"
+            "<b>/post [topic]</b> - Immediate FB post\n"
+            "<b>/force_post [text]</b> - Direct raw FB post\n"
+            "<b>/pulse</b> - Activity report\n"
+            "<b>/check</b> - Monitor FB comments\n"
+            "<b>/research [topic]</b> - PubMed search\n"
+            "<b>/news [topic]</b> - RSS search\n"
+            "<b>/affiliate [keyword]</b> - Amazon search\n"
+            "<b>/video [topic]</b> - Video generation\n"
+            "<b>/index</b> - Rebuild knowledge index\n"
+            "<b>/status</b> - System status report\n"
+            "<b>/debug</b> - View uplink logs\n"
+            "<b>/test_uplink</b> - Diagnostic website post\n"
+            "<b>/sync</b> - Manual repository sync\n"
+            "<b>/fix_git</b> - Emergency Git repair"
         )
-        await update.message.reply_text(help_text, parse_mode='Markdown')
+        await update.message.reply_text(help_text, parse_mode='HTML')
 
     @restricted
     async def clear_memory(self, update: Update, context: ContextTypes.DEFAULT_TYPE):
