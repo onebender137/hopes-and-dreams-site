@@ -1067,3 +1067,41 @@ document.addEventListener('DOMContentLoaded', () => {
         return `[${currentAgent}] Query logged. My current intelligence parameters are limited to known protocols. Try asking about 'Alpha GPC', 'HRV', or 'The Syndicate'.`;
     }
 });
+
+// Syndicate Matrix Gutter Logic (Lightweight)
+document.addEventListener('DOMContentLoaded', () => {
+    if (window.innerWidth <= 1024) return; // Abort on mobile
+
+    const createGutter = (side) => {
+        const gutter = document.createElement('div');
+        gutter.className = `data-gutter ${side}`;
+        document.body.appendChild(gutter);
+        return gutter;
+    };
+
+    const leftGutter = createGutter('left');
+    const rightGutter = createGutter('right');
+
+    // Matrix character set (Katakana + Latin + Numerals)
+    const chars = "ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789@#$%^&*";
+
+    // Moderate interval for ~50% density
+    setInterval(() => {
+        const text = chars.charAt(Math.floor(Math.random() * chars.length)) +
+                     chars.charAt(Math.floor(Math.random() * chars.length)) +
+                     chars.charAt(Math.floor(Math.random() * chars.length));
+
+        const el = document.createElement('div');
+        el.innerText = text;
+        el.style.opacity = Math.random() * 0.5 + 0.1;
+        el.style.marginBottom = "6px";
+
+        const target = Math.random() > 0.5 ? leftGutter : rightGutter;
+        target.prepend(el);
+
+        // Keep DOM clean
+        if (target.children.length > 35) {
+            target.removeChild(target.lastChild);
+        }
+    }, 600);
+});
