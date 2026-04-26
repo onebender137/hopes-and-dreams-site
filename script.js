@@ -1093,7 +1093,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
         const el = document.createElement('div');
         el.innerText = text;
-        el.style.opacity = Math.random() * 0.5 + 0.1;
+        el.style.opacity = Math.random() * 0.4 + 0.05;
         el.style.marginBottom = "6px";
 
         const target = Math.random() > 0.5 ? leftGutter : rightGutter;
@@ -1176,6 +1176,36 @@ document.addEventListener('DOMContentLoaded', () => {
                     scroller.scrollTo({ left: scrollLeft, behavior: 'smooth' });
                 }, 500);
             }
+
+            // Click and Drag scrolling
+            let isDown = false;
+            let startX;
+            let scrollLeft;
+
+            scroller.addEventListener('mousedown', (e) => {
+                isDown = true;
+                scroller.classList.add('grabbing');
+                startX = e.pageX - scroller.offsetLeft;
+                scrollLeft = scroller.scrollLeft;
+            });
+
+            scroller.addEventListener('mouseleave', () => {
+                isDown = false;
+                scroller.classList.remove('grabbing');
+            });
+
+            scroller.addEventListener('mouseup', () => {
+                isDown = false;
+                scroller.classList.remove('grabbing');
+            });
+
+            scroller.addEventListener('mousemove', (e) => {
+                if (!isDown) return;
+                e.preventDefault();
+                const x = e.pageX - scroller.offsetLeft;
+                const walk = (x - startX) * 2; // scroll-fast factor
+                scroller.scrollLeft = scrollLeft - walk;
+            });
 
         } catch (error) {
             console.error('Syndicate Navigation Error:', error);
