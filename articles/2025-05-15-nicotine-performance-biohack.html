@@ -158,7 +158,7 @@
         <div class="glow-divider"></div>
 
         <article class="article-container" data-reveal>
-            <span class="meta-data">Transmission // May 2025</span>
+            <div class="timestamp-live" data-timestamp="[ LIVE FEED ] RECEIVED: 2025-05-15 09:00:00 AST"></div>
             <h1>Nicotine: The Formidable Performance Biohack</h1>
 
             <img src="../media/nicotine/Gemini_Generated_Image_a15tk0a15tk0a15t.png" alt="Nicotine Biohacking" class="article-img">
@@ -182,6 +182,12 @@
             <div class="hack-box">
                 <h4>Prostar Life Hack</h4>
                 <p>The "Syndicate Sprint": Use 1mg of nicotine mouth spray combined with a cup of mold-free coffee before a deep-work block. This pairing accelerates the entry into a flow state while keeping physical hunger signals muted.</p>
+            </div>
+
+
+            <div class="researcher-sig">
+                [ STATUS: TRANSMISSION_COMPLETE ]<br>
+                [ AUTHOR: LEAD TECHNICAL RESEARCHER ]
             </div>
 
             <div class="syndicate-footer">
@@ -209,5 +215,33 @@
 
     <script src="../codex.js" defer></script>
     <script src="../script.js" defer></script>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', () => {
+            const timestampElement = document.querySelector('.timestamp-live');
+            if (timestampElement) {
+                const text = timestampElement.getAttribute('data-timestamp');
+                if (!text) return;
+
+                timestampElement.innerHTML = '<span class="typing-text"></span><span class="cursor"></span>';
+                const typingText = timestampElement.querySelector('.typing-text');
+
+                let i = 0;
+                const typingSpeed = 40;
+
+                function typeWriter() {
+                    if (i < text.length) {
+                        typingText.textContent += text.charAt(i);
+                        i++;
+                        setTimeout(typeWriter, typingSpeed);
+                    }
+                }
+
+                // Small delay before starting
+                setTimeout(typeWriter, 500);
+            }
+        });
+    </script>
+
 </body>
 </html>

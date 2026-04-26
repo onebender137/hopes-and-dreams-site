@@ -158,7 +158,7 @@
         <div class="glow-divider"></div>
 
         <article class="article-container" data-reveal>
-            <span class="meta-data">Transmission // April 2026</span>
+            <div class="timestamp-live" data-timestamp="[ LIVE FEED ] RECEIVED: 2026-04-23 09:00:00 AST"></div>
             <h1>Nootropics 101: The Foundation</h1>
 
 
@@ -168,6 +168,12 @@
             </div>
 
             <div class="hack-box"><h4>Prostar Life Hack</h4><p>New to the Syndicate? Start with the "Golden Trio": 200mg L-Theanine, 100mg Caffeine, and 300mg Alpha GPC. This stack provides clean energy and focus without the jitters, while providing the choline foundation for cognitive output.</p></div>
+
+
+            <div class="researcher-sig">
+                [ STATUS: TRANSMISSION_COMPLETE ]<br>
+                [ AUTHOR: LEAD TECHNICAL RESEARCHER ]
+            </div>
 
             <div class="syndicate-footer">
                 <h3>Join the Conversation</h3>
@@ -194,5 +200,33 @@
 
     <script src="../codex.js" defer></script>
     <script src="../script.js" defer></script>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', () => {
+            const timestampElement = document.querySelector('.timestamp-live');
+            if (timestampElement) {
+                const text = timestampElement.getAttribute('data-timestamp');
+                if (!text) return;
+
+                timestampElement.innerHTML = '<span class="typing-text"></span><span class="cursor"></span>';
+                const typingText = timestampElement.querySelector('.typing-text');
+
+                let i = 0;
+                const typingSpeed = 40;
+
+                function typeWriter() {
+                    if (i < text.length) {
+                        typingText.textContent += text.charAt(i);
+                        i++;
+                        setTimeout(typeWriter, typingSpeed);
+                    }
+                }
+
+                // Small delay before starting
+                setTimeout(typeWriter, 500);
+            }
+        });
+    </script>
+
 </body>
 </html>

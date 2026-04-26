@@ -156,17 +156,17 @@
 
     <div class="container">
         <article class="article-container" data-reveal>
-            <span class="meta-data">Transmission // April 2026</span>
+            <div class="timestamp-live" data-timestamp="[ LIVE FEED ] RECEIVED: 2026-04-24 09:00:00 AST"></div>
             <h1>Cytokine Modulation: High-Dose Omega-3 Protocols for Systemic Optimization</h1>
 
             <div class="intel-burst">
-                <h2>The Immunomodulatory Axis</h2>
+                <h2>Mechanics</h2>
                 <p>Cytokine modulation through omega-3 fatty acids exploits the powerful immunomodulatory effects of <strong>Eicosapentaenoic Acid (EPA)</strong> and <strong>Docosahexaenoic Acid (DHA)</strong>. These long-chain fatty acids specifically inhibit the expression of pro-inflammatory cytokines such as <strong>TNF-alpha, IL-1beta, and IL-6</strong>, while simultaneously upregulating anti-inflammatory mediators like <strong>IL-10</strong>.</p>
 
-                <h2>Mechanistic Leverage</h2>
+                <h2>Biological Leverage</h2>
                 <p>This action is mediated through multiple biological vectors: the modification of lipid raft composition, the inhibition of the <strong>NF-kappaB</strong> signaling pathway, and the production of specialized pro-resolving mediators (SPMs) like resolvins and protectins. By altering the fatty acid profile of cell membranes, omega-3s influence the very architecture of immune response signaling.</p>
 
-                <h2>Neuroprotective Implications</h2>
+                <h2>Biological Leverage</h2>
                 <p>Beyond systemic inflammation, omega-3 fatty acids exhibit profound optimization effects on cognitive function. High-dose DHA is critical for maintaining synaptic integrity and fluidizing neuronal membranes, potentially mitigating the long-term risks of neurodegenerative pathologies. In the context of high-performance biohacking, this translates to faster processing speeds and improved recovery from cognitive fatigue.</p>
 
                 <h2>Tactical Implementation</h2>
@@ -178,6 +178,12 @@
             <div class="hack-box">
                 <h4>Prostar Life Hack</h4>
                 <p>For maximum anti-inflammatory leverage, stack your high-dose Omega-3 with 500mg of Curcumin (standardized to 95% curcuminoids) and a piperine source. The synergistic inhibition of the COX-2 and LOX pathways provides a broad-spectrum "firewall" against systemic inflammation.</p>
+            </div>
+
+
+            <div class="researcher-sig">
+                [ STATUS: TRANSMISSION_COMPLETE ]<br>
+                [ AUTHOR: LEAD TECHNICAL RESEARCHER ]
             </div>
 
             <div class="syndicate-footer">
@@ -205,5 +211,33 @@
 
     <script src="../codex.js" defer></script>
     <script src="../script.js" defer></script>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', () => {
+            const timestampElement = document.querySelector('.timestamp-live');
+            if (timestampElement) {
+                const text = timestampElement.getAttribute('data-timestamp');
+                if (!text) return;
+
+                timestampElement.innerHTML = '<span class="typing-text"></span><span class="cursor"></span>';
+                const typingText = timestampElement.querySelector('.typing-text');
+
+                let i = 0;
+                const typingSpeed = 40;
+
+                function typeWriter() {
+                    if (i < text.length) {
+                        typingText.textContent += text.charAt(i);
+                        i++;
+                        setTimeout(typeWriter, typingSpeed);
+                    }
+                }
+
+                // Small delay before starting
+                setTimeout(typeWriter, 500);
+            }
+        });
+    </script>
+
 </body>
 </html>
