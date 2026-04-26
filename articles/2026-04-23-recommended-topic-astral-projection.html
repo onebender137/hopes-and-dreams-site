@@ -140,7 +140,7 @@
 
     <div class="container">
         <article class="article-container" data-reveal>
-            <span class="meta-data">Transmission // April 2026</span>
+            <div class="timestamp-live" data-timestamp="[ LIVE FEED ] RECEIVED: 2026-04-23 09:00:00 AST"></div>
             <h1>Astral Projection: The Separation Protocol</h1>
 
             <div class="intel-burst">
@@ -159,6 +159,12 @@
             <div class="hack-box">
                 <h4>Syndicate Protocol</h4>
                 <p>For maximum effectiveness, ensure your room is in total darkness. Use a weighted blanket to dampen physical sensory input, making it easier for the brain to prioritize internal signals over external stimuli during the exit phase.</p>
+            </div>
+
+
+            <div class="researcher-sig">
+                [ STATUS: TRANSMISSION_COMPLETE ]<br>
+                [ AUTHOR: LEAD TECHNICAL RESEARCHER ]
             </div>
 
             <div class="syndicate-footer">
@@ -186,5 +192,33 @@
 
     <script src="../codex.js" defer></script>
     <script src="../script.js" defer></script>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', () => {
+            const timestampElement = document.querySelector('.timestamp-live');
+            if (timestampElement) {
+                const text = timestampElement.getAttribute('data-timestamp');
+                if (!text) return;
+
+                timestampElement.innerHTML = '<span class="typing-text"></span><span class="cursor"></span>';
+                const typingText = timestampElement.querySelector('.typing-text');
+
+                let i = 0;
+                const typingSpeed = 40;
+
+                function typeWriter() {
+                    if (i < text.length) {
+                        typingText.textContent += text.charAt(i);
+                        i++;
+                        setTimeout(typeWriter, typingSpeed);
+                    }
+                }
+
+                // Small delay before starting
+                setTimeout(typeWriter, 500);
+            }
+        });
+    </script>
+
 </body>
 </html>
