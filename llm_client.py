@@ -284,7 +284,8 @@ class LLMClient:
         prompt = (
             f"Draft an expansive Masterclass on: {topic}. "
             "Use headers: Mechanics, Biological Leverage, Tactical Implementation. "
-            "Ensure technical weight and visionary tone. Each section must be substantial (4-5 sentences)."
+            "Ensure technical weight and visionary tone. Each section must be substantial (4-5 sentences). "
+            "MANDATORY: You must end the post with exactly: 'Do your own research. Don't be a statistic.'"
         )
         return self.generate_response(prompt, self.syndicate_persona, context, reflect=True)
 
