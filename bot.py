@@ -450,9 +450,16 @@ class HopesAndDreamsBot:
         os.makedirs("articles", exist_ok=True)
         self._log_uplink(f"WEBSITE: Initializing Syndicate Transmission for {topic}...")
 
+        # 0. Handle missing image (Weaponize the pipeline)
+        if not image_path:
+            image_path = self._get_random_media()
+            if image_path:
+                self._log_uplink(f"WEBSITE: No image provided. Selected random asset: {image_path}")
+
         # 1. Beautify content using LLM
         try:
-            beautified_html = self._beautify_for_blog(content, topic, image_path)
+            # We now capture priority from beautification
+            beautified_html, priority = self._beautify_for_blog(content, topic, image_path)
             if not beautified_html or len(beautified_html) < 100:
                 self._log_uplink("WEBSITE ERROR: Beautification returned empty or suspiciously short HTML.")
                 return False
@@ -476,7 +483,7 @@ class HopesAndDreamsBot:
             return False
 
         # 4. Update intel.html (Latest 3)
-        self._update_intel_html(topic, filename, date_str)
+        self._update_intel_html(topic, filename, date_str, priority)
 
         # 5. Update transmissions.html (Archive)
         self._update_transmissions_html(topic, filename, date_str)
@@ -500,18 +507,23 @@ class HopesAndDreamsBot:
                 template = f.read()
         except Exception as e:
             self._log_uplink(f"WEBSITE ERROR: Template not found at {template_path}: {e}")
-            return f"<h1>{topic}</h1><p>{content}</p>" # Minimal fallback
+            return f"<h1>{topic}</h1><p>{content}</p>", 2 # Minimal fallback
 
         # 2. Ask LLM to generate the beautified body and the hack box separately
         prompt = (
             f"I have a new Syndicate Masterclass about '{topic}'.\n\n"
             f"RAW CONTENT:\n{content}\n\n"
             "INSTRUCTIONS:\n"
-            "1. Rewrite the content to be more 'beautified' for a blog post. \n"
+            "1. Rewrite the content to be more 'beautified' for a professional blog post. \n"
             "2. Use PROPER HTML tags for structure: <h2> for section headers, <p> for paragraphs, and <strong> for emphasis.\n"
-            "3. Identify the most actionable advice and create a 'Prostar Life Hack' section.\n"
-            "4. Return the result as a JSON object with two keys: 'body' (the HTML formatted content) and 'hack' (the HTML for the hack-box contents - NO H4 TAG, just the <p> text).\n"
-            "5. Return ONLY the JSON object. No talk, no markdown code blocks around the JSON."
+            "3. MANDATORY: Structure the body using NUMBERED HEADERS for each main section (e.g., '1. The Mechanism', '2. Protocol implementation').\n"
+            "4. MANDATORY: Create a 'Prostar Life Hack' section containing the most actionable, high-value takeaway.\n"
+            "5. Analyze the 'Intelligence Level' of the content. If it contains deep technical pharmacological data or complex protocols, assign Priority 1. If it's a general overview, assign Priority 2.\n"
+            "6. Return the result as a JSON object with three keys:\n"
+            "   - 'body': The HTML formatted content.\n"
+            "   - 'hack': The HTML text for the hack-box contents (just the text, no <h4>).\n"
+            "   - 'priority': The integer 1 or 2.\n"
+            "7. Return ONLY the JSON object. No talk, no markdown code blocks around the JSON."
         )
 
         # We need a longer context for beautification to handle the template and content
@@ -533,11 +545,13 @@ class HopesAndDreamsBot:
             data = json.loads(json_clean)
             beautified_body = data.get('body', f"<p>{content.replace('\n', '<br>')}</p>")
             hack_content = data.get('hack', "")
+            priority = int(data.get('priority', 2))
         except Exception as e:
             self._log_uplink(f"WEBSITE ERROR: JSON parsing failed: {e}. Falling back to raw content.")
             # Fallback if JSON fails
             beautified_body = f"<p>{content.replace('\n', '<br>')}</p>"
             hack_content = ""
+            priority = 2
 
         # 3. Construct the Hack Box HTML if content exists
         hack_html = ""
@@ -553,24 +567,28 @@ class HopesAndDreamsBot:
             image_html = f'<img src="../{image_path}" alt="{topic}" class="article-img">'
 
         # 5. Inject into template using placeholders
-        date_str = datetime.now().strftime("%B %Y")
+        now = datetime.now()
+        date_display = now.strftime("%B %Y")
+        timestamp_str = f"[ LIVE FEED ] RECEIVED: {now.strftime('%Y-%m-%d %H:%M:%S')} AST"
 
         final_html = template.replace("{{SYNDICATE_TITLE}}", topic)
-        final_html = final_html.replace("{{SYNDICATE_DATE}}", date_str)
+        final_html = final_html.replace("{{SYNDICATE_DATE}}", date_display)
+        final_html = final_html.replace("{{SYNDICATE_TIMESTAMP}}", timestamp_str)
         final_html = final_html.replace("{{SYNDICATE_CONTENT}}", beautified_body)
         final_html = final_html.replace("{{SYNDICATE_HACK}}", hack_html)
         final_html = final_html.replace("{{SYNDICATE_IMAGE}}", image_html)
 
-        return final_html
-    def _update_intel_html(self, topic, filename, date_str):
+        return final_html, priority
+    def _update_intel_html(self, topic, filename, date_str, priority=2):
         """Updates the intel.html file with the latest 3 posts."""
-        self._log_uplink("WEBSITE: Syncing intel.html...")
+        self._log_uplink(f"WEBSITE: Syncing intel.html (Priority: {priority})...")
         try:
             with open("intel.html", 'r') as f:
                 html = f.read()
 
+            priority_class = " priority-1" if priority == 1 else ""
             new_card = (
-                f'                <div class="card">\n'
+                f'                <div class="card{priority_class}">\n'
                 f'                    <div class="meta-data" style="font-size: 0.7rem; color: var(--neon-gold); margin-bottom: 10px;">TRANSMISSION: {date_str}</div>\n'
                 f'                    <h3>{topic}</h3>\n'
                 f'                    <p>{topic} protocol initialized. Access the full intel burst below.</p>\n'
@@ -590,7 +608,7 @@ class HopesAndDreamsBot:
                 after_block = post_parts[1]
 
                 # Extract cards using regex but handle the block more safely
-                cards = re.findall(r'<div class="card">.*?</a>\s*</div>', current_block, re.DOTALL)
+                cards = re.findall(r'<div class="card[^"]*">.*?</a>\s*</div>', current_block, re.DOTALL)
                 cards = [c for c in cards if "Initializing Feed" not in c and "Waiting for Uplink" not in c and "Data Stream Alpha" not in c]
                 cards.insert(0, new_card)
                 cards = cards[:3]
