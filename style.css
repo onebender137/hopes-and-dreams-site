@@ -1224,9 +1224,10 @@ body.light-mode #neural-info-box {
     overflow: hidden;
     font-family: monospace;
     font-size: 0.9rem;
-    color: rgba(80, 110, 80, 0.3); /* Subtle, low-opacity Matrix green/grey */
-    z-index: -1;
+    color: var(--neon-blue);
+    z-index: 1;
     pointer-events: none;
+    text-shadow: 0 0 5px var(--neon-blue);
     padding-top: 20px;
 }
 .data-gutter.left { left: 15px; }
@@ -1278,6 +1279,7 @@ body.light-mode #neural-info-box {
     gap: 20px;
     overflow-x: auto;
     padding: 20px 40px;
+    cursor: grab;
     scrollbar-width: none; /* Firefox */
     -ms-overflow-style: none;  /* IE and Edge */
     scroll-behavior: smooth;
@@ -1286,6 +1288,11 @@ body.light-mode #neural-info-box {
 
 .nav-scroller::-webkit-scrollbar {
     display: none; /* Chrome, Safari, Opera */
+}
+
+.nav-scroller.grabbing {
+    cursor: grabbing;
+    scroll-behavior: auto; /* Smoother dragging without momentum fight */
 }
 
 .nav-card {
