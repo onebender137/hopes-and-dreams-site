@@ -1105,3 +1105,82 @@ document.addEventListener('DOMContentLoaded', () => {
         }
     }, 600);
 });
+
+// --- Article Navigation Scroller Logic ---
+document.addEventListener('DOMContentLoaded', () => {
+    const navPlaceholder = document.getElementById('article-navigation');
+    if (!navPlaceholder) return;
+
+    // Determine if we are in an article page
+    const isArticle = window.location.pathname.includes('/articles/');
+    if (!isArticle) return;
+
+    const transmissionsUrl = '../transmissions.html';
+
+    async function initializeArticleNav() {
+        try {
+            const response = await fetch(transmissionsUrl);
+            const html = await response.text();
+            const parser = new DOMParser();
+            const doc = parser.parseFromString(html, 'text/html');
+            const archiveItems = Array.from(doc.querySelectorAll('.archive-item'));
+
+            if (archiveItems.length === 0) return;
+
+            const currentPath = window.location.pathname.split('/').pop();
+            let currentIndex = archiveItems.findIndex(item => item.getAttribute('href').includes(currentPath));
+
+            // Generate the scroller HTML
+            let navHTML = `
+                <h2 class="section-title">Syndicate Transmissions</h2>
+                <div class="nav-scroller-container">
+                    <div class="nav-scroller" id="nav-scroller">
+            `;
+
+            archiveItems.forEach((item, index) => {
+                const title = item.querySelector('.title').textContent;
+                const date = item.querySelector('.date').textContent;
+                const href = item.getAttribute('href');
+                const isActive = index === currentIndex;
+                const isPrev = index === currentIndex + 1; // Reverse chronological order
+                const isNext = index === currentIndex - 1;
+
+                let cardClass = 'nav-card';
+                if (isActive) cardClass += ' active';
+                if (isPrev) cardClass += ' prev-card';
+                if (isNext) cardClass += ' next-card';
+
+                navHTML += `
+                    <a href="../${href}" class="${cardClass}" data-index="${index}">
+                        <div>
+                            <div class="nav-meta">${date}</div>
+                            <h4>${title}</h4>
+                        </div>
+                    </a>
+                `;
+            });
+
+            navHTML += `
+                    </div>
+                </div>
+            `;
+
+            navPlaceholder.innerHTML = navHTML;
+
+            // Scroll the active card into center view
+            const scroller = document.getElementById('nav-scroller');
+            const activeCard = scroller.querySelector('.nav-card.active');
+            if (activeCard) {
+                setTimeout(() => {
+                    const scrollLeft = activeCard.offsetLeft - (scroller.offsetWidth / 2) + (activeCard.offsetWidth / 2);
+                    scroller.scrollTo({ left: scrollLeft, behavior: 'smooth' });
+                }, 500);
+            }
+
+        } catch (error) {
+            console.error('Syndicate Navigation Error:', error);
+        }
+    }
+
+    initializeArticleNav();
+});
