@@ -1,4 +1,5 @@
 import urllib.parse
+import re
 from amazon_paapi import AmazonApi
 from config import Config
 
@@ -58,10 +59,30 @@ class AffiliateClient:
         tag = Config.AMAZON_ASSOCIATE_TAG or "hopesanddreams-20"
         return f"https://www.amazon.ca/s?k={encoded_keyword}&tag={tag}"
 
+    def sanitize_text(self, text: str):
+        """Removes any URLs that do not contain the mandatory affiliate tag."""
+        if not text:
+            return text
+
+        tag = Config.AMAZON_ASSOCIATE_TAG or "hopesanddreams-20"
+
+        # Regex to find URLs
+        url_pattern = r'https?://[^\s<>"]+|www\.[^\s<>"]+'
+
+        def replace_link(match):
+            url = match.group(0)
+            if tag in url:
+                return url
+            return "[REDACTED LINK]" # Or just empty string ""
+
+        return re.sub(url_pattern, replace_link, text)
+
     def format_affiliate_payload(self, pitch: str, link: str):
         """Combines pitch, link, and the mandatory legal disclaimer."""
         disclaimer = "As an Amazon Associate, I earn from qualifying purchases."
-        payload = f"{pitch}\n\n🔍 Check it out here: {link}\n\n{disclaimer}"
+        # Sanitize the pitch just in case the LLM hallucinated other links
+        clean_pitch = self.sanitize_text(pitch)
+        payload = f"{clean_pitch}\n\n{disclaimer}\n{link}"
         return payload
 
 if __name__ == "__main__":

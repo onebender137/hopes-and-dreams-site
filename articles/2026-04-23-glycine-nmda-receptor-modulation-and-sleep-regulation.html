@@ -130,7 +130,7 @@
 
     <div class="container">
         <article class="article-container" data-reveal>
-            <span class="meta-data">Transmission // April 2026</span>
+            <div class="timestamp-live" data-timestamp="[ LIVE FEED ] RECEIVED: 2026-04-23 09:00:00 AST"></div>
             <h1>Glycine: NMDA Modulation and Sleep Architecture</h1>
 
             <div class="intel-burst">
@@ -149,6 +149,12 @@
             <div class="hack-box">
                 <h4>Syndicate Sleep Stack</h4>
                 <p>Combine 3g of Glycine with 200mg of Magnesium Bisglycinate 30 minutes before sleep. This synergistic pair maximizes NMDA modulation and ensures deep, restorative recovery cycles.</p>
+            </div>
+
+
+            <div class="researcher-sig">
+                [ STATUS: TRANSMISSION_COMPLETE ]<br>
+                [ AUTHOR: LEAD TECHNICAL RESEARCHER ]
             </div>
 
             <div class="syndicate-footer">
@@ -176,5 +182,33 @@
 
     <script src="../codex.js" defer></script>
     <script src="../script.js" defer></script>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', () => {
+            const timestampElement = document.querySelector('.timestamp-live');
+            if (timestampElement) {
+                const text = timestampElement.getAttribute('data-timestamp');
+                if (!text) return;
+
+                timestampElement.innerHTML = '<span class="typing-text"></span><span class="cursor"></span>';
+                const typingText = timestampElement.querySelector('.typing-text');
+
+                let i = 0;
+                const typingSpeed = 40;
+
+                function typeWriter() {
+                    if (i < text.length) {
+                        typingText.textContent += text.charAt(i);
+                        i++;
+                        setTimeout(typeWriter, typingSpeed);
+                    }
+                }
+
+                // Small delay before starting
+                setTimeout(typeWriter, 500);
+            }
+        });
+    </script>
+
 </body>
 </html>

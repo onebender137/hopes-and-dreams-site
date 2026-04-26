@@ -280,19 +280,11 @@ class LLMClient:
             return content.strip()
 
     def create_biohacking_post(self, topic: str, context: str = ""):
-        """Generates a deep-dive biohacking article (long-form, FB + website)."""
+        """Generates the Facebook/Site Masterclass."""
         prompt = (
-            f"Write a deep technical biohacking article about: {topic}.\n\n"
-            "FIRST LINE: A single punchy headline, max 8 words, that grabs attention.\n"
-            "Examples of good headlines: 'NAD+: The Mitochondrial Reset Switch', "
-            "'Hijacking Cellular Energy with NR', 'Glutathione: The Master Antioxidant Protocol'.\n"
-            "DO NOT use the word 'Masterclass', 'Deep Dive', 'Comprehensive Guide', or 'Ultimate' "
-            "in the headline. Make it bold, specific, and punchy.\n\n"
-            "STRUCTURE after the headline (each section 4-5 dense sentences):\n"
-            "THE MECHANICS - the receptor/pathway biology\n"
-            "BIOLOGICAL LEVERAGE - downstream physiological effects\n"
-            "TACTICAL IMPLEMENTATION - dosage, timing, stacking, contraindications\n\n"
-            "End with: Do your own research. Don't be a statistic."
+            f"Draft an expansive Masterclass on: {topic}. "
+            "Use headers: Mechanics, Biological Leverage, Tactical Implementation. "
+            "Ensure technical weight and visionary tone. Each section must be substantial (4-5 sentences)."
         )
         return self.generate_response(prompt, self.syndicate_persona, context, reflect=True)
 

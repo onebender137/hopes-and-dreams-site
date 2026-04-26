@@ -158,7 +158,7 @@
         <div class="glow-divider"></div>
 
         <article class="article-container" data-reveal>
-            <span class="meta-data">Transmission // May 2025</span>
+            <div class="timestamp-live" data-timestamp="[ LIVE FEED ] RECEIVED: 2025-05-15 09:00:00 AST"></div>
             <h1>Nootropics Foundation: Definition & Scope</h1>
 
             <img src="../media/general/Gemini_Generated_Image_dikpf1dikpf1dikp (1).png" alt="Nootropics Foundation" class="article-img">
@@ -188,6 +188,12 @@
                 <p>The "Choline Base": If you are using Racetams (like Piracetam), always stack them with a high-quality choline source like Alpha GPC. This prevents the "Racetam Headache" caused by the brain's increased demand for acetylcholine during high-intensity cognitive processing.</p>
             </div>
 
+
+            <div class="researcher-sig">
+                [ STATUS: TRANSMISSION_COMPLETE ]<br>
+                [ AUTHOR: LEAD TECHNICAL RESEARCHER ]
+            </div>
+
             <div class="syndicate-footer">
                 <h3>Join the Conversation</h3>
                 <p>Discuss this transmission and share your results with the rest of the builders in our private community.</p>
@@ -213,5 +219,33 @@
 
     <script src="../codex.js" defer></script>
     <script src="../script.js" defer></script>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', () => {
+            const timestampElement = document.querySelector('.timestamp-live');
+            if (timestampElement) {
+                const text = timestampElement.getAttribute('data-timestamp');
+                if (!text) return;
+
+                timestampElement.innerHTML = '<span class="typing-text"></span><span class="cursor"></span>';
+                const typingText = timestampElement.querySelector('.typing-text');
+
+                let i = 0;
+                const typingSpeed = 40;
+
+                function typeWriter() {
+                    if (i < text.length) {
+                        typingText.textContent += text.charAt(i);
+                        i++;
+                        setTimeout(typeWriter, typingSpeed);
+                    }
+                }
+
+                // Small delay before starting
+                setTimeout(typeWriter, 500);
+            }
+        });
+    </script>
+
 </body>
 </html>
