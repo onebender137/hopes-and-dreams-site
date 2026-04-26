@@ -311,12 +311,29 @@ class HopesAndDreamsBot:
         products = self.affiliate.search_products(topic, limit=1)
 
         if products:
-            recommendation = self.affiliate.format_product_as_recommendation(products[0])
+            product_title = products[0]['title']
+            product_url = products[0]['url']
         else:
-            # Fallback to manual link
-            manual_link = self.affiliate.generate_canadian_link(topic)
-            pitch = f"For those looking to optimize their protocol with {topic}, here is the top-vetted option on Amazon.ca."
-            recommendation = self.affiliate.format_affiliate_payload(pitch, manual_link)
+            product_title = topic
+            product_url = self.affiliate.generate_canadian_link(topic)
+
+        # Generate a human-like, peer-to-peer pitch
+        prompt = (
+            f"Write a 1-2 sentence recommendation for {product_title}. "
+            "Tone: Peer-to-peer biohacker, underground, technical, NO marketing fluff. "
+            "Explain briefly why someone would want this for their protocol. "
+            "Do NOT include links or disclosures yet."
+        )
+
+        try:
+            pitch = self.llm.generate_response(prompt, self.llm.public_syndicate_persona)
+            # Use the new formatting logic which handles sanitation and disclosure
+            recommendation = self.affiliate.format_affiliate_payload(pitch, product_url)
+        except Exception as e:
+            self._log_uplink(f"AFFILIATE ERROR: Failed to generate pitch: {e}")
+            # Fallback
+            pitch = f"Vetted source for {topic} optimization."
+            recommendation = self.affiliate.format_affiliate_payload(pitch, product_url)
 
         result = self.fb.reply_to_comment(post_id, recommendation)
         if result:
