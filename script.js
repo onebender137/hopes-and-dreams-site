@@ -30,6 +30,37 @@ document.addEventListener('DOMContentLoaded', () => {
 
     document.querySelectorAll('[data-reveal]').forEach(el => observer.observe(el));
 
+    // --- Typewriter Effect for Timestamps ---
+    document.querySelectorAll('.timestamp-live[data-timestamp]').forEach(el => {
+        const text = el.getAttribute('data-timestamp');
+        if (!text) return;
+
+        el.innerHTML = '<span class="typing-text"></span><span class="cursor"></span>';
+        const typingText = el.querySelector('.typing-text');
+        let i = 0;
+        const typingSpeed = 40;
+
+        function typeWriter() {
+            if (i < text.length) {
+                typingText.textContent += text.charAt(i);
+                i++;
+                setTimeout(typeWriter, typingSpeed);
+            }
+        }
+        setTimeout(typeWriter, 500);
+    });
+
+    // --- Decryption (Boot-Up) Sequence ---
+    // Robustly target the first paragraph of an article container
+    const firstArticleP = document.querySelector('.article-container p, .intel-burst p');
+    if (firstArticleP) {
+        firstArticleP.classList.add('decryption-text');
+        // Staggered reveal
+        setTimeout(() => {
+            firstArticleP.classList.add('decrypted');
+        }, 500);
+    }
+
     // --- Interactive Feature Logic ---
 
     // 0. Caffeine Fade Visualizer

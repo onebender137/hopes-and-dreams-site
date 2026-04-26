@@ -166,7 +166,7 @@
                 <h2>Biological Leverage</h2>
                 <p>This action is mediated through multiple biological vectors: the modification of lipid raft composition, the inhibition of the <strong>NF-kappaB</strong> signaling pathway, and the production of specialized pro-resolving mediators (SPMs) like resolvins and protectins. By altering the fatty acid profile of cell membranes, omega-3s influence the very architecture of immune response signaling.</p>
 
-                <h2>Biological Leverage</h2>
+                <h2>Cognitive Architecture</h2>
                 <p>Beyond systemic inflammation, omega-3 fatty acids exhibit profound optimization effects on cognitive function. High-dose DHA is critical for maintaining synaptic integrity and fluidizing neuronal membranes, potentially mitigating the long-term risks of neurodegenerative pathologies. In the context of high-performance biohacking, this translates to faster processing speeds and improved recovery from cognitive fatigue.</p>
 
                 <h2>Tactical Implementation</h2>
@@ -212,32 +212,7 @@
     <script src="../codex.js" defer></script>
     <script src="../script.js" defer></script>
 
-    <script>
-        document.addEventListener('DOMContentLoaded', () => {
-            const timestampElement = document.querySelector('.timestamp-live');
-            if (timestampElement) {
-                const text = timestampElement.getAttribute('data-timestamp');
-                if (!text) return;
 
-                timestampElement.innerHTML = '<span class="typing-text"></span><span class="cursor"></span>';
-                const typingText = timestampElement.querySelector('.typing-text');
-
-                let i = 0;
-                const typingSpeed = 40;
-
-                function typeWriter() {
-                    if (i < text.length) {
-                        typingText.textContent += text.charAt(i);
-                        i++;
-                        setTimeout(typeWriter, typingSpeed);
-                    }
-                }
-
-                // Small delay before starting
-                setTimeout(typeWriter, 500);
-            }
-        });
-    </script>
 
 </body>
 </html>
