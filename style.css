@@ -166,6 +166,17 @@ nav a:hover {
     margin-bottom: 60px;
 }
 
+/* Priority Card Sizing */
+.priority-1 {
+    grid-column: span 2;
+}
+
+@media (max-width: 768px) {
+    .priority-1 {
+        grid-column: span 1;
+    }
+}
+
 .card-link {
     text-decoration: none;
     display: block;
@@ -695,6 +706,46 @@ body.light-mode .theme-toggle-pill {
         padding: 8px 12px;
         font-size: 0.6rem;
     }
+}
+
+/* --- SYNDICATE COMMAND CENTER ELEMENTS --- */
+.timestamp-live {
+    font-family: 'JetBrains Mono', monospace;
+    color: var(--neon-blue);
+    font-size: 0.85rem;
+    letter-spacing: 2px;
+    text-transform: uppercase;
+    margin-bottom: 15px;
+    display: block;
+    text-shadow: 0 0 10px rgba(56, 189, 248, 0.5);
+}
+
+@keyframes blink {
+    0% { opacity: 1; }
+    50% { opacity: 0; }
+    100% { opacity: 1; }
+}
+
+.cursor {
+    display: inline-block;
+    width: 10px;
+    height: 1.2em;
+    background-color: var(--neon-blue);
+    margin-left: 5px;
+    vertical-align: middle;
+    animation: blink 1s infinite;
+}
+
+.researcher-sig {
+    border-top: 1px solid rgba(56, 189, 248, 0.3);
+    margin-top: 60px;
+    padding-top: 30px;
+    font-family: 'JetBrains Mono', monospace;
+    color: var(--neon-blue);
+    text-shadow: 0 0 15px rgba(56, 189, 248, 0.6);
+    font-size: 0.85rem;
+    letter-spacing: 1px;
+    line-height: 1.8;
 }
 
 /* --- FOOTER --- */
