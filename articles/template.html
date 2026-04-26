@@ -129,6 +129,10 @@
             border-top: 1px solid rgba(255, 255, 255, 0.05);
         }
 
+        .timestamp-live {
+            min-height: 1.2em;
+        }
+
         @media (max-width: 600px) {
             h1 { font-size: 2rem; }
             nav { flex-direction: column; gap: 20px; align-items: center; }
@@ -156,7 +160,7 @@
 
     <div class="container">
         <article class="article-container" data-reveal>
-            <span class="meta-data">Transmission // {{SYNDICATE_DATE}}</span>
+            <div class="timestamp-live" data-timestamp="{{SYNDICATE_TIMESTAMP}}"></div>
             <h1>{{SYNDICATE_TITLE}}</h1>
 
             {{SYNDICATE_IMAGE}}
@@ -166,6 +170,11 @@
             </div>
 
             {{SYNDICATE_HACK}}
+
+            <div class="researcher-sig">
+                [ STATUS: TRANSMISSION_COMPLETE ]<br>
+                [ AUTHOR: LEAD TECHNICAL RESEARCHER ]
+            </div>
 
             <div class="syndicate-footer">
                 <h3>Join the Conversation</h3>
@@ -192,5 +201,31 @@
 
     <script src="../codex.js" defer></script>
     <script src="../script.js" defer></script>
+    <script>
+        document.addEventListener('DOMContentLoaded', () => {
+            const timestampElement = document.querySelector('.timestamp-live');
+            if (timestampElement) {
+                const text = timestampElement.getAttribute('data-timestamp');
+                if (!text) return;
+
+                timestampElement.innerHTML = '<span class="typing-text"></span><span class="cursor"></span>';
+                const typingText = timestampElement.querySelector('.typing-text');
+
+                let i = 0;
+                const typingSpeed = 40;
+
+                function typeWriter() {
+                    if (i < text.length) {
+                        typingText.textContent += text.charAt(i);
+                        i++;
+                        setTimeout(typeWriter, typingSpeed);
+                    }
+                }
+
+                // Small delay before starting
+                setTimeout(typeWriter, 500);
+            }
+        });
+    </script>
 </body>
 </html>
