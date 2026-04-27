@@ -1367,3 +1367,106 @@ body.light-mode #neural-info-box {
     .nav-card { flex: 0 0 220px; }
     .nav-scroller-container::before, .nav-scroller-container::after { width: 40px; }
 }
+
+/* --- NEURO-LAUNCHPAD HERO --- */
+#hero-launchpad {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100vw;
+    height: 100vh;
+    background-color: #050510;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    z-index: 2000;
+    overflow: hidden;
+    transition: opacity 1s ease;
+}
+
+#hero-brain-container {
+    width: 60vw;
+    height: 60vh;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+#brain-hero-svg {
+    width: 100%;
+    height: 100%;
+    max-width: 1000px;
+    filter: drop-shadow(0 0 20px rgba(56, 189, 248, 0.2));
+    animation: hormetic-pulse 4s infinite ease-in-out;
+}
+
+@keyframes hormetic-pulse {
+    0%, 100% { transform: scale(1); filter: drop-shadow(0 0 20px rgba(56, 189, 248, 0.2)); }
+    50% { transform: scale(1.05); filter: drop-shadow(0 0 40px rgba(56, 189, 248, 0.4)); }
+}
+
+#hero-ui-labels {
+    position: absolute;
+    width: 100%;
+    height: 100%;
+    pointer-events: none;
+}
+
+.hero-label {
+    position: absolute;
+    font-family: 'JetBrains Mono', monospace;
+    color: var(--neon-blue);
+    font-size: 1.2rem;
+    text-transform: uppercase;
+    letter-spacing: 2px;
+    opacity: 0;
+    transition: opacity 0.3s ease;
+    background: rgba(10, 15, 43, 0.8);
+    padding: 10px 20px;
+    border: 1px solid var(--neon-blue);
+    border-radius: 4px;
+}
+
+#hero-instruction {
+    margin-top: 40px;
+    font-family: 'JetBrains Mono', monospace;
+    color: var(--neon-gold);
+    letter-spacing: 5px;
+    font-weight: 900;
+    animation: blink 2s infinite;
+}
+
+/* Line Drawing Path */
+.connection-line {
+    fill: none;
+    stroke: var(--neon-blue);
+    stroke-width: 2;
+    stroke-dasharray: 1000;
+    stroke-dashoffset: 1000;
+}
+
+/* State Transitions */
+#main-interface.active {
+    display: block !important;
+    opacity: 1 !important;
+}
+
+#header-logo-proxy {
+    width: 100%;
+    height: 100%;
+}
+
+body.launch-sequence-active #hero-launchpad {
+    pointer-events: none;
+}
+
+#hero-connections {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    pointer-events: none;
+    z-index: 2100;
+}
