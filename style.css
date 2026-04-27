@@ -849,9 +849,7 @@ footer a:hover {
 }
 
 @media (min-width: 1024px) {
-    body, a, button, .accordion-header, .check-item, input {
-        cursor: none !important;
-    }
+    body:not(.launchpad-active), a, button, .accordion-header, .check-item, input { cursor: none; }
     .custom-cursor, .cursor-trail {
         display: block;
     }
@@ -1229,13 +1227,15 @@ body.light-mode #neural-info-box {
     pointer-events: none;
     text-shadow: 0 0 5px var(--neon-blue);
     padding-top: 20px;
-}
+
+    pointer-events: none;}
 .data-gutter.left { left: 15px; }
 .data-gutter.right { right: 15px; text-align: right; }
 
 /* Hard kill-switch for mobile */
 @media (max-width: 1024px) {
-    .data-gutter { display: none !important; }
+    .data-gutter { display: none !important;
+    pointer-events: none;}
 }
 
 /* --- ARTICLE NAVIGATION SCROLLER --- */
@@ -1429,13 +1429,18 @@ body.light-mode #neural-info-box {
 }
 
 #hero-instruction {
+    z-index: 999999 !important;
+    position: relative !important;
     margin-top: 40px;
     font-family: 'JetBrains Mono', monospace;
     color: var(--neon-gold);
     letter-spacing: 5px;
     font-weight: 900;
     animation: blink 2s infinite;
-}
+
+    z-index: 999999;
+    position: relative;
+    pointer-events: auto;}
 
 /* Line Drawing Path */
 .connection-line {
@@ -1469,4 +1474,19 @@ body.launch-sequence-active #hero-launchpad {
     height: 100%;
     pointer-events: none;
     z-index: 2100;
+}
+
+.hotspot {
+    pointer-events: auto !important;
+    cursor: pointer !important;
+}
+
+.scanlines {
+    position: fixed;
+    top: 0; left: 0; width: 100vw; height: 100vh;
+    background: linear-gradient(rgba(18, 16, 16, 0) 50%, rgba(0, 0, 0, 0.1) 50%), linear-gradient(90deg, rgba(255, 0, 0, 0.03), rgba(0, 255, 0, 0.01), rgba(0, 0, 255, 0.03));
+    z-index: 2500;
+    background-size: 100% 3px, 3px 100%;
+    pointer-events: none;
+    opacity: 0.3;
 }
