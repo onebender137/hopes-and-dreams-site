@@ -1375,7 +1375,7 @@ body.light-mode #neural-info-box {
     left: 0;
     width: 100vw;
     height: 100vh;
-    background-color: #050510;
+    background-color: transparent;
     display: flex;
     flex-direction: column;
     align-items: center;
@@ -1386,6 +1386,7 @@ body.light-mode #neural-info-box {
 }
 
 #hero-brain-container {
+    position: relative;
     width: 60vw;
     height: 60vh;
     display: flex;
@@ -1393,62 +1394,112 @@ body.light-mode #neural-info-box {
     justify-content: center;
 }
 
-#brain-hero-svg {
+#hero-brain-image {
     width: 100%;
     height: 100%;
     max-width: 1000px;
+    object-fit: contain;
     filter: drop-shadow(0 0 20px rgba(56, 189, 248, 0.2));
-    animation: hormetic-pulse 4s infinite ease-in-out;
 }
 
-@keyframes hormetic-pulse {
-    0%, 100% { transform: scale(1); filter: drop-shadow(0 0 20px rgba(56, 189, 248, 0.2)); }
-    50% { transform: scale(1.05); filter: drop-shadow(0 0 40px rgba(56, 189, 248, 0.4)); }
-}
-
-#hero-ui-labels {
+#hero-hotspots {
     position: absolute;
-    width: 100%;
-    height: 100%;
+    top: 0; left: 0; width: 100%; height: 100%;
+}
+
+.hotspot {
+    position: absolute;
+    width: 30px;
+    height: 30px;
+    background: rgba(56, 189, 248, 0.1);
+    border: 2px solid var(--neon-blue);
+    border-radius: 50%;
+    cursor: pointer;
+    transform: translate(-50%, -50%);
+    z-index: 2200;
+    transition: all 0.3s ease;
+}
+
+.hotspot:hover {
+    background: var(--neon-blue);
+    box-shadow: 0 0 20px var(--neon-blue);
+    transform: translate(-50%, -50%) scale(1.2);
+}
+
+#hero-labels-container {
+    position: absolute;
+    top: 0; left: 0; width: 100%; height: 100%;
     pointer-events: none;
 }
 
-.hero-label {
+.hero-section-label {
     position: absolute;
     font-family: 'JetBrains Mono', monospace;
     color: var(--neon-blue);
-    font-size: 1.2rem;
+    font-size: 1.1rem;
+    font-weight: 900;
     text-transform: uppercase;
     letter-spacing: 2px;
     opacity: 0;
-    transition: opacity 0.3s ease;
-    background: rgba(10, 15, 43, 0.8);
-    padding: 10px 20px;
+    background: rgba(10, 15, 43, 0.9);
+    padding: 8px 16px;
     border: 1px solid var(--neon-blue);
-    border-radius: 4px;
+    white-space: nowrap;
+    z-index: 2150;
+    pointer-events: none;
+}
+
+/* Hotspot Positions */
+#hotspot-procurement { top: 30%; left: 35%; }
+#hotspot-optimization { top: 35%; left: 65%; }
+#hotspot-intel { top: 55%; left: 40%; }
+#hotspot-about { top: 60%; left: 60%; }
+#hotspot-privacy { top: 75%; left: 50%; }
+
+/* Label Positions */
+#label-Procurement { top: 15%; left: 10%; }
+#label-Optimization { top: 15%; right: 10%; }
+#label-Intel-Hub { top: 50%; left: 5%; }
+#label-About { top: 50%; right: 5%; }
+#label-Privacy { bottom: 15%; left: 50%; transform: translateX(-50%); }
+
+#hero-main-title {
+    position: absolute;
+    bottom: 10vh;
+    font-size: 4rem;
+    font-weight: 900;
+    color: var(--text-main);
+    letter-spacing: 12px;
+    text-shadow: 0 0 30px rgba(56, 189, 248, 0.4);
+    z-index: 2100;
+    pointer-events: none;
 }
 
 #hero-instruction {
-    z-index: 999999 !important;
-    position: relative !important;
-    margin-top: 40px;
+    z-index: 2100;
+    position: absolute;
+    bottom: 5vh;
     font-family: 'JetBrains Mono', monospace;
     color: var(--neon-gold);
     letter-spacing: 5px;
     font-weight: 900;
     animation: blink 2s infinite;
+    pointer-events: auto;
+}
 
-    z-index: 999999;
-    position: relative;
-    pointer-events: auto;}
+#hero-svg-overlay {
+    position: absolute;
+    top: 0; left: 0; width: 100%; height: 100%;
+    pointer-events: none;
+    z-index: 2050;
+}
 
-/* Line Drawing Path */
-.connection-line {
+#hero-connection-line {
     fill: none;
     stroke: var(--neon-blue);
     stroke-width: 2;
-    stroke-dasharray: 1000;
-    stroke-dashoffset: 1000;
+    opacity: 0;
+    transition: opacity 0.2s ease;
 }
 
 /* State Transitions */

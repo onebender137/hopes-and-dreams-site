@@ -1221,145 +1221,123 @@ gsap.registerPlugin(Flip, TextPlugin);
 document.addEventListener('DOMContentLoaded', () => {
     const hero = document.getElementById('hero-launchpad');
     const mainInterface = document.getElementById('main-interface');
-    let brainSvg = document.getElementById('brain-hero-svg');
+    const brainImage = document.getElementById('hero-brain-image');
+    const heroTitle = document.getElementById('hero-main-title');
     const destination = document.getElementById('header-logo-proxy');
+    const connLine = document.getElementById('hero-connection-line');
+    const hotspots = document.querySelectorAll('.hotspot');
+    const labels = document.querySelectorAll('.hero-section-label');
     const isLive = localStorage.getItem('syndicate_live') === 'true';
 
-    // --- Site-wide SVG Injection ---
-    if (destination && !brainSvg) {
-        fetch('/brain_logo_final.svg')
-            .then(res => res.text())
-            .then(svgText => {
-                destination.innerHTML = svgText;
-                const injectedSvg = destination.querySelector('svg');
-                if (injectedSvg) {
-                    injectedSvg.id = 'brain-hero-svg';
-                    injectedSvg.style.cursor = 'pointer';
-                    document.body.classList.add('logo-header-state');
-                    injectedSvg.onclick = () => {
-                        localStorage.removeItem('syndicate_live');
-                        window.location.href = '/index.html';
-                    };
-                }
-            });
-    }
+    if (!hero || !mainInterface || !brainImage) return;
 
-    if (!hero || !mainInterface || !brainSvg) return;
+    // --- Throb Animation ---
+    gsap.to(brainImage, {
+        scale: 1.05,
+        duration: 2,
+        repeat: -1,
+        yoyo: true,
+        ease: "power1.inOut"
+    });
 
-    // --- Persistent State Check (index.html) ---
+    // --- Persistent State Check ---
     if (isLive) {
         hero.style.display = 'none';
         mainInterface.style.display = 'block';
         mainInterface.style.opacity = '1';
-        document.body.classList.remove('launchpad-active');
         document.body.classList.add('logo-header-state');
-        if (destination && brainSvg) {
-            destination.appendChild(brainSvg);
-            brainSvg.style.cursor = 'pointer';
-            brainSvg.onclick = () => {
+        if (destination) {
+            destination.appendChild(brainImage);
+            brainImage.style.cursor = 'pointer';
+            brainImage.onclick = () => {
                 localStorage.removeItem('syndicate_live');
-                window.location.href = '/index.html';
+                window.location.href = 'index.html';
             };
         }
         return;
     }
 
-    document.body.classList.add('launchpad-active');
+    // --- Hover Logic ---
+    hotspots.forEach(hotspot => {
+        const section = hotspot.dataset.section;
+        const labelId = `label-${section.replace(/\s+/g, '-')}`;
+        const label = document.getElementById(labelId);
 
-    const hotspots = document.querySelectorAll('.hotspot');
-    const labelL = document.getElementById('label-left');
-    const labelR = document.getElementById('label-right');
-    const connSvg = document.getElementById('hero-connections');
-    let isTransitioning = false;
+        hotspot.addEventListener('mouseenter', () => {
+            if (label) {
+                gsap.to(label, { opacity: 1, duration: 0.3 });
 
-    let scrambleInterval = null;
-    function scrambleText(element, targetText) {
-        if (scrambleInterval) clearInterval(scrambleInterval);
-        const chars = "0123456789ABCDEF";
-        let iterations = 0;
-        scrambleInterval = setInterval(() => {
-            element.innerText = targetText.split("")
-                .map((char, index) => {
-                    if(index < iterations) return targetText[index];
-                    return chars[Math.floor(Math.random() * chars.length)];
-                })
-                .join("");
-            if(iterations >= targetText.length) clearInterval(scrambleInterval);
-            iterations += 1/3;
-        }, 30);
-    }
+                // Draw line
+                const hRect = hotspot.getBoundingClientRect();
+                const lRect = label.getBoundingClientRect();
 
-    function handleInteraction(hotspot, type) {
-        if (isTransitioning) return;
-        const moduleName = hotspot.getAttribute('data-module');
-        const color = hotspot.getAttribute('fill');
-        const rect = hotspot.getBoundingClientRect();
-        const targetLabel = rect.left < window.innerWidth / 2 ? labelL : labelR;
-        const otherLabel = targetLabel === labelL ? labelR : labelL;
+                const x1 = hRect.left + hRect.width / 2;
+                const y1 = hRect.top + hRect.height / 2;
+                const x2 = lRect.left + lRect.width / 2;
+                const y2 = lRect.top + lRect.height / 2;
 
-        otherLabel.style.opacity = 0;
-        targetLabel.style.opacity = 1;
-        targetLabel.style.borderColor = color;
-        targetLabel.style.color = color;
-
-        targetLabel.style.top = (rect.top + rect.height/2 - 20) + 'px';
-        targetLabel.style.left = (rect.left < window.innerWidth / 2) ? (rect.left - targetLabel.offsetWidth - 20) + 'px' : (rect.right + 20) + 'px';
-
-        scrambleText(targetLabel, moduleName);
-
-        const lRect = targetLabel.getBoundingClientRect();
-        const startX = (rect.left < window.innerWidth / 2) ? lRect.right : lRect.left;
-        const startY = lRect.top + lRect.height / 2;
-        const endX = rect.left + rect.width / 2;
-        const endY = rect.top + rect.height / 2;
-
-        if (connSvg) {
-            connSvg.innerHTML = `<line x1="${startX}" y1="${startY}" x2="${endX}" y2="${endY}" stroke="${color}" stroke-width="2" stroke-dasharray="1000" stroke-dashoffset="1000">
-                <animate attributeName="stroke-dashoffset" from="1000" to="0" duration="0.4s" fill="freeze" />
-            </line>`;
-        }
-    }
-
-    hotspots.forEach(h => {
-        h.addEventListener('mouseenter', () => handleInteraction(h, 'hover'));
-        h.addEventListener('touchstart', (e) => {
-            e.preventDefault();
-            handleInteraction(h, 'touch');
+                connLine.setAttribute('x1', x1);
+                connLine.setAttribute('y1', y1);
+                connLine.setAttribute('x2', x2);
+                connLine.setAttribute('y2', y2);
+                gsap.to(connLine, { opacity: 0.8, duration: 0.2 });
+            }
         });
 
-        h.addEventListener('click', () => {
-            if (isTransitioning) return;
-            isTransitioning = true;
+        hotspot.addEventListener('mouseleave', () => {
+            if (label) {
+                gsap.to(label, { opacity: 0, duration: 0.3 });
+                gsap.to(connLine, { opacity: 0, duration: 0.2 });
+            }
+        });
+
+        // --- Transition Logic (Step A, B, C) ---
+        hotspot.addEventListener('click', () => {
             localStorage.setItem('syndicate_live', 'true');
 
-            const state = Flip.getState(brainSvg);
-            destination.appendChild(brainSvg);
+            const tl = gsap.timeline();
 
-            document.body.classList.add('logo-header-state');
-
-            Flip.from(state, {
-                duration: 1.5,
-                ease: "power2.inOut",
-                onComplete: () => {
-                    brainSvg.style.cursor = 'pointer';
-                    brainSvg.onclick = () => {
-                        localStorage.removeItem('syndicate_live');
-                        window.location.href = '/index.html';
-                    };
-                }
+            // Step A: Title fade and slide down
+            tl.to(heroTitle, {
+                y: 50,
+                opacity: 0,
+                duration: 0.8,
+                ease: "power2.in"
             });
 
-            gsap.to(mainInterface, { opacity: 1, duration: 1, delay: 0.5 });
-            gsap.to(hero, { opacity: 0, duration: 1, delay: 0.5 });
-            if (labelL) labelL.style.opacity = 0;
-            if (labelR) labelR.style.opacity = 0;
-            if (connSvg) connSvg.innerHTML = '';
-        });
-    });
+            // Step B: Brain Flip to Header
+            tl.add(() => {
+                const state = Flip.getState(brainImage);
+                destination.appendChild(brainImage);
 
-    document.getElementById('hero-launchpad')?.addEventListener('mouseleave', () => {
-        if (labelL) labelL.style.opacity = 0;
-        if (labelR) labelR.style.opacity = 0;
-        if (connSvg) connSvg.innerHTML = '';
+                Flip.from(state, {
+                    duration: 1.2,
+                    scale: true,
+                    ease: "power3.inOut",
+                    onComplete: () => {
+                        document.body.classList.add('logo-header-state');
+                        brainImage.style.cursor = 'pointer';
+                        brainImage.onclick = () => {
+                            localStorage.removeItem('syndicate_live');
+                            window.location.href = 'index.html';
+                        };
+                    }
+                });
+            }, "-=0.4");
+
+            // Step C: Fade in architecture
+            tl.to(mainInterface, {
+                display: 'block',
+                opacity: 1,
+                duration: 1,
+                ease: "power2.out"
+            }, "-=0.6");
+
+            tl.to(hero, {
+                opacity: 0,
+                duration: 1,
+                onComplete: () => hero.style.display = 'none'
+            }, "-=1");
+        });
     });
 });
