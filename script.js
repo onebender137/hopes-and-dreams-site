@@ -1216,32 +1216,47 @@ document.addEventListener('DOMContentLoaded', () => {
 });
 
 // --- NEURO-LAUNCHPAD LOGIC ---
+gsap.registerPlugin(Flip, TextPlugin);
+
 document.addEventListener('DOMContentLoaded', () => {
     const hero = document.getElementById('hero-launchpad');
     const mainInterface = document.getElementById('main-interface');
-    const brainSvg = document.getElementById('brain-hero-svg');
+    let brainSvg = document.getElementById('brain-hero-svg');
     const destination = document.getElementById('header-logo-proxy');
+    const isLive = localStorage.getItem('syndicate_live') === 'true';
+
+    // --- Site-wide SVG Injection ---
+    if (destination && !brainSvg) {
+        fetch('/brain_logo_final.svg')
+            .then(res => res.text())
+            .then(svgText => {
+                destination.innerHTML = svgText;
+                const injectedSvg = destination.querySelector('svg');
+                if (injectedSvg) {
+                    injectedSvg.id = 'brain-hero-svg';
+                    injectedSvg.style.cursor = 'pointer';
+                    document.body.classList.add('logo-header-state');
+                    injectedSvg.onclick = () => {
+                        localStorage.removeItem('syndicate_live');
+                        window.location.href = '/index.html';
+                    };
+                }
+            });
+    }
 
     if (!hero || !mainInterface || !brainSvg) return;
 
-    // --- State Persistence Check ---
-    const isLive = localStorage.getItem('syndicate_live') === 'true';
-    console.log("Syndicate Live Status:", isLive);
-
+    // --- Persistent State Check (index.html) ---
     if (isLive) {
         hero.style.display = 'none';
         mainInterface.style.display = 'block';
         mainInterface.style.opacity = '1';
         document.body.classList.remove('launchpad-active');
+        document.body.classList.add('logo-header-state');
         if (destination && brainSvg) {
-            console.log("Relocating brain to header...");
             destination.appendChild(brainSvg);
-            gsap.set(brainSvg, { filter: 'grayscale(1) contrast(1.1) opacity(0.7)', animation: 'none' });
-
-            // Bind Home Command (Reset)
             brainSvg.style.cursor = 'pointer';
             brainSvg.onclick = () => {
-                console.log("Resetting Syndicate state...");
                 localStorage.removeItem('syndicate_live');
                 window.location.href = '/index.html';
             };
@@ -1250,7 +1265,6 @@ document.addEventListener('DOMContentLoaded', () => {
     }
 
     document.body.classList.add('launchpad-active');
-    gsap.registerPlugin(Flip, TextPlugin);
 
     const hotspots = document.querySelectorAll('.hotspot');
     const labelL = document.getElementById('label-left');
@@ -1288,13 +1302,11 @@ document.addEventListener('DOMContentLoaded', () => {
         targetLabel.style.borderColor = color;
         targetLabel.style.color = color;
 
-        // Position label relative to hotspot
         targetLabel.style.top = (rect.top + rect.height/2 - 20) + 'px';
         targetLabel.style.left = (rect.left < window.innerWidth / 2) ? (rect.left - targetLabel.offsetWidth - 20) + 'px' : (rect.right + 20) + 'px';
 
         scrambleText(targetLabel, moduleName);
 
-        // Path Draw
         const lRect = targetLabel.getBoundingClientRect();
         const startX = (rect.left < window.innerWidth / 2) ? lRect.right : lRect.left;
         const startY = lRect.top + lRect.height / 2;
@@ -1302,74 +1314,52 @@ document.addEventListener('DOMContentLoaded', () => {
         const endY = rect.top + rect.height / 2;
 
         if (connSvg) {
-            connSvg.innerHTML = `<svg style="position:absolute; top:0; left:0; width:100%; height:100%; pointer-events:none;"><path class="connection-line" d="M${startX},${startY} L${endX},${endY}" style="stroke:${color}; fill:none; stroke-width:2;" /></svg>`;
-            const path = connSvg.querySelector('.connection-line');
-            const length = path.getTotalLength();
-            gsap.fromTo(path, { strokeDasharray: length, strokeDashoffset: length }, { strokeDashoffset: 0, duration: 0.4 });
+            connSvg.innerHTML = `<line x1="${startX}" y1="${startY}" x2="${endX}" y2="${endY}" stroke="${color}" stroke-width="2" stroke-dasharray="1000" stroke-dashoffset="1000">
+                <animate attributeName="stroke-dashoffset" from="1000" to="0" duration="0.4s" fill="freeze" />
+            </line>`;
         }
-        gsap.to(brainSvg, { filter: `drop-shadow(0 0 30px ${color})`, duration: 0.3 });
     }
 
-    function resetInteraction() {
-        if (isTransitioning) return;
-        if (scrambleInterval) clearInterval(scrambleInterval);
+    hotspots.forEach(h => {
+        h.addEventListener('mouseenter', () => handleInteraction(h, 'hover'));
+        h.addEventListener('touchstart', (e) => {
+            e.preventDefault();
+            handleInteraction(h, 'touch');
+        });
+
+        h.addEventListener('click', () => {
+            if (isTransitioning) return;
+            isTransitioning = true;
+            localStorage.setItem('syndicate_live', 'true');
+
+            const state = Flip.getState(brainSvg);
+            destination.appendChild(brainSvg);
+
+            document.body.classList.add('logo-header-state');
+
+            Flip.from(state, {
+                duration: 1.5,
+                ease: "power2.inOut",
+                onComplete: () => {
+                    brainSvg.style.cursor = 'pointer';
+                    brainSvg.onclick = () => {
+                        localStorage.removeItem('syndicate_live');
+                        window.location.href = '/index.html';
+                    };
+                }
+            });
+
+            gsap.to(mainInterface, { opacity: 1, duration: 1, delay: 0.5 });
+            gsap.to(hero, { opacity: 0, duration: 1, delay: 0.5 });
+            if (labelL) labelL.style.opacity = 0;
+            if (labelR) labelR.style.opacity = 0;
+            if (connSvg) connSvg.innerHTML = '';
+        });
+    });
+
+    document.getElementById('hero-launchpad')?.addEventListener('mouseleave', () => {
         if (labelL) labelL.style.opacity = 0;
         if (labelR) labelR.style.opacity = 0;
         if (connSvg) connSvg.innerHTML = '';
-        gsap.to(brainSvg, { filter: 'drop-shadow(0 0 20px rgba(56, 189, 248, 0.2))', duration: 0.3 });
-    }
-
-    hotspots.forEach(hotspot => {
-        ['mouseenter', 'touchstart'].forEach(evt => {
-            hotspot.addEventListener(evt, (e) => {
-                if (evt === 'touchstart') e.preventDefault();
-                handleInteraction(hotspot, evt);
-            });
-        });
-
-        ['mouseleave', 'touchend'].forEach(evt => {
-            hotspot.addEventListener(evt, () => {
-                resetInteraction();
-            });
-        });
-
-        ['click', 'touchend'].forEach(evt => {
-            hotspot.addEventListener(evt, (e) => {
-                if (isTransitioning) return;
-                isTransitioning = true;
-                document.body.classList.add('launch-sequence-active');
-                localStorage.setItem('syndicate_live', 'true');
-
-                brainSvg.style.animation = 'none';
-                const state = Flip.getState(brainSvg);
-
-                if (destination) destination.appendChild(brainSvg);
-                mainInterface.style.display = 'block';
-
-                Flip.from(state, {
-                    duration: 1.5,
-                    ease: "power4.inOut",
-                    scale: true,
-                    onComplete: () => {
-                        hero.style.display = 'none';
-                        document.body.classList.remove('launchpad-active');
-                        gsap.to(brainSvg, { filter: 'grayscale(1) contrast(1.1) opacity(0.7)', duration: 1.5 });
-
-                        // Bind Home Command (Reset)
-                        brainSvg.style.cursor = 'pointer';
-                        brainSvg.onclick = () => {
-                            localStorage.removeItem('syndicate_live');
-                            window.location.href = '/index.html';
-                        };
-                    }
-                });
-
-                gsap.to(mainInterface, { opacity: 1, duration: 1, delay: 0.5 });
-                gsap.to(hero, { opacity: 0, duration: 1, delay: 0.5 });
-                if (labelL) labelL.style.opacity = 0;
-                if (labelR) labelR.style.opacity = 0;
-                if (connSvg) connSvg.innerHTML = '';
-            });
-        });
     });
 });
