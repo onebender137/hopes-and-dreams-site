@@ -1,6 +1,9 @@
 import os
 import random
 import re
+from PIL import Image
+if not hasattr(Image, 'ANTIALIAS'):
+    Image.ANTIALIAS = Image.LANCZOS
 
 # --- CRITICAL WSL/LINUX FIX ---
 # Must be set BEFORE moviepy is imported to ensure the backend is found
@@ -80,17 +83,20 @@ class VideoCreator:
         bg_image_path = self._get_random_background(topic)
         
         if bg_image_path:
-            # Load the 'wild' image, resize for vertical (1080x1920), and center it
+            # 1. Load and force image to fill the 1080x1920 vertical canvas
             bg = ImageClip(bg_image_path).set_duration(duration)
-            bg = bg.resize(height=1920) 
-            bg = bg.set_pos('center')
             
-            # Dark overlay to make white text pop against busy images
-            overlay = ColorClip(size=(1080, 1920), color=(0, 0, 0)).set_opacity(0.4).set_duration(duration)
+            # Use 'fill' strategy: Resize by height, then crop/center to avoid the offset
+            bg = bg.resize(height=1920).set_position('center')
+            
+            # 2. Dark overlay pinned exactly to the top-left (0,0) to cover everything
+            overlay = ColorClip(size=(1080, 1920), color=(0, 0, 0))
+            overlay = overlay.set_opacity(0.4).set_duration(duration).set_position((0, 0))
+            
             background_group = [bg, overlay]
         else:
-            # Fallback to Syndicate Blue if no image found
-            bg = ColorClip(size=(1080, 1920), color=(0, 0, 40)).set_duration(duration)
+            # Fallback to Syndicate Blue pinned to top-left
+            bg = ColorClip(size=(1080, 1920), color=(0, 0, 40)).set_duration(duration).set_position((0, 0))
             background_group = [bg]
 
         # 3. Text Safety Logic
@@ -112,23 +118,25 @@ class VideoCreator:
             txt_clip = txt_clip.set_pos('center').set_duration(duration)
             
             # 5. Composite Layers
-            video = CompositeVideoClip(background_group + [txt_clip])
+            video = CompositeVideoClip(background_group + [txt_clip], size=(1080, 1920))
         except Exception as e:
             print(f"WARNING: ImageMagick text rendering failed: {e}")
             video = CompositeVideoClip(background_group)
 
         video.audio = audio
 
-        # 6. Production Render (Optimized for MSI threads)
         video.write_videofile(
             output_path, 
             fps=24, 
             codec='libx264', 
             audio_codec='aac', 
             threads=4, 
-            logger=None
+            preset='ultrafast',
+            logger='bar',
+            ffmpeg_params=["-nostdin"]
         )
         return output_path
+        
 
     async def generate_biohacking_snippet(self, topic: str, content: str):
         """Higher-level production method to produce a full snippet."""
