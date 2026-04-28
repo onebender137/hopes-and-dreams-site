@@ -63,6 +63,7 @@ header {
     align-items: center;
     justify-content: center;
     line-height: 0;
+    margin: 0 auto;
 }
 
 .logo-wrap img {
@@ -1493,6 +1494,18 @@ body.light-mode #neural-info-box {
 #hero-main-title::after {
     display: none !important;
     content: none !important;
+}
+@media (max-width: 600px) {
+    #hero-main-title {
+        font-size: 2rem;
+        letter-spacing: 4px;
+        bottom: 8vh;
+    }
+    #hero-instruction {
+        font-size: 0.65rem;
+        letter-spacing: 3px;
+        bottom: 3vh;
+    }
 }
 
 #hero-instruction {
