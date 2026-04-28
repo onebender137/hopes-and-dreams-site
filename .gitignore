@@ -45,3 +45,5 @@ output/
 *.mp3
 code
 vscode_cli.tar.gz
+*.before_*
+chat_memory.json.poisoned
