@@ -1286,11 +1286,28 @@ document.addEventListener('DOMContentLoaded', () => {
             }
         });
 
-        // --- Transition Logic (Step A, B, C) ---
-        hotspot.addEventListener('click', () => startTransition());
+        // --- Transition Logic with Navigation ---
+        // Each hotspot navigates to its actual page after the transition
+        hotspot.addEventListener('click', () => {
+            const section = hotspot.dataset.section;
+            const navMap = {
+                'Procurement': 'shop.html',
+                'Optimization': 'optimization.html',
+                'Intel Hub': 'intel.html',
+                'About': 'about.html',
+                'Privacy': 'privacy.html'
+            };
+            const targetPage = navMap[section];
+            if (targetPage) {
+                // Run transition, then navigate
+                startTransition(targetPage);
+            } else {
+                startTransition();
+            }
+        });
     });
 
-    // Make image also trigger transition
+    // Brain click = stay on home page (default behavior)
     brainImage.addEventListener('click', () => startTransition());
 
     function startTransition() {
