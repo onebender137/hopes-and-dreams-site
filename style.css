@@ -1400,7 +1400,22 @@ body.light-mode #neural-info-box {
     width: auto;
     height: auto;
     display: block;
-    filter: drop-shadow(0 0 20px rgba(56, 189, 248, 0.2));
+    animation: hormetic-throb 3.5s ease-in-out infinite;
+    will-change: transform, filter;
+}
+
+@keyframes hormetic-throb {
+    0%, 100% {
+        transform: scale(1);
+        filter: drop-shadow(0 0 25px rgba(56, 189, 248, 0.3))
+                drop-shadow(0 0 50px rgba(168, 85, 247, 0.15));
+    }
+    50% {
+        transform: scale(1.045);
+        filter: drop-shadow(0 0 50px rgba(56, 189, 248, 0.65))
+                drop-shadow(0 0 100px rgba(168, 85, 247, 0.4))
+                drop-shadow(0 0 140px rgba(56, 189, 248, 0.2));
+    }
 }
 
 #hero-hotspots {

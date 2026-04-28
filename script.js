@@ -1232,13 +1232,8 @@ document.addEventListener('DOMContentLoaded', () => {
     if (!hero || !mainInterface || !brainImage) return;
 
     // --- Throb Animation ---
-    gsap.to(brainImage, {
-        scale: 1.05,
-        duration: 2,
-        repeat: -1,
-        yoyo: true,
-        ease: "power1.inOut"
-    });
+    // Disabled - replaced by stronger CSS hormetic-throb keyframes in style.css
+    // (See #hero-brain-image rule for box-shadow pulse + scale)
 
     // --- Persistent State Check ---
     if (isLive) {
