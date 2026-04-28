@@ -744,6 +744,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
     // Theme Toggle
     const themeToggle = document.getElementById('theme-toggle');
+    const themeToggleLander = document.getElementById('theme-toggle-lander');
     const body = document.body;
     const logo = document.querySelector('.logo-wrap img');
 
@@ -752,6 +753,7 @@ document.addEventListener('DOMContentLoaded', () => {
     if (currentTheme === 'light') {
         body.classList.add('light-mode');
         if (themeToggle) themeToggle.textContent = '🌙 DARK MODE';
+        if (themeToggleLander) themeToggleLander.textContent = '🌙 DARK MODE';
         if (logo) {
             // Check if logo src is relative to articles
             const isArticle = window.location.pathname.includes('/articles/');
@@ -761,6 +763,10 @@ document.addEventListener('DOMContentLoaded', () => {
         if (heroBrain) heroBrain.src = 'topper-inverted.png';
     }
 
+    // Lander pill fires same logic as main toggle
+    if (themeToggleLander) {
+        themeToggleLander.addEventListener('click', () => themeToggle && themeToggle.click());
+    }
     if (themeToggle) {
         themeToggle.addEventListener('click', () => {
             body.classList.toggle('light-mode');
@@ -769,6 +775,7 @@ document.addEventListener('DOMContentLoaded', () => {
             if (body.classList.contains('light-mode')) {
                 theme = 'light';
                 themeToggle.textContent = '🌙 DARK MODE';
+                if (themeToggleLander) themeToggleLander.textContent = '🌙 DARK MODE';
                 if (logo) {
                     const isArticle = window.location.pathname.includes('/articles/');
                     logo.src = isArticle ? '../topper-inverted.png' : 'topper-inverted.png';
@@ -777,6 +784,7 @@ document.addEventListener('DOMContentLoaded', () => {
                 if (heroBrainLight) heroBrainLight.src = 'topper-inverted.png';
             } else {
                 themeToggle.textContent = '☀️ LIGHT MODE';
+                if (themeToggleLander) themeToggleLander.textContent = '☀️ LIGHT MODE';
                 if (logo) {
                     const isArticle = window.location.pathname.includes('/articles/');
                     logo.src = isArticle ? '../topper.png' : 'topper.png';
