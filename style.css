@@ -1546,6 +1546,9 @@ body.light-mode #neural-info-box {
 #header-logo-proxy {
     width: 100%;
     height: 100%;
+    display: flex;
+    justify-content: center;
+    align-items: center;
 }
 
 body.launch-sequence-active #hero-launchpad {
