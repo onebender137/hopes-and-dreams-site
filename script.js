@@ -755,7 +755,7 @@ document.addEventListener('DOMContentLoaded', () => {
         if (logo) {
             // Check if logo src is relative to articles
             const isArticle = window.location.pathname.includes('/articles/');
-            logo.src = isArticle ? '../topper-inverted.webp' : 'topper-inverted.webp';
+            logo.src = isArticle ? '../topper-inverted.png' : 'topper-inverted.png';
         }
     }
 
@@ -769,13 +769,13 @@ document.addEventListener('DOMContentLoaded', () => {
                 themeToggle.textContent = '🌙 DARK MODE';
                 if (logo) {
                     const isArticle = window.location.pathname.includes('/articles/');
-                    logo.src = isArticle ? '../topper-inverted.webp' : 'topper-inverted.webp';
+                    logo.src = isArticle ? '../topper-inverted.png' : 'topper-inverted.png';
                 }
             } else {
                 themeToggle.textContent = '☀️ LIGHT MODE';
                 if (logo) {
                     const isArticle = window.location.pathname.includes('/articles/');
-                    logo.src = isArticle ? '../topper.webp' : 'topper.webp';
+                    logo.src = isArticle ? '../topper.png' : 'topper.png';
                 }
             }
             localStorage.setItem('theme', theme);
@@ -1292,52 +1292,62 @@ document.addEventListener('DOMContentLoaded', () => {
         });
 
         // --- Transition Logic (Step A, B, C) ---
-        hotspot.addEventListener('click', () => {
-            localStorage.setItem('syndicate_live', 'true');
-
-            const tl = gsap.timeline();
-
-            // Step A: Title fade and slide down
-            tl.to(heroTitle, {
-                y: 50,
-                opacity: 0,
-                duration: 0.8,
-                ease: "power2.in"
-            });
-
-            // Step B: Brain Flip to Header
-            tl.add(() => {
-                const state = Flip.getState(brainImage);
-                destination.appendChild(brainImage);
-
-                Flip.from(state, {
-                    duration: 1.2,
-                    scale: true,
-                    ease: "power3.inOut",
-                    onComplete: () => {
-                        document.body.classList.add('logo-header-state');
-                        brainImage.style.cursor = 'pointer';
-                        brainImage.onclick = () => {
-                            localStorage.removeItem('syndicate_live');
-                            window.location.href = 'index.html';
-                        };
-                    }
-                });
-            }, "-=0.4");
-
-            // Step C: Fade in architecture
-            tl.to(mainInterface, {
-                display: 'block',
-                opacity: 1,
-                duration: 1,
-                ease: "power2.out"
-            }, "-=0.6");
-
-            tl.to(hero, {
-                opacity: 0,
-                duration: 1,
-                onComplete: () => hero.style.display = 'none'
-            }, "-=1");
-        });
+        hotspot.addEventListener('click', () => startTransition());
     });
+
+    // Make image also trigger transition
+    brainImage.addEventListener('click', () => startTransition());
+
+    function startTransition() {
+        if (localStorage.getItem('syndicate_live') === 'true') return;
+        localStorage.setItem('syndicate_live', 'true');
+
+        const tl = gsap.timeline();
+
+        // Step A: Title fade and slide down
+        tl.to(heroTitle, {
+            y: 50,
+            opacity: 0,
+            duration: 0.6,
+            ease: "power2.in"
+        });
+
+        // Step B: Brain Flip to Header
+        tl.add(() => {
+            const state = Flip.getState(brainImage);
+            destination.appendChild(brainImage);
+
+            const flipTween = Flip.from(state, {
+                duration: 1.2,
+                scale: true,
+                ease: "power3.inOut",
+                onComplete: () => {
+                    document.body.classList.add('logo-header-state');
+                    brainImage.style.cursor = 'pointer';
+                    brainImage.onclick = () => {
+                        localStorage.removeItem('syndicate_live');
+                        window.location.href = 'index.html';
+                    };
+                }
+            });
+            // We can't easily return a tween inside a timeline callback to make it blocking
+            // so we'll use a delayed call for Step C or similar, but better is to just add it.
+        });
+
+        // Step C: Fade in architecture (Wait for Step B to finish roughly)
+        tl.to(mainInterface, {
+            display: 'block',
+            opacity: 1,
+            duration: 1,
+            ease: "power2.out"
+        }, "+=1.2"); // Positive offset to ensure Step B (duration 1.2) finishes
+
+        tl.to(hero, {
+            opacity: 0,
+            duration: 1,
+            onComplete: () => {
+                hero.style.display = 'none';
+            }
+        }, "-=1");
+    }
 });
