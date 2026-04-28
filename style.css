@@ -1480,7 +1480,7 @@ body.light-mode #neural-info-box {
     font-weight: 900;
     color: var(--text-main);
     letter-spacing: 8px;
-    text-shadow: 0 0 25px rgba(56, 189, 248, 0.45);
+    text-shadow: none;
     z-index: 2040;
     pointer-events: none;
     font-family: 'Inter', system-ui, -apple-system, sans-serif;
