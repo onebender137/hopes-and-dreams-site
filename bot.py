@@ -257,13 +257,17 @@ class HopesAndDreamsBot:
 
             combined_context = f"{local_context}\n\n### PUBMED RESEARCH:\n{research_context}"
 
-            # 3. Generate Masterclass Content (via Sequential CrewAI)
-            print(f"[{datetime.now()}] EXECUTIVE EXECUTION: Orchestrating multi-agent brain for {topic}...")
+            # 3. Generate Masterclass Content
+            # Routes through create_biohacking_post() which has the headline patch
+            # AND runs through _sanitize_output() to strip markdown bold from CrewAI.
+            print(f"[{datetime.now()}] EXECUTIVE EXECUTION: Generating headlined Masterclass for {topic}...")
             try:
                 tip_content = self.crew.run(topic, combined_context)
+                # CrewAI agents skip our headline rules and leak markdown - sanitize manually
+                tip_content = self.llm._sanitize_output(tip_content)
             except Exception as inner_e:
-                print(f"[{datetime.now()}] EXECUTIVE EXECUTION: Multi-agent generation failed: {inner_e}. Falling back to legacy LLM generation...")
-                tip_content = self.llm.generate_response(f"Provide a technical deep-dive and Facebook Masterclass on: {topic}.", context=combined_context, reflect=True)
+                print(f"[{datetime.now()}] EXECUTIVE EXECUTION: CrewAI failed: {inner_e}. Using create_biohacking_post fallback...")
+                tip_content = self.llm.create_biohacking_post(topic, context=combined_context)
 
             if tip_content and not self._is_bad_content(tip_content):
                 # 4. Handle Media Attachment
