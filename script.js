@@ -1310,9 +1310,21 @@ document.addEventListener('DOMContentLoaded', () => {
     // Brain click = stay on home page (default behavior)
     brainImage.addEventListener('click', () => startTransition());
 
-    function startTransition() {
-        if (localStorage.getItem('syndicate_live') === 'true') return;
+    function startTransition(navigateTo) {
+        // If launch already happened (returning visitor), just navigate
+        if (localStorage.getItem('syndicate_live') === 'true') {
+            if (navigateTo) window.location.href = navigateTo;
+            return;
+        }
         localStorage.setItem('syndicate_live', 'true');
+        // For hotspot clicks with a target page, run a brief transition then navigate
+        if (navigateTo) {
+            const tl = gsap.timeline();
+            tl.to(heroTitle, { y: 50, opacity: 0, duration: 0.4, ease: "power2.in" });
+            tl.to(brainImage, { scale: 0.5, opacity: 0.8, duration: 0.5, ease: "power2.in" }, "<");
+            setTimeout(() => { window.location.href = navigateTo; }, 600);
+            return;
+        }
 
         const tl = gsap.timeline();
 
