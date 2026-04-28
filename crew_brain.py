@@ -71,15 +71,15 @@ class SyndicateCrew:
         )
 
         # Task 2: Copywriting Phase
-        writing_task = Task(
-            description=(
-                f"Take the researcher's report on {topic} and draft a Facebook Masterclass.\n"
-                "Structure it with three headers: THE MECHANICS, THE BIOLOGICAL LEVERAGE, and THE TACTICAL IMPLEMENTATION.\n"
-                "Ensure the tone is gritty, professional, and science-heavy. No fluff. No polite intros. "
-                "Keep the total length under 3000 characters to ensure Telegram compatibility.\n"
-                "End with: 'Do your own research. Don't be a statistic.'\n"
-                f"{self.logic_bridges}"
-            ),
+       writing_task = Task(
+    description=(
+        f"Take the researcher's report on {topic} and draft a Facebook Masterclass.\n"
+        "Structure it with three HTML headers using this exact format: <h2>THE MECHANICS</h2>, <h2>THE BIOLOGICAL LEVERAGE</h2>, and <h2>THE TACTICAL IMPLEMENTATION</h2>. Do not use plain text for these headers. Wrap all paragraphs in <p> tags. Output must be valid HTML.\n"
+        "Ensure the tone is gritty, professional, and science-heavy. No fluff. No polite intros. "
+        "Keep the total length under 3000 characters to ensure Telegram compatibility.\n"
+        "End with: 'Do your own research. Don't be a statistic.'\n"
+        f"{self.logic_bridges}"
+    ),
             expected_output="A final, beautified Syndicate Masterclass post in the Hopes and Dreams persona.",
             agent=self.writer
         )
