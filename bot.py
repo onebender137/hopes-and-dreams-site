@@ -89,7 +89,50 @@ SYNDICATE_TOPIC_POOL = [
     "Stem Cell Regeneration", "Telomere maintenance", "HPA Axis balance", "Endocannabinoid System",
     "Liposomal delivery systems", "Cerebrolysin / Semax / Selank (Technical)", "Memory Palaces / Loci",
     "Spaced Repetition / Anki", "Identity Shifting", "Stress Inoculation",
-    "Social Connection biohacking", "Altruism & Neurobiology", "Stoicism for Resilience"
+    "Social Connection biohacking", "Altruism & Neurobiology", "Stoicism for Resilience",
+
+    # === PEPTIDES (12) ===
+    "BPC-157 Healing Protocols", "TB-500 Tissue Repair", "GHK-Cu (Copper Peptide)",
+    "Selank for Anxiolytic Calm", "Semax for Cognitive Drive", "Epitalon for Telomere Length",
+    "MOTS-c Mitochondrial Peptide", "Thymosin Alpha-1 Immune Modulation",
+    "Ipamorelin GH Pulse", "DSIP Sleep Peptide", "AOD-9604 Fat Loss Peptide",
+    "Pinealon Cognitive Peptide",
+
+    # === MITOCHONDRIAL & ENERGY (8) ===
+    "CoQ10 vs Ubiquinol Bioavailability", "Urolithin A Mitophagy",
+    "PQQ Mitochondrial Biogenesis", "Methylene Blue Microdosing Protocol",
+    "NMN vs NR Bioavailability", "Nicotinamide Riboside Daily Dosing",
+    "Mitochondrial Uncoupling Strategies", "Alpha-Lipoic Acid Glucose Pathway",
+
+    # === STACK-DRIVEN MASTERCLASSES (10) ===
+    "The WBTB Lucid Dreaming Stack", "The Calm-Focus Stack (L-Theanine + Caffeine)",
+    "Post-Workout Recovery Stack", "Sleep Architecture Stack",
+    "Morning Cognitive Activation Stack", "Anxiolytic Without Sedation Stack",
+    "Pre-Cardio Endurance Stack", "Memory Consolidation Stack",
+    "Cortisol Down-Regulation Stack", "Acetylcholine Optimization Stack",
+
+    # === LIGHT, EMF, ENVIRONMENTAL (8) ===
+    "Red Light 660nm vs 850nm Wavelength Selection", "EMF Mitigation Strategies",
+    "Blue Light Timing for Circadian Rhythm", "UV-B Exposure for Vitamin D Synthesis",
+    "Infrared Sauna Heat Shock Proteins", "Negative Ion Exposure",
+    "Faraday Cage Sleep Optimization", "Air Quality and Cognitive Performance",
+
+    # === PHARMACOLOGY PATHWAYS (10) ===
+    "Sigma-1 Receptor Agonism", "mTOR Pathway Modulation",
+    "AMPK Activation for Longevity", "Sirtuin Pathway Optimization",
+    "Adenosine Receptor Antagonism", "Endocannabinoid Tone Modulation",
+    "Glutamate Excitotoxicity Mitigation", "Cholinergic System Tuning",
+    "Serotonin Receptor Subtype Selectivity", "Dopaminergic Tolerance Management",
+
+    # === HORMONAL OPTIMIZATION (6) ===
+    "DHEA Supplementation Protocols", "Pregnenolone for Neurosteroid Balance",
+    "T3/T4 Thyroid Conversion Optimization", "Estrogen Metabolism Pathways",
+    "Growth Hormone Pulse Optimization", "Insulin Sensitivity Restoration",
+
+    # === RECOVERY & PERFORMANCE SCIENCE (6) ===
+    "Lactate Threshold Training", "HRV-Guided Training Periodization",
+    "Contrast Therapy Hot-Cold Protocols", "Active Recovery vs Passive",
+    "Zone 2 Cardio for Mitochondrial Density", "Eccentric Loading for Tendon Health",
 ]
 
 class HopesAndDreamsBot:
