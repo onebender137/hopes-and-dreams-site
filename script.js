@@ -757,6 +757,8 @@ document.addEventListener('DOMContentLoaded', () => {
             const isArticle = window.location.pathname.includes('/articles/');
             logo.src = isArticle ? '../topper-inverted.png' : 'topper-inverted.png';
         }
+        const heroBrain = document.getElementById('hero-brain-image');
+        if (heroBrain) heroBrain.src = 'topper-inverted.png';
     }
 
     if (themeToggle) {
@@ -771,12 +773,16 @@ document.addEventListener('DOMContentLoaded', () => {
                     const isArticle = window.location.pathname.includes('/articles/');
                     logo.src = isArticle ? '../topper-inverted.png' : 'topper-inverted.png';
                 }
+                const heroBrainLight = document.getElementById('hero-brain-image');
+                if (heroBrainLight) heroBrainLight.src = 'topper-inverted.png';
             } else {
                 themeToggle.textContent = '☀️ LIGHT MODE';
                 if (logo) {
                     const isArticle = window.location.pathname.includes('/articles/');
                     logo.src = isArticle ? '../topper.png' : 'topper.png';
                 }
+                const heroBrainDark = document.getElementById('hero-brain-image');
+                if (heroBrainDark) heroBrainDark.src = 'topper.png';
             }
             localStorage.setItem('theme', theme);
         });
