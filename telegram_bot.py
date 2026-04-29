@@ -174,7 +174,7 @@ class TelegramBot:
 
                 # Add affiliate recommendation (non-blocking)
                 post_id = result.get('id')
-                asyncio.create_task(asyncio.to_thread(self.hdbot._add_affiliate_comment, post_id, topic))
+                asyncio.create_task(asyncio.to_thread(self.hdbot._add_affiliate_comment, post_id, topic, content))
             else:
                 await update.message.reply_text("❌ Failed to post.")
         else:
@@ -333,7 +333,7 @@ class TelegramBot:
 
             # Add affiliate recommendation (non-blocking)
             post_id = result.get('id')
-            asyncio.create_task(asyncio.to_thread(self.hdbot._add_affiliate_comment, post_id, self.last_topic))
+            asyncio.create_task(asyncio.to_thread(self.hdbot._add_affiliate_comment, post_id, self.last_topic, self.last_draft))
 
             self.last_draft = None
             self.last_topic = None

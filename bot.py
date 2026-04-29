@@ -340,7 +340,7 @@ class HopesAndDreamsBot:
 
                     # Add affiliate recommendation in the comments
                     post_id = result.get('id')
-                    self._add_affiliate_comment(post_id, topic)
+                    self._add_affiliate_comment(post_id, topic, tip_content)
 
                     return result
                 else:
@@ -352,24 +352,53 @@ class HopesAndDreamsBot:
 
         return None
 
-    def _add_affiliate_comment(self, post_id, topic):
+    def _extract_clean_affiliate_keyword(self, topic, content=None):
+        """Uses the LLM to extract a clean, searchable product keyword from a topic/content."""
+        system_msg = "You are the Syndicate's Inventory Specialist. Your job is to identify a single, specific product or supplement for Amazon search."
+
+        prompt = (
+            f"Analyze this topic: '{topic}'\n"
+            f"{f'And this content excerpt: {content[:500]}...' if content else ''}\n\n"
+            "INSTRUCTIONS:\n"
+            "1. Identify the core supplement, compound, or biohacking tool mentioned.\n"
+            "2. If the topic is a messy command (e.g., 'a post called...'), ignore the command fluff and find the actual subject.\n"
+            "3. Return ONLY the name of the product (e.g., 'Alpha GPC' or 'Nicotine Patches').\n"
+            "4. NO punctuation, NO meta-commentary, NO 'The product is...'.\n"
+            "5. If multiple are found, pick the most central one.\n"
+            "6. If none are found, return the original topic cleaned of obvious command prefixes."
+        )
+
+        try:
+            clean_keyword = self.llm.generate_response(prompt, system_msg, sanitize=True)
+            if clean_keyword and len(clean_keyword) < 50:
+                return clean_keyword.strip()
+        except Exception as e:
+            print(f"Keyword extraction failed: {e}")
+
+        # Fallback: Basic cleanup of common prefixes if LLM fails
+        clean_topic = re.sub(r'(?i)^(?:a post called|draft a post about|post about)\s+', '', topic)
+        return clean_topic.strip()
+
+    def _add_affiliate_comment(self, post_id, topic, content=None):
         """Searches for a product related to the topic and posts it as a comment."""
         if not post_id or not topic:
             return
 
-        print(f"[{datetime.now()}] EXECUTIVE EXECUTION: Adding affiliate recommendation for {topic} to post {post_id}...")
+        # Extract a clean keyword for better product matching
+        clean_keyword = self._extract_clean_affiliate_keyword(topic, content)
+        print(f"[{datetime.now()}] EXECUTIVE EXECUTION: Adding affiliate recommendation for {clean_keyword} (Topic: {topic}) to post {post_id}...")
 
         # Give FB a few seconds to index the post
         time.sleep(5)
 
-        products = self.affiliate.search_products(topic, limit=1)
+        products = self.affiliate.search_products(clean_keyword, limit=1)
 
         if products:
             product_title = products[0]['title']
             product_url = products[0]['url']
         else:
-            product_title = topic
-            product_url = self.affiliate.generate_canadian_link(topic)
+            product_title = clean_keyword
+            product_url = self.affiliate.generate_canadian_link(clean_keyword)
 
         # Generate a human-like, peer-to-peer pitch
         prompt = (
