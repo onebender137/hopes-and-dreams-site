@@ -223,6 +223,8 @@ class HopesAndDreamsBot:
                             "He often mentions topics like lucid dreaming, astral projection, or specific supplements. "
                             "If he explicitly requested a topic for a specific time, prioritize that. "
                             "Return ONLY the topic name (e.g., 'Lucid Dreaming' or 'Magnesium L-Threonate'). "
+                            "DO NOT include meta-commentary like 'The topic requested is...' or 'He wants to post about...'. "
+                            "JUST return the topic name. "
                             "If no specific topic is found, return 'RANDOM'."
                         )
                         
@@ -608,13 +610,29 @@ class HopesAndDreamsBot:
         try:
             data = json.loads(json_clean)
             beautified_body = data.get('body', f"<p>{content.replace('\n', '<br>')}</p>")
+
+            # --- POST-PROCESSING SANITIZATION ---
+            # Catch LLM errors like nesting <h2> inside <p> or using <h1>
+            beautified_body = beautified_body.replace('<h1>', '<h2>').replace('</h1>', '</h2>')
+            # Use regex to find <p>...<h2>...</h2>...</p> and flatten it
+            beautified_body = re.sub(r'<p>\s*(<h[1-6]>.*?</h[1-6]>)\s*</p>', r'\1', beautified_body, flags=re.DOTALL)
+            # Remove any ** stars that might have leaked into HTML
+            beautified_body = beautified_body.replace('**', '')
+
             hack_content = data.get('hack', "")
             priority = int(data.get('priority', 2))
         except Exception as e:
             self._log_uplink(f"WEBSITE ERROR: JSON parsing failed: {e}. Falling back to raw content.")
             # Fallback if JSON fails
             beautified_body = f"<p>{content.replace('\n', '<br>')}</p>"
-            hack_content = ""
+
+            # Robust fallback for hack content: try to find it in raw content or use a default
+            hack_match = re.search(r'(?:PROSTAR LIFE HACK|LIFE HACK|PROTOCOL TIP):?\s*(.*)', content, re.IGNORECASE)
+            if hack_match:
+                hack_content = hack_match.group(1).strip()
+            else:
+                hack_content = "Always verify protocol biological leverage with baseline biometric tracking. Data is sovereignty."
+
             priority = 2
 
         # 3. Construct the Hack Box HTML if content exists
