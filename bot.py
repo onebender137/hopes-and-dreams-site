@@ -232,7 +232,12 @@ class HopesAndDreamsBot:
                         topic = self.llm.generate_response(prompt, system_msg)
                         
                         if topic and "RANDOM" not in topic.upper() and len(topic) < 100:
-                            return topic.strip().replace("'", "").replace("\"", "")
+                            topic = topic.strip().replace("'", "").replace("\"", "")
+                            # Meta-commentary cleanup for requested topics
+                            topic = re.sub(r'(?i)The specific topic requested by the CEO for the \d{2}:\d{2} post is\s+', '', topic)
+                            topic = re.sub(r'(?i)post with title\s+', '', topic)
+                            topic = re.sub(r'(?i)Masterclass:\s*', '', topic)
+                            return topic.strip()
             except (json.JSONDecodeError, IOError, Exception) as e:
                 print(f"Error reading chat memory for topics: {e}")
 
@@ -561,6 +566,10 @@ class HopesAndDreamsBot:
 
     def _beautify_for_blog(self, content, topic, image_path):
         """Uses the LLM to beautify content and then injects it into the HTML template."""
+        # Scrub topic meta-commentary
+        topic = re.sub(r'(?i)The specific topic requested by the CEO for the \d{2}:\d{2} post is\s+', '', topic)
+        topic = re.sub(r'(?i)post with title\s+', '', topic)
+        topic = re.sub(r'(?i)Masterclass:\s*', '', topic)
         system_msg = (
             "You are the Syndicate's Digital Architect. Your job is to take raw biohacking intel "
             "and format it for a high-end article for our website."
@@ -623,6 +632,18 @@ class HopesAndDreamsBot:
             beautified_body = beautified_body.replace('**', '')
             # 5. Ensure multiple <br> tags are replaced with proper paragraph structure if leaked
             beautified_body = re.sub(r'(?:<br\s*/?>\s*){2,}', '</p><p>', beautified_body)
+            # 6. Ensure all paragraphs are wrapped and non-header text isn't loose
+            # (Simple regex approach to wrap loose text or handle missing <p> tags)
+            if "<p>" not in beautified_body.lower() and "<h2>" in beautified_body.lower():
+                 # Very basic wrap for content that might just be headers and raw text
+                 parts = re.split(r'(<h[1-6]>.*?</h[1-6]>)', beautified_body, flags=re.DOTALL)
+                 new_parts = []
+                 for p in parts:
+                     if p.strip() and not p.startswith('<h'):
+                         new_parts.append(f"<p>{p.strip()}</p>")
+                     else:
+                         new_parts.append(p)
+                 beautified_body = "".join(new_parts)
 
             hack_content = data.get('hack', "")
             priority = int(data.get('priority', 2))
@@ -658,7 +679,12 @@ class HopesAndDreamsBot:
         date_display = now.strftime("%B %Y")
         timestamp_str = f"[ LIVE FEED ] RECEIVED: {now.strftime('%Y-%m-%d %H:%M:%S')} AST"
 
-        final_html = template.replace("{{SYNDICATE_TITLE}}", topic)
+        # Scrub meta-commentary from topic for the title
+        clean_topic = re.sub(r'(?i)The specific topic requested by the CEO for the \d{2}:\d{2} post is\s+', '', topic)
+        clean_topic = re.sub(r'(?i)post with title\s+', '', clean_topic)
+        clean_topic = re.sub(r'(?i)Masterclass:\s*', '', clean_topic)
+
+        final_html = template.replace("{{SYNDICATE_TITLE}}", clean_topic)
         final_html = final_html.replace("{{SYNDICATE_DATE}}", date_display)
         final_html = final_html.replace("{{SYNDICATE_TIMESTAMP}}", timestamp_str)
         final_html = final_html.replace("{{SYNDICATE_CONTENT}}", beautified_body)
