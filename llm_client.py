@@ -298,7 +298,8 @@ class LLMClient:
             "Ensure technical weight and visionary tone. Each section must be substantial (4-5 sentences). "
             "MANDATORY: You must end the post with exactly: 'Do your own research. Don't be a statistic.'"
         )
-        return self.generate_response(prompt, self.syndicate_persona, context, reflect=True)
+        # We reflect=True to ensure quality, and sanitize=True to strip HTML for social media
+        return self.generate_response(prompt, self.syndicate_persona, context, reflect=True, sanitize=True)
 
 
 if __name__ == "__main__":
