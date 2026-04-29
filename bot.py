@@ -223,8 +223,8 @@ class HopesAndDreamsBot:
                             "He often mentions topics like lucid dreaming, astral projection, or specific supplements. "
                             "If he explicitly requested a topic for a specific time, prioritize that. "
                             "Return ONLY the topic name (e.g., 'Lucid Dreaming' or 'Magnesium L-Threonate'). "
-                            "DO NOT include meta-commentary like 'The topic requested is...' or 'He wants to post about...'. "
-                            "JUST return the topic name. "
+                            "DO NOT include meta-commentary like 'The topic requested is...', 'He wants to post about...', or 'The specific topic requested by the CEO for the XX:XX post is...'. "
+                            "STRICTLY return the topic name itself. "
                             "If no specific topic is found, return 'RANDOM'."
                         )
                         
@@ -592,8 +592,9 @@ class HopesAndDreamsBot:
             "7. Return ONLY the JSON object. No talk, no markdown code blocks around the JSON."
         )
 
-        # We need a longer context for beautification to handle the template and content
-        json_response = self.llm.generate_response(prompt, system_msg, reflect=True, options={'num_ctx': 8192})
+        # We need a longer context for beautification to handle the template and content.
+        # We set sanitize=False because we WANT HTML tags in the JSON response.
+        json_response = self.llm.generate_response(prompt, system_msg, reflect=True, options={'num_ctx': 8192}, sanitize=False)
 
         # Cleanup: Robustly extract JSON if the LLM ignores the "no markdown" instruction
         json_clean = json_response.strip()
@@ -612,12 +613,16 @@ class HopesAndDreamsBot:
             beautified_body = data.get('body', f"<p>{content.replace('\n', '<br>')}</p>")
 
             # --- POST-PROCESSING SANITIZATION ---
-            # Catch LLM errors like nesting <h2> inside <p> or using <h1>
+            # 1. Catch LLM errors like nesting <h2> inside <p> or using <h1>
             beautified_body = beautified_body.replace('<h1>', '<h2>').replace('</h1>', '</h2>')
-            # Use regex to find <p>...<h2>...</h2>...</p> and flatten it
+            # 2. Use regex to find <p>...<h2>...</h2>...</p> and flatten it
             beautified_body = re.sub(r'<p>\s*(<h[1-6]>.*?</h[1-6]>)\s*</p>', r'\1', beautified_body, flags=re.DOTALL)
-            # Remove any ** stars that might have leaked into HTML
+            # 3. Strip any "Masterclass:" or "Topic:" or similar meta-prefixes from the content body
+            beautified_body = re.sub(r'(?:Masterclass|Topic|Title):\s*', '', beautified_body, flags=re.IGNORECASE)
+            # 4. Remove any ** stars that might have leaked into HTML
             beautified_body = beautified_body.replace('**', '')
+            # 5. Ensure multiple <br> tags are replaced with proper paragraph structure if leaked
+            beautified_body = re.sub(r'(?:<br\s*/?>\s*){2,}', '</p><p>', beautified_body)
 
             hack_content = data.get('hack', "")
             priority = int(data.get('priority', 2))
