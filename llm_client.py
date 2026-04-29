@@ -214,12 +214,15 @@ class LLMClient:
         # 8. Collapse 3+ blank lines to 2 (cleaner spacing)
         out = re.sub(r'\n{3,}', '\n\n', out)
 
-        # 9. Trim trailing whitespace per line
+        # 9. Strip any remaining HTML tags (Safety pass for Facebook/Telegram)
+        out = re.sub(r'<[^>]+>', '', out)
+
+        # 10. Trim trailing whitespace per line
         out = '\n'.join(line.rstrip() for line in out.split('\n'))
 
         return out.strip()
 
-    def generate_response(self, prompt: str, system_message: str = None, context: str = "", reflect: bool = False, options: dict = None):
+    def generate_response(self, prompt: str, system_message: str = None, context: str = "", reflect: bool = False, options: dict = None, sanitize: bool = True):
         """The Research & Convey Loop."""
         # Use provided system message or default to Syndicate public for community queries
         final_system = system_message or self.public_syndicate_persona
@@ -242,31 +245,39 @@ class LLMClient:
 
             # Quality Control Step
             if reflect:
-                content = self._reflect_and_correct(content, final_system, options)
+                content = self._reflect_and_correct(content, final_system, options, sanitize=sanitize)
 
             # Final sanitizer pass - strip markdown that the model snuck in
-            return self._sanitize_output(content)
+            if sanitize:
+                return self._sanitize_output(content)
+            return content
 
         except Exception as e:
             print(f"Error in LLM Loop: {e}")
             return "Transmission interrupted. System destabilized."
 
-    def _reflect_and_correct(self, content: str, system_message: str = None, options: dict = None):
+    def _reflect_and_correct(self, content: str, system_message: str = None, options: dict = None, sanitize: bool = True):
         """Internal reflection to ensure depth and grit without AI meta-talk."""
         print("Reflecting and self-correcting (Ensuring depth and grit)...")
+
+        rules = ""
+        if sanitize:
+            rules = (
+                "CRITICAL OUTPUT RULES:\n"
+                "- Output ONLY the final revised post.\n"
+                "- Do NOT include meta-comments, intro notes, or 'Revised Response' headers.\n"
+                "- STRIP all bracketed citation markers like [1], [2], [3] - rewrite those sentences without them.\n"
+                "- STRIP any 'References' or 'Citations' sections - delete them entirely.\n"
+                "- STRIP all markdown formatting: no ### headers, no #### subheaders, no ** bold **, "
+                "no * italics *, no --- separators. The output goes to TTS for video reels - markdown reads "
+                "as 'hashtag hashtag' which is broken. Convert any ### Header to: HEADER (caps, no symbols).\n"
+                "- Output should be clean plain text ready for Facebook posting AND TTS narration.\n\n"
+            )
 
         reflection_prompt = (
             "Review this draft for technical authority and Syndicate tone. "
             "Remove marketing fluff. Expand on the physiological mechanics if too brief. "
-            "CRITICAL OUTPUT RULES:\n"
-            "- Output ONLY the final revised post.\n"
-            "- Do NOT include meta-comments, intro notes, or 'Revised Response' headers.\n"
-            "- STRIP all bracketed citation markers like [1], [2], [3] - rewrite those sentences without them.\n"
-            "- STRIP any 'References' or 'Citations' sections - delete them entirely.\n"
-            "- STRIP all markdown formatting: no ### headers, no #### subheaders, no ** bold **, "
-            "no * italics *, no --- separators. The output goes to TTS for video reels - markdown reads "
-            "as 'hashtag hashtag' which is broken. Convert any ### Header to: HEADER (caps, no symbols).\n"
-            "- Output should be clean plain text ready for Facebook posting AND TTS narration.\n\n"
+            f"{rules}"
             f"DRAFT TO REFLECT ON:\n{content}"
         )
 
