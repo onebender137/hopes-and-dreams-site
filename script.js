@@ -51,14 +51,14 @@ document.addEventListener('DOMContentLoaded', () => {
     });
 
     // --- Decryption (Boot-Up) Sequence ---
-    // Target all paragraphs within the article content for the decryption effect
-    const articlePs = document.querySelectorAll('.article-container p, .intel-burst p');
-    articlePs.forEach((p, index) => {
-        p.classList.add('decryption-text');
+    // Target all structural elements within the article content for the decryption effect
+    const articleElements = document.querySelectorAll('.article-container p, .article-container h2, .article-container li, .intel-burst p, .intel-burst h2, .intel-burst li');
+    articleElements.forEach((el, index) => {
+        el.classList.add('decryption-text');
         // Staggered reveal based on index
         setTimeout(() => {
-            p.classList.add('decrypted');
-        }, 500 + (index * 150)); // Delay each paragraph slightly for a better visual sequence
+            el.classList.add('decrypted');
+        }, 500 + (index * 150)); // Delay each element slightly for a better visual sequence
     });
 
     // --- Interactive Feature Logic ---
