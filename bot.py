@@ -558,8 +558,8 @@ class HopesAndDreamsBot:
 
         # 1. Beautify content using LLM
         try:
-            # We now capture priority from beautification
-            beautified_html, priority = self._beautify_for_blog(content, topic, image_path)
+            # We now capture priority and a clean title from beautification
+            beautified_html, priority, clean_title = self._beautify_for_blog(content, topic, image_path)
             if not beautified_html or len(beautified_html) < 100:
                 self._log_uplink("WEBSITE ERROR: Beautification returned empty or suspiciously short HTML.")
                 return False
@@ -569,7 +569,7 @@ class HopesAndDreamsBot:
 
         # 2. Generate slug and filename
         date_str = datetime.now().strftime("%Y-%m-%d")
-        slug = re.sub(r'[^a-z0-9]+', '-', topic.lower()).strip('-')
+        slug = re.sub(r'[^a-z0-9]+', '-', clean_title.lower()).strip('-')
         filename = f"{date_str}-{slug}.html"
         filepath = os.path.join("articles", filename)
 
@@ -583,10 +583,10 @@ class HopesAndDreamsBot:
             return False
 
         # 4. Update intel.html (Latest 3)
-        self._update_intel_html(topic, filename, date_str, priority)
+        self._update_intel_html(clean_title, filename, date_str, priority)
 
         # 5. Update transmissions.html (Archive)
-        self._update_transmissions_html(topic, filename, date_str)
+        self._update_transmissions_html(clean_title, filename, date_str)
 
         # 6. Git Commit and Push
         self._git_push_changes(f"Syndicate Transmission: {topic}")
@@ -623,11 +623,13 @@ class HopesAndDreamsBot:
             "3. MANDATORY: Structure the body using NUMBERED HEADERS for each main section (e.g., '1. The Mechanism', '2. Protocol implementation').\n"
             "4. MANDATORY: Create a 'Prostar Life Hack' section containing the most actionable, high-value takeaway.\n"
             "5. Analyze the 'Intelligence Level' of the content. If it contains deep technical pharmacological data or complex protocols, assign Priority 1. If it's a general overview, assign Priority 2.\n"
-            "6. Return the result as a JSON object with three keys:\n"
+            "6. Generate a professional, punchy, and technical title for the post (e.g., 'Neurobiology of Sulbutiamine' or 'Optimizing HRV with Cold Thermogenesis'). Do NOT include prefixes like 'Masterclass:' or 'Topic:'.\n"
+            "7. Return the result as a JSON object with four keys:\n"
             "   - 'body': The HTML formatted content.\n"
             "   - 'hack': The HTML text for the hack-box contents (just the text, no <h4>).\n"
             "   - 'priority': The integer 1 or 2.\n"
-            "7. Return ONLY the JSON object. No talk, no markdown code blocks around the JSON."
+            "   - 'title': The professional title string.\n"
+            "8. Return ONLY the JSON object. No talk, no markdown code blocks around the JSON."
         )
 
         # We need a longer context for beautification to handle the template and content.
@@ -649,6 +651,7 @@ class HopesAndDreamsBot:
         try:
             data = json.loads(json_clean)
             beautified_body = data.get('body', f"<p>{content.replace('\n', '<br>')}</p>")
+            clean_title = data.get('title', topic).strip()
 
             # --- POST-PROCESSING SANITIZATION ---
             # 1. Catch LLM errors like nesting <h2> inside <p> or using <h1>
@@ -680,6 +683,7 @@ class HopesAndDreamsBot:
             self._log_uplink(f"WEBSITE ERROR: JSON parsing failed: {e}. Falling back to raw content.")
             # Fallback if JSON fails
             beautified_body = f"<p>{content.replace('\n', '<br>')}</p>"
+            clean_title = topic.strip()
 
             # Robust fallback for hack content: try to find it in raw content or use a default
             hack_match = re.search(r'(?:PROSTAR LIFE HACK|LIFE HACK|PROTOCOL TIP):?\s*(.*)', content, re.IGNORECASE)
@@ -708,19 +712,19 @@ class HopesAndDreamsBot:
         date_display = now.strftime("%B %Y")
         timestamp_str = f"[ LIVE FEED ] RECEIVED: {now.strftime('%Y-%m-%d %H:%M:%S')} AST"
 
-        # Scrub meta-commentary from topic for the title
-        clean_topic = re.sub(r'(?i)The specific topic requested by the CEO for the \d{2}:\d{2} post is\s+', '', topic)
-        clean_topic = re.sub(r'(?i)post with title\s+', '', clean_topic)
-        clean_topic = re.sub(r'(?i)Masterclass:\s*', '', clean_topic)
+        # Final scrub of meta-commentary from the clean_title
+        clean_title = re.sub(r'(?i)The specific topic requested by the CEO for the \d{2}:\d{2} post is\s+', '', clean_title)
+        clean_title = re.sub(r'(?i)post with title\s+', '', clean_title)
+        clean_title = re.sub(r'(?i)Masterclass:\s*', '', clean_title)
 
-        final_html = template.replace("{{SYNDICATE_TITLE}}", clean_topic)
+        final_html = template.replace("{{SYNDICATE_TITLE}}", clean_title)
         final_html = final_html.replace("{{SYNDICATE_DATE}}", date_display)
         final_html = final_html.replace("{{SYNDICATE_TIMESTAMP}}", timestamp_str)
         final_html = final_html.replace("{{SYNDICATE_CONTENT}}", beautified_body)
         final_html = final_html.replace("{{SYNDICATE_HACK}}", hack_html)
         final_html = final_html.replace("{{SYNDICATE_IMAGE}}", image_html)
 
-        return final_html, priority
+        return final_html, priority, clean_title
     def _update_intel_html(self, topic, filename, date_str, priority=2):
         """Updates the intel.html file with the latest 3 posts."""
         self._log_uplink(f"WEBSITE: Syncing intel.html (Priority: {priority})...")
