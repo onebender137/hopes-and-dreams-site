@@ -1132,17 +1132,24 @@ document.addEventListener('DOMContentLoaded', () => {
     const transmissionsUrl = '../transmissions.html';
 
     async function initializeArticleNav() {
+        console.log("Initializing Syndicate Transmission Scroller...");
         try {
             const response = await fetch(transmissionsUrl);
+            if (!response.ok) {
+                console.error(`Failed to fetch transmissions: ${response.status}`);
+                return;
+            }
             const html = await response.text();
             const parser = new DOMParser();
             const doc = parser.parseFromString(html, 'text/html');
             const archiveItems = Array.from(doc.querySelectorAll('.archive-item'));
 
+            console.log(`Found ${archiveItems.length} items in archive.`);
             if (archiveItems.length === 0) return;
 
             const currentPath = window.location.pathname.split('/').pop();
             let currentIndex = archiveItems.findIndex(item => item.getAttribute('href').includes(currentPath));
+            console.log(`Current article index: ${currentIndex}`);
 
             // Generate the scroller HTML
             let navHTML = `
@@ -1152,8 +1159,14 @@ document.addEventListener('DOMContentLoaded', () => {
             `;
 
             archiveItems.forEach((item, index) => {
-                const title = item.querySelector('.title').textContent;
-                const date = item.querySelector('.date').textContent;
+                const titleEl = item.querySelector('.title');
+                const dateEl = item.querySelector('.date');
+                if (!titleEl || !dateEl) {
+                    console.warn(`Skipping malformed archive item at index ${index}`);
+                    return;
+                }
+                const title = titleEl.textContent;
+                const date = dateEl.textContent;
                 const href = item.getAttribute('href');
                 const isActive = index === currentIndex;
                 const isPrev = index === currentIndex + 1; // Reverse chronological order
@@ -1230,7 +1243,9 @@ document.addEventListener('DOMContentLoaded', () => {
 });
 
 // --- NEURO-LAUNCHPAD LOGIC ---
-gsap.registerPlugin(Flip, TextPlugin);
+if (typeof gsap !== 'undefined') {
+    gsap.registerPlugin(Flip, TextPlugin);
+}
 
 document.addEventListener('DOMContentLoaded', () => {
     const hero = document.getElementById('hero-launchpad');
@@ -1333,59 +1348,70 @@ document.addEventListener('DOMContentLoaded', () => {
         localStorage.setItem('syndicate_live', 'true');
         // For hotspot clicks with a target page, run a brief transition then navigate
         if (navigateTo) {
-            const tl = gsap.timeline();
-            tl.to(heroTitle, { y: 50, opacity: 0, duration: 0.4, ease: "power2.in" });
-            tl.to(brainImage, { scale: 0.5, opacity: 0.8, duration: 0.5, ease: "power2.in" }, "<");
-            setTimeout(() => { window.location.href = navigateTo; }, 600);
+            if (typeof gsap !== 'undefined') {
+                const tl = gsap.timeline();
+                tl.to(heroTitle, { y: 50, opacity: 0, duration: 0.4, ease: "power2.in" });
+                tl.to(brainImage, { scale: 0.5, opacity: 0.8, duration: 0.5, ease: "power2.in" }, "<");
+                setTimeout(() => { window.location.href = navigateTo; }, 600);
+            } else {
+                window.location.href = navigateTo;
+            }
             return;
         }
 
-        const tl = gsap.timeline();
+        if (typeof gsap !== 'undefined') {
+            const tl = gsap.timeline();
 
-        // Step A: Title fade and slide down
-        tl.to(heroTitle, {
-            y: 50,
-            opacity: 0,
-            duration: 0.6,
-            ease: "power2.in"
-        });
-
-        // Step B: Brain Flip to Header
-        tl.add(() => {
-            const state = Flip.getState(brainImage);
-            destination.appendChild(brainImage);
-
-            const flipTween = Flip.from(state, {
-                duration: 1.2,
-                scale: true,
-                ease: "power3.inOut",
-                onComplete: () => {
-                    document.body.classList.add('logo-header-state');
-                    brainImage.style.cursor = 'pointer';
-                    brainImage.onclick = () => {
-                        localStorage.removeItem('syndicate_live');
-                        window.location.href = 'index.html';
-                    };
-                }
+            // Step A: Title fade and slide down
+            tl.to(heroTitle, {
+                y: 50,
+                opacity: 0,
+                duration: 0.6,
+                ease: "power2.in"
             });
-            // We can't easily return a tween inside a timeline callback to make it blocking
-            // so we'll use a delayed call for Step C or similar, but better is to just add it.
-        });
 
-        // Step C: Fade in architecture (Wait for Step B to finish roughly)
-        tl.to(mainInterface, {
-            display: 'block',
-            opacity: 1,
-            duration: 1,
-            ease: "power2.out"
-        }, "+=1.2"); // Positive offset to ensure Step B (duration 1.2) finishes
+            // Step B: Brain Flip to Header
+            tl.add(() => {
+                const state = Flip.getState(brainImage);
+                destination.appendChild(brainImage);
 
-        tl.to(hero, {
-            opacity: 0,
-            duration: 1,
-            onComplete: () => {
-                hero.style.display = 'none';
-            }
-        }, "-=1");
+                const flipTween = Flip.from(state, {
+                    duration: 1.2,
+                    scale: true,
+                    ease: "power3.inOut",
+                    onComplete: () => {
+                        document.body.classList.add('logo-header-state');
+                        brainImage.style.cursor = 'pointer';
+                        brainImage.onclick = () => {
+                            localStorage.removeItem('syndicate_live');
+                            window.location.href = 'index.html';
+                        };
+                    }
+                });
+            });
+
+            // Step C: Fade in architecture (Wait for Step B to finish roughly)
+            tl.to(mainInterface, {
+                display: 'block',
+                opacity: 1,
+                duration: 1,
+                ease: "power2.out"
+            }, "+=1.2");
+
+            tl.to(hero, {
+                opacity: 0,
+                duration: 1,
+                onComplete: () => {
+                    hero.style.display = 'none';
+                }
+            }, "-=1");
+        } else {
+            // Fallback if GSAP is missing
+            hero.style.display = 'none';
+            mainInterface.style.display = 'block';
+            mainInterface.style.opacity = '1';
+            document.body.classList.add('logo-header-state');
+            destination.appendChild(brainImage);
+        }
     }
 });
