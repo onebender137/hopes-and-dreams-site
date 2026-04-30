@@ -320,8 +320,10 @@ class HopesAndDreamsBot:
                 tip_content = self.llm.create_biohacking_post(topic, context=combined_context)
 
             if tip_content and not self._is_bad_content(tip_content):
-                # 4. Handle Media Attachment
-                image_path = self._get_random_media()
+                # 4. Handle Media Attachment — generate topic-specific image first
+                image_path = self._generate_topic_image(topic)
+                if not image_path:
+                    image_path = self._get_random_media()
                 if image_path:
                     print(f"[{datetime.now()}] EXECUTIVE EXECUTION: Media found for payload: {image_path}")
                 else:
@@ -546,39 +548,120 @@ class HopesAndDreamsBot:
         return False
 
     def _generate_topic_image(self, topic):
-    """Hits Pollinations.ai to generate a topic-specific infographic image."""
-    import requests
-    import urllib.parse
-    from datetime import datetime
+        """Generates a topic image with FLUX visual + Pillow text overlay for readable text."""
+        import requests
+        import os
+        import base64
+        from datetime import datetime
+        from PIL import Image, ImageDraw, ImageFont
+        from io import BytesIO
 
-    prompt = (
-        f"Dark navy blue background, neon cyan and gold technical infographic about {topic}. "
-        "Biohacking, neuroscience, pharmacology theme. "
-        "Labeled diagrams, molecular pathways, brain anatomy. "
-        "High detail, professional data visualization, cyberpunk aesthetic. "
-        "Text overlay: DO YOUR OWN RESEARCH. DON'T BE A STATISTIC."
-    )
-    encoded = urllib.parse.quote(prompt)
-    url = f"https://image.pollinations.ai/prompt/{encoded}?width=1280&height=720&nologo=true&seed={random.randint(1,99999)}"
+        api_key = os.environ.get("TOGETHER_API_KEY")
+        if not api_key:
+            self._log_uplink("IMAGE GEN: No TOGETHER_API_KEY found, skipping.")
+            return None
 
-    try:
-        self._log_uplink(f"IMAGE GEN: Requesting Pollinations image for '{topic}'...")
-        response = requests.get(url, timeout=60)
-        if response.status_code == 200:
+        # Visual-only prompt — NO text instructions, FLUX can't spell
+        prompt = (
+            f"Abstract scientific illustration representing {topic}. "
+            "Dark navy blue background. Glowing neon cyan and gold molecular structures. "
+            "Brain anatomy, neural networks, biochemical pathways. "
+            "Cyberpunk cinematic lighting, deep blue and gold color palette. "
+            "Atmospheric, professional pharmaceutical research aesthetic. "
+            "No text, no letters, no words, pure visual imagery, dramatic depth of field."
+        )
+
+        try:
+            self._log_uplink(f"IMAGE GEN: Requesting FLUX visual for '{topic}'...")
+            response = requests.post(
+                "https://api.together.xyz/v1/images/generations",
+                headers={"Authorization": f"Bearer {api_key}", "Content-Type": "application/json"},
+                json={
+                    "model": "black-forest-labs/FLUX.1-schnell",
+                    "prompt": prompt,
+                    "width": 1280,
+                    "height": 720,
+                    "steps": 4,
+                    "n": 1,
+                    "response_format": "b64_json"
+                },
+                timeout=60
+            )
+            if response.status_code != 200:
+                self._log_uplink(f"IMAGE GEN: FLUX returned {response.status_code}: {response.text[:200]}")
+                return None
+
+            img_data = base64.b64decode(response.json()["data"][0]["b64_json"])
+            img = Image.open(BytesIO(img_data)).convert("RGB")
+
+            # === PILLOW TEXT OVERLAY ===
+            draw = ImageDraw.Draw(img, "RGBA")
+            W, H = img.size
+
+            # Try common system fonts, fall back gracefully
+            def load_font(size, bold=False):
+                paths = [
+                    "/usr/share/fonts/truetype/dejavu/DejaVuSans-Bold.ttf" if bold else "/usr/share/fonts/truetype/dejavu/DejaVuSans.ttf",
+                    "/usr/share/fonts/truetype/liberation/LiberationSans-Bold.ttf" if bold else "/usr/share/fonts/truetype/liberation/LiberationSans-Regular.ttf",
+                ]
+                for p in paths:
+                    if os.path.exists(p):
+                        return ImageFont.truetype(p, size)
+                return ImageFont.load_default()
+
+            title_font = load_font(72, bold=True)
+            tagline_font = load_font(28, bold=True)
+            footer_font = load_font(24, bold=True)
+
+            # Top dark band for title
+            draw.rectangle([(0, 0), (W, 160)], fill=(3, 9, 31, 200))
+            # Bottom dark band for footer
+            draw.rectangle([(0, H-90), (W, H)], fill=(3, 9, 31, 220))
+
+            # TITLE — uppercase, centered, gold
+            title = topic.upper()
+            # Wrap if too long
+            if len(title) > 32:
+                words = title.split()
+                mid = len(words) // 2
+                line1 = ' '.join(words[:mid])
+                line2 = ' '.join(words[mid:])
+                bbox1 = draw.textbbox((0, 0), line1, font=load_font(56, bold=True))
+                bbox2 = draw.textbbox((0, 0), line2, font=load_font(56, bold=True))
+                w1 = bbox1[2] - bbox1[0]
+                w2 = bbox2[2] - bbox2[0]
+                draw.text(((W-w1)//2, 20), line1, font=load_font(56, bold=True), fill=(251, 191, 36))
+                draw.text(((W-w2)//2, 85), line2, font=load_font(56, bold=True), fill=(251, 191, 36))
+            else:
+                bbox = draw.textbbox((0, 0), title, font=title_font)
+                w = bbox[2] - bbox[0]
+                draw.text(((W-w)//2, 40), title, font=title_font, fill=(251, 191, 36))
+
+            # Tagline below title — neon cyan
+            tagline = "SYNDICATE INTELLIGENCE // BIOHACKING PROTOCOL"
+            bbox = draw.textbbox((0, 0), tagline, font=tagline_font)
+            w = bbox[2] - bbox[0]
+            draw.text(((W-w)//2, 125), tagline, font=tagline_font, fill=(56, 189, 248))
+
+            # FOOTER — white
+            footer = "DO YOUR OWN RESEARCH. DON'T BE A STATISTIC."
+            bbox = draw.textbbox((0, 0), footer, font=footer_font)
+            w = bbox[2] - bbox[0]
+            draw.text(((W-w)//2, H-60), footer, font=footer_font, fill=(248, 250, 252))
+
+            # Save
             os.makedirs("media/general", exist_ok=True)
             slug = topic.lower().replace(' ', '-')[:50]
             date_str = datetime.now().strftime('%Y-%m-%d')
             filename = f"media/general/{date_str}-{slug}.png"
-            with open(filename, 'wb') as f:
-                f.write(response.content)
+            img.save(filename, "PNG")
             self._log_uplink(f"IMAGE GEN: Saved to {filename}")
             return filename
-        else:
-            self._log_uplink(f"IMAGE GEN: Pollinations returned {response.status_code}, falling back.")
-    except Exception as e:
-        self._log_uplink(f"IMAGE GEN: Failed ({e}), falling back to random media.")
-    return None
 
+        except Exception as e:
+            self._log_uplink(f"IMAGE GEN: Failed ({e}), falling back to random media.")
+        return None
+        
 def _post_to_website(self, content, topic, image_path=None):
     """Beautifies the content and posts it to the website (articles/ and intel.html)."""
     os.makedirs("articles", exist_ok=True)
