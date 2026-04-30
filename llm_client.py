@@ -293,9 +293,10 @@ class LLMClient:
     def create_biohacking_post(self, topic: str, context: str = ""):
         """Generates the Facebook/Site Masterclass."""
         prompt = (
-            f"Draft an expansive Masterclass on: {topic}. "
-            "Use headers: Mechanics, Biological Leverage, Tactical Implementation. "
-            "Ensure technical weight and visionary tone. Each section must be substantial (4-5 sentences). "
+            f"Draft an expansive Masterclass on: {topic}.\n\n"
+            "MANDATORY: Start the post with a punchy, professional title in ALL CAPS based on the topic.\n"
+            "Use headers: Mechanics, Biological Leverage, Tactical Implementation.\n"
+            "Ensure technical weight and visionary tone. Each section must be substantial (4-5 sentences).\n"
             "MANDATORY: You must end the post with exactly: 'Do your own research. Don't be a statistic.'"
         )
         # We reflect=True to ensure quality, and sanitize=True to strip HTML for social media
