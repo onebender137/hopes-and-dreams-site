@@ -70,6 +70,8 @@ class TelegramBot:
         )
         self.chat_history = self._load_history()
         self.last_draft = None
+        self.last_topic = None
+        self.last_image_path = None
 
     def _load_history(self):
         """Loads chat history from a JSON file."""
@@ -105,6 +107,10 @@ class TelegramBot:
             "<b>/clear</b> - Reset memory\n"
             "<b>/draft [topic]</b> - Generate Masterclass draft\n"
             "<b>/confirm</b> - Post draft to FB\n"
+            "<b>/draft [topic]</b> - Generate Masterclass draft + image\n"
+            "<b>/confirm</b> - Post draft + image to FB + website\n"
+            "<b>/regen_img</b> - Regenerate just the image\n"
+            "<b>/cancel</b> - Drop the pending draft\n"
             "<b>/post [topic]</b> - Immediate FB post\n"
             "<b>/force_post [text]</b> - Direct raw FB post\n"
             "<b>/pulse</b> - Activity report\n"
@@ -133,19 +139,45 @@ class TelegramBot:
 
     @restricted
     async def draft_post_cmd(self, update: Update, context: ContextTypes.DEFAULT_TYPE):
-        """Handles the /draft command with RAG context."""
-        topic = " ".join(context.args) if context.args else "current biohacking stack"
-        await context.bot.send_chat_action(chat_id=update.effective_chat.id, action="typing")
+        """Handles the /draft command with RAG context. Generates image too."""
+        if not context.args:
+            await update.message.reply_text("Usage: /draft <topic>")
+            return
+        topic = " ".join(context.args)
+        await update.message.reply_text(f"🧠 Generating Masterclass draft on: {topic}\n⏳ This takes ~30s...")
 
-        local_context = self.knowledge.query_knowledge(topic)
+        local_context = self.hdbot.knowledge.search(topic, top_k=3) if hasattr(self.hdbot, 'knowledge') else ""
         draft = await asyncio.to_thread(self.llm.create_biohacking_post, topic, local_context)
         self.last_draft = draft
         self.last_topic = topic
 
-        if draft:
-            await self._send_long_message(update, f"📝 **SYNDICATE MASTERCLASS DRAFT:**\n\n{draft}\n\nType /confirm to post.")
-        else:
+        if not draft:
             await update.message.reply_text("I'm sorry, I couldn't generate a draft right now.")
+            return
+
+        # Send draft text first
+        await self._send_long_message(update, f"📝 **SYNDICATE MASTERCLASS DRAFT:**\n\n{draft}")
+
+        # Generate image
+        await update.message.reply_text("🎨 Generating infographic image...")
+        image_path = await asyncio.to_thread(self.hdbot._generate_topic_image, topic)
+        self.last_image_path = image_path
+
+        if image_path:
+            try:
+                with open(image_path, 'rb') as img:
+                    await update.message.reply_photo(photo=img, caption=f"🖼️ Image for: {topic}")
+            except Exception as e:
+                await update.message.reply_text(f"⚠️ Image saved to {image_path} but couldn't display: {e}")
+        else:
+            await update.message.reply_text("⚠️ Image generation failed. Will use random media on /confirm.")
+
+        await update.message.reply_text(
+            "✅ Ready to post.\n"
+            "/confirm — post to FB + website\n"
+            "/regen_img — regenerate just the image\n"
+            "/cancel — drop this draft"
+        )
 
     @restricted
     async def post_immediate(self, update: Update, context: ContextTypes.DEFAULT_TYPE):
@@ -309,36 +341,68 @@ class TelegramBot:
 
     @restricted
     async def confirm_post(self, update: Update, context: ContextTypes.DEFAULT_TYPE):
-        """Handles the /confirm command to push the last draft to Facebook."""
-        if not self.hdbot:
-            await update.message.reply_text("FB client not available.")
-            return
+        """Handles the /confirm command to push the last draft + image to FB and website."""
         if not self.last_draft:
             await update.message.reply_text("No draft available. Use /draft first!")
             return
 
-        await context.bot.send_chat_action(chat_id=update.effective_chat.id, action="typing")
+        image_path = getattr(self, 'last_image_path', None)
+        if not image_path:
+            image_path = self.hdbot._get_random_media()
+
+        await update.message.reply_text("📡 Posting to Facebook...")
         print("EXECUTIVE EXECUTION: Confirmed draft being pushed to FB API.")
-        result = self.hdbot.fb.post_to_page(self.last_draft)
+        result = self.hdbot.fb.post_to_page(self.last_draft, image_path=image_path)
 
         if result:
-            await update.message.reply_text("🚀 Syndicate Masterclass LIVE.")
+            post_id = result.get('id') if isinstance(result, dict) else None
+            await update.message.reply_text("✅ Posted to Facebook!\n📡 Pushing to website...")
 
-            # 5. Website Transmission Uplink
-            print(f"[{datetime.now()}] EXECUTIVE EXECUTION: Initiating website transmission uplink via Telegram (Confirm)...")
-            asyncio.create_task(asyncio.to_thread(self.hdbot._post_to_website, self.last_draft, self.last_topic))
+            asyncio.create_task(asyncio.to_thread(
+                self.hdbot._post_to_website,
+                self.last_draft,
+                self.last_topic,
+                image_path
+            ))
 
-            # Record the topic as posted to avoid repeats
-            self.hdbot._record_posted_topic(self.last_topic)
+            if post_id:
+                asyncio.create_task(asyncio.to_thread(
+                    self.hdbot._add_affiliate_comment,
+                    post_id,
+                    self.last_topic,
+                    self.last_draft
+                ))
 
-            # Add affiliate recommendation (non-blocking)
-            post_id = result.get('id')
-            asyncio.create_task(asyncio.to_thread(self.hdbot._add_affiliate_comment, post_id, self.last_topic, self.last_draft))
-
+            await update.message.reply_text("🚀 Syndicate transmission complete.")
             self.last_draft = None
             self.last_topic = None
+            self.last_image_path = None
         else:
-            await update.message.reply_text("❌ Failed to post.")
+            await update.message.reply_text("❌ FB post failed.")
+
+    async def regen_img_cmd(self, update: Update, context: ContextTypes.DEFAULT_TYPE):
+        """Regenerate the image for the current draft."""
+        if not self.last_draft or not self.last_topic:
+            await update.message.reply_text("No active draft. Use /draft first.")
+            return
+        await update.message.reply_text("🎨 Regenerating image...")
+        image_path = await asyncio.to_thread(self.hdbot._generate_topic_image, self.last_topic)
+        self.last_image_path = image_path
+        if image_path:
+            with open(image_path, 'rb') as img:
+                await update.message.reply_photo(photo=img, caption="🖼️ New image. /confirm or /regen_img again.")
+        else:
+            await update.message.reply_text("⚠️ Image generation failed.")
+
+    async def cancel_draft_cmd(self, update: Update, context: ContextTypes.DEFAULT_TYPE):
+        """Drop the pending draft."""
+        if self.last_draft:
+            self.last_draft = None
+            self.last_topic = None
+            self.last_image_path = None
+            await update.message.reply_text("🗑️ Draft discarded.")
+        else:
+            await update.message.reply_text("No draft to cancel.")
 
     @restricted
     async def get_pulse(self, update: Update, context: ContextTypes.DEFAULT_TYPE):
@@ -486,6 +550,8 @@ class TelegramBot:
         application.add_handler(CommandHandler('news', self.search_news))
         application.add_handler(CommandHandler('affiliate', self.search_affiliate))
         application.add_handler(CommandHandler('video', self.generate_video))
+        application.add_handler(CommandHandler('regen_img', self.regen_img_cmd))
+        application.add_handler(CommandHandler('cancel', self.cancel_draft_cmd))
         application.add_handler(CommandHandler('index', self.rebuild_index_cmd))
 
         # Ensure commands are not processed as chat
