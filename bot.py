@@ -545,16 +545,51 @@ class HopesAndDreamsBot:
 
         return False
 
-    def _post_to_website(self, content, topic, image_path=None):
-        """Beautifies the content and posts it to the website (articles/ and intel.html)."""
-        os.makedirs("articles", exist_ok=True)
-        self._log_uplink(f"WEBSITE: Initializing Syndicate Transmission for {topic}...")
+    def _generate_topic_image(self, topic):
+    """Hits Pollinations.ai to generate a topic-specific infographic image."""
+    import requests
+    import urllib.parse
+    from datetime import datetime
 
-        # 0. Handle missing image (Weaponize the pipeline)
+    prompt = (
+        f"Dark navy blue background, neon cyan and gold technical infographic about {topic}. "
+        "Biohacking, neuroscience, pharmacology theme. "
+        "Labeled diagrams, molecular pathways, brain anatomy. "
+        "High detail, professional data visualization, cyberpunk aesthetic. "
+        "Text overlay: DO YOUR OWN RESEARCH. DON'T BE A STATISTIC."
+    )
+    encoded = urllib.parse.quote(prompt)
+    url = f"https://image.pollinations.ai/prompt/{encoded}?width=1280&height=720&nologo=true&seed={random.randint(1,99999)}"
+
+    try:
+        self._log_uplink(f"IMAGE GEN: Requesting Pollinations image for '{topic}'...")
+        response = requests.get(url, timeout=60)
+        if response.status_code == 200:
+            os.makedirs("media/general", exist_ok=True)
+            slug = topic.lower().replace(' ', '-')[:50]
+            date_str = datetime.now().strftime('%Y-%m-%d')
+            filename = f"media/general/{date_str}-{slug}.png"
+            with open(filename, 'wb') as f:
+                f.write(response.content)
+            self._log_uplink(f"IMAGE GEN: Saved to {filename}")
+            return filename
+        else:
+            self._log_uplink(f"IMAGE GEN: Pollinations returned {response.status_code}, falling back.")
+    except Exception as e:
+        self._log_uplink(f"IMAGE GEN: Failed ({e}), falling back to random media.")
+    return None
+
+def _post_to_website(self, content, topic, image_path=None):
+    """Beautifies the content and posts it to the website (articles/ and intel.html)."""
+    os.makedirs("articles", exist_ok=True)
+    self._log_uplink(f"WEBSITE: Initializing Syndicate Transmission for {topic}...")
+    # 0. Handle missing image — try to generate topic-specific first
+    if not image_path:
+        image_path = self._generate_topic_image(topic)
         if not image_path:
             image_path = self._get_random_media()
-            if image_path:
-                self._log_uplink(f"WEBSITE: No image provided. Selected random asset: {image_path}")
+        if image_path:
+            self._log_uplink(f"WEBSITE: Image resolved: {image_path}")
 
         # 1. Beautify content using LLM
         try:
