@@ -662,54 +662,54 @@ class HopesAndDreamsBot:
             self._log_uplink(f"IMAGE GEN: Failed ({e}), falling back to random media.")
         return None
         
-def _post_to_website(self, content, topic, image_path=None):
-    """Beautifies the content and posts it to the website (articles/ and intel.html)."""
-    os.makedirs("articles", exist_ok=True)
-    self._log_uplink(f"WEBSITE: Initializing Syndicate Transmission for {topic}...")
-    # 0. Handle missing image — try to generate topic-specific first
-    if not image_path:
-        image_path = self._generate_topic_image(topic)
+    def _post_to_website(self, content, topic, image_path=None):
+        """Beautifies the content and posts it to the website (articles/ and intel.html)."""
+        os.makedirs("articles", exist_ok=True)
+        self._log_uplink(f"WEBSITE: Initializing Syndicate Transmission for {topic}...")
+        # 0. Handle missing image — try to generate topic-specific first
         if not image_path:
-            image_path = self._get_random_media()
-        if image_path:
-            self._log_uplink(f"WEBSITE: Image resolved: {image_path}")
+            image_path = self._generate_topic_image(topic)
+            if not image_path:
+                image_path = self._get_random_media()
+            if image_path:
+                self._log_uplink(f"WEBSITE: Image resolved: {image_path}")
 
-        # 1. Beautify content using LLM
-        try:
-            # We now capture priority and a clean title from beautification
-            beautified_html, priority, clean_title = self._beautify_for_blog(content, topic, image_path)
-            if not beautified_html or len(beautified_html) < 100:
-                self._log_uplink("WEBSITE ERROR: Beautification returned empty or suspiciously short HTML.")
+            # 1. Beautify content using LLM
+            try:
+                # We now capture priority and a clean title from beautification
+                beautified_html, priority, clean_title = self._beautify_for_blog(content, topic, image_path)
+                if not beautified_html or len(beautified_html) < 100:
+                    self._log_uplink("WEBSITE ERROR: Beautification returned empty or suspiciously short HTML.")
+                    return False
+            except Exception as e:
+                self._log_uplink(f"WEBSITE ERROR: Beautification failed: {str(e)}")
                 return False
-        except Exception as e:
-            self._log_uplink(f"WEBSITE ERROR: Beautification failed: {str(e)}")
-            return False
 
-        # 2. Generate slug and filename
-        date_str = datetime.now().strftime("%Y-%m-%d")
-        slug = re.sub(r'[^a-z0-9]+', '-', clean_title.lower()).strip('-')
-        filename = f"{date_str}-{slug}.html"
-        filepath = os.path.join("articles", filename)
+            # 2. Generate slug and filename
+            date_str = datetime.now().strftime("%Y-%m-%d")
+            slug = re.sub(r'[^a-z0-9]+', '-', clean_title.lower()).strip('-')
+            filename = f"{date_str}-{slug}.html"
+            filepath = os.path.join("articles", filename)
 
-        # 3. Save the article
-        try:
-            with open(filepath, 'w') as f:
-                f.write(beautified_html)
-            self._log_uplink(f"WEBSITE: Article saved to {filepath}")
-        except Exception as e:
-            self._log_uplink(f"WEBSITE ERROR: Failed to save article file: {e}")
-            return False
+            # 3. Save the article
+            try:
+                with open(filepath, 'w') as f:
+                    f.write(beautified_html)
+                self._log_uplink(f"WEBSITE: Article saved to {filepath}")
+            except Exception as e:
+                self._log_uplink(f"WEBSITE ERROR: Failed to save article file: {e}")
+                return False
 
-        # 4. Update intel.html (Latest 3)
-        self._update_intel_html(clean_title, filename, date_str, priority)
+            # 4. Update intel.html (Latest 3)
+            self._update_intel_html(clean_title, filename, date_str, priority)
 
-        # 5. Update transmissions.html (Archive)
-        self._update_transmissions_html(clean_title, filename, date_str)
+            # 5. Update transmissions.html (Archive)
+            self._update_transmissions_html(clean_title, filename, date_str)
 
-        # 6. Git Commit and Push
-        self._git_push_changes(f"Syndicate Transmission: {topic}")
+            # 6. Git Commit and Push
+            self._git_push_changes(f"Syndicate Transmission: {topic}")
 
-        return True
+            return True
 
     def _beautify_for_blog(self, content, topic, image_path):
         """Uses the LLM to beautify content and then injects it into the HTML template."""
