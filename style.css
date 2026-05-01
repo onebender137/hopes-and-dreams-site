@@ -754,36 +754,43 @@ body.light-mode .article-container::before {
     100% { text-shadow: 0 0 transparent; transform: translate(0, 0); }
 }
 
-.article-container h1 {
-    color: var(--text-main);
-    font-size: clamp(2.2rem, 7vw, 3.5rem);
+h1, h2, h3, h4, h5, h6 {
+    color: #ffffff !important;
     font-weight: 900;
-    line-height: 1.1;
-    margin-bottom: 25px;
-    text-shadow: 0 0 30px rgba(255, 255, 255, 0.2);
-    transition: all 0.3s ease;
+    text-transform: uppercase;
+    letter-spacing: 3px;
+    text-shadow: 0 0 20px var(--neon-blue), 0 0 5px #ffffff;
+    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
 }
 
-.article-container h2, .article-container h3, .article-container h4 {
-    color: #ffffff;
-    font-weight: 800;
+h1:hover, h2:hover, h3:hover, h4:hover, h5:hover, h6:hover {
+    animation: glitch-anim 0.3s cubic-bezier(.25,.46,.45,.94) infinite;
+    color: var(--neon-gold) !important;
+    text-shadow: 0 0 30px var(--neon-gold), 0 0 10px #ffffff;
+}
+
+.article-container h1,
+.article-container h2,
+.article-container h3,
+.article-container h4,
+.article-container h5,
+.article-container h6 {
     margin-top: 60px;
     margin-bottom: 25px;
-    text-transform: uppercase;
-    letter-spacing: 2px;
-    text-shadow: 0 0 15px var(--neon-blue), 0 0 5px #ffffff;
-    transition: all 0.3s ease;
 }
 
-.article-container h2 { font-size: clamp(1.6rem, 5vw, 2.4rem); }
-.article-container h3 { font-size: clamp(1.4rem, 4vw, 2rem); }
-.article-container h4 { font-size: clamp(1.2rem, 3vw, 1.6rem); }
-
-.article-container h1:hover, .article-container h2:hover, .article-container h3:hover, .article-container h4:hover {
-    animation: glitch-anim 0.2s cubic-bezier(.25,.46,.45,.94) both;
-    color: var(--neon-gold);
-    text-shadow: 0 0 25px var(--neon-gold);
+.article-container h1 {
+    font-size: clamp(2.2rem, 7vw, 3.5rem);
+    line-height: 1.1;
+    margin-top: 0;
+    text-shadow: 0 0 30px var(--neon-blue), 0 0 10px #ffffff;
 }
+
+.article-container h2 { font-size: clamp(1.8rem, 6vw, 2.8rem); }
+.article-container h3 { font-size: clamp(1.5rem, 5vw, 2.2rem); }
+.article-container h4 { font-size: clamp(1.3rem, 4vw, 1.8rem); }
+.article-container h5 { font-size: clamp(1.1rem, 3vw, 1.5rem); }
+.article-container h6 { font-size: clamp(1rem, 2vw, 1.2rem); }
 
 /* Decryption Text Animation */
 .decryption-text {
