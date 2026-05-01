@@ -1635,3 +1635,30 @@ body.launch-sequence-active #hero-launchpad {
     color: #e2e8f0; 
     font-size: 1.1rem;
 }
+/* Syndicate Layout Patch: Fix centering and image scaling */
+.article-container {
+    text-align: left; /* Restores standard reading alignment */
+    display: block;
+}
+
+.article-container h1 {
+    text-align: center; /* Keeps the main title centered for impact */
+    margin-bottom: 40px;
+}
+
+/* Ensure infographics and research images fill the container */
+.article-container img {
+    max-width: 100%;
+    height: auto;
+    display: block;
+    margin: 30px auto; /* Centers the image itself but keeps text left-aligned */
+    border: 1px solid rgba(56, 189, 248, 0.2);
+    box-shadow: 0 0 20px rgba(0, 0, 0, 0.5);
+}
+
+/* Fix for the small, squished text seen in the Magnesium post */
+.article-container p {
+    max-width: 100%;
+    margin-left: 0;
+    margin-right: 0;
+}
