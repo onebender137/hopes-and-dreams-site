@@ -982,8 +982,8 @@ class HopesAndDreamsBot:
                 if "Syndicate Pre-Sync Stash" in stash_list.stdout:
                     subprocess.run(["git", "stash", "pop"], capture_output=True)
 
-            # 3. Ensure we only stage the intended files
-            subprocess.run(["git", "add", "intel.html", "transmissions.html", "articles/"], check=True, capture_output=True, text=True)
+            # 3. Ensure we only stage the intended files (including generated media)
+            subprocess.run(["git", "add", "intel.html", "transmissions.html", "articles/", "media/"], check=True, capture_output=True, text=True)
 
             # 4. Check if there are staged changes to commit
             status = subprocess.run(["git", "status", "--porcelain"], capture_output=True, text=True)
