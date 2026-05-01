@@ -653,8 +653,9 @@ class HopesAndDreamsBot:
             os.makedirs("media/general", exist_ok=True)
             slug = topic.lower().replace(' ', '-')[:50]
             date_str = datetime.now().strftime('%Y-%m-%d')
-            filename = f"media/general/{date_str}-{slug}.png"
-            img.save(filename, "PNG")
+            filename = f"media/general/{date_str}-{slug}.jpg"
+            # Save as JPEG with optimized quality to keep file size small for FB
+            img.save(filename, "JPEG", quality=85, optimize=True)
             self._log_uplink(f"IMAGE GEN: Saved to {filename}")
             return filename
 
