@@ -626,22 +626,28 @@ class HopesAndDreamsBot:
                 mid = len(words) // 2
                 line1 = ' '.join(words[:mid])
                 line2 = ' '.join(words[mid:])
-                bbox1 = draw.textbbox((0, 0), line1, font=load_font(56, bold=True))
-                bbox2 = draw.textbbox((0, 0), line2, font=load_font(56, bold=True))
+                # Extend the top dark band for 2-line titles
+                draw.rectangle([(0, 0), (W, 220)], fill=(3, 9, 31, 200))
+                font_2line = load_font(52, bold=True)
+                bbox1 = draw.textbbox((0, 0), line1, font=font_2line)
+                bbox2 = draw.textbbox((0, 0), line2, font=font_2line)
                 w1 = bbox1[2] - bbox1[0]
                 w2 = bbox2[2] - bbox2[0]
-                draw.text(((W-w1)//2, 20), line1, font=load_font(56, bold=True), fill=(251, 191, 36))
-                draw.text(((W-w2)//2, 85), line2, font=load_font(56, bold=True), fill=(251, 191, 36))
+                draw.text(((W-w1)//2, 20), line1, font=font_2line, fill=(251, 191, 36))
+                draw.text(((W-w2)//2, 90), line2, font=font_2line, fill=(251, 191, 36))
+                # Push tagline down too
+                tagline_y = 175
             else:
                 bbox = draw.textbbox((0, 0), title, font=title_font)
                 w = bbox[2] - bbox[0]
                 draw.text(((W-w)//2, 40), title, font=title_font, fill=(251, 191, 36))
+                tagline_y = 125
 
             # Tagline below title — neon cyan
             tagline = "SYNDICATE INTELLIGENCE // BIOHACKING PROTOCOL"
             bbox = draw.textbbox((0, 0), tagline, font=tagline_font)
             w = bbox[2] - bbox[0]
-            draw.text(((W-w)//2, 125), tagline, font=tagline_font, fill=(56, 189, 248))
+            draw.text(((W-w)//2, tagline_y), tagline, font=tagline_font, fill=(56, 189, 248))
 
             # FOOTER — white
             footer = "DO YOUR OWN RESEARCH. DON'T BE A STATISTIC."
