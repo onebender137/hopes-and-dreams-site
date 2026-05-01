@@ -146,7 +146,7 @@ class TelegramBot:
         topic = " ".join(context.args)
         await update.message.reply_text(f"🧠 Generating Masterclass draft on: {topic}\n⏳ This takes ~30s...")
 
-        local_context = self.hdbot.knowledge.search(topic, top_k=3) if hasattr(self.hdbot, 'knowledge') else ""
+        local_context = self.knowledge.query_knowledge(topic, limit=3)
         draft = await asyncio.to_thread(self.llm.create_biohacking_post, topic, local_context)
         self.last_draft = draft
         self.last_topic = topic
