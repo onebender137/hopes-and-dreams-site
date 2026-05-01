@@ -883,7 +883,7 @@ class HopesAndDreamsBot:
             new_card = (
                 f'                <div class="card{priority_class}">\n'
                 f'                    <div class="meta-data" style="font-size: 0.7rem; color: var(--neon-gold); margin-bottom: 10px;">TRANSMISSION: {date_str}</div>\n'
-                f'                    <h3>{topic}</h3>\n'
+                f'                    <h3 style="color: #ffffff; text-shadow: 0 0 10px var(--neon-blue);">{topic}</h3>\n'
                 f'                    <p>{topic} protocol initialized. Access the full intel burst below.</p>\n'
                 f'                    <a href="articles/{filename}" class="buy-btn" style="font-size: 0.7rem; padding: 8px 16px;">View Intel →</a>\n'
                 f'                </div>'
