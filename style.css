@@ -1620,3 +1620,18 @@ body.launch-sequence-active #hero-launchpad {
     pointer-events: none;
     opacity: 0.3;
 }
+/* Syndicate Fix: Tone down article sub-headers for readability */
+.article-container h2,
+.article-container h3,
+.article-container h4 {
+    text-shadow: 0 0 8px var(--neon-blue); /* Softer glow */
+    letter-spacing: 1.5px; /* Tighter spacing for readability */
+    text-transform: none; /* Let you use normal casing if you want */
+    color: var(--neon-blue) !important; /* Differentiates from the white H1 */
+}
+
+/* Optional: Give the paragraph text a slight bump in brightness */
+.article-container p {
+    color: #e2e8f0; 
+    font-size: 1.1rem;
+}
