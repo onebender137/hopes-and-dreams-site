@@ -774,10 +774,31 @@ class HopesAndDreamsBot:
             clean_title = data.get('title', topic).strip()
 
             # --- POST-PROCESSING SANITIZATION ---
-            # 1. Catch LLM errors like nesting <h2> inside <p> or using <h1>
+            # 1. Catch LLM errors like using <h1>
             beautified_body = beautified_body.replace('<h1>', '<h2>').replace('</h1>', '</h2>')
-            # 2. Use regex to find <p>...<h2>...</h2>...</p> and flatten it
-            beautified_body = re.sub(r'<p>\s*(<h[1-6]>.*?</h[1-6]>)\s*</p>', r'\1', beautified_body, flags=re.DOTALL)
+
+            # 2. Robustly handle nested headers in <p> tags
+            def split_headers_from_p(match):
+                inner_content = match.group(1)
+                if not re.search(r'<h[1-6]>', inner_content):
+                    return match.group(0)  # No headers inside, return original <p>...</p>
+
+                # Split content by any header tag
+                parts = re.split(r'(<h[1-6]>.*?</h[1-6]>)', inner_content, flags=re.DOTALL)
+                new_parts = []
+                for p in parts:
+                    p_stripped = p.strip()
+                    if not p_stripped:
+                        continue
+                    if p_stripped.startswith('<h'):
+                        new_parts.append(p_stripped)
+                    else:
+                        new_parts.append(f"<p>{p_stripped}</p>")
+                return "".join(new_parts)
+
+            # Apply splitting logic to all <p> blocks
+            beautified_body = re.sub(r'<p>(.*?)</p>', split_headers_from_p, beautified_body, flags=re.DOTALL)
+
             # 3. Strip any "Masterclass:" or "Topic:" or similar meta-prefixes from the content body
             beautified_body = re.sub(r'(?:Masterclass|Topic|Title):\s*', '', beautified_body, flags=re.IGNORECASE)
             # 4. Remove any ** stars that might have leaked into HTML
