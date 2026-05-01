@@ -57,7 +57,7 @@ class LLMClient:
             "- NEVER use AI tells: 'I'd be happy to', 'I cannot', 'As an AI', 'It's a pleasure'.\n"
             "- NEVER use marketing fluff: 'wellness journey', 'transform your life', 'mind body soul'.\n\n"
             "FORMATTING: Plain prose with paragraph breaks. Section labels as a single line in CAPS "
-            "(e.g., 'THE MECHANICS' on its own line, then prose) - no markdown headers. "
+            "(e.g., 'MECHANICS', 'BIOLOGICAL LEVERAGE', 'TACTICAL IMPLEMENTATION') on their own line, then prose - no markdown headers. "
             "Keep the underground biohacker grit - this is the Syndicate, not WebMD. Don't be afraid "
             "of strong assertions when the science backs them.\n\n"
 
