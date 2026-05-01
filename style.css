@@ -133,13 +133,13 @@ nav a:hover {
 }
 
 .section-title {
-    color: var(--neon-gold);
-    font-size: 2rem;
+    color: #ffffff;
+    font-size: clamp(1.8rem, 5vw, 2.8rem);
     font-weight: 900;
     text-transform: uppercase;
-    letter-spacing: 2px;
+    letter-spacing: 3px;
     margin-bottom: 40px;
-    text-shadow: 0 0 15px rgba(251, 191, 36, 0.2);
+    text-shadow: 0 0 20px var(--neon-blue), 0 0 5px #ffffff;
 }
 
 /* --- ANIMATIONS --- */
@@ -230,10 +230,17 @@ nav a:hover {
 }
 
 .card h3 {
-    color: var(--neon-blue);
+    color: #ffffff;
     margin-top: 0;
     font-size: 1.5rem;
     font-weight: 700;
+    text-shadow: 0 0 10px var(--neon-blue);
+    transition: all 0.3s ease;
+}
+
+.card:hover h3 {
+    color: var(--neon-gold);
+    text-shadow: 0 0 15px var(--neon-gold);
 }
 
 .card p {
@@ -747,8 +754,35 @@ body.light-mode .article-container::before {
     100% { text-shadow: 0 0 transparent; transform: translate(0, 0); }
 }
 
-.article-container h1:hover, .article-container h2:hover {
+.article-container h1 {
+    color: var(--text-main);
+    font-size: clamp(2.2rem, 7vw, 3.5rem);
+    font-weight: 900;
+    line-height: 1.1;
+    margin-bottom: 25px;
+    text-shadow: 0 0 30px rgba(255, 255, 255, 0.2);
+    transition: all 0.3s ease;
+}
+
+.article-container h2, .article-container h3, .article-container h4 {
+    color: #ffffff;
+    font-weight: 800;
+    margin-top: 60px;
+    margin-bottom: 25px;
+    text-transform: uppercase;
+    letter-spacing: 2px;
+    text-shadow: 0 0 15px var(--neon-blue), 0 0 5px #ffffff;
+    transition: all 0.3s ease;
+}
+
+.article-container h2 { font-size: clamp(1.6rem, 5vw, 2.4rem); }
+.article-container h3 { font-size: clamp(1.4rem, 4vw, 2rem); }
+.article-container h4 { font-size: clamp(1.2rem, 3vw, 1.6rem); }
+
+.article-container h1:hover, .article-container h2:hover, .article-container h3:hover, .article-container h4:hover {
     animation: glitch-anim 0.2s cubic-bezier(.25,.46,.45,.94) both;
+    color: var(--neon-gold);
+    text-shadow: 0 0 25px var(--neon-gold);
 }
 
 /* Decryption Text Animation */

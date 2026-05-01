@@ -85,8 +85,21 @@
 <script defer="" src="script.js"></script>
 <style>
         .container { max-width: 900px; margin: 0 auto; padding: 0 24px 100px; }
-        h1 { color: var(--neon-gold); text-transform: uppercase; letter-spacing: 2px; font-size: 2.2rem; font-weight: 900; }
-        h2 { color: var(--neon-blue); text-transform: uppercase; margin-top: 30px; font-weight: 700; }
+        h1 {
+            color: #ffffff;
+            text-transform: uppercase;
+            letter-spacing: 2px;
+            font-size: clamp(1.8rem, 5vw, 2.5rem);
+            font-weight: 900;
+            text-shadow: 0 0 20px var(--neon-blue);
+        }
+        h2 {
+            color: #ffffff;
+            text-transform: uppercase;
+            margin-top: 30px;
+            font-weight: 700;
+            text-shadow: 0 0 15px var(--neon-blue);
+        }
     </style>
 </head>
 <body>

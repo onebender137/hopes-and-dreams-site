@@ -4,6 +4,43 @@ import facebook
 from config import Config
 
 class FBClient:
+    def _apply_unicode_style(self, text: str):
+        """Converts ALL CAPS lines into Mathematical Bold Unicode characters for high-impact FB headers."""
+        if not text:
+            return text
+
+        def to_bold(line):
+            # Skip if it looks like a URL or is too short to be a header
+            if "http" in line or len(line.strip()) < 3:
+                return line
+
+            out = ""
+            for char in line:
+                codepoint = ord(char)
+                if 65 <= codepoint <= 90: # A-Z
+                    out += chr(codepoint + 119743)
+                elif 97 <= codepoint <= 122: # a-z
+                    out += chr(codepoint + 119737)
+                elif 48 <= codepoint <= 57: # 0-9
+                    out += chr(codepoint + 120744)
+                else:
+                    out += char
+            return out
+
+        # Match lines that are purely uppercase (allowing for numbers and spaces/punctuation)
+        # We only style lines that are at least 3 chars long and primarily uppercase.
+        lines = text.split('\n')
+        styled_lines = []
+        for line in lines:
+            stripped = line.strip()
+            # If line is ALL CAPS and significant, bold it.
+            if stripped.isupper() and len(stripped) >= 3:
+                styled_lines.append(to_bold(line))
+            else:
+                styled_lines.append(line)
+
+        return '\n'.join(styled_lines)
+
     def __init__(self, page_access_token=None):
         """Initializes the Facebook Graph API client for Page management."""
         self.page_token = page_access_token or Config.FB_PAGE_ACCESS_TOKEN
@@ -52,6 +89,9 @@ class FBClient:
         if not self.page_graph:
             print("Error: Page Graph API client not initialized.")
             return None
+
+        # Apply Syndicate Unicode styling to headers
+        message = self._apply_unicode_style(message)
 
         # If no specific image was passed, use the smart selector
         final_image = image_path or self.get_smart_image(message)
