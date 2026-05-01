@@ -1622,62 +1622,61 @@ body.launch-sequence-active #hero-launchpad {
     opacity: 0.3;
 }
 
-/* --- SYNDICATE ARTICLE READABILITY PATCHES --- */
+/* --- SYNDICATE ARTICLE CENTERED LAYOUT PATCH --- */
 
-/* 1. Global Container Fix: Reset Jules' centering for articles */
+/* 1. Global Container Fix: Center everything back as requested */
 .article-container {
-    text-align: left !important;
+    text-align: center !important;
     display: block !important;
-    max-width: 800px;
+    max-width: 900px; /* Slightly wider for centered aesthetics */
     margin: 0 auto;
 }
 
-/* 2. Live Feed Re-Centering: Keeps the prompt in the middle */
-.article-container .timestamp-live {
+/* 2. Live Feed & Header Reset */
+.article-container .timestamp-live,
+.article-container h1 {
     display: block !important;
     text-align: center !important;
     width: 100% !important;
     margin-bottom: 20px;
-}
-
-/* 3. Title Centering: Keep the main H1 centered for impact */
-.article-container h1 {
-    text-align: center !important;
-    margin-bottom: 40px;
     text-transform: uppercase !important;
 }
 
-/* 4. Sub-Header Tone-Down: Softer glow and readable spacing */
+/* 3. Sub-Header Tone-Down: Centered with blue glow */
 .article-container h2,
 .article-container h3,
 .article-container h4 {
-    text-shadow: 0 0 8px var(--neon-blue) !important;
-    letter-spacing: 1.5px !important;
+    text-shadow: 0 0 10px var(--neon-blue) !important;
+    letter-spacing: 2px !important;
     text-transform: uppercase !important;
     color: var(--neon-blue) !important;
-    text-align: left !important;
-    margin-top: 40px;
+    text-align: center !important;
+    margin-top: 50px;
 }
 
-/* 5. Body Text Reset: Force lowercase, brightness, and alignment */
+/* 4. Body Text Force: Centered and Forced Lowercase (to fight the HTML edits) */
 .article-container p, 
 .article-container li, 
 .article-container span:not(.cursor) {
     color: #e2e8f0 !important;
-    font-size: 1.1rem !important;
-    text-transform: none !important; /* Kills Jules' all-caps spree */
-    text-align: left !important;
-    max-width: 100% !important;
-    margin-left: 0 !important;
-    margin-right: 0 !important;
+    font-size: 1.15rem !important;
+    
+    /* This forces text back to sentence case even if the HTML is all caps */
+    text-transform: lowercase !important; 
+    display: block;
 }
 
-/* 6. Image & Infographic Scaling: Ensure full-width visibility */
+/* Re-capitalize the first letter of paragraphs for professionalism */
+.article-container p::first-letter {
+    text-transform: uppercase !important;
+}
+
+/* 5. Image & Infographic Scaling */
 .article-container img {
     max-width: 100% !important;
     height: auto !important;
     display: block !important;
-    margin: 30px auto !important;
+    margin: 40px auto !important;
     border: 1px solid rgba(56, 189, 248, 0.2);
-    box-shadow: 0 0 20px rgba(0, 0, 0, 0.5);
+    box-shadow: 0 0 30px rgba(0, 0, 0, 0.6);
 }
