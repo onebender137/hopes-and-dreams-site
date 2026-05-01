@@ -1578,7 +1578,7 @@ body.light-mode #neural-info-box {
     transition: opacity 0.2s ease;
 }
 
-/* State Transitions */
+/* --- FINAL STATE & TRANSITION LOGIC --- */
 #main-interface.active {
     display: block !important;
     opacity: 1 !important;
@@ -1614,51 +1614,70 @@ body.launch-sequence-active #hero-launchpad {
 .scanlines {
     position: fixed;
     top: 0; left: 0; width: 100vw; height: 100vh;
-    background: linear-gradient(rgba(18, 16, 16, 0) 50%, rgba(0, 0, 0, 0.1) 50%), linear-gradient(90deg, rgba(255, 0, 0, 0.03), rgba(0, 255, 0, 0.01), rgba(0, 0, 255, 0.03));
+    background: linear-gradient(rgba(18, 16, 16, 0) 50%, rgba(0, 0, 0, 0.1) 50%), 
+                linear-gradient(90deg, rgba(255, 0, 0, 0.03), rgba(0, 255, 0, 0.01), rgba(0, 0, 255, 0.03));
     z-index: 2500;
     background-size: 100% 3px, 3px 100%;
     pointer-events: none;
     opacity: 0.3;
 }
-/* Syndicate Fix: Tone down article sub-headers for readability */
+
+/* --- SYNDICATE ARTICLE READABILITY PATCHES --- */
+
+/* 1. Global Container Fix: Reset Jules' centering for articles */
+.article-container {
+    text-align: left !important;
+    display: block !important;
+    max-width: 800px;
+    margin: 0 auto;
+}
+
+/* 2. Live Feed Re-Centering: Keeps the prompt in the middle */
+.article-container .timestamp-live {
+    display: block !important;
+    text-align: center !important;
+    width: 100% !important;
+    margin-bottom: 20px;
+}
+
+/* 3. Title Centering: Keep the main H1 centered for impact */
+.article-container h1 {
+    text-align: center !important;
+    margin-bottom: 40px;
+    text-transform: uppercase !important;
+}
+
+/* 4. Sub-Header Tone-Down: Softer glow and readable spacing */
 .article-container h2,
 .article-container h3,
 .article-container h4 {
-    text-shadow: 0 0 8px var(--neon-blue); /* Softer glow */
-    letter-spacing: 1.5px; /* Tighter spacing for readability */
-    text-transform: none; /* Let you use normal casing if you want */
-    color: var(--neon-blue) !important; /* Differentiates from the white H1 */
+    text-shadow: 0 0 8px var(--neon-blue) !important;
+    letter-spacing: 1.5px !important;
+    text-transform: uppercase !important;
+    color: var(--neon-blue) !important;
+    text-align: left !important;
+    margin-top: 40px;
 }
 
-/* Optional: Give the paragraph text a slight bump in brightness */
-.article-container p {
-    color: #e2e8f0; 
-    font-size: 1.1rem;
-}
-/* Syndicate Layout Patch: Fix centering and image scaling */
-.article-container {
-    text-align: left; /* Restores standard reading alignment */
-    display: block;
-}
-
-.article-container h1 {
-    text-align: center; /* Keeps the main title centered for impact */
-    margin-bottom: 40px;
+/* 5. Body Text Reset: Force lowercase, brightness, and alignment */
+.article-container p, 
+.article-container li, 
+.article-container span:not(.cursor) {
+    color: #e2e8f0 !important;
+    font-size: 1.1rem !important;
+    text-transform: none !important; /* Kills Jules' all-caps spree */
+    text-align: left !important;
+    max-width: 100% !important;
+    margin-left: 0 !important;
+    margin-right: 0 !important;
 }
 
-/* Ensure infographics and research images fill the container */
+/* 6. Image & Infographic Scaling: Ensure full-width visibility */
 .article-container img {
-    max-width: 100%;
-    height: auto;
-    display: block;
-    margin: 30px auto; /* Centers the image itself but keeps text left-aligned */
+    max-width: 100% !important;
+    height: auto !important;
+    display: block !important;
+    margin: 30px auto !important;
     border: 1px solid rgba(56, 189, 248, 0.2);
     box-shadow: 0 0 20px rgba(0, 0, 0, 0.5);
-}
-
-/* Fix for the small, squished text seen in the Magnesium post */
-.article-container p {
-    max-width: 100%;
-    margin-left: 0;
-    margin-right: 0;
 }
