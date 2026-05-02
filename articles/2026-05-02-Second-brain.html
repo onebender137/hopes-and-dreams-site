@@ -1,0 +1,451 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Free Note Syncing Across All Your Devices — No Subscription Required | Hopes and Dreams</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link rel="dns-prefetch" href="https://fonts.googleapis.com">
+    <link rel="dns-prefetch" href="https://fonts.gstatic.com">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;700;900&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="../style.css">
+    <style>
+        /* --- ARTICLE CONTENT AREA --- */
+        .article-container {
+            max-width: 800px;
+            margin: 0 auto;
+            padding: 0 24px 100px;
+        }
+
+        .glow-divider {
+            width: 100%;
+            height: 1px;
+            background: radial-gradient(circle, var(--neon-blue) 0%, transparent 70%);
+            opacity: 0.2;
+            margin-bottom: 60px;
+        }
+
+        h1 {
+            color: var(--text-main);
+            font-size: clamp(2.2rem, 7vw, 3.5rem);
+            font-weight: 900;
+            line-height: 1.1;
+            margin-bottom: 25px;
+            text-shadow: 0 0 30px rgba(255, 255, 255, 0.2);
+        }
+
+        .meta-data {
+            color: var(--neon-gold);
+            text-transform: uppercase;
+            font-size: 0.9rem;
+            letter-spacing: 2px;
+            font-weight: 700;
+            margin-bottom: 40px;
+            display: block;
+        }
+
+        h2 {
+            color: #ffffff;
+            font-size: clamp(1.6rem, 5vw, 2.4rem);
+            font-weight: 800;
+            margin-top: 60px;
+            margin-bottom: 25px;
+            text-transform: uppercase;
+            letter-spacing: 2px;
+            text-shadow: 0 0 15px var(--neon-blue), 0 0 5px #ffffff;
+        }
+
+        h3 {
+            color: #ffffff;
+            font-size: clamp(1.2rem, 4vw, 1.8rem);
+            font-weight: 700;
+            margin-top: 40px;
+            margin-bottom: 20px;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+        }
+
+        p {
+            color: var(--text-dim);
+            font-size: 1.2rem;
+            margin-bottom: 25px;
+        }
+
+        strong {
+            color: var(--text-main);
+            font-weight: 700;
+        }
+
+        .hack-box {
+            background-color: var(--card-bg);
+            border-left: 4px solid var(--neon-gold);
+            padding: 30px;
+            border-radius: 0 16px 16px 0;
+            margin: 40px 0;
+        }
+
+        .hack-box h4 {
+            color: var(--neon-gold);
+            margin: 0 0 10px 0;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+        }
+
+        .article-img {
+            width: 100%;
+            border-radius: 24px;
+            border: 1px solid rgba(56, 189, 248, 0.2);
+            margin: 40px 0;
+        }
+
+        ul, ol {
+            color: var(--text-dim);
+            font-size: 1.1rem;
+            margin-bottom: 30px;
+            padding-left: 20px;
+        }
+
+        li {
+            margin-bottom: 10px;
+        }
+
+        pre {
+            background: rgba(0, 0, 0, 0.3);
+            padding: 20px;
+            border-radius: 12px;
+            border: 1px solid rgba(56, 189, 248, 0.2);
+            overflow-x: auto;
+            margin-bottom: 25px;
+        }
+
+        code {
+            font-family: 'Courier New', Courier, monospace;
+            color: var(--neon-blue);
+        }
+
+        .syndicate-footer {
+            margin-top: 80px;
+            padding: 40px;
+            background: rgba(56, 189, 248, 0.05);
+            border: 1px solid rgba(56, 189, 248, 0.1);
+            border-radius: 24px;
+            text-align: center;
+        }
+
+        .btn-fb {
+            display: inline-block;
+            margin-top: 20px;
+            background: var(--neon-blue);
+            color: var(--bg-main);
+            padding: 15px 30px;
+            border-radius: 50px;
+            text-decoration: none;
+            font-weight: 900;
+            text-transform: uppercase;
+            transition: 0.3s;
+        }
+
+        .btn-fb:hover {
+            background: var(--neon-gold);
+            transform: scale(1.05);
+        }
+
+        footer {
+            text-align: center;
+            padding: 60px 0;
+            color: #4b5563;
+            font-size: 0.85rem;
+            border-top: 1px solid rgba(255, 255, 255, 0.05);
+        }
+
+        .timestamp-live {
+            min-height: 1.2em;
+        }
+
+        @media (max-width: 600px) {
+            h1 { font-size: 2rem; }
+            nav { flex-direction: column; gap: 20px; align-items: center; }
+        }
+    </style>
+</head>
+<body>
+    <div id="scroll-progress"></div>
+    <button id="theme-toggle" class="theme-toggle-pill" aria-label="Toggle between dark and light mode">☀️ LIGHT MODE</button>
+
+    <header>
+        <div class="logo-wrap">
+            <img src="../topper.png" alt="Hopes and Dreams" width="1780" height="1050" fetchpriority="high">
+        </div>
+
+        <nav>
+            <a href="../index.html">Home</a>
+            <a href="../shop.html">Procurement</a>
+            <a href="../optimization.html">Optimization</a>
+            <a href="../intel.html">Intel Hub</a>
+            <a href="../about.html">About</a>
+            <a href="../privacy.html">Privacy</a>
+        </nav>
+    </header>
+
+    <div class="container">
+        <article class="article-container" data-reveal>
+            <div class="timestamp-live" data-timestamp="[ LIVE FEED ] RECEIVED: 2026-05-02 09:00:00 AST"></div>
+            <h1>Free Note Syncing Across All Your Devices — No Subscription Required</h1>
+
+
+
+            <div class="intel-burst">
+                <p><strong>Stop paying for cloud sync. Start owning your notes.</strong></p>
+
+<p>If you're anything like me, ideas don't wait for you to be at your desk. They hit you in line at the grocery store, at 2am when you can't sleep, or right in the middle of something else entirely. You need a way to capture them <em>instantly</em> — and have them waiting for you on every device.</p>
+
+<p>Today I'm going to show you how to set up <strong>Obsidian</strong> — a free, powerful note-taking app — on your desktop AND your Android phone, and sync everything between them for <strong>$0/month</strong> using Git and GitHub.</p>
+
+<p>No coding experience needed. Just follow along.</p>
+
+<div class="glow-divider"></div>
+
+<h2>WHAT YOU'LL HAVE WHEN WE'RE DONE</h2>
+
+<ul>
+    <li>✅ Obsidian installed on your Windows desktop</li>
+    <li>✅ Obsidian installed on your Android phone</li>
+    <li>✅ All your notes automatically syncing between both devices</li>
+    <li>✅ A full backup of every note you've ever written on GitHub</li>
+    <li>✅ Version history — you can go back and see every change you've ever made</li>
+</ul>
+
+<div class="glow-divider"></div>
+
+<h2>PART 1: SET UP YOUR DESKTOP</h2>
+
+<h3>STEP 1 — INSTALL OBSIDIAN ON WINDOWS</h3>
+
+<ol>
+    <li>Go to <a href="https://obsidian.md">https://obsidian.md</a></li>
+    <li>Click <strong>Download</strong> and grab the Windows installer</li>
+    <li>Run the installer and open Obsidian</li>
+    <li>When it asks, choose <strong>"Create new vault"</strong></li>
+    <li>Give it a name (something like "My Vault" or "Notes") and pick where to save it — your Documents folder works great</li>
+</ol>
+
+<p>You now have Obsidian running with an empty vault. Write a quick test note if you want — just click the new note icon and type something.</p>
+
+<h3>STEP 2 — INSTALL GIT ON WINDOWS</h3>
+
+<p>Git is the tool that handles syncing behind the scenes.</p>
+
+<ol>
+    <li>Go to <a href="https://git-scm.com/downloads">https://git-scm.com/downloads</a></li>
+    <li>Download the Windows installer</li>
+    <li>Run it — you can accept all the default options during install</li>
+    <li>Once installed, open <strong>Command Prompt</strong> (search "cmd" in your Start menu) and type: <code>git --version</code></li>
+    <li>If you see a version number, you're good</li>
+</ol>
+
+<h3>STEP 3 — CREATE A GITHUB ACCOUNT AND REPOSITORY</h3>
+
+<p>GitHub is where your notes will be stored in the cloud (it's free).</p>
+
+<ol>
+    <li>Go to <a href="https://github.com">https://github.com</a> and sign up for a free account</li>
+    <li>Once logged in, click the <strong>"+"</strong> icon in the top right and choose <strong>"New repository"</strong></li>
+    <li>Name it something like "Obsidian" or "Notes"</li>
+    <li>Set it to <strong>Private</strong> (unless you want the world reading your notes!)</li>
+    <li><strong>Don't</strong> check any of the boxes for README, .gitignore, or license — leave them all unchecked</li>
+    <li>Click <strong>"Create repository"</strong></li>
+    <li>You'll see a page with a URL that looks like: <code>https://github.com/YOUR-USERNAME/Obsidian.git</code> — keep this page open, you'll need that URL</li>
+</ol>
+
+<h3>STEP 4 — CONNECT YOUR VAULT TO GITHUB</h3>
+
+<p>Open Command Prompt and navigate to your vault folder. If your vault is in Documents, type:</p>
+
+<pre><code>cd C:\Users\YOUR-USERNAME\Documents\Your Vault Name</code></pre>
+
+<p>Then run these commands one at a time:</p>
+
+<pre><code>git init
+git add .
+git commit -m "Initial commit"
+git branch -M main
+git remote add origin https://github.com/YOUR-USERNAME/YOUR-REPO-NAME.git
+git push -u origin main</code></pre>
+
+<p>It may ask you to sign into GitHub in a browser — do it. After that, your notes are on GitHub!</p>
+
+<p><strong>Don't worry about the LF/CRLF warnings</strong> — those are harmless line-ending messages on Windows. Totally normal.</p>
+
+<h3>STEP 5 — INSTALL THE OBSIDIAN GIT PLUGIN</h3>
+
+<p>This is the magic piece that makes it all automatic.</p>
+
+<ol>
+    <li>In Obsidian, go to <strong>Settings</strong> (gear icon, bottom left)</li>
+    <li>Go to <strong>Community plugins</strong></li>
+    <li>Turn off <strong>Restricted mode</strong> if it's on</li>
+    <li>Click <strong>Browse</strong> and search for <strong>"Obsidian Git"</strong> (by Vinzent03)</li>
+    <li>Click <strong>Install</strong>, then <strong>Enable</strong></li>
+    <li>Now go to the plugin's settings (still in the Settings menu, scroll down to "Obsidian Git" under Community Plugins)</li>
+</ol>
+
+<h3>STEP 6 — CONFIGURE THE PLUGIN SETTINGS</h3>
+
+<p>Set these values:</p>
+
+<ul>
+    <li><strong>Auto commit-and-sync interval:</strong> <code>5</code> (commits your changes every 5 minutes)</li>
+    <li><strong>Auto push interval:</strong> <code>5</code> (pushes changes to GitHub every 5 minutes — DON'T leave this at 0!)</li>
+    <li><strong>Auto pull interval:</strong> <code>5</code> (pulls changes from GitHub every 5 minutes)</li>
+</ul>
+
+<p>That's it for desktop. Your notes will now automatically save, commit, and sync every 5 minutes.</p>
+
+<div class="glow-divider"></div>
+
+<h2>PART 2: SET UP YOUR ANDROID PHONE</h2>
+
+<h3>STEP 7 — INSTALL OBSIDIAN ON ANDROID</h3>
+
+<ol>
+    <li>Open the Google Play Store</li>
+    <li>Search for <strong>"Obsidian"</strong> and install it</li>
+    <li>Open the app</li>
+</ol>
+
+<p><strong>Don't create a new vault yet</strong> — we're going to clone your existing one.</p>
+
+<h3>STEP 8 — INSTALL THE OBSIDIAN GIT PLUGIN ON MOBILE</h3>
+
+<ol>
+    <li>In Obsidian mobile, go to <strong>Settings → Community plugins</strong></li>
+    <li>Turn off Restricted mode</li>
+    <li>Browse and install <strong>"Obsidian Git"</strong> (same plugin, by Vinzent03)</li>
+    <li>Enable it</li>
+</ol>
+
+<h3>STEP 9 — CREATE A GITHUB PERSONAL ACCESS TOKEN</h3>
+
+<p>Your phone can't use your saved Windows credentials, so you need a token.</p>
+
+<ol>
+    <li>On your phone (or computer — might be easier), go to: <a href="https://github.com/settings/tokens">https://github.com/settings/tokens</a></li>
+    <li>Click <strong>"Generate new token"</strong> → choose <strong>"Fine-grained"</strong> or <strong>"Classic"</strong> (classic is simpler)</li>
+    <li>Give it a name like "Obsidian Mobile"</li>
+    <li>For classic tokens: check the <strong>"repo"</strong> scope (full control of private repos)</li>
+    <li>Set expiration to whatever you're comfortable with (or "No expiration")</li>
+    <li>Click <strong>Generate token</strong></li>
+    <li><strong>COPY THE TOKEN NOW</strong> — you won't be able to see it again!</li>
+</ol>
+
+<h3>STEP 10 — CLONE YOUR VAULT ON MOBILE</h3>
+
+<ol>
+    <li>In the Obsidian Git plugin settings on mobile, enter:
+        <ul>
+            <li><strong>Username:</strong> your GitHub username</li>
+            <li><strong>Password/Token:</strong> paste the personal access token you just created</li>
+        </ul>
+    </li>
+    <li>Open the <strong>command palette</strong> on mobile — <strong>swipe down from the top of the Obsidian app</strong> (not the phone's notification shade)</li>
+    <li>Search for <strong>"Clone an existing remote repo"</strong> and tap it</li>
+    <li>Enter your repo URL: <code>https://github.com/YOUR-USERNAME/YOUR-REPO-NAME.git</code></li>
+    <li>It will ask about a vault folder — accept the default</li>
+    <li>When it asks if your remote repo contains a <code>.obsidian</code> directory at root — tap <strong>Yes</strong></li>
+    <li>Let it clone — this might take a moment</li>
+</ol>
+
+<h3>STEP 11 — CONFIGURE MOBILE PLUGIN SETTINGS</h3>
+
+<p>Go into the Obsidian Git plugin settings on mobile and set:</p>
+
+<ul>
+    <li><strong>Auto commit-and-sync interval:</strong> <code>5</code></li>
+    <li><strong>Auto push interval:</strong> <code>5</code></li>
+    <li><strong>Auto pull interval:</strong> <code>5</code></li>
+    <li><strong>Pull on startup:</strong> <code>ON</code> ← This one is important!</li>
+</ul>
+
+<div class="glow-divider"></div>
+
+<h2>PART 3: TEST IT!</h2>
+
+<ol>
+    <li>Create a new note on your phone — just write "Hello from mobile!" or whatever</li>
+    <li>Either wait 5 minutes or manually trigger a sync from the command palette ("Commit-and-sync")</li>
+    <li>Check your desktop — within a few minutes, the note should appear</li>
+</ol>
+
+<p>Then do the reverse — create a note on desktop and watch it show up on your phone.</p>
+
+<p><strong>If it works, you're done. You now have free, automatic, cross-device note syncing with full version history. 🎉</strong></p>
+
+<div class="glow-divider"></div>
+
+<h2>QUICK TIPS</h2>
+
+<p><strong>💡 Capture ideas fast:</strong> The whole point of this setup is that your phone is always in your pocket. Idea hits you? Open Obsidian, jot it down, and it'll be waiting on your desktop when you sit down to work.</p>
+
+<p><strong>⚠️ One device at a time:</strong> Try not to edit the <em>same note</em> on both devices at the exact same time. The auto-sync handles most things, but simultaneous edits to the same file can cause merge conflicts.</p>
+
+<p><strong>📱 Mobile limitations:</strong> The Git plugin on mobile is labeled "experimental" by its developer. It works well for small to medium vaults, but if your vault grows very large (hundreds of files with images), you might experience slowness. For most people, it's perfectly fine.</p>
+
+<p><strong>🔒 Your notes are private:</strong> As long as you set your GitHub repository to "Private" in Step 3, nobody can see your notes but you.</p>
+
+<div class="glow-divider"></div>
+
+<h2>WHY THIS SETUP IS WORTH IT</h2>
+
+<ul>
+    <li><strong>It's free.</strong> Obsidian Sync costs $8/month. This costs $0.</li>
+    <li><strong>You own your data.</strong> Your notes are plain text files on your computer and your GitHub. No proprietary lock-in.</li>
+    <li><strong>Version history.</strong> Every change is tracked. Accidentally delete a paragraph? Go back in time and get it.</li>
+    <li><strong>It works offline.</strong> Both apps work without internet. They sync when you're back online.</li>
+</ul>
+
+<p><em>Got questions? Send us an email — happy to help you get set up!</em></p>
+
+<p>Do your own research. Don't be a statistic.</p>
+            </div>
+
+            <div class="hack-box"><h4>Prostar Life Hack</h4><p>Sync is not a backup. Git is both. Redundancy is resilience. Data sovereignty is the first step to cognitive sovereignty.</p></div>
+
+            <div class="researcher-sig">
+                [ STATUS: TRANSMISSION_COMPLETE ]<br>
+                [ AUTHOR: LEAD TECHNICAL RESEARCHER ]
+            </div>
+
+            <div class="syndicate-footer">
+                <h3>Join the Conversation</h3>
+                <p>Discuss this transmission and share your results with the rest of the builders in our private community.</p>
+                <a href="https://www.facebook.com/profile.php?id=61581034972328" class="btn-fb" target="_blank" rel="noopener noreferrer">Connect on Facebook →</a>
+            </div>
+        </article>
+
+        <section id="article-navigation" class="article-nav-section"></section>
+
+        <section class="newsletter-section" data-reveal>
+            <div class="newsletter-box">
+                <h3>Join the Syndicate</h3>
+                <p>Initialize your subscription for weekly intelligence on neuro-optimization, biological hacking, and technical stack evolution.</p>
+                <form action="https://formspree.io/f/xqegvale" method="POST" class="newsletter-form">
+                    <input type="email" name="email" placeholder="Enter your email address" required>
+                    <button type="submit">Secure Entry</button>
+                </form>
+            </div>
+        </section>
+
+        <footer>
+            <p>&copy; 2026 Dream Syndicate Digital Assets. All Rights Reserved.</p>
+        </footer>
+    </div>
+
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.5/gsap.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.5/Flip.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.5/TextPlugin.min.js"></script>
+    <script src="../codex.js" defer></script>
+    <script src="../script.js" defer></script>
+
+</body>
+</html>
