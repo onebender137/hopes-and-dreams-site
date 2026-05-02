@@ -175,6 +175,12 @@ class LLMClient:
 
         out = text
 
+        # Strip CrewAI internal framing leaks
+        import re
+        out = re.sub(r'(?i)^.*?your final answer:?\s*', '', out, count=1)
+        out = re.sub(r'(?i)^.*?my final answer:?\s*', '', out, count=1)
+        out = re.sub(r'(?i)^.*?final answer:?\s*', '', out, count=1)
+
         # 1. Remove fake citation markers and References sections
         # Strip "References:" / "Citations:" sections through end of text or blank line
         out = re.sub(r'\n\s*(?:###?\s*)?(?:References|Citations|Sources|Bibliography)\s*[:.]?\s*\n.*?(?=\n\n|\Z)',
