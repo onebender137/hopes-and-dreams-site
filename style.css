@@ -1613,3 +1613,12 @@ body.launch-sequence-active #hero-launchpad {
     pointer-events: none;
     opacity: 0.3;
 }
+
+/* LIGHT MODE HEADERS - LOOK 1: Crisp Neon */
+body.light-mode .article-container h1,
+body.light-mode .article-container h2,
+body.light-mode .article-container h3,
+body.light-mode .article-container h4 {
+    color: var(--neon-blue);
+    text-shadow: 0 0 8px rgba(2, 132, 199, 0.2); 
+}
