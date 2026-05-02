@@ -621,7 +621,21 @@ class HopesAndDreamsBot:
             # TITLE — uppercase, centered, gold
             title = topic.upper()
             # Wrap if too long
-            if len(title) > 32:
+            if len(title) > 60:
+                words = title.split()
+                mid = len(words) // 2
+                line1 = ' '.join(words[:mid])
+                line2 = ' '.join(words[mid:])
+                draw.rectangle([(0, 0), (W, 220)], fill=(3, 9, 31, 200))
+                font_3line = load_font(36, bold=True)
+                bbox1 = draw.textbbox((0, 0), line1, font=font_3line)
+                bbox2 = draw.textbbox((0, 0), line2, font=font_3line)
+                w1 = bbox1[2] - bbox1[0]
+                w2 = bbox2[2] - bbox2[0]
+                draw.text(((W-w1)//2, 20), line1, font=font_3line, fill=(251, 191, 36))
+                draw.text(((W-w2)//2, 70), line2, font=font_3line, fill=(251, 191, 36))
+                tagline_y = 130
+            elif len(title) > 32:
                 words = title.split()
                 mid = len(words) // 2
                 line1 = ' '.join(words[:mid])
