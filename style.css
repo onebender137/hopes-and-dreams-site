@@ -1615,7 +1615,7 @@ body.launch-sequence-active #hero-launchpad {
 }
 
 /* =========================================
-   LIGHT MODE HEADERS FIX (Crisp Neon)
+   LIGHT MODE HEADERS FIX (Comprehensive)
    ========================================= */
 body.light-mode .article-container h1,
 body.light-mode .article-container h2,
@@ -1623,7 +1623,13 @@ body.light-mode .article-container h3,
 body.light-mode .article-container h4,
 body.light-mode .section-title,
 body.light-mode h2,
-body.light-mode h3 {
-    color: var(--neon-blue);
-    text-shadow: 0 0 8px rgba(2, 132, 199, 0.2); 
+body.light-mode h3,
+body.light-mode h4,
+body.light-mode .card h1,
+body.light-mode .card h2,
+body.light-mode .card h3,
+body.light-mode .card h4,
+body.light-mode .archive-item .title {
+    color: var(--neon-blue) !important;
+    text-shadow: 0 0 8px rgba(2, 132, 199, 0.2) !important;
 }
