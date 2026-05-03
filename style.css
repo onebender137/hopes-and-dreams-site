@@ -1165,7 +1165,7 @@ body.light-mode #neural-info-box {
     height: 4px;
 }
 
-@media (max-width: 600px) {
+@media (max-width: 1024px) {
     .readiness-grid {
         grid-template-columns: 1fr;
     }
@@ -1176,23 +1176,33 @@ body.light-mode #neural-info-box {
     }
 
     .sticky-widget.compact .readiness-grid {
-        justify-content: space-around;
-        gap: 10px;
+        justify-content: center;
+        gap: 20px;
+        display: flex;
     }
 
     .sticky-widget.compact .readiness-details {
-        justify-content: center;
-        gap: 20px;
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        gap: 8px 15px;
+        flex-grow: 0;
+        justify-content: start;
+        margin: 0;
     }
 
     .sticky-widget.compact .readiness-factor {
         min-width: 0;
         width: auto;
         flex: none;
+        display: flex;
+        align-items: center;
+        gap: 8px;
     }
 
     .sticky-widget.compact .factor-bar {
-        display: none;
+        display: block;
+        width: 35px;
+        height: 4px;
     }
 }
 
