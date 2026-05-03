@@ -894,6 +894,7 @@ class HopesAndDreamsBot:
         clean_title = re.sub(r'(?i)Masterclass:\s*', '', clean_title)
 
         final_html = template.replace("{{SYNDICATE_TITLE}}", clean_title)
+        final_html = final_html.replace("{{WEBSITE_API_KEY}}", Config.WEBSITE_API_KEY or "")
         final_html = final_html.replace("{{SYNDICATE_DATE}}", date_display)
         final_html = final_html.replace("{{SYNDICATE_TIMESTAMP}}", timestamp_str)
         final_html = final_html.replace("{{SYNDICATE_CONTENT}}", beautified_body)
