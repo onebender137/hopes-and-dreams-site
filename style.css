@@ -71,6 +71,7 @@ header {
     height: auto;
     max-height: 150px;
     object-fit: contain;
+    aspect-ratio: 1780 / 1050;
 }
 
 nav {
@@ -165,6 +166,15 @@ nav a:hover {
     grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
     gap: 30px;
     margin-bottom: 60px;
+}
+
+/* Sticky Widget Support */
+.sticky-widget {
+    position: sticky;
+    top: 20px;
+    z-index: 100;
+    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.5);
+    background: var(--chat-window-bg) !important;
 }
 
 /* Priority Card Sizing */
@@ -1248,29 +1258,14 @@ body.light-mode #neural-info-box {
     }
 }
 
-/* Syndicate Data Gutters - Matrix Edition */
+/* Syndicate Data Gutters - Matrix Edition (Canvas Based) */
 .data-gutter {
-    position: fixed;
-    top: 0;
-    bottom: 0;
-    width: 180px;
-    overflow: hidden;
-    font-family: monospace;
-    font-size: 0.9rem;
-    color: var(--neon-blue);
-    z-index: 1;
     pointer-events: none;
-    text-shadow: 0 0 5px var(--neon-blue);
-    padding-top: 20px;
-
-    pointer-events: none;}
-.data-gutter.left { left: 15px; }
-.data-gutter.right { right: 15px; text-align: right; }
+}
 
 /* Hard kill-switch for mobile */
 @media (max-width: 1024px) {
-    .data-gutter { display: none !important;
-    pointer-events: none;}
+    .data-gutter { display: none !important; }
 }
 
 /* --- ARTICLE NAVIGATION SCROLLER --- */
