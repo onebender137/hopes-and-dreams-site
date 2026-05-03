@@ -1128,12 +1128,13 @@ document.addEventListener('DOMContentLoaded', () => {
 
     function draw() {
         contexts.forEach((ctx, i) => {
-            // Semi-transparent background to create trailing effect
-            ctx.fillStyle = "rgba(10, 15, 43, 0.15)";
+            const isLightMode = document.body.classList.contains('light-mode');
+
+            // FIX 1: Dynamic Background matching the CSS --bg-main variables with 15% opacity
+            ctx.fillStyle = isLightMode ? "rgba(248, 250, 252, 0.15)" : "rgba(10, 15, 43, 0.15)";
             ctx.fillRect(0, 0, canvases[i].width, canvases[i].height);
 
             // Matrix Text Styling
-            const isLightMode = document.body.classList.contains('light-mode');
             ctx.fillStyle = isLightMode ? "#0284c7" : "#38bdf8";
             ctx.font = `${fontSize}px monospace`;
             ctx.shadowBlur = 8;
@@ -1157,10 +1158,9 @@ document.addEventListener('DOMContentLoaded', () => {
 
     init();
     window.addEventListener('resize', init);
-    // 33ms = ~30fps, perfect for "raining code" speed
-    setInterval(draw, 33);
-});
-
+    
+    // FIX 2: Slowed down from 33ms to 65ms for a more readable, relaxed pace
+    setInterval(draw, 65);
 // --- Article Navigation Scroller Logic ---
 document.addEventListener('DOMContentLoaded', () => {
     const navPlaceholder = document.getElementById('article-navigation');
