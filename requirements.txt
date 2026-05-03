@@ -176,6 +176,7 @@ xxhash==3.6.0
 yarl==1.23.0
 zipp==3.23.0
 zstandard==0.25.0
+Flask-Limiter==3.8.0
 arize-phoenix
 openinference-instrumentation-langchain
 openinference-instrumentation-crewai

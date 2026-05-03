@@ -674,8 +674,8 @@ class HopesAndDreamsBot:
             slug = topic.lower().replace(' ', '-')[:50]
             date_str = datetime.now().strftime('%Y-%m-%d')
             filename = f"media/general/{date_str}-{slug}.jpg"
-            # Save as JPEG with optimized quality to keep file size small for FB
-            img.save(filename, "JPEG", quality=85, optimize=True)
+            # Save as JPEG with optimized quality and progressive loading for faster web delivery
+            img.save(filename, "JPEG", quality=85, optimize=True, progressive=True)
             self._log_uplink(f"IMAGE GEN: Saved to {filename}")
             return filename
 
@@ -727,6 +727,9 @@ class HopesAndDreamsBot:
 
         # 5. Update transmissions.html (Archive)
         self._update_transmissions_html(clean_title, filename, date_str)
+
+        # 5b. Update transmissions.json (Optimized Scroller Metadata)
+        self._update_transmissions_json(clean_title, filename, date_str)
 
         # 6. Git Commit and Push
         self._git_push_changes(f"Syndicate Transmission: {topic}")
@@ -997,6 +1000,37 @@ class HopesAndDreamsBot:
         except Exception as e:
             self._log_uplink(f"WEBSITE ERROR: Failed to update transmissions.html: {e}")
 
+    def _update_transmissions_json(self, topic, filename, date_str):
+        """Updates the transmissions.json optimized metadata file."""
+        self._log_uplink("WEBSITE: Syncing transmissions.json...")
+        json_file = "transmissions.json"
+        try:
+            transmissions = []
+            if os.path.exists(json_file):
+                with open(json_file, 'r') as f:
+                    transmissions = json.load(f)
+
+            # Insert at top (reverse chronological)
+            transmissions.insert(0, {
+                "href": f"articles/{filename}",
+                "title": topic,
+                "date": date_str
+            })
+
+            # Keep it unique by href to avoid duplicates on retries
+            seen = set()
+            unique_transmissions = []
+            for t in transmissions:
+                if t['href'] not in seen:
+                    unique_transmissions.append(t)
+                    seen.add(t['href'])
+
+            with open(json_file, 'w') as f:
+                json.dump(unique_transmissions, f, indent=4)
+            self._log_uplink("WEBSITE: transmissions.json synced successfully.")
+        except Exception as e:
+            self._log_uplink(f"WEBSITE ERROR: Failed to update transmissions.json: {e}")
+
     def _git_push_changes(self, commit_message):
         """Automates the git workflow to push changes to the repository."""
         self._log_uplink("GIT: Synchronizing repository...")
@@ -1036,7 +1070,7 @@ class HopesAndDreamsBot:
                     subprocess.run(["git", "stash", "pop"], capture_output=True)
 
             # 3. Ensure we only stage the intended files (including generated media)
-            subprocess.run(["git", "add", "intel.html", "transmissions.html", "articles/", "media/"], check=True, capture_output=True, text=True)
+            subprocess.run(["git", "add", "intel.html", "transmissions.html", "transmissions.json", "articles/", "media/"], check=True, capture_output=True, text=True)
 
             # 4. Check if there are staged changes to commit
             status = subprocess.run(["git", "status", "--porcelain"], capture_output=True, text=True)
@@ -1056,6 +1090,12 @@ class HopesAndDreamsBot:
             subprocess.run(["git", "stash", "push", "--include-untracked", "-m", "Syndicate Final Stash"], capture_output=True)
 
             try:
+                # Add all relevant files again just in case (e.g. transmissions.json)
+                subprocess.run(["git", "add", "intel.html", "transmissions.html", "transmissions.json", "articles/", "media/"], capture_output=True)
+
+                # Update commit message if we missed files initially
+                subprocess.run(["git", "commit", "--amend", "--no-edit"], capture_output=True)
+
                 # Pull with rebase
                 pull_res = subprocess.run(["git", "pull", "origin", target_branch, "--rebase"], capture_output=True, text=True)
                 if pull_res.returncode != 0:
