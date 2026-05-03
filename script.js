@@ -983,11 +983,18 @@ document.addEventListener('DOMContentLoaded', () => {
 
         // Integrated with Local Bot via Cloudflare Tunnel
         try {
+            const headers = {
+                'Content-Type': 'application/json'
+            };
+
+            // Add API Key if available (Check for global config)
+            if (window.SYNDICATE_CONFIG && window.SYNDICATE_CONFIG.API_KEY) {
+                headers['X-Syndicate-Key'] = window.SYNDICATE_CONFIG.API_KEY;
+            }
+
             const response = await fetch('https://ai.hopes-and-dreams.ca/api/chat', {
                 method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json'
-                },
+                headers: headers,
                 body: JSON.stringify({
                     message: text
                 })
@@ -1082,42 +1089,76 @@ document.addEventListener('DOMContentLoaded', () => {
     }
 });
 
-// Syndicate Matrix Gutter Logic (Lightweight)
+// Syndicate Matrix Gutter Logic (High-Performance Canvas Edition)
 document.addEventListener('DOMContentLoaded', () => {
     if (window.innerWidth <= 1024) return; // Abort on mobile
 
-    const createGutter = (side) => {
-        const gutter = document.createElement('div');
-        gutter.className = `data-gutter ${side}`;
-        document.body.appendChild(gutter);
-        return gutter;
+    const createGutterCanvas = (side) => {
+        const canvas = document.createElement('canvas');
+        canvas.className = `data-gutter ${side}`;
+        canvas.style.position = 'fixed';
+        canvas.style.top = '0';
+        canvas.style[side] = '15px';
+        canvas.style.width = '180px';
+        canvas.style.height = '100vh';
+        canvas.style.zIndex = '1';
+        canvas.style.pointerEvents = 'none';
+        document.body.appendChild(canvas);
+        return canvas;
     };
 
-    const leftGutter = createGutter('left');
-    const rightGutter = createGutter('right');
+    const leftCanvas = createGutterCanvas('left');
+    const rightCanvas = createGutterCanvas('right');
+    const canvases = [leftCanvas, rightCanvas];
+    const contexts = canvases.map(c => c.getContext('2d'));
 
-    // Matrix character set (Katakana + Latin + Numerals)
-    const chars = "ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789@#$%^&*";
+    const chars = "ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789@#$%^&*ｦｱｲｳｴｵｶｷｸｹｺｻｼｽｾｿﾀﾁﾂﾃﾄﾅﾆﾇﾈﾉﾊﾋﾌﾍﾎﾏﾐﾑﾒﾓﾔﾕﾖﾗﾘﾙﾚﾛﾜﾝ";
+    const fontSize = 16;
+    let columns;
+    let drops;
 
-    // Moderate interval for ~50% density
-    setInterval(() => {
-        const text = chars.charAt(Math.floor(Math.random() * chars.length)) +
-                     chars.charAt(Math.floor(Math.random() * chars.length)) +
-                     chars.charAt(Math.floor(Math.random() * chars.length));
+    function init() {
+        canvases.forEach(canvas => {
+            canvas.width = 180;
+            canvas.height = window.innerHeight;
+        });
+        columns = Math.floor(180 / fontSize);
+        drops = Array(columns).fill(1);
+    }
 
-        const el = document.createElement('div');
-        el.innerText = text;
-        el.style.opacity = Math.random() * 0.4 + 0.05;
-        el.style.marginBottom = "6px";
+    function draw() {
+        contexts.forEach((ctx, i) => {
+            // Semi-transparent background to create trailing effect
+            ctx.fillStyle = "rgba(10, 15, 43, 0.15)";
+            ctx.fillRect(0, 0, canvases[i].width, canvases[i].height);
 
-        const target = Math.random() > 0.5 ? leftGutter : rightGutter;
-        target.prepend(el);
+            // Matrix Text Styling
+            const isLightMode = document.body.classList.contains('light-mode');
+            ctx.fillStyle = isLightMode ? "#0284c7" : "#38bdf8";
+            ctx.font = `${fontSize}px monospace`;
+            ctx.shadowBlur = 8;
+            ctx.shadowColor = isLightMode ? "rgba(2, 132, 199, 0.5)" : "rgba(56, 189, 248, 0.5)";
 
-        // Keep DOM clean
-        if (target.children.length > 35) {
-            target.removeChild(target.lastChild);
-        }
-    }, 600);
+            for (let j = 0; j < drops.length; j++) {
+                const text = chars.charAt(Math.floor(Math.random() * chars.length));
+                const x = j * fontSize;
+                const y = drops[j] * fontSize;
+
+                ctx.fillText(text, x, y);
+
+                // Reset drop to top randomly after it crosses screen
+                if (y > canvases[i].height && Math.random() > 0.975) {
+                    drops[j] = 0;
+                }
+                drops[j]++;
+            }
+        });
+    }
+
+    init();
+    window.addEventListener('resize', init);
+    // 33ms = ~30fps, perfect for "raining code" speed
+    setInterval(draw, 33);
 });
 
 // --- Article Navigation Scroller Logic ---
@@ -1129,26 +1170,23 @@ document.addEventListener('DOMContentLoaded', () => {
     const isArticle = window.location.pathname.includes('/articles/');
     if (!isArticle) return;
 
-    const transmissionsUrl = '../transmissions.html';
+    const transmissionsUrl = '../transmissions.json';
 
     async function initializeArticleNav() {
-        console.log("Initializing Syndicate Transmission Scroller...");
+        console.log("Initializing Syndicate Transmission Scroller (JSON Optimized)...");
         try {
             const response = await fetch(transmissionsUrl);
             if (!response.ok) {
                 console.error(`Failed to fetch transmissions: ${response.status}`);
                 return;
             }
-            const html = await response.text();
-            const parser = new DOMParser();
-            const doc = parser.parseFromString(html, 'text/html');
-            const archiveItems = Array.from(doc.querySelectorAll('.archive-item'));
+            const archiveItems = await response.json();
 
-            console.log(`Found ${archiveItems.length} items in archive.`);
+            console.log(`Found ${archiveItems.length} items in optimized archive.`);
             if (archiveItems.length === 0) return;
 
             const currentPath = window.location.pathname.split('/').pop();
-            let currentIndex = archiveItems.findIndex(item => item.getAttribute('href').includes(currentPath));
+            let currentIndex = archiveItems.findIndex(item => item.href.includes(currentPath));
             console.log(`Current article index: ${currentIndex}`);
 
             // Generate the scroller HTML
@@ -1159,15 +1197,9 @@ document.addEventListener('DOMContentLoaded', () => {
             `;
 
             archiveItems.forEach((item, index) => {
-                const titleEl = item.querySelector('.title');
-                const dateEl = item.querySelector('.date');
-                if (!titleEl || !dateEl) {
-                    console.warn(`Skipping malformed archive item at index ${index}`);
-                    return;
-                }
-                const title = titleEl.textContent;
-                const date = dateEl.textContent;
-                const href = item.getAttribute('href');
+                const title = item.title;
+                const date = item.date;
+                const href = item.href;
                 const isActive = index === currentIndex;
                 const isPrev = index === currentIndex + 1; // Reverse chronological order
                 const isNext = index === currentIndex - 1;
@@ -1273,10 +1305,6 @@ document.addEventListener('DOMContentLoaded', () => {
         if (destination) {
             destination.appendChild(brainImage);
             brainImage.style.cursor = 'pointer';
-            brainImage.onclick = () => {
-                localStorage.removeItem('syndicate_live');
-                window.location.href = 'index.html';
-            };
         }
         return;
     }
@@ -1337,7 +1365,10 @@ document.addEventListener('DOMContentLoaded', () => {
     });
 
     // Brain click = stay on home page (default behavior)
-    brainImage.addEventListener('click', () => startTransition());
+    brainImage.addEventListener('click', (e) => {
+        e.preventDefault();
+        startTransition();
+    });
 
     function startTransition(navigateTo) {
         // If launch already happened (returning visitor), just navigate
@@ -1382,10 +1413,7 @@ document.addEventListener('DOMContentLoaded', () => {
                     onComplete: () => {
                         document.body.classList.add('logo-header-state');
                         brainImage.style.cursor = 'pointer';
-                        brainImage.onclick = () => {
-                            localStorage.removeItem('syndicate_live');
-                            window.location.href = 'index.html';
-                        };
+                        // Already wrapped in <a> tag for SEO
                     }
                 });
             });
