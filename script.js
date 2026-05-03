@@ -1126,16 +1126,17 @@ document.addEventListener('DOMContentLoaded', () => {
         drops = Array(columns).fill(1);
     }
 
-    function draw() {
+   function draw() {
         contexts.forEach((ctx, i) => {
             const isLightMode = document.body.classList.contains('light-mode');
 
-            // Dynamic Background matching the CSS --bg-main variables with 15% opacity
+            // NEW LOGIC: Match the canvas fade exactly to the site theme
+            // Light Mode: #f8fafc | Dark Mode: #0a0f2b
             ctx.fillStyle = isLightMode ? "rgba(248, 250, 252, 0.15)" : "rgba(10, 15, 43, 0.15)";
             ctx.fillRect(0, 0, canvases[i].width, canvases[i].height);
 
             // Matrix Text Styling
-            ctx.fillStyle = isLightMode ? "#0284c7" : "#38bdf8";
+            ctx.fillStyle = isLightMode ? "#0284c7" : "#38bdf8"; 
             ctx.font = `${fontSize}px monospace`;
             ctx.shadowBlur = 8;
             ctx.shadowColor = isLightMode ? "rgba(2, 132, 199, 0.5)" : "rgba(56, 189, 248, 0.5)";
