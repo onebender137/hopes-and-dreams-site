@@ -1130,7 +1130,7 @@ document.addEventListener('DOMContentLoaded', () => {
         contexts.forEach((ctx, i) => {
             const isLightMode = document.body.classList.contains('light-mode');
 
-            // FIX 1: Dynamic Background matching the CSS --bg-main variables with 15% opacity
+            // Dynamic Background matching the CSS --bg-main variables with 15% opacity
             ctx.fillStyle = isLightMode ? "rgba(248, 250, 252, 0.15)" : "rgba(10, 15, 43, 0.15)";
             ctx.fillRect(0, 0, canvases[i].width, canvases[i].height);
 
@@ -1158,9 +1158,10 @@ document.addEventListener('DOMContentLoaded', () => {
 
     init();
     window.addEventListener('resize', init);
-    
-    // FIX 2: Slowed down from 33ms to 65ms for a more readable, relaxed pace
+    // Slowed down from 33ms to 65ms for a more readable, relaxed pace
     setInterval(draw, 65);
+}); // <--- THIS is the bracket that went missing!
+
 // --- Article Navigation Scroller Logic ---
 document.addEventListener('DOMContentLoaded', () => {
     const navPlaceholder = document.getElementById('article-navigation');
