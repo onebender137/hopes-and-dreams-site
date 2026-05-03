@@ -113,7 +113,7 @@ body {
 
 #hero-main-title {
     position: absolute;
-    bottom: 6vh;
+    bottom: 4vh;
     left: 0; right: 0;
     text-align: center;
     font-size: clamp(1rem, 2.8vw, 2.2rem);
@@ -131,7 +131,7 @@ body {
 }
 #hero-instruction {
     position: absolute;
-    bottom: 3vh;
+    top: 3vh;
     font-family: 'JetBrains Mono', monospace;
     color: var(--neon-gold);
     letter-spacing: 4px;
@@ -198,8 +198,8 @@ body {
 #dev-coords .label { color: var(--text-dim); font-size: 9px; }
 
 @media (max-width: 600px) {
-    #hero-main-title { font-size: 0.9rem; letter-spacing: 4px; bottom: 8vh; }
-    #hero-instruction { font-size: 0.5rem; letter-spacing: 2px; bottom: 4vh; }
+    #hero-main-title { font-size: 0.9rem; letter-spacing: 4px; bottom: 6vh; }
+    #hero-instruction { font-size: 0.5rem; letter-spacing: 2px; top: 2vh; }
     .hex-text { font-size: 8px; }
     .decoded-text { font-size: 9px; }
     #brain-svg-wrap { max-width: 98vw; max-height: 65vh; }
@@ -238,64 +238,64 @@ body {
                  Coordinate space: 1780 x 1050
                  ============================================= -->
 
-            <!-- PROCUREMENT — Upper-left frontal lobe (neural network clusters) -->
+            <!-- PROCUREMENT — Upper-left lobe (neural network web, sparkle nodes) -->
             <g class="hotspot-group" data-section="Procurement" data-hex="50 52 4F 43" data-label="PROCUREMENT MODULE" data-page="shop.html">
                 <path class="hotspot-region" d="
-                    M 520 220
-                    C 490 260, 480 320, 510 380
-                    C 530 420, 580 440, 630 410
-                    C 660 385, 670 330, 655 280
-                    C 640 230, 580 200, 520 220 Z"/>
-                <circle class="hotspot-glow" cx="580" cy="320" r="70" filter="url(#gf)"/>
-                <circle class="node-dot" cx="580" cy="320" r="8"/>
+                    M 580 250
+                    C 560 290, 540 350, 560 410
+                    C 580 450, 640 470, 700 440
+                    C 740 420, 750 360, 735 310
+                    C 720 260, 650 230, 580 250 Z"/>
+                <circle class="hotspot-glow" cx="650" cy="350" r="75" filter="url(#gf)"/>
+                <circle class="node-dot" cx="650" cy="350" r="8"/>
             </g>
 
-            <!-- OPTIMIZATION — Upper-right (right side of neural net, near star trail) -->
+            <!-- OPTIMIZATION — Upper-right where star trail meets brain -->
             <g class="hotspot-group" data-section="Optimization" data-hex="4F 50 54 49" data-label="OPTIMIZATION MODULE" data-page="optimization.html">
                 <path class="hotspot-region" d="
-                    M 680 200
-                    C 720 180, 790 200, 830 260
-                    C 860 310, 855 380, 820 410
-                    C 785 440, 720 420, 695 370
-                    C 665 320, 650 250, 680 200 Z"/>
-                <circle class="hotspot-glow" cx="760" cy="310" r="70" filter="url(#gf)"/>
-                <circle class="node-dot" cx="760" cy="310" r="8"/>
+                    M 750 220
+                    C 790 200, 870 220, 910 280
+                    C 940 330, 930 400, 895 430
+                    C 860 460, 790 440, 765 390
+                    C 735 340, 720 270, 750 220 Z"/>
+                <circle class="hotspot-glow" cx="835" cy="325" r="75" filter="url(#gf)"/>
+                <circle class="node-dot" cx="835" cy="325" r="8"/>
             </g>
 
-            <!-- INTEL HUB — Lower-left (lower swirl / brainstem area) -->
+            <!-- INTEL HUB — Lower-left (big cyan swirl area) -->
             <g class="hotspot-group" data-section="Intel Hub" data-hex="49 4E 54 4C" data-label="INTEL RELAY" data-page="intel.html">
                 <path class="hotspot-region" d="
-                    M 500 460
-                    C 480 500, 475 560, 500 620
-                    C 520 660, 575 685, 630 660
-                    C 670 640, 680 580, 665 530
-                    C 645 480, 570 445, 500 460 Z"/>
-                <circle class="hotspot-glow" cx="580" cy="565" r="70" filter="url(#gf)"/>
-                <circle class="node-dot" cx="580" cy="565" r="8"/>
+                    M 560 480
+                    C 530 520, 520 590, 550 660
+                    C 575 710, 640 740, 710 710
+                    C 760 690, 770 630, 750 570
+                    C 730 510, 640 465, 560 480 Z"/>
+                <circle class="hotspot-glow" cx="650" cy="590" r="80" filter="url(#gf)"/>
+                <circle class="node-dot" cx="650" cy="590" r="8"/>
             </g>
 
-            <!-- ABOUT — Lower-right -->
+            <!-- ABOUT — Lower-right / bottom (purple tail, brainstem) -->
             <g class="hotspot-group" data-section="About" data-hex="41 42 4F 55" data-label="ABOUT SYNDICATE" data-page="about.html">
                 <path class="hotspot-region" d="
-                    M 680 460
-                    C 720 440, 785 455, 820 510
-                    C 850 555, 845 620, 820 660
-                    C 790 700, 730 690, 700 650
-                    C 665 600, 650 500, 680 460 Z"/>
-                <circle class="hotspot-glow" cx="760" cy="565" r="70" filter="url(#gf)"/>
-                <circle class="node-dot" cx="760" cy="565" r="8"/>
+                    M 740 500
+                    C 780 480, 860 500, 900 560
+                    C 935 610, 920 690, 880 740
+                    C 840 780, 770 770, 740 720
+                    C 710 670, 700 550, 740 500 Z"/>
+                <circle class="hotspot-glow" cx="820" cy="620" r="80" filter="url(#gf)"/>
+                <circle class="node-dot" cx="820" cy="620" r="8"/>
             </g>
 
-            <!-- PRIVACY — Shooting star burst (top-right) -->
+            <!-- PRIVACY — Shooting star burst (gold star, top-right) -->
             <g class="hotspot-group" data-section="Privacy" data-hex="50 56 43 59" data-label="PRIVACY PROTOCOL" data-page="privacy.html">
                 <path class="hotspot-region" d="
-                    M 880 80
-                    C 940 50, 1060 70, 1110 160
-                    C 1150 240, 1130 340, 1070 380
-                    C 1010 420, 940 390, 900 320
-                    C 860 250, 830 140, 880 80 Z"/>
-                <circle class="hotspot-glow" cx="1000" cy="220" r="85" filter="url(#gf)"/>
-                <circle class="node-dot" cx="1000" cy="220" r="8"/>
+                    M 950 100
+                    C 1010 70, 1150 80, 1210 170
+                    C 1260 250, 1240 360, 1170 400
+                    C 1100 440, 1020 400, 975 330
+                    C 930 260, 900 160, 950 100 Z"/>
+                <circle class="hotspot-glow" cx="1090" cy="240" r="90" filter="url(#gf)"/>
+                <circle class="node-dot" cx="1090" cy="240" r="8"/>
             </g>
 
             <!-- =============================================
@@ -303,44 +303,44 @@ body {
                  Bigger text, wider boxes, positioned in margins
                  ============================================= -->
 
-            <!-- Procurement — left side -->
+            <!-- Procurement — upper-left -->
             <g class="hex-label-group" id="label-group-Procurement">
-                <line class="conn-line" x1="580" y1="320" x2="440" y2="220"/>
-                <rect class="label-bg" x="345" y="165" width="380" height="80" rx="5"/>
-                <text class="hex-text" x="535" y="200" text-anchor="middle">50 52 4F 43</text>
-                <text class="decoded-text" x="535" y="232" text-anchor="middle">PROCUREMENT MODULE</text>
+                <line class="conn-line" x1="650" y1="350" x2="470" y2="250"/>
+                <rect class="label-bg" x="350" y="198" width="380" height="80" rx="5"/>
+                <text class="hex-text" x="540" y="233" text-anchor="middle">50 52 4F 43</text>
+                <text class="decoded-text" x="540" y="265" text-anchor="middle">PROCUREMENT MODULE</text>
             </g>
 
-            <!-- Optimization — right side -->
+            <!-- Optimization — upper-right -->
             <g class="hex-label-group" id="label-group-Optimization">
-                <line class="conn-line" x1="760" y1="310" x2="1100" y2="220"/>
-                <rect class="label-bg" x="990" y="165" width="400" height="80" rx="5"/>
-                <text class="hex-text" x="1190" y="200" text-anchor="middle">4F 50 54 49</text>
-                <text class="decoded-text" x="1190" y="232" text-anchor="middle">OPTIMIZATION MODULE</text>
+                <line class="conn-line" x1="835" y1="325" x2="1150" y2="420"/>
+                <rect class="label-bg" x="1050" y="388" width="400" height="80" rx="5"/>
+                <text class="hex-text" x="1250" y="423" text-anchor="middle">4F 50 54 49</text>
+                <text class="decoded-text" x="1250" y="455" text-anchor="middle">OPTIMIZATION MODULE</text>
             </g>
 
-            <!-- Intel Hub — left lower -->
+            <!-- Intel Hub — lower-left -->
             <g class="hex-label-group" id="label-group-Intel-Hub">
-                <line class="conn-line" x1="580" y1="565" x2="440" y2="700"/>
-                <rect class="label-bg" x="345" y="670" width="320" height="80" rx="5"/>
-                <text class="hex-text" x="505" y="705" text-anchor="middle">49 4E 54 4C</text>
-                <text class="decoded-text" x="505" y="737" text-anchor="middle">INTEL RELAY</text>
+                <line class="conn-line" x1="650" y1="590" x2="460" y2="720"/>
+                <rect class="label-bg" x="350" y="695" width="320" height="80" rx="5"/>
+                <text class="hex-text" x="510" y="730" text-anchor="middle">49 4E 54 4C</text>
+                <text class="decoded-text" x="510" y="762" text-anchor="middle">INTEL RELAY</text>
             </g>
 
-            <!-- About — right lower -->
+            <!-- About — lower-right -->
             <g class="hex-label-group" id="label-group-About">
-                <line class="conn-line" x1="760" y1="565" x2="1100" y2="700"/>
-                <rect class="label-bg" x="990" y="670" width="360" height="80" rx="5"/>
-                <text class="hex-text" x="1170" y="705" text-anchor="middle">41 42 4F 55</text>
-                <text class="decoded-text" x="1170" y="737" text-anchor="middle">ABOUT SYNDICATE</text>
+                <line class="conn-line" x1="820" y1="620" x2="1150" y2="720"/>
+                <rect class="label-bg" x="1050" y="695" width="360" height="80" rx="5"/>
+                <text class="hex-text" x="1230" y="730" text-anchor="middle">41 42 4F 55</text>
+                <text class="decoded-text" x="1230" y="762" text-anchor="middle">ABOUT SYNDICATE</text>
             </g>
 
-            <!-- Privacy — top right -->
+            <!-- Privacy — top-right near star -->
             <g class="hex-label-group" id="label-group-Privacy">
-                <line class="conn-line" x1="1000" y1="220" x2="1250" y2="80"/>
-                <rect class="label-bg-gold" x="1140" y="30" width="370" height="80" rx="5"/>
-                <text class="hex-text" x="1325" y="65" text-anchor="middle" style="fill:var(--neon-gold)">50 56 43 59</text>
-                <text class="decoded-text" x="1325" y="97" text-anchor="middle">PRIVACY PROTOCOL</text>
+                <line class="conn-line" x1="1090" y1="240" x2="1250" y2="110"/>
+                <rect class="label-bg-gold" x="1150" y="60" width="370" height="80" rx="5"/>
+                <text class="hex-text" x="1335" y="95" text-anchor="middle" style="fill:var(--neon-gold)">50 56 43 59</text>
+                <text class="decoded-text" x="1335" y="127" text-anchor="middle">PRIVACY PROTOCOL</text>
             </g>
         </svg>
     </div>
@@ -396,12 +396,14 @@ document.addEventListener('DOMContentLoaded', () => {
         const decodedText = labelGroup.querySelector('.decoded-text');
         let hoverTl = null;
         let scrambleInterval = null;
+        let glitchInterval = null;
 
         group.addEventListener('mouseenter', () => {
             moduleDisplay.textContent = section.toUpperCase();
             coordDisplay.textContent = 'REGION: ' + section.toUpperCase();
             if (hoverTl) hoverTl.kill();
             if (scrambleInterval) clearInterval(scrambleInterval);
+            if (glitchInterval) clearInterval(glitchInterval);
 
             hoverTl = gsap.timeline();
             hoverTl.to(nodeDot, { opacity: 1, duration: 0.12 });
@@ -409,24 +411,45 @@ document.addEventListener('DOMContentLoaded', () => {
             hoverTl.to(connLine, { opacity: 0.6, duration: 0.25 }, '<0.08');
             hoverTl.to(labelGroup, { opacity: 1, duration: 0.18 }, '<0.08');
 
-            // Hex scramble decode effect
-            const chars = '0123456789ABCDEF';
+            // GLITCHY hex scramble — faster, more chaotic
+            const chars = '0123456789ABCDEF!@#$%&*<>{}[]';
             let count = 0;
+            let settled = false;
             scrambleInterval = setInterval(() => {
                 let s = '';
                 for (let i = 0; i < hexString.length; i++) {
                     if (hexString[i] === ' ') s += ' ';
-                    else if (count > i * 2) s += hexString[i];
-                    else s += chars[Math.floor(Math.random() * 16)];
+                    else if (count > i * 1.5) s += hexString[i];
+                    else s += chars[Math.floor(Math.random() * chars.length)];
                 }
                 hexText.textContent = s;
+                // Random opacity flicker during scramble
+                hexText.style.opacity = Math.random() > 0.15 ? '1' : '0.3';
                 count++;
-                if (count > hexString.length * 3) {
+                if (count > hexString.length * 2.5) {
                     clearInterval(scrambleInterval);
                     scrambleInterval = null;
                     hexText.textContent = hexString;
+                    hexText.style.opacity = '1';
+                    settled = true;
+                    // POST-SETTLE GLITCH: random re-corruptions
+                    glitchInterval = setInterval(() => {
+                        if (Math.random() > 0.6) {
+                            let glitched = hexString.split('');
+                            let pos = Math.floor(Math.random() * glitched.length);
+                            if (glitched[pos] !== ' ') {
+                                glitched[pos] = chars[Math.floor(Math.random() * 16)];
+                            }
+                            hexText.textContent = glitched.join('');
+                            hexText.style.opacity = '0.7';
+                            setTimeout(() => {
+                                hexText.textContent = hexString;
+                                hexText.style.opacity = '1';
+                            }, 60 + Math.random() * 80);
+                        }
+                    }, 400 + Math.random() * 600);
                 }
-            }, 35);
+            }, 22);
 
             // Decoded label appears after hex settles
             hoverTl.to(decodedText, { opacity: 1, duration: 0.35, ease: 'power2.out' }, '+=0.25');
@@ -437,6 +460,8 @@ document.addEventListener('DOMContentLoaded', () => {
             coordDisplay.textContent = 'REGION: --';
             if (hoverTl) hoverTl.kill();
             if (scrambleInterval) { clearInterval(scrambleInterval); scrambleInterval = null; }
+            if (glitchInterval) { clearInterval(glitchInterval); glitchInterval = null; }
+            hexText.style.opacity = '1';
             gsap.to([nodeDot, glowCircle, connLine, labelGroup], { opacity: 0, duration: 0.2 });
             gsap.to(decodedText, { opacity: 0, duration: 0.1 });
         });
