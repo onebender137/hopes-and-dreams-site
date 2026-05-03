@@ -931,13 +931,37 @@ class HopesAndDreamsBot:
                 after_block = post_parts[1]
 
                 # Extract cards using regex but handle the block more safely
+                # Resilient pattern to handle nested div or variations in attributes
                 cards = re.findall(r'<div class="card[^"]*">.*?</a>\s*</div>', current_block, re.DOTALL)
-                cards = [c for c in cards if "Initializing Feed" not in c and "Waiting for Uplink" not in c and "Data Stream Alpha" not in c]
-                cards.insert(0, new_card)
-                cards = cards[:3]
 
-                new_block = "\n" + "\n".join(cards) + "\n                "
+                # Cleanup: ensure no broken or duplicate cards are preserved
+                seen_hrefs = set()
+                unique_cards = []
+
+                # Add the new card first
+                unique_cards.append(new_card)
+                seen_hrefs.add(f"articles/{filename}")
+
+                for c in cards:
+                    if "Initializing Feed" in c or "Waiting for Uplink" in c or "Data Stream Alpha" in c:
+                        continue
+
+                    # Extract href to ensure uniqueness
+                    href_match = re.search(r'href="(articles/[^"]+)"', c)
+                    if href_match:
+                        href = href_match.group(1)
+                        if href not in seen_hrefs:
+                            unique_cards.append(c)
+                            seen_hrefs.add(href)
+                    else:
+                        unique_cards.append(c)
+
+                unique_cards = unique_cards[:3]
+
+                new_block = "\n" + "\n".join(unique_cards) + "\n                "
                 html = pre_block + start_marker + new_block + end_marker + after_block
+            else:
+                self._log_uplink("WEBSITE ERROR: Markers for Latest Posts not found in intel.html")
 
             # Update archive preview
             archive_start = "<!-- OLDER_POSTS_START -->"
@@ -951,12 +975,31 @@ class HopesAndDreamsBot:
 
                 new_archive_item = f'<li style="margin-bottom: 10px;"><a href="articles/{filename}" style="color: var(--text-dim); text-decoration: none; font-size: 0.85rem;">[{date_str}] {topic}</a></li>'
                 archive_items = re.findall(r'<li.*?>.*?</li>', current_archive, re.DOTALL)
-                archive_items = [i for i in archive_items if "No archived transmissions found" not in i]
-                archive_items.insert(0, new_archive_item)
-                archive_items = archive_items[:5]
 
-                new_archive_block = "\n                    " + "\n                    ".join(archive_items) + "\n                    "
+                seen_archive_hrefs = set()
+                unique_archive_items = []
+                unique_archive_items.append(new_archive_item)
+                seen_archive_hrefs.add(f"articles/{filename}")
+
+                for i in archive_items:
+                    if "No archived transmissions found" in i:
+                        continue
+
+                    href_match = re.search(r'href="(articles/[^"]+)"', i)
+                    if href_match:
+                        href = href_match.group(1)
+                        if href not in seen_archive_hrefs:
+                            unique_archive_items.append(i)
+                            seen_archive_hrefs.add(href)
+                    else:
+                        unique_archive_items.append(i)
+
+                unique_archive_items = unique_archive_items[:5]
+
+                new_archive_block = "\n                    " + "\n                    ".join(unique_archive_items) + "\n                    "
                 html = pre_archive + archive_start + new_archive_block + archive_end + after_archive
+            else:
+                self._log_uplink("WEBSITE ERROR: Markers for Older Posts not found in intel.html")
 
             with open("intel.html", 'w') as f:
                 f.write(html)
@@ -989,15 +1032,33 @@ class HopesAndDreamsBot:
                 after_block = post_parts[1]
 
                 items = re.findall(r'<a.*?class="archive-item">.*?</a>', current_block, re.DOTALL)
-                items = [i for i in items if "Initializing deep archive retrieval" not in i]
-                items.insert(0, new_item)
 
-                new_block = "\n" + "\n".join(items) + "\n            "
+                seen_hrefs = set()
+                unique_items = []
+                unique_items.append(new_item)
+                seen_hrefs.add(f"articles/{filename}")
+
+                for i in items:
+                    if "Initializing deep archive retrieval" in i:
+                        continue
+
+                    href_match = re.search(r'href="(articles/[^"]+)"', i)
+                    if href_match:
+                        href = href_match.group(1)
+                        if href not in seen_hrefs:
+                            unique_items.append(i)
+                            seen_hrefs.add(href)
+                    else:
+                        unique_items.append(i)
+
+                new_block = "\n" + "\n".join(unique_items) + "\n            "
                 html = pre_block + start_marker + new_block + end_marker + after_block
 
                 with open("transmissions.html", 'w') as f:
                     f.write(html)
                 self._log_uplink("WEBSITE: transmissions.html synced successfully.")
+            else:
+                self._log_uplink("WEBSITE ERROR: Markers for Archive Posts not found in transmissions.html")
         except Exception as e:
             self._log_uplink(f"WEBSITE ERROR: Failed to update transmissions.html: {e}")
 
@@ -1012,17 +1073,25 @@ class HopesAndDreamsBot:
                     transmissions = json.load(f)
 
             # Insert at top (reverse chronological)
+            # Sanitize inputs to avoid HTML leaking into JSON from messy titles
+            clean_topic = re.sub('<[^<]+?>', '', topic).strip()
+            clean_date = re.sub('<[^<]+?>', '', date_str).strip()
+
             transmissions.insert(0, {
                 "href": f"articles/{filename}",
-                "title": topic,
-                "date": date_str
+                "title": clean_topic,
+                "date": clean_date
             })
 
             # Keep it unique by href to avoid duplicates on retries
             seen = set()
             unique_transmissions = []
             for t in transmissions:
-                if t['href'] not in seen:
+                # Extra safety: ensure href is just the path, no extra HTML fragments
+                if isinstance(t.get('href'), str):
+                    t['href'] = t['href'].split('"')[0].split('<')[0].strip()
+
+                if t.get('href') and t['href'] not in seen:
                     unique_transmissions.append(t)
                     seen.add(t['href'])
 
