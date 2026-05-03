@@ -761,7 +761,8 @@ class HopesAndDreamsBot:
             "1. Rewrite the content to be more 'beautified' for a professional blog post. \n"
             "2. Use PROPER HTML tags for structure: <h2> for section headers, <p> for paragraphs, and <strong> for emphasis.\n"
             "3. MANDATORY: Structure the body using NUMBERED HEADERS for each main section (e.g., '1. The Mechanism', '2. Protocol implementation').\n"
-            "4. MANDATORY: Create a 'Prostar Life Hack' section containing the most actionable, high-value takeaway.\n"
+            "4. MANDATORY: Each section must be expansive and broken into multiple <p> tags. DO NOT return a single large block of text.\n"
+            "5. MANDATORY: Create a 'Prostar Life Hack' section containing the most actionable, high-value takeaway.\n"
             "5. Analyze the 'Intelligence Level' of the content. If it contains deep technical pharmacological data or complex protocols, assign Priority 1. If it's a general overview, assign Priority 2.\n"
             "6. Generate a professional, punchy, and technical title for the post (e.g., 'Neurobiology of Sulbutiamine' or 'Optimizing HRV with Cold Thermogenesis'). Do NOT include prefixes like 'Masterclass:' or 'Topic:'.\n"
             "7. Return the result as a JSON object with four keys:\n"
@@ -825,18 +826,29 @@ class HopesAndDreamsBot:
             beautified_body = beautified_body.replace('**', '')
             # 5. Ensure multiple <br> tags are replaced with proper paragraph structure if leaked
             beautified_body = re.sub(r'(?:<br\s*/?>\s*){2,}', '</p><p>', beautified_body)
+            # 5.1 Fallback: Convert double newlines to paragraph breaks if the LLM returned loose text
+            if "<p>" not in beautified_body.lower():
+                beautified_body = "<p>" + beautified_body.replace("\n\n", "</p><p>").replace("\n", " ") + "</p>"
             # 6. Ensure all paragraphs are wrapped and non-header text isn't loose
             # (Simple regex approach to wrap loose text or handle missing <p> tags)
-            if "<p>" not in beautified_body.lower() and "<h2>" in beautified_body.lower():
-                 # Very basic wrap for content that might just be headers and raw text
-                 parts = re.split(r'(<h[1-6]>.*?</h[1-6]>)', beautified_body, flags=re.DOTALL)
-                 new_parts = []
-                 for p in parts:
-                     if p.strip() and not p.startswith('<h'):
-                         new_parts.append(f"<p>{p.strip()}</p>")
-                     else:
-                         new_parts.append(p)
-                 beautified_body = "".join(new_parts)
+            # Split by headers to handle chunks
+            parts = re.split(r'(<h[1-6]>.*?</h[1-6]>)', beautified_body, flags=re.DOTALL)
+            new_parts = []
+            for p in parts:
+                content_chunk = p.strip()
+                if content_chunk and not content_chunk.startswith('<h'):
+                    # If the chunk contains text OUTSIDE of <p> tags, we need to handle it
+                    # Split the chunk by <p> tags to find loose text
+                    sub_parts = re.split(r'(<p.*?>.*?</p>)', content_chunk, flags=re.DOTALL | re.IGNORECASE)
+                    for sp in sub_parts:
+                        sub_content = sp.strip()
+                        if sub_content and not sub_content.startswith('<p'):
+                            new_parts.append(f"<p>{sub_content}</p>")
+                        else:
+                            new_parts.append(sp)
+                else:
+                    new_parts.append(p)
+            beautified_body = "".join(new_parts)
 
             hack_content = data.get('hack', "")
             priority = int(data.get('priority', 2))
