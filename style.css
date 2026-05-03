@@ -175,6 +175,72 @@ nav a:hover {
     z-index: 100;
     box-shadow: 0 10px 30px rgba(0, 0, 0, 0.5);
     background: var(--chat-window-bg) !important;
+    transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.sticky-widget.compact {
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    width: 100%;
+    max-width: 100% !important;
+    border-radius: 0;
+    padding: 10px 24px;
+    margin: 0;
+    z-index: 1000;
+    border-left: none;
+    border-right: none;
+    border-top: none;
+    border-bottom: 1px solid var(--neon-blue);
+    cursor: pointer;
+    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.4);
+}
+
+.sticky-widget.compact .widget-title {
+    margin-bottom: 0;
+    font-size: 0.9rem;
+}
+
+.sticky-widget.compact .readiness-grid {
+    display: flex;
+    align-items: center;
+    gap: 20px;
+    grid-template-columns: none;
+}
+
+.sticky-widget.compact .readiness-circle {
+    width: 40px;
+    height: 40px;
+    margin: 0;
+}
+
+.sticky-widget.compact .circular-chart {
+    width: 40px;
+    height: 40px;
+    margin: 0;
+}
+
+.sticky-widget.compact .percentage {
+    font-size: 0.8rem;
+}
+
+.sticky-widget.compact .readiness-details,
+.sticky-widget.compact #readiness-advice {
+    display: none;
+}
+
+.sticky-widget.compact .compact-readiness-label {
+    display: block;
+    color: var(--text-main);
+    font-weight: 900;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+    font-size: 0.8rem;
+}
+
+.compact-readiness-label {
+    display: none;
 }
 
 /* Priority Card Sizing */
