@@ -947,7 +947,7 @@ class HopesAndDreamsBot:
                         continue
 
                     # Extract href to ensure uniqueness
-                    href_match = re.search(r'href="(articles/[^"]+)"', c)
+                    href_match = re.search(r'href="([^"]+)"', c)
                     if href_match:
                         href = href_match.group(1)
                         if href not in seen_hrefs:
@@ -985,7 +985,7 @@ class HopesAndDreamsBot:
                     if "No archived transmissions found" in i:
                         continue
 
-                    href_match = re.search(r'href="(articles/[^"]+)"', i)
+                    href_match = re.search(r'href="([^"]+)"', i)
                     if href_match:
                         href = href_match.group(1)
                         if href not in seen_archive_hrefs:
@@ -1042,7 +1042,7 @@ class HopesAndDreamsBot:
                     if "Initializing deep archive retrieval" in i:
                         continue
 
-                    href_match = re.search(r'href="(articles/[^"]+)"', i)
+                    href_match = re.search(r'href="([^"]+)"', i)
                     if href_match:
                         href = href_match.group(1)
                         if href not in seen_hrefs:

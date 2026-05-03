@@ -799,9 +799,18 @@ document.addEventListener('DOMContentLoaded', () => {
     // --- Sticky Readiness Command Shrink Logic ---
     const readinessCommand = document.getElementById('readiness-command');
     if (readinessCommand) {
+        // Use a placeholder to prevent layout shift when widget goes fixed
+        const placeholder = document.createElement('div');
+        placeholder.style.display = 'none';
+        placeholder.style.height = readinessCommand.offsetHeight + 'px';
+        placeholder.style.margin = getComputedStyle(readinessCommand).margin;
+        readinessCommand.parentNode.insertBefore(placeholder, readinessCommand);
+
         // Capture original position relative to the document
         const getAbsoluteOffset = () => {
-            const rect = readinessCommand.getBoundingClientRect();
+            const rect = readinessCommand.classList.contains('compact')
+                ? placeholder.getBoundingClientRect()
+                : readinessCommand.getBoundingClientRect();
             return rect.top + window.pageYOffset;
         };
 
@@ -811,6 +820,7 @@ document.addEventListener('DOMContentLoaded', () => {
         window.addEventListener('resize', () => {
             if (!readinessCommand.classList.contains('compact')) {
                 originalOffset = getAbsoluteOffset();
+                placeholder.style.height = readinessCommand.offsetHeight + 'px';
             }
         });
 
@@ -818,10 +828,17 @@ document.addEventListener('DOMContentLoaded', () => {
             const currentScroll = window.pageYOffset || document.documentElement.scrollTop;
 
             // Trigger compact mode once the viewport reaches the widget's original position
-            if (currentScroll > originalOffset - 10) {
-                readinessCommand.classList.add('compact');
+            if (currentScroll > originalOffset) {
+                if (!readinessCommand.classList.contains('compact')) {
+                    placeholder.style.height = readinessCommand.offsetHeight + 'px';
+                    placeholder.style.display = 'block';
+                    readinessCommand.classList.add('compact');
+                }
             } else {
-                readinessCommand.classList.remove('compact');
+                if (readinessCommand.classList.contains('compact')) {
+                    readinessCommand.classList.remove('compact');
+                    placeholder.style.display = 'none';
+                }
             }
         });
 
@@ -1138,8 +1155,8 @@ document.addEventListener('DOMContentLoaded', () => {
         canvas.className = `data-gutter ${side}`;
         canvas.style.position = 'fixed';
         canvas.style.top = '0';
-        canvas.style[side] = '15px';
-        canvas.style.width = '180px';
+        canvas.style[side] = '0'; // Flush with the edge to avoid "blinds" gap
+        canvas.style.width = '80px'; // Narrower to avoid cutting off elements
         canvas.style.height = '100vh';
         canvas.style.zIndex = '1';
         canvas.style.pointerEvents = 'none';
@@ -1155,7 +1172,7 @@ document.addEventListener('DOMContentLoaded', () => {
     const contexts = canvases.map(c => c.getContext('2d'));
 
     const chars = "ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789@#$%^&*ｦｱｲｳｴｵｶｷｸｹｺｻｼｽｾｿﾀﾁﾂﾃﾄﾅﾆﾇﾈﾉﾊﾋﾌﾍﾎﾏﾐﾑﾒﾓﾔﾕﾖﾗﾘﾙﾚﾛﾜﾝ";
-    const fontSize = 16;
+    const fontSize = 14; // Slightly smaller font for narrower gutters
     let columns;
     let drops;
     let matrixBgColor = "rgba(10, 15, 43, 0.15)";
@@ -1175,16 +1192,17 @@ document.addEventListener('DOMContentLoaded', () => {
         // Extract R, G, B values from "rgb(r, g, b)" or "rgba(r, g, b, a)"
         const match = resolvedColor.match(/\d+/g);
         if (match && match.length >= 3) {
+            // Use 0.15 alpha for trail effect, but ensures RGB matches the theme exactly
             matrixBgColor = `rgba(${match[0]}, ${match[1]}, ${match[2]}, 0.15)`;
         }
     }
 
     function init() {
         canvases.forEach(canvas => {
-            canvas.width = 180;
+            canvas.width = 80; // Match CSS width
             canvas.height = window.innerHeight;
         });
-        columns = Math.floor(180 / fontSize);
+        columns = Math.floor(80 / fontSize);
         drops = Array(columns).fill(1);
         updateMatrixBgColor();
     }
