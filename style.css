@@ -208,9 +208,9 @@ nav a:hover {
 .sticky-widget.compact .readiness-grid {
     display: flex;
     align-items: center;
-    gap: 20px;
+    gap: 30px;
     grid-template-columns: none;
-    max-width: 900px;
+    max-width: 1200px;
     margin: 0 auto;
     width: 100%;
 }
@@ -231,7 +231,14 @@ nav a:hover {
     font-size: 0.8rem;
 }
 
-.sticky-widget.compact .readiness-details,
+.sticky-widget.compact .readiness-details {
+    display: flex;
+    flex-grow: 1;
+    gap: 15px;
+    margin: 0;
+    justify-content: flex-end;
+}
+
 .sticky-widget.compact #readiness-advice {
     display: none;
 }
@@ -1076,6 +1083,14 @@ body.light-mode #neural-info-box {
 
 .readiness-factor {
     margin-bottom: 12px;
+    display: flex;
+    flex-direction: column;
+}
+
+.factor-icon {
+    display: none;
+    color: var(--neon-blue);
+    filter: drop-shadow(0 0 5px var(--neon-blue));
 }
 
 .factor-label {
@@ -1103,6 +1118,40 @@ body.light-mode #neural-info-box {
     transition: width 0.5s ease;
     box-shadow: 0 0 10px var(--neon-blue);
 }
+
+#factor-caffeine .factor-fill { background: linear-gradient(90deg, #fbbf24, #f59e0b); box-shadow: 0 0 10px #fbbf24; }
+#factor-fasting .factor-fill { background: linear-gradient(90deg, #38bdf8, #0ea5e9); box-shadow: 0 0 10px #38bdf8; }
+#factor-sleep .factor-fill { background: linear-gradient(90deg, #8b5cf6, #7c3aed); box-shadow: 0 0 10px #8b5cf6; }
+#factor-protocols .factor-fill { background: linear-gradient(90deg, #10b981, #059669); box-shadow: 0 0 10px #10b981; }
+
+.sticky-widget.compact .readiness-factor {
+    flex-direction: row;
+    align-items: center;
+    gap: 8px;
+    margin: 0;
+    min-width: 80px;
+    flex: 1;
+    max-width: 150px;
+}
+
+.sticky-widget.compact .factor-label {
+    display: none;
+}
+
+.sticky-widget.compact .factor-icon {
+    display: flex;
+    flex-shrink: 0;
+}
+
+.sticky-widget.compact .factor-bar {
+    margin: 0;
+    height: 4px;
+}
+
+#factor-caffeine .factor-icon { color: #fbbf24; filter: drop-shadow(0 0 5px #fbbf24); }
+#factor-fasting .factor-icon { color: #38bdf8; filter: drop-shadow(0 0 5px #38bdf8); }
+#factor-sleep .factor-icon { color: #8b5cf6; filter: drop-shadow(0 0 5px #8b5cf6); }
+#factor-protocols .factor-icon { color: #10b981; filter: drop-shadow(0 0 5px #10b981); }
 
 @media (max-width: 600px) {
     .readiness-grid {
