@@ -796,6 +796,46 @@ document.addEventListener('DOMContentLoaded', () => {
         });
     }
 
+    // --- Sticky Readiness Command Shrink Logic ---
+    const readinessCommand = document.getElementById('readiness-command');
+    if (readinessCommand) {
+        // Capture original position relative to the document
+        const getAbsoluteOffset = () => {
+            const rect = readinessCommand.getBoundingClientRect();
+            return rect.top + window.pageYOffset;
+        };
+
+        let originalOffset = getAbsoluteOffset();
+
+        // Recalculate offset on resize in case layout shifts
+        window.addEventListener('resize', () => {
+            if (!readinessCommand.classList.contains('compact')) {
+                originalOffset = getAbsoluteOffset();
+            }
+        });
+
+        window.addEventListener('scroll', () => {
+            const currentScroll = window.pageYOffset || document.documentElement.scrollTop;
+
+            // Trigger compact mode once the viewport reaches the widget's original position
+            if (currentScroll > originalOffset - 10) {
+                readinessCommand.classList.add('compact');
+            } else {
+                readinessCommand.classList.remove('compact');
+            }
+        });
+
+        // Click to return to original position
+        readinessCommand.addEventListener('click', (e) => {
+            if (readinessCommand.classList.contains('compact')) {
+                window.scrollTo({
+                    top: originalOffset - 20,
+                    behavior: 'smooth'
+                });
+            }
+        });
+    }
+
     // Initial Score Calculation
     if (typeof calculateReadinessScore === 'function') {
         calculateReadinessScore();
@@ -1103,6 +1143,8 @@ document.addEventListener('DOMContentLoaded', () => {
         canvas.style.height = '100vh';
         canvas.style.zIndex = '1';
         canvas.style.pointerEvents = 'none';
+        canvas.style.background = 'var(--bg-main)';
+        canvas.style.transition = 'background-color var(--transition-speed)';
         document.body.appendChild(canvas);
         return canvas;
     };
@@ -1116,6 +1158,26 @@ document.addEventListener('DOMContentLoaded', () => {
     const fontSize = 16;
     let columns;
     let drops;
+    let matrixBgColor = "rgba(10, 15, 43, 0.15)";
+
+    function updateMatrixBgColor() {
+        // Read the CSS variable directly from body to get the target value instantly
+        const bodyStyle = getComputedStyle(document.body);
+        let bgColor = bodyStyle.getPropertyValue('--bg-main').trim();
+
+        // Robust color parsing: create a dummy element to resolve hex/var to rgb
+        const temp = document.createElement('div');
+        temp.style.color = bgColor;
+        document.body.appendChild(temp);
+        const resolvedColor = getComputedStyle(temp).color;
+        document.body.removeChild(temp);
+
+        // Extract R, G, B values from "rgb(r, g, b)" or "rgba(r, g, b, a)"
+        const match = resolvedColor.match(/\d+/g);
+        if (match && match.length >= 3) {
+            matrixBgColor = `rgba(${match[0]}, ${match[1]}, ${match[2]}, 0.15)`;
+        }
+    }
 
     function init() {
         canvases.forEach(canvas => {
@@ -1124,15 +1186,23 @@ document.addEventListener('DOMContentLoaded', () => {
         });
         columns = Math.floor(180 / fontSize);
         drops = Array(columns).fill(1);
+        updateMatrixBgColor();
     }
 
-   function draw() {
+    // Update background color when theme changes
+    const themeToggleEl = document.getElementById('theme-toggle');
+    if (themeToggleEl) {
+        themeToggleEl.addEventListener('click', () => {
+            // The class toggle happens immediately, update color in the next tick
+            setTimeout(updateMatrixBgColor, 0);
+        });
+    }
+
+    function draw() {
         contexts.forEach((ctx, i) => {
             const isLightMode = document.body.classList.contains('light-mode');
 
-            // NEW LOGIC: Match the canvas fade exactly to the site theme
-            // Light Mode: #f8fafc | Dark Mode: #0a0f2b
-            ctx.fillStyle = isLightMode ? "rgba(248, 250, 252, 0.15)" : "rgba(10, 15, 43, 0.15)";
+            ctx.fillStyle = matrixBgColor;
             ctx.fillRect(0, 0, canvases[i].width, canvases[i].height);
 
             // Matrix Text Styling
