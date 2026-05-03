@@ -37,7 +37,8 @@ class LLMClient:
             "- Open with the mechanism, not a marketing hook\n"
             "- Walk through biological leverage clearly\n"
             "- End with practical implementation: dosage ranges, timing, stacking notes\n"
-            "- Use headers when asked, otherwise dense prose\n\n"
+            "- Use headers when asked, otherwise dense prose\n"
+            "- MANDATORY: Each section must be expansive (at least 2-3 paragraphs) and technically dense.\n\n"
 
             "ABSOLUTE PROHIBITIONS:\n"
             "- NEVER claim a compound 'cures' or 'prevents' diseases like cancer, dementia, etc. "
@@ -302,7 +303,8 @@ class LLMClient:
             f"Draft an expansive Masterclass on: {topic}.\n\n"
             "MANDATORY: Start the post with a punchy, professional title in ALL CAPS based on the topic.\n"
             "Use headers: Mechanics, Biological Leverage, Tactical Implementation.\n"
-            "Ensure technical weight and visionary tone. Each section must be substantial (4-5 sentences).\n"
+            "Ensure technical weight and visionary tone. Each section must be expansive, containing at least TWO substantial paragraphs of 4-5 sentences each.\n"
+            "Use double newlines between sections and paragraphs to ensure proper formatting.\n"
             "MANDATORY: You must end the post with exactly: 'Do your own research. Don't be a statistic.'"
         )
         # We reflect=True to ensure quality, and sanitize=True to strip HTML for social media
