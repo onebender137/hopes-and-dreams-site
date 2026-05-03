@@ -29,6 +29,9 @@ class Config:
     # HuggingFace
     HF_TOKEN = os.getenv("HF_TOKEN")
 
+    # Security
+    WEBSITE_API_KEY = os.getenv("WEBSITE_API_KEY")
+
     # Ollama Settings
     OLLAMA_MODEL = os.getenv("OLLAMA_MODEL", "dolphin-llama3:8b")
     OLLAMA_BASE_URL = os.getenv("OLLAMA_BASE_URL", "http://localhost:11434")
