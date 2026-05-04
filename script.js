@@ -1372,19 +1372,14 @@ if (typeof gsap !== 'undefined') {
 document.addEventListener('DOMContentLoaded', () => {
     const hero = document.getElementById('hero-launchpad');
     const mainInterface = document.getElementById('main-interface');
-    const brainImage = document.getElementById('hero-brain-image');
+    const brainImage = document.getElementById('hero-brain-image'); // hidden, used as flip proxy for header destination
+    const brainSvgWrap = document.getElementById('brain-svg-wrap'); // visible SVG container — what we actually animate
     const heroTitle = document.getElementById('hero-main-title');
+    const heroInstruction = document.getElementById('hero-instruction');
     const destination = document.getElementById('header-logo-proxy');
-    const connLine = document.getElementById('hero-connection-line');
-    const hotspots = document.querySelectorAll('.hotspot');
-    const labels = document.querySelectorAll('.hero-section-label');
     const isLive = localStorage.getItem('syndicate_live') === 'true';
 
-    if (!hero || !mainInterface || !brainImage) return;
-
-    // --- Throb Animation ---
-    // Disabled - replaced by stronger CSS hormetic-throb keyframes in style.css
-    // (See #hero-brain-image rule for box-shadow pulse + scale)
+    if (!hero || !mainInterface) return;
 
     // --- Persistent State Check ---
     if (isLive) {
@@ -1392,51 +1387,94 @@ document.addEventListener('DOMContentLoaded', () => {
         mainInterface.style.display = 'block';
         mainInterface.style.opacity = '1';
         document.body.classList.add('logo-header-state');
-        if (destination) {
+        if (destination && brainImage) {
             destination.appendChild(brainImage);
+            brainImage.style.display = 'block';
             brainImage.style.cursor = 'pointer';
         }
         return;
     }
 
-    // --- Hover Logic ---
-    hotspots.forEach(hotspot => {
-        const section = hotspot.dataset.section;
-        const labelId = `label-${section.replace(/\s+/g, '-')}`;
-        const label = document.getElementById(labelId);
+    // --- SVG Hotspot Hover + Click Logic ---
+    const hotspotGroups = document.querySelectorAll('.hotspot-group');
+    hotspotGroups.forEach(group => {
+        const section = group.dataset.section;
+        const hexString = group.dataset.hex;
+        const page = group.dataset.page;
+        const labelId = 'label-group-' + section.replace(/\s+/g, '-');
+        const labelGroup = document.getElementById(labelId);
+        const glowCircle = group.querySelector('.hotspot-glow');
+        const nodeDot = group.querySelector('.node-dot');
+        if (!labelGroup) return;
+        const connLine = labelGroup.querySelector('.conn-line');
+        const hexText = labelGroup.querySelector('.hex-text');
+        const decodedText = labelGroup.querySelector('.decoded-text');
+        let hoverTl = null;
+        let scrambleInterval = null;
+        let glitchInterval = null;
 
-        hotspot.addEventListener('mouseenter', () => {
-            if (label) {
-                gsap.to(label, { opacity: 1, duration: 0.3 });
+        group.addEventListener('mouseenter', () => {
+            if (hoverTl) hoverTl.kill();
+            if (scrambleInterval) clearInterval(scrambleInterval);
+            if (glitchInterval) clearInterval(glitchInterval);
 
-                // Draw line
-                const hRect = hotspot.getBoundingClientRect();
-                const lRect = label.getBoundingClientRect();
+            hoverTl = gsap.timeline();
+            hoverTl.to(nodeDot, { opacity: 1, duration: 0.12 });
+            hoverTl.to(glowCircle, { opacity: 0.5, duration: 0.3, ease: 'power2.out' }, '<0.05');
+            hoverTl.to(connLine, { opacity: 0.6, duration: 0.25 }, '<0.08');
+            hoverTl.to(labelGroup, { opacity: 1, duration: 0.18 }, '<0.08');
 
-                const x1 = hRect.left + hRect.width / 2;
-                const y1 = hRect.top + hRect.height / 2;
-                const x2 = lRect.left + lRect.width / 2;
-                const y2 = lRect.top + lRect.height / 2;
+            // Glitchy hex scramble
+            const chars = '0123456789ABCDEF!@#$%&*<>{}[]';
+            let count = 0;
+            scrambleInterval = setInterval(() => {
+                let s = '';
+                for (let i = 0; i < hexString.length; i++) {
+                    if (hexString[i] === ' ') s += ' ';
+                    else if (count > i * 1.5) s += hexString[i];
+                    else s += chars[Math.floor(Math.random() * chars.length)];
+                }
+                hexText.textContent = s;
+                hexText.style.opacity = Math.random() > 0.15 ? '1' : '0.3';
+                count++;
+                if (count > hexString.length * 2.5) {
+                    clearInterval(scrambleInterval);
+                    scrambleInterval = null;
+                    hexText.textContent = hexString;
+                    hexText.style.opacity = '1';
+                    // Post-settle re-corruption glitches
+                    glitchInterval = setInterval(() => {
+                        if (Math.random() > 0.6) {
+                            let glitched = hexString.split('');
+                            let pos = Math.floor(Math.random() * glitched.length);
+                            if (glitched[pos] !== ' ') {
+                                glitched[pos] = chars[Math.floor(Math.random() * 16)];
+                            }
+                            hexText.textContent = glitched.join('');
+                            hexText.style.opacity = '0.7';
+                            setTimeout(() => {
+                                hexText.textContent = hexString;
+                                hexText.style.opacity = '1';
+                            }, 60 + Math.random() * 80);
+                        }
+                    }, 400 + Math.random() * 600);
+                }
+            }, 22);
 
-                connLine.setAttribute('x1', x1);
-                connLine.setAttribute('y1', y1);
-                connLine.setAttribute('x2', x2);
-                connLine.setAttribute('y2', y2);
-                gsap.to(connLine, { opacity: 0.8, duration: 0.2 });
-            }
+            hoverTl.to(decodedText, { opacity: 1, duration: 0.35, ease: 'power2.out' }, '+=0.25');
         });
 
-        hotspot.addEventListener('mouseleave', () => {
-            if (label) {
-                gsap.to(label, { opacity: 0, duration: 0.3 });
-                gsap.to(connLine, { opacity: 0, duration: 0.2 });
-            }
+        group.addEventListener('mouseleave', () => {
+            if (hoverTl) hoverTl.kill();
+            if (scrambleInterval) { clearInterval(scrambleInterval); scrambleInterval = null; }
+            if (glitchInterval) { clearInterval(glitchInterval); glitchInterval = null; }
+            hexText.style.opacity = '1';
+            gsap.to([nodeDot, glowCircle, connLine, labelGroup], { opacity: 0, duration: 0.2 });
+            gsap.to(decodedText, { opacity: 0, duration: 0.1 });
         });
 
-        // --- Transition Logic with Navigation ---
-        // Each hotspot navigates to its actual page after the transition
-        hotspot.addEventListener('click', () => {
-            const section = hotspot.dataset.section;
+        // Click → run transition then navigate
+        group.addEventListener('click', () => {
             const navMap = {
                 'Procurement': 'shop.html',
                 'Optimization': 'optimization.html',
@@ -1444,35 +1482,33 @@ document.addEventListener('DOMContentLoaded', () => {
                 'About': 'about.html',
                 'Privacy': 'privacy.html'
             };
-            const targetPage = navMap[section];
-            if (targetPage) {
-                // Run transition, then navigate
-                startTransition(targetPage);
-            } else {
-                startTransition();
-            }
+            const targetPage = navMap[section] || page;
+            startTransition(targetPage);
         });
     });
 
-    // Brain click = stay on home page (default behavior)
-    brainImage.addEventListener('click', (e) => {
-        e.preventDefault();
-        startTransition();
+    // Mobile fallback nav already navigates via <a> hrefs — but mark as live on click
+    document.querySelectorAll('.mobile-nav-item').forEach(link => {
+        link.addEventListener('click', () => {
+            localStorage.setItem('syndicate_live', 'true');
+        });
     });
 
     function startTransition(navigateTo) {
-        // If launch already happened (returning visitor), just navigate
+        // Returning visitor: skip animation, just navigate
         if (localStorage.getItem('syndicate_live') === 'true') {
             if (navigateTo) window.location.href = navigateTo;
             return;
         }
         localStorage.setItem('syndicate_live', 'true');
-        // For hotspot clicks with a target page, run a brief transition then navigate
+
+        // Fast hop with target page
         if (navigateTo) {
-            if (typeof gsap !== 'undefined') {
+            if (typeof gsap !== 'undefined' && brainSvgWrap) {
                 const tl = gsap.timeline();
                 tl.to(heroTitle, { y: 50, opacity: 0, duration: 0.4, ease: "power2.in" });
-                tl.to(brainImage, { scale: 0.5, opacity: 0.8, duration: 0.5, ease: "power2.in" }, "<");
+                tl.to(heroInstruction, { opacity: 0, duration: 0.3 }, "<");
+                tl.to(brainSvgWrap, { scale: 0.5, opacity: 0.8, duration: 0.5, ease: "power2.in" }, "<");
                 setTimeout(() => { window.location.href = navigateTo; }, 600);
             } else {
                 window.location.href = navigateTo;
@@ -1480,35 +1516,31 @@ document.addEventListener('DOMContentLoaded', () => {
             return;
         }
 
-        if (typeof gsap !== 'undefined') {
+        // Full launchpad → command center transition (no target page, brain stays as header logo)
+        if (typeof gsap !== 'undefined' && brainSvgWrap && destination) {
             const tl = gsap.timeline();
 
-            // Step A: Title fade and slide down
-            tl.to(heroTitle, {
-                y: 50,
-                opacity: 0,
-                duration: 0.6,
-                ease: "power2.in"
-            });
+            tl.to(heroTitle, { y: 50, opacity: 0, duration: 0.6, ease: "power2.in" });
+            tl.to(heroInstruction, { opacity: 0, duration: 0.4 }, "<");
 
-            // Step B: Brain Flip to Header
             tl.add(() => {
+                // Show the hidden img and Flip it into the header
+                brainImage.style.display = 'block';
                 const state = Flip.getState(brainImage);
                 destination.appendChild(brainImage);
-
-                const flipTween = Flip.from(state, {
+                Flip.from(state, {
                     duration: 1.2,
                     scale: true,
                     ease: "power3.inOut",
                     onComplete: () => {
                         document.body.classList.add('logo-header-state');
                         brainImage.style.cursor = 'pointer';
-                        // Already wrapped in <a> tag for SEO
                     }
                 });
+                // Fade the SVG container while the img Flips into place
+                gsap.to(brainSvgWrap, { opacity: 0, duration: 0.6 });
             });
 
-            // Step C: Fade in architecture (Wait for Step B to finish roughly)
             tl.to(mainInterface, {
                 display: 'block',
                 opacity: 1,
@@ -1524,12 +1556,15 @@ document.addEventListener('DOMContentLoaded', () => {
                 }
             }, "-=1");
         } else {
-            // Fallback if GSAP is missing
+            // Fallback if GSAP missing
             hero.style.display = 'none';
             mainInterface.style.display = 'block';
             mainInterface.style.opacity = '1';
             document.body.classList.add('logo-header-state');
-            destination.appendChild(brainImage);
+            if (destination && brainImage) {
+                destination.appendChild(brainImage);
+                brainImage.style.display = 'block';
+            }
         }
     }
 });

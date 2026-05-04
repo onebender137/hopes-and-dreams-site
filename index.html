@@ -132,31 +132,105 @@
 <body>
     <div id="hero-launchpad">
         <button id="theme-toggle-lander" class="theme-toggle-pill" aria-label="Toggle theme" style="position:absolute;top:20px;left:20px;z-index:3000;">☀️ LIGHT MODE</button>
-        <div id="hero-brain-container">
-            <img id="hero-brain-image" src="topper.png" alt="Syndicate Neural Interface" style="cursor: pointer;">
-            <div id="hero-hotspots">
-                <div class="hotspot" id="hotspot-procurement" data-section="Procurement" style="top: 35%; left: 30%;"></div>
-                <div class="hotspot" id="hotspot-optimization" data-section="Optimization" style="top: 30%; left: 70%;"></div>
-                <div class="hotspot" id="hotspot-intel" data-section="Intel Hub" style="top: 60%; left: 35%;"></div>
-                <div class="hotspot" id="hotspot-about" data-section="About" style="top: 65%; left: 65%;"></div>
-                <div class="hotspot" id="hotspot-privacy" data-section="Privacy" style="top: 85%; left: 50%;"></div>
-            </div>
+
+        <div id="hero-instruction">HOVER REGIONS TO DECODE ◆ CLICK TO INITIALIZE</div>
+
+        <!-- HYBRID SVG: raster brain + vector hotspot regions -->
+        <div id="brain-svg-wrap">
+            <img id="hero-brain-image" src="topper.png" alt="Syndicate Neural Interface" style="display:none;">
+            <svg id="hero-brain-svg" viewBox="260 -10 1370 990" xmlns="http://www.w3.org/2000/svg">
+                <defs>
+                    <filter id="hero-glow-filter" x="-50%" y="-50%" width="200%" height="200%">
+                        <feGaussianBlur stdDeviation="6" result="b"/>
+                        <feMerge><feMergeNode in="b"/><feMergeNode in="SourceGraphic"/></feMerge>
+                    </filter>
+                </defs>
+
+                <image href="topper.png" x="0" y="0" width="1780" height="1050"/>
+
+                <!-- PROCUREMENT — Upper-left lobe -->
+                <g class="hotspot-group" data-section="Procurement" data-hex="50 52 4F 43" data-page="shop.html">
+                    <path class="hotspot-region" d="M 580 250 C 560 290, 540 350, 560 410 C 580 450, 640 470, 700 440 C 740 420, 750 360, 735 310 C 720 260, 650 230, 580 250 Z"/>
+                    <circle class="hotspot-glow" cx="650" cy="350" r="75" filter="url(#hero-glow-filter)"/>
+                    <circle class="node-dot" cx="650" cy="350" r="8"/>
+                </g>
+
+                <!-- OPTIMIZATION — Upper-right where star meets brain -->
+                <g class="hotspot-group" data-section="Optimization" data-hex="4F 50 54 49" data-page="optimization.html">
+                    <path class="hotspot-region" d="M 750 220 C 790 200, 870 220, 910 280 C 940 330, 930 400, 895 430 C 860 460, 790 440, 765 390 C 735 340, 720 270, 750 220 Z"/>
+                    <circle class="hotspot-glow" cx="835" cy="325" r="75" filter="url(#hero-glow-filter)"/>
+                    <circle class="node-dot" cx="835" cy="325" r="8"/>
+                </g>
+
+                <!-- INTEL HUB — Lower-left swirl -->
+                <g class="hotspot-group" data-section="Intel Hub" data-hex="49 4E 54 4C" data-page="intel.html">
+                    <path class="hotspot-region" d="M 560 480 C 530 520, 520 590, 550 660 C 575 710, 640 740, 710 710 C 760 690, 770 630, 750 570 C 730 510, 640 465, 560 480 Z"/>
+                    <circle class="hotspot-glow" cx="650" cy="590" r="80" filter="url(#hero-glow-filter)"/>
+                    <circle class="node-dot" cx="650" cy="590" r="8"/>
+                </g>
+
+                <!-- ABOUT — Lower-right brainstem -->
+                <g class="hotspot-group" data-section="About" data-hex="41 42 4F 55" data-page="about.html">
+                    <path class="hotspot-region" d="M 740 500 C 780 480, 860 500, 900 560 C 935 610, 920 690, 880 740 C 840 780, 770 770, 740 720 C 710 670, 700 550, 740 500 Z"/>
+                    <circle class="hotspot-glow" cx="820" cy="620" r="80" filter="url(#hero-glow-filter)"/>
+                    <circle class="node-dot" cx="820" cy="620" r="8"/>
+                </g>
+
+                <!-- PRIVACY — Shooting star burst -->
+                <g class="hotspot-group" data-section="Privacy" data-hex="50 56 43 59" data-page="privacy.html">
+                    <path class="hotspot-region" d="M 950 100 C 1010 70, 1150 80, 1210 170 C 1260 250, 1240 360, 1170 400 C 1100 440, 1020 400, 975 330 C 930 260, 900 160, 950 100 Z"/>
+                    <circle class="hotspot-glow" cx="1090" cy="240" r="90" filter="url(#hero-glow-filter)"/>
+                    <circle class="node-dot" cx="1090" cy="240" r="8"/>
+                </g>
+
+                <!-- HEX-DECODE LABELS -->
+                <g class="hex-label-group" id="label-group-Procurement">
+                    <line class="conn-line" x1="650" y1="350" x2="470" y2="220"/>
+                    <rect class="label-bg" x="280" y="155" width="500" height="110" rx="6"/>
+                    <text class="hex-text" x="530" y="200" text-anchor="middle">50 52 4F 43</text>
+                    <text class="decoded-text" x="530" y="245" text-anchor="middle">PROCUREMENT MODULE</text>
+                </g>
+
+                <g class="hex-label-group" id="label-group-Optimization">
+                    <line class="conn-line" x1="835" y1="325" x2="1150" y2="420"/>
+                    <rect class="label-bg" x="990" y="385" width="510" height="110" rx="6"/>
+                    <text class="hex-text" x="1245" y="430" text-anchor="middle">4F 50 54 49</text>
+                    <text class="decoded-text" x="1245" y="475" text-anchor="middle">OPTIMIZATION MODULE</text>
+                </g>
+
+                <g class="hex-label-group" id="label-group-Intel-Hub">
+                    <line class="conn-line" x1="650" y1="590" x2="460" y2="730"/>
+                    <rect class="label-bg" x="280" y="700" width="430" height="110" rx="6"/>
+                    <text class="hex-text" x="495" y="745" text-anchor="middle">49 4E 54 4C</text>
+                    <text class="decoded-text" x="495" y="790" text-anchor="middle">INTEL RELAY</text>
+                </g>
+
+                <g class="hex-label-group" id="label-group-About">
+                    <line class="conn-line" x1="820" y1="620" x2="1150" y2="730"/>
+                    <rect class="label-bg" x="990" y="700" width="490" height="110" rx="6"/>
+                    <text class="hex-text" x="1235" y="745" text-anchor="middle">41 42 4F 55</text>
+                    <text class="decoded-text" x="1235" y="790" text-anchor="middle">ABOUT SYNDICATE</text>
+                </g>
+
+                <g class="hex-label-group" id="label-group-Privacy">
+                    <line class="conn-line" x1="1090" y1="240" x2="1250" y2="100"/>
+                    <rect class="label-bg-gold" x="1100" y="35" width="500" height="110" rx="6"/>
+                    <text class="hex-text" x="1350" y="80" text-anchor="middle" style="fill:var(--neon-gold)">50 56 43 59</text>
+                    <text class="decoded-text" x="1350" y="125" text-anchor="middle">PRIVACY PROTOCOL</text>
+                </g>
+            </svg>
         </div>
 
-        <div id="hero-labels-container">
-            <div class="hero-section-label" id="label-Procurement">PROCUREMENT</div>
-            <div class="hero-section-label" id="label-Optimization">OPTIMIZATION</div>
-            <div class="hero-section-label" id="label-Intel-Hub">INTEL HUB</div>
-            <div class="hero-section-label" id="label-About">ABOUT</div>
-            <div class="hero-section-label" id="label-Privacy">PRIVACY</div>
+        <!-- Mobile fallback nav (hidden on desktop) -->
+        <div id="hero-mobile-nav">
+            <a href="shop.html" class="mobile-nav-item">▸ PROCUREMENT</a>
+            <a href="optimization.html" class="mobile-nav-item">▸ OPTIMIZATION</a>
+            <a href="intel.html" class="mobile-nav-item">▸ INTEL HUB</a>
+            <a href="about.html" class="mobile-nav-item">▸ ABOUT</a>
+            <a href="privacy.html" class="mobile-nav-item">▸ PRIVACY</a>
         </div>
-
-        <svg id="hero-svg-overlay">
-            <line id="hero-connection-line" x1="0" y1="0" x2="0" y2="0" />
-        </svg>
 
         <div id="hero-main-title">HOPES AND DREAMS</div>
-        <div id="hero-instruction">CLICK TO INITIALIZE</div>
     </div>
 
 <div id="main-interface" style="opacity: 0; display: none;">
