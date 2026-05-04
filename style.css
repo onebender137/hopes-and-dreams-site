@@ -1585,8 +1585,8 @@ body.light-mode #neural-info-box {
 
 #brain-svg-wrap {
     position: relative;
-    max-width: 95vw;
-    max-height: 85vh;
+    max-width: 98vw;
+    max-height: 92vh;
     animation: hormetic-throb 3.5s ease-in-out infinite;
     will-change: transform, filter;
 }
@@ -1685,11 +1685,11 @@ body.logo-header-state #hero-brain-image {
 
 #hero-main-title {
     position: absolute;
-    bottom: 4vh;
+    bottom: 2vh;
     left: 0;
     right: 0;
     text-align: center;
-    font-size: clamp(1rem, 2.8vw, 2.2rem);
+    font-size: clamp(0.9rem, 2.4vw, 1.8rem);
     font-weight: 900;
     color: var(--text-main);
     letter-spacing: 10px;
@@ -1711,7 +1711,7 @@ body.logo-header-state #hero-brain-image {
 
 #hero-instruction {
     position: absolute;
-    top: 3vh;
+    top: 1.5vh;
     left: 0;
     right: 0;
     text-align: center;
