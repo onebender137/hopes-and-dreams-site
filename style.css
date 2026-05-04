@@ -1585,8 +1585,8 @@ body.light-mode #neural-info-box {
 
 #brain-svg-wrap {
     position: relative;
-    max-width: 92vw;
-    max-height: 78vh;
+    max-width: 95vw;
+    max-height: 85vh;
     animation: hormetic-throb 3.5s ease-in-out infinite;
     will-change: transform, filter;
 }
