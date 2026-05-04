@@ -1611,11 +1611,11 @@ body.light-mode #neural-info-box {
     }
 }
 
-/* Header logo state — once the brain has Flipped to header, restore img display */
+/* Header logo state — once the brain has Flipped to header, restore img display
+   The img inherits .logo-wrap img sizing rules (150px max-height) so it matches
+   the brain shown on all other pages. */
 body.logo-header-state #hero-brain-image {
     display: block !important;
-    max-width: 60px;
-    max-height: 60px;
 }
 
 /* Invisible interactive hotspot regions */
