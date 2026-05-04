@@ -761,6 +761,9 @@ document.addEventListener('DOMContentLoaded', () => {
         }
         const heroBrain = document.getElementById('hero-brain-image');
         if (heroBrain) heroBrain.src = 'topper-inverted.png';
+        // Swap the SVG <image> href too (this is the actually-visible brain on the landing)
+        const svgBrain = document.querySelector('#hero-brain-svg image');
+        if (svgBrain) svgBrain.setAttribute('href', 'topper-inverted.png');
     }
 
     // Lander pill fires same logic as main toggle
@@ -782,6 +785,8 @@ document.addEventListener('DOMContentLoaded', () => {
                 }
                 const heroBrainLight = document.getElementById('hero-brain-image');
                 if (heroBrainLight) heroBrainLight.src = 'topper-inverted.png';
+                const svgBrainLight = document.querySelector('#hero-brain-svg image');
+                if (svgBrainLight) svgBrainLight.setAttribute('href', 'topper-inverted.png');
             } else {
                 themeToggle.textContent = '☀️ LIGHT MODE';
                 if (themeToggleLander) themeToggleLander.textContent = '☀️ LIGHT MODE';
@@ -791,6 +796,8 @@ document.addEventListener('DOMContentLoaded', () => {
                 }
                 const heroBrainDark = document.getElementById('hero-brain-image');
                 if (heroBrainDark) heroBrainDark.src = 'topper.png';
+                const svgBrainDark = document.querySelector('#hero-brain-svg image');
+                if (svgBrainDark) svgBrainDark.setAttribute('href', 'topper.png');
             }
             localStorage.setItem('theme', theme);
         });
