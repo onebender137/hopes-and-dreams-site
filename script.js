@@ -1425,43 +1425,51 @@ document.addEventListener('DOMContentLoaded', () => {
             hoverTl.to(labelGroup, { opacity: 1, duration: 0.18 }, '<0.08');
 
             // Glitchy hex scramble
-            const chars = '0123456789ABCDEF!@#$%&*<>{}[]';
+            // SLOW + DRAMATIC hex scramble decode — you should clearly see chars cycling
+            const chars = '0123456789ABCDEF!@#$%&*<>{}[]/?\\|';
             let count = 0;
             scrambleInterval = setInterval(() => {
                 let s = '';
                 for (let i = 0; i < hexString.length; i++) {
                     if (hexString[i] === ' ') s += ' ';
-                    else if (count > i * 1.5) s += hexString[i];
+                    // Each char locks in after the scrambler reaches it
+                    // Slowed locking rate (i * 4 instead of i * 1.5) = much more visible cycling
+                    else if (count > i * 4) s += hexString[i];
                     else s += chars[Math.floor(Math.random() * chars.length)];
                 }
                 hexText.textContent = s;
-                hexText.style.opacity = Math.random() > 0.15 ? '1' : '0.3';
+                // Stronger opacity flicker — drops to 30% on 25% of frames
+                hexText.style.opacity = Math.random() > 0.25 ? '1' : '0.3';
                 count++;
-                if (count > hexString.length * 2.5) {
+                if (count > hexString.length * 5) {
                     clearInterval(scrambleInterval);
                     scrambleInterval = null;
                     hexText.textContent = hexString;
                     hexText.style.opacity = '1';
-                    // Post-settle re-corruption glitches
+                    // AGGRESSIVE post-settle re-corruption — fires often, multiple chars at once
                     glitchInterval = setInterval(() => {
-                        if (Math.random() > 0.6) {
+                        if (Math.random() > 0.3) {  // 70% chance every cycle (was 40%)
                             let glitched = hexString.split('');
-                            let pos = Math.floor(Math.random() * glitched.length);
-                            if (glitched[pos] !== ' ') {
-                                glitched[pos] = chars[Math.floor(Math.random() * 16)];
+                            // Corrupt 1-3 characters at random
+                            const numCorrupt = 1 + Math.floor(Math.random() * 3);
+                            for (let n = 0; n < numCorrupt; n++) {
+                                let pos = Math.floor(Math.random() * glitched.length);
+                                if (glitched[pos] !== ' ') {
+                                    glitched[pos] = chars[Math.floor(Math.random() * chars.length)];
+                                }
                             }
                             hexText.textContent = glitched.join('');
-                            hexText.style.opacity = '0.7';
+                            hexText.style.opacity = '0.6';
                             setTimeout(() => {
                                 hexText.textContent = hexString;
                                 hexText.style.opacity = '1';
-                            }, 60 + Math.random() * 80);
+                            }, 80 + Math.random() * 120);
                         }
-                    }, 400 + Math.random() * 600);
+                    }, 200 + Math.random() * 400); // Tighter cycle (was 400-1000ms, now 200-600ms)
                 }
-            }, 22);
+            }, 65); // SLOWER scramble interval (was 22ms, now 65ms) — actually visible decoding
 
-            hoverTl.to(decodedText, { opacity: 1, duration: 0.35, ease: 'power2.out' }, '+=0.25');
+            hoverTl.to(decodedText, { opacity: 1, duration: 0.4, ease: 'power2.out' }, '+=1.5');
         });
 
         group.addEventListener('mouseleave', () => {
