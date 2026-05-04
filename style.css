@@ -1645,7 +1645,7 @@ body.logo-header-state #hero-brain-image {
     font-family: 'JetBrains Mono', monospace;
     font-size: 32px;
     font-weight: 700;
-    fill: var(--neon-blue);
+    fill: #38bdf8;  /* hardcoded bright blue — labels are dark UI, stay legible */
     letter-spacing: 4px;
 }
 
@@ -1653,13 +1653,13 @@ body.logo-header-state #hero-brain-image {
     font-family: 'JetBrains Mono', monospace;
     font-size: 36px;
     font-weight: 900;
-    fill: var(--neon-gold);
+    fill: #fbbf24;  /* hardcoded bright gold — labels are dark UI, stay legible */
     letter-spacing: 5px;
     opacity: 0;
 }
 
 .conn-line {
-    stroke: var(--neon-blue);
+    stroke: #38bdf8;  /* hardcoded — connection lines stay visible against any background */
     stroke-width: 2;
     stroke-dasharray: 8 5;
     opacity: 0;
@@ -1667,19 +1667,19 @@ body.logo-header-state #hero-brain-image {
 }
 
 .node-dot {
-    fill: var(--neon-blue);
+    fill: #38bdf8;
     opacity: 0;
 }
 
 .label-bg {
     fill: rgba(10, 15, 43, 0.92);
-    stroke: var(--neon-blue);
+    stroke: #38bdf8;
     stroke-width: 1.2;
 }
 
 .label-bg-gold {
     fill: rgba(10, 15, 43, 0.92);
-    stroke: var(--neon-gold);
+    stroke: #fbbf24;
     stroke-width: 1.2;
 }
 
