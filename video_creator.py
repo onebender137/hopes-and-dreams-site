@@ -1,7 +1,11 @@
 import os
 import random
 import re
-from PIL import Image
+import base64
+import requests
+from io import BytesIO
+from datetime import datetime
+from PIL import Image, ImageDraw, ImageFont
 if not hasattr(Image, 'ANTIALIAS'):
     Image.ANTIALIAS = Image.LANCZOS
 
@@ -43,12 +47,77 @@ class VideoCreator:
         await communicate.save(output_path)
         return output_path
 
+    def _generate_flux_background(self, topic: str):
+        """
+        Generates a topic-specific 1080x1920 vertical video background using FLUX.
+        Returns path to saved JPEG, or None if API key missing / generation fails.
+        Falls through to _get_random_background() in the caller on None.
+        """
+        api_key = os.environ.get("TOGETHER_API_KEY")
+        if not api_key:
+            print("[VIDEO BG] No TOGETHER_API_KEY found, falling back to random.")
+            return None
+
+        # Visual-only prompt — no text, FLUX can't spell reliably
+        prompt = (
+            f"Abstract scientific illustration representing {topic}. "
+            "Vertical composition, dark navy blue background. "
+            "Glowing neon cyan and gold molecular structures. "
+            "Brain anatomy, neural networks, biochemical pathways. "
+            "Cyberpunk cinematic lighting, deep blue and gold color palette. "
+            "Atmospheric, professional pharmaceutical research aesthetic. "
+            "No text, no letters, no words, pure visual imagery, dramatic depth of field."
+        )
+
+        try:
+            print(f"[VIDEO BG] Requesting FLUX vertical visual for '{topic}'...")
+            response = requests.post(
+                "https://api.together.xyz/v1/images/generations",
+                headers={
+                    "Authorization": f"Bearer {api_key}",
+                    "Content-Type": "application/json"
+                },
+                json={
+                    "model": "black-forest-labs/FLUX.1-schnell",
+                    "prompt": prompt,
+                    "width": 768,    # FLUX schnell needs multiples of 16, 768x1344 ~= 9:16 ratio
+                    "height": 1344,
+                    "steps": 4,
+                    "n": 1,
+                    "response_format": "b64_json"
+                },
+                timeout=60
+            )
+            if response.status_code != 200:
+                print(f"[VIDEO BG] FLUX returned {response.status_code}: {response.text[:200]}")
+                return None
+
+            img_data = base64.b64decode(response.json()["data"][0]["b64_json"])
+            img = Image.open(BytesIO(img_data)).convert("RGB")
+
+            # Resize to exact 1080x1920 (vertical short standard)
+            img = img.resize((1080, 1920), Image.LANCZOS)
+
+            # Save it
+            os.makedirs("media/video_backgrounds", exist_ok=True)
+            slug = re.sub(r'[^a-z0-9-]+', '-', topic.lower()).strip('-')[:50]
+            date_str = datetime.now().strftime('%Y-%m-%d-%H%M%S')
+            filename = f"media/video_backgrounds/{date_str}-{slug}.jpg"
+            img.save(filename, "JPEG", quality=88, optimize=True)
+            print(f"[VIDEO BG] FLUX background saved: {filename}")
+            return filename
+
+        except Exception as e:
+            print(f"[VIDEO BG] FLUX generation failed ({e}), falling back to random.")
+            return None
+
     def _get_random_background(self, topic: str):
-        """Picks a random 'wild' image from the relevant topic folder."""
+        """Picks a random 'wild' image from the relevant topic folder. Used as fallback when FLUX is unavailable."""
         mapping = {
             "nicotine": "nicotine", "patch": "nicotine", "asprey": "nicotine",
             "astral": "astral", "dream": "astral", "vibration": "astral", "darius": "astral",
-            "kratom": "kratom", "alkaloid": "kratom", "mitragynine": "kratom"
+            "kratom": "kratom", "alkaloid": "kratom", "mitragynine": "kratom",
+            "cannabis": "cannabis", "thc": "cannabis", "cbd": "cannabis",
         }
         
         subfolder = "general"
@@ -70,6 +139,18 @@ class VideoCreator:
         except Exception:
             return None
 
+    def _select_background(self, topic: str):
+        """
+        Two-tier background selection:
+        1. Try FLUX topic-specific generation (online, ~6-10s)
+        2. Fall back to random folder image if FLUX fails or no API key
+        """
+        bg = self._generate_flux_background(topic)
+        if bg:
+            return bg
+        print("[VIDEO BG] Using local fallback background.")
+        return self._get_random_background(topic)
+
     def create_daily_short(self, text: str, audio_path: str, topic: str, output_name: str = "daily_short.mp4"):
         """Creates a high-impact video snippet using 'Wild' backgrounds."""
         print(f"Creating video: {output_name}...")
@@ -79,8 +160,8 @@ class VideoCreator:
         audio = AudioFileClip(audio_path)
         duration = audio.duration
 
-        # 2. Select and Create Background
-        bg_image_path = self._get_random_background(topic)
+        # 2. Select Background — FLUX topic-specific first, random fallback
+        bg_image_path = self._select_background(topic)
         
         if bg_image_path:
             # 1. Load and force image to fill the 1080x1920 vertical canvas
@@ -90,8 +171,9 @@ class VideoCreator:
             bg = bg.resize(height=1920).set_position('center')
             
             # 2. Dark overlay pinned exactly to the top-left (0,0) to cover everything
+            # Slightly heavier dim (0.5) to ensure text legibility on busier FLUX visuals
             overlay = ColorClip(size=(1080, 1920), color=(0, 0, 0))
-            overlay = overlay.set_opacity(0.4).set_duration(duration).set_position((0, 0))
+            overlay = overlay.set_opacity(0.5).set_duration(duration).set_position((0, 0))
             
             background_group = [bg, overlay]
         else:
