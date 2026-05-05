@@ -475,8 +475,23 @@ class TelegramBot:
             return
         await context.bot.send_chat_action(chat_id=update.effective_chat.id, action="typing")
 
-        prompt = f"Write a technical, Syndicate-style 30-second script about: {topic}."
+        # Hardened prompt — explicit anti-preamble guards
+        prompt = (
+            f"Write the spoken script ONLY for a 30-second Syndicate-style biohacking video about: {topic}. "
+            "OUTPUT RULES (CRITICAL):\n"
+            "- Begin with the first sentence of the actual script. NO preamble.\n"
+            "- DO NOT write 'Sure', 'Let's', 'Alright', 'Okay', 'Here is', 'Here's the script', or any acknowledgment.\n"
+            "- DO NOT write headings, labels, stage directions, brackets, or notes.\n"
+            "- DO NOT mention forums, posts, or that this is a script.\n"
+            "- Plain spoken prose only. Direct, technical, authoritative tone.\n"
+            "- Target ~75 words (about 30 seconds at conversational pace).\n"
+            "- Start with a hook sentence. End with a forward-looking statement.\n"
+            f"\nBegin the script now about: {topic}"
+        )
         content = await asyncio.to_thread(self.llm.generate_response, prompt)
+
+        # Sanitizer — strip any LLM preamble that slipped through
+        content = self._strip_script_preamble(content) if content else content
 
         if content:
             await update.message.reply_text(f"🎥 **PRODUCTION STARTED**\n\nScript:\n'{content}'\n\nGenerating Intel-optimized voiceover...")
@@ -490,6 +505,52 @@ class TelegramBot:
                 await update.message.reply_text("Issue generating snippet.")
         else:
             await update.message.reply_text("Could not generate script.")
+
+    def _strip_script_preamble(self, text: str) -> str:
+        """
+        Removes common LLM preamble/wrapper phrases that leak into video scripts.
+        Applies multiple cleanup passes to catch quote wrappers, lead-in phrases,
+        section labels, and trailing meta-comments.
+        """
+        import re
+        if not text:
+            return text
+
+        cleaned = text.strip()
+
+        # 1. Strip outer quote wrappers ("..." or '...' around the entire response)
+        if (cleaned.startswith('"') and cleaned.endswith('"')) or \
+           (cleaned.startswith("'") and cleaned.endswith("'")):
+            cleaned = cleaned[1:-1].strip()
+
+        # 2. Drop any leading "Script:" / "Here's the script:" style label lines
+        cleaned = re.sub(
+            r'^(script|here(\'s| is) the script|here(\'s| is)|video script)[:\-\s]+',
+            '',
+            cleaned,
+            flags=re.IGNORECASE
+        )
+
+        # 3. Strip common conversational lead-in phrases up to first sentence break
+        # Matches things like "Sure, let's tackle this like we're on the underground forum:"
+        lead_in_patterns = [
+            r"^(sure|alright|okay|ok|yeah|yes|absolutely|of course|got it|certainly)[\s,]+[^.!?\n]*[.!?:\n]+",
+            r"^(let'?s|we'?ll|i'?ll|here'?s|here is)\s+[^.!?\n]{0,80}[.!?:\n]+",
+            r"^(no problem|happy to|love to)[\s,]+[^.!?\n]*[.!?:\n]+",
+        ]
+        for pattern in lead_in_patterns:
+            new_cleaned = re.sub(pattern, '', cleaned, count=1, flags=re.IGNORECASE)
+            if new_cleaned != cleaned and len(new_cleaned) > 50:
+                # Only accept the strip if it didn't nuke the whole script
+                cleaned = new_cleaned.strip()
+
+        # 4. Strip leading colons/dashes left from removed labels
+        cleaned = re.sub(r'^[:\-\s]+', '', cleaned)
+
+        # 5. Drop any "underground forum" / "we're on the" bullshit phrases
+        cleaned = re.sub(r"(like )?we'?re on the (underground|biohacking) forum[\s,:.]*", '', cleaned, flags=re.IGNORECASE)
+
+        return cleaned.strip()
 
     async def chat(self, update: Update, context: ContextTypes.DEFAULT_TYPE):
         """Handles incoming chat with RAG memory."""
