@@ -29,9 +29,16 @@ class SyndicateDatabase:
                 CREATE TABLE IF NOT EXISTS posted_topics (
                     id INTEGER PRIMARY KEY AUTOINCREMENT,
                     topic TEXT NOT NULL,
+                    slot TEXT,
                     posted_at DATETIME DEFAULT CURRENT_TIMESTAMP
                 )
             ''')
+
+            # Migration: Ensure 'slot' column exists in posted_topics
+            cursor.execute("PRAGMA table_info(posted_topics)")
+            columns = [column[1] for column in cursor.fetchall()]
+            if 'slot' not in columns:
+                cursor.execute('ALTER TABLE posted_topics ADD COLUMN slot TEXT')
 
             # Table for replied comments
             cursor.execute('''
@@ -42,12 +49,23 @@ class SyndicateDatabase:
             ''')
             conn.commit()
 
-    def add_posted_topic(self, topic):
+    def add_posted_topic(self, topic, slot=None):
         """Records a new posted topic."""
         with self._get_connection() as conn:
             cursor = conn.cursor()
-            cursor.execute('INSERT INTO posted_topics (topic) VALUES (?)', (topic,))
+            cursor.execute('INSERT INTO posted_topics (topic, slot) VALUES (?, ?)', (topic, slot))
             conn.commit()
+
+    def is_slot_posted(self, date_str, slot):
+        """Checks if a specific slot has already been posted on a given date."""
+        with self._get_connection() as conn:
+            cursor = conn.cursor()
+            # SQLite CURRENT_TIMESTAMP is UTC. We'll use date(posted_at) for comparison.
+            cursor.execute('''
+                SELECT 1 FROM posted_topics
+                WHERE date(posted_at, 'localtime') = ? AND slot = ?
+            ''', (date_str, slot))
+            return cursor.fetchone() is not None
 
     def get_recent_topics(self, limit=50):
         """Retrieves the most recently posted topics."""
