@@ -179,9 +179,9 @@ class HopesAndDreamsBot:
         """Deprecated: SQLite saves automatically."""
         pass
 
-    def _record_posted_topic(self, topic):
+    def _record_posted_topic(self, topic, slot=None):
         """Records a new posted topic to SQLite."""
-        self.db.add_posted_topic(topic)
+        self.db.add_posted_topic(topic, slot=slot)
         # Update local cache for immediate use if needed
         self.posted_topics = self._load_posted_topics()
 
@@ -290,6 +290,13 @@ class HopesAndDreamsBot:
     def generate_and_post_daily_tip(self, topic=None, slot=None):
         """Generates a daily Syndicate Masterclass and posts it to the Facebook Page."""
         try:
+            # Prevent double-posting for the same slot
+            if slot:
+                date_str = datetime.now().strftime("%Y-%m-%d")
+                if self.db.is_slot_posted(date_str, slot):
+                    print(f"[{datetime.now()}] EXECUTIVE GUARD: Slot {slot} already posted today ({date_str}). Skipping.")
+                    return None
+
             if not topic:
                 print(f"[{datetime.now()}] EXECUTIVE EXECUTION: Identifying topic from chat memory for slot {slot}...")
                 topic = self.get_recent_topics_from_memory(slot=slot)
@@ -323,7 +330,10 @@ class HopesAndDreamsBot:
                 # 4. Handle Media Attachment — generate topic-specific image first
                 image_path = self._generate_topic_image(topic)
                 if not image_path:
+                    image_path = self.fb.get_smart_image(tip_content)
+                if not image_path:
                     image_path = self._get_random_media()
+
                 if image_path:
                     print(f"[{datetime.now()}] EXECUTIVE EXECUTION: Media found for payload: {image_path}")
                 else:
@@ -338,7 +348,7 @@ class HopesAndDreamsBot:
                     print(f"Syndicate Masterclass posted successfully at {datetime.now()}!")
 
                     # Record the topic as posted to avoid repeats
-                    self._record_posted_topic(topic)
+                    self._record_posted_topic(topic, slot=slot)
 
                     # Add affiliate recommendation in the comments
                     post_id = result.get('id')
@@ -473,16 +483,21 @@ class HopesAndDreamsBot:
                     print(f"Replied to comment {comment_id}")
 
     def _get_random_media(self):
-        """Scans the media/ folder and returns a path to a random jpg or png image."""
+        """Scans the media/ folder and subfolders for a random jpg or png image."""
         media_dir = "media"
         if not os.path.exists(media_dir):
             return None
 
         try:
-            valid_extensions = ('.jpg', '.png')
-            files = [os.path.join(media_dir, f) for f in os.listdir(media_dir) if f.lower().endswith(valid_extensions)]
-            if files:
-                return random.choice(files)
+            valid_extensions = ('.jpg', '.png', '.jpeg', '.webp')
+            all_files = []
+            for root, dirs, files in os.walk(media_dir):
+                for f in files:
+                    if f.lower().endswith(valid_extensions):
+                        all_files.append(os.path.join(root, f))
+
+            if all_files:
+                return random.choice(all_files)
         except Exception as e:
             print(f"Error scanning media directory: {e}")
 
@@ -690,6 +705,8 @@ class HopesAndDreamsBot:
         # 0. Handle missing image — try to generate topic-specific first
         if not image_path:
             image_path = self._generate_topic_image(topic)
+            if not image_path:
+                image_path = self.fb.get_smart_image(content)
             if not image_path:
                 image_path = self._get_random_media()
 
