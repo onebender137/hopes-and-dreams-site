@@ -219,24 +219,28 @@ class HopesAndDreamsBot:
                         slot_context = f" for the {slot} post" if slot else ""
                         prompt = (
                             f"Analyze these recent messages from the CEO: {combined}\n\n"
-                            f"Identify the specific topic or supplement he wants to post about{slot_context}. "
+                            f"Identify the SINGLE most relevant specific topic or supplement he wants to post about{slot_context}. "
                             "He often mentions topics like lucid dreaming, astral projection, or specific supplements. "
+                            "CRITICAL: If multiple supplements or topics are mentioned, pick the SINGLE most recent or most central one. NEVER return a list of multiple topics. "
                             "If he explicitly requested a topic for a specific time, prioritize that. "
                             "Return ONLY the topic name (e.g., 'Lucid Dreaming' or 'Magnesium L-Threonate'). "
                             "DO NOT include meta-commentary like 'The topic requested is...', 'He wants to post about...', or 'The specific topic requested by the CEO for the XX:XX post is...'. "
-                            "STRICTLY return the topic name itself. "
+                            "STRICTLY return the topic name itself. NO newlines, NO pipes, NO special characters. "
                             "If no specific topic is found, return 'RANDOM'."
                         )
                         
                         system_msg = "You are an expert content strategist for the Hopes and Dreams Syndicate. You listen to the CEO's specific requests."
                         topic = self.llm.generate_response(prompt, system_msg)
                         
-                        if topic and "RANDOM" not in topic.upper() and len(topic) < 100:
-                            topic = topic.strip().replace("'", "").replace("\"", "")
+                        if topic and "RANDOM" not in topic.upper() and len(topic) < 150:
+                            # Robust sanitization: strip newlines, pipes, and extra spaces
+                            topic = topic.replace('\n', ' ').replace('|', ' ').strip()
+                            topic = topic.replace("'", "").replace("\"", "")
                             # Meta-commentary cleanup for requested topics
                             topic = re.sub(r'(?i)The specific topic requested by the CEO for the \d{2}:\d{2} post is\s+', '', topic)
                             topic = re.sub(r'(?i)post with title\s+', '', topic)
                             topic = re.sub(r'(?i)Masterclass:\s*', '', topic)
+                            topic = re.sub(r'\s+', ' ', topic) # Collapse multiple spaces
                             return topic.strip()
             except (json.JSONDecodeError, IOError, Exception) as e:
                 print(f"Error reading chat memory for topics: {e}")
@@ -686,7 +690,8 @@ class HopesAndDreamsBot:
 
             # Save
             os.makedirs("media/general", exist_ok=True)
-            slug = topic.lower().replace(' ', '-')[:50]
+            # Strict slug sanitization to avoid newlines or special characters in filenames
+            slug = re.sub(r'[^a-z0-9]+', '-', topic.lower()).strip('-')[:50]
             date_str = datetime.now().strftime('%Y-%m-%d')
             filename = f"media/general/{date_str}-{slug}.jpg"
             # Save as JPEG with optimized quality and progressive loading for faster web delivery
