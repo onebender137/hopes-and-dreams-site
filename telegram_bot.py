@@ -103,35 +103,45 @@ class TelegramBot:
     async def help_cmd(self, update: Update, context: ContextTypes.DEFAULT_TYPE):
         """Handles the /help command."""
         help_text = (
-            "<b>📊 SYNDICATE INTEL HUB - COMMAND DIRECTORY</b>\n\n"
-            "<b>/clear</b> - Reset memory\n"
-            "<b>/draft [topic]</b> - Generate Masterclass draft\n"
-            "<b>/confirm</b> - Post draft to FB\n"
+            "<b>📊 SYNDICATE INTEL HUB — COMMAND DIRECTORY</b>\n"
+            "\n<b>📝 DRAFT &amp; POSTING</b>\n"
             "<b>/draft [topic]</b> - Generate Masterclass draft + image\n"
-            "<b>/confirm</b> - Post draft + image to FB + website\n"
             "<b>/regen_img</b> - Regenerate just the image\n"
+            "<b>/confirm</b> - Post draft to FB + website\n"
             "<b>/cancel</b> - Drop the pending draft\n"
-            "<b>/post [topic]</b> - Immediate FB post\n"
-            "<b>/force_post [text]</b> - Direct raw FB post\n"
-            "<b>/pulse</b> - Activity report\n"
-            "<b>/check</b> - Monitor FB comments\n"
-            "<b>/research [topic]</b> - PubMed search\n"
-            "<b>/news [topic]</b> - RSS search\n"
-            "<b>/affiliate [keyword]</b> - Amazon search\n"
-            "<b>/video [topic]</b> - Video generation\n"
-            "<b>/index</b> - Rebuild knowledge index\n"
+            "<b>/post [topic]</b> - Immediate FB post (skip draft)\n"
+            "<b>/force_post [text]</b> - Direct raw FB post (no LLM)\n"
+            "<b>/video [topic]</b> - Generate video snippet\n"
             "\n<b>📅 SCHEDULE QUEUE</b>\n"
-            "<b>/schedule YYYY-MM-DD HH:MM | topic</b> - Queue ONE post (slot is 07:00, 12:00, or 15:00)\n"
-            "<b>/schedule_day YYYY-MM-DD | t1 | t2 | t3</b> - Queue all 3 slots in one shot\n"
+            "<b>/schedule YYYY-MM-DD HH:MM | topic</b> - Queue ONE post (slots: 07:00, 12:00, 15:00)\n"
+            "<b>/schedule_day YYYY-MM-DD | t1 | t2 | t3</b> - Queue all 3 slots for a day\n"
             "<b>/upcoming</b> - List all queued posts\n"
             "<b>/unschedule YYYY-MM-DD HH:MM</b> - Remove ONE queued post\n"
             "<b>/clear_day YYYY-MM-DD</b> - Wipe all queued posts for a date\n"
-            "\n<b>🛠 SYSTEM</b>\n"
+            "\n<b>🎨 THEME PLANNING</b>\n"
+            "<b>/themes</b> - List available catalog themes\n"
+            "<b>/theme_day YYYY-MM-DD &lt;theme&gt;</b> - Propose 3 topics for a day\n"
+            "<b>/theme_week YYYY-MM-DD | t1 | t2 | ...</b> - Propose up to 7 days × 3 slots\n"
+            "<b>/confirm_theme</b> - Save pending theme proposal to queue\n"
+            "<b>/cancel_theme</b> - Drop pending theme proposal\n"
+            "\n<b>🔍 RESEARCH &amp; INTEL</b>\n"
+            "<b>/research [topic]</b> - PubMed search\n"
+            "<b>/news [topic]</b> - RSS news search\n"
+            "<b>/affiliate [keyword]</b> - Amazon affiliate search\n"
+            "<b>/check</b> - Monitor FB comments for replies\n"
+            "<b>/pulse</b> - Activity report\n"
+            "\n<b>🛠 SYSTEM &amp; DIAGNOSTICS</b>\n"
             "<b>/status</b> - System status report\n"
-            "<b>/debug</b> - View uplink logs\n"
+            "<b>/debug</b> - View recent uplink logs\n"
             "<b>/test_uplink</b> - Diagnostic website post\n"
-            "<b>/sync</b> - Manual repository sync\n"
-            "<b>/fix_git</b> - Emergency Git repair"
+            "<b>/sync</b> - Manual git repository sync\n"
+            "<b>/fix_git</b> - Emergency git repair\n"
+            "<b>/index</b> - Rebuild knowledge base index\n"
+            "<b>/clear</b> - Reset chat memory (NUCLEAR)\n"
+            "<b>/help</b> - This menu\n"
+            "\n<i>💡 Slots run at 07:00, 12:00, 15:00 ADT.\n"
+            "Schedule queue overrides chat memory inference.\n"
+            "Theme proposals require /confirm_theme to save.</i>"
         )
         await update.message.reply_text(help_text, parse_mode='HTML')
 
@@ -396,6 +406,236 @@ class TelegramBot:
             await update.message.reply_text(f"🗑 Wiped {count} scheduled post(s) for {date_str}.")
         else:
             await update.message.reply_text(f"ℹ️ Nothing pending for {date_str}.")
+
+    # ===== THEME COMMANDS =====
+    # /themes — list catalog
+    # /theme_day YYYY-MM-DD <theme>            → propose 3 topics, await /confirm_theme
+    # /theme_week YYYY-MM-DD <t1>|<t2>|...     → propose 7 days × 3 slots, await /confirm_theme
+    # /confirm_theme                            → save the pending proposal to schedule queue
+    # /cancel_theme                             → drop the pending proposal
+
+    SLOTS_IN_ORDER = ['07:00', '12:00', '15:00']
+
+    @restricted
+    async def themes_cmd(self, update: Update, context: ContextTypes.DEFAULT_TYPE):
+        """Lists all available catalog themes."""
+        themes = self.hdbot.list_available_themes()
+        msg = "<b>🎨 AVAILABLE THEMES</b>\n\n"
+        msg += "Catalog themes (instant, curated):\n"
+        for t in themes:
+            count = len(self.hdbot.THEME_CATALOG[t])
+            msg += f"  • <code>{t}</code> ({count} topics)\n"
+        msg += "\n💡 Anything else triggers LLM brainstorm fallback (e.g. <code>yuschak protocol</code>)."
+        msg += "\n\nUsage:\n"
+        msg += "<code>/theme_day 2026-05-12 mushrooms</code>\n"
+        msg += "<code>/theme_week 2026-05-12 | mushrooms | peptides | sleep | cognitive | mitochondrial | recovery | nootropics</code>"
+        await update.message.reply_text(msg, parse_mode='HTML')
+
+    @restricted
+    async def theme_day_cmd(self, update: Update, context: ContextTypes.DEFAULT_TYPE):
+        """
+        Proposes 3 topics for a date based on a theme. User must /confirm_theme to save.
+        Usage: /theme_day YYYY-MM-DD <theme>
+        """
+        if not hasattr(self, '_db_for_schedule'):
+            from database_client import SyndicateDatabase
+            self._db_for_schedule = SyndicateDatabase()
+
+        if len(context.args) < 2:
+            await update.message.reply_text(
+                "Usage: <code>/theme_day YYYY-MM-DD &lt;theme&gt;</code>\n\n"
+                "Examples:\n"
+                "<code>/theme_day 2026-05-12 mushrooms</code>\n"
+                "<code>/theme_day 2026-05-13 yuschak protocol</code>\n\n"
+                "See <code>/themes</code> for catalog.",
+                parse_mode='HTML'
+            )
+            return
+
+        from datetime import datetime as _dt
+        try:
+            parsed = _dt.strptime(context.args[0], '%Y-%m-%d')
+            date_str = parsed.strftime('%Y-%m-%d')
+        except ValueError:
+            await update.message.reply_text(f"⚠️ Bad date '{context.args[0]}'. Use YYYY-MM-DD.")
+            return
+
+        theme = " ".join(context.args[1:]).strip()
+        if not theme:
+            await update.message.reply_text("⚠️ Need a theme name. Try <code>/themes</code> for the list.", parse_mode='HTML')
+            return
+
+        # Tell user we're working on it (LLM brainstorm can take a few seconds)
+        await update.message.reply_text(f"🧠 Building theme '{theme}' for {date_str}...")
+
+        topics = await asyncio.to_thread(self.hdbot.brainstorm_theme_topics, theme, 3)
+
+        if not topics or len(topics) < 3:
+            await update.message.reply_text(
+                f"⚠️ Couldn't generate 3 topics for '{theme}'. "
+                f"Got {len(topics) if topics else 0}. Try a different theme or check <code>/themes</code>.",
+                parse_mode='HTML'
+            )
+            return
+
+        # Stash proposal as pending — user confirms with /confirm_theme
+        proposal = {
+            'kind': 'day',
+            'theme': theme,
+            'used_catalog': bool(self.hdbot._resolve_theme(theme)),
+            'plan': [(date_str, slot, topic) for slot, topic in zip(self.SLOTS_IN_ORDER, topics)]
+        }
+        self.pending_theme_proposal = proposal
+
+        source_tag = "📋 catalog" if proposal['used_catalog'] else "🧠 LLM brainstorm"
+        msg = f"<b>🎨 THEME PROPOSAL — {theme}</b> ({source_tag})\n\n📅 <b>{date_str}</b>\n"
+        for slot, topic in zip(self.SLOTS_IN_ORDER, topics):
+            msg += f"  • <code>{slot}</code> — {topic}\n"
+        msg += "\n<code>/confirm_theme</code> — save to queue\n"
+        msg += "<code>/cancel_theme</code> — drop this proposal\n"
+        msg += "<code>/theme_day</code> again — reroll with same theme"
+        await update.message.reply_text(msg, parse_mode='HTML')
+
+    @restricted
+    async def theme_week_cmd(self, update: Update, context: ContextTypes.DEFAULT_TYPE):
+        """
+        Proposes a full week (7 days × 3 slots = 21 topics).
+        Usage: /theme_week YYYY-MM-DD | theme_mon | theme_tue | ... | theme_sun
+        """
+        if not hasattr(self, '_db_for_schedule'):
+            from database_client import SyndicateDatabase
+            self._db_for_schedule = SyndicateDatabase()
+
+        raw = " ".join(context.args).strip()
+        if '|' not in raw:
+            await update.message.reply_text(
+                "Usage: <code>/theme_week YYYY-MM-DD | theme1 | theme2 | ... | theme7</code>\n\n"
+                "Example:\n"
+                "<code>/theme_week 2026-05-12 | mushrooms | peptides | sleep | cognitive | mitochondrial | recovery | nootropics</code>\n\n"
+                "First date is Day 1, then Day 2, ... up to 7 days.",
+                parse_mode='HTML'
+            )
+            return
+
+        parts = [p.strip() for p in raw.split('|')]
+        if len(parts) < 2 or len(parts) > 8:
+            await update.message.reply_text(
+                f"Need DATE + 1-7 themes (got {len(parts)} pipe-separated parts). "
+                "Example: <code>/theme_week 2026-05-12 | mushrooms | peptides | sleep</code>",
+                parse_mode='HTML'
+            )
+            return
+
+        date_raw = parts[0]
+        themes = parts[1:]
+
+        from datetime import datetime as _dt, timedelta as _td
+        try:
+            start_date = _dt.strptime(date_raw, '%Y-%m-%d')
+        except ValueError:
+            await update.message.reply_text(f"⚠️ Bad date '{date_raw}'. Use YYYY-MM-DD.")
+            return
+
+        await update.message.reply_text(
+            f"🧠 Building {len(themes)}-day theme week starting {start_date.strftime('%Y-%m-%d')}...\n"
+            "(LLM brainstorms may take ~5-10s each — hold tight)"
+        )
+
+        plan = []  # list of (date_str, slot, topic)
+        all_topics_so_far = []  # avoid duplicates across the week
+        for day_offset, theme in enumerate(themes):
+            if not theme:
+                continue
+            day_date = (start_date + _td(days=day_offset)).strftime('%Y-%m-%d')
+            day_topics = await asyncio.to_thread(
+                self.hdbot.brainstorm_theme_topics, theme, 3, list(all_topics_so_far)
+            )
+            if not day_topics or len(day_topics) < 3:
+                await update.message.reply_text(
+                    f"⚠️ Day {day_offset+1} ({theme}): only got {len(day_topics) if day_topics else 0}/3 topics. "
+                    "Continuing with what we have."
+                )
+                # Pad with placeholder so slot alignment stays correct, user can /unschedule + redo manually
+                while len(day_topics) < 3:
+                    day_topics.append(f"[needs manual fill — {theme}]")
+            for slot, topic in zip(self.SLOTS_IN_ORDER, day_topics):
+                plan.append((day_date, slot, topic))
+                all_topics_so_far.append(topic)
+
+        if not plan:
+            await update.message.reply_text("⚠️ No proposals generated. Aborted.")
+            return
+
+        proposal = {'kind': 'week', 'themes': themes, 'plan': plan}
+        self.pending_theme_proposal = proposal
+
+        # Build proposal display, grouped by date
+        from collections import defaultdict
+        by_date = defaultdict(list)
+        for date_str, slot, topic in plan:
+            by_date[date_str].append((slot, topic))
+
+        msg_lines = ["<b>🎨 WEEK THEME PROPOSAL</b>\n"]
+        for i, (date_str, items) in enumerate(sorted(by_date.items())):
+            theme_for_day = themes[i] if i < len(themes) else "?"
+            msg_lines.append(f"\n<b>{date_str}</b> — <i>{theme_for_day}</i>")
+            for slot, topic in sorted(items):
+                display = topic if len(topic) <= 60 else topic[:57] + '…'
+                msg_lines.append(f"  • <code>{slot}</code> — {display}")
+
+        msg_lines.append(f"\n<i>Total: {len(plan)} posts queued for review</i>")
+        msg_lines.append("\n<code>/confirm_theme</code> — save all to queue")
+        msg_lines.append("<code>/cancel_theme</code> — drop this proposal")
+
+        msg = "\n".join(msg_lines)
+        # Telegram 4096 char ceiling
+        if len(msg) > 4000:
+            msg = msg[:3950] + "\n\n…(truncated — confirm to save full plan)"
+        await update.message.reply_text(msg, parse_mode='HTML')
+
+    @restricted
+    async def confirm_theme_cmd(self, update: Update, context: ContextTypes.DEFAULT_TYPE):
+        """Saves a pending theme proposal to the schedule queue."""
+        proposal = getattr(self, 'pending_theme_proposal', None)
+        if not proposal or not proposal.get('plan'):
+            await update.message.reply_text("ℹ️ No pending theme proposal. Run /theme_day or /theme_week first.")
+            return
+
+        if not hasattr(self, '_db_for_schedule'):
+            from database_client import SyndicateDatabase
+            self._db_for_schedule = SyndicateDatabase()
+
+        saved = 0
+        skipped = 0
+        for date_str, slot, topic in proposal['plan']:
+            # Skip placeholder entries from /theme_week
+            if topic.startswith('[needs manual fill'):
+                skipped += 1
+                continue
+            try:
+                self._db_for_schedule.schedule_topic(date_str, slot, topic)
+                saved += 1
+            except Exception as e:
+                print(f"[CONFIRM_THEME] save failed for {date_str} {slot}: {e}")
+                skipped += 1
+
+        # Clear the pending proposal
+        self.pending_theme_proposal = None
+
+        msg = f"✅ <b>QUEUED</b> {saved} post(s)"
+        if skipped:
+            msg += f"\n⚠️ Skipped {skipped} (placeholders or errors)"
+        msg += "\n\nRun <code>/upcoming</code> to verify."
+        await update.message.reply_text(msg, parse_mode='HTML')
+
+    @restricted
+    async def cancel_theme_cmd(self, update: Update, context: ContextTypes.DEFAULT_TYPE):
+        """Drops a pending theme proposal."""
+        if getattr(self, 'pending_theme_proposal', None):
+            self.pending_theme_proposal = None
+            await update.message.reply_text("🗑 Theme proposal dropped.")
+        else:
+            await update.message.reply_text("ℹ️ No pending theme proposal to drop.")
 
     @restricted
     async def draft_post_cmd(self, update: Update, context: ContextTypes.DEFAULT_TYPE):
@@ -881,6 +1121,13 @@ class TelegramBot:
         application.add_handler(CommandHandler('upcoming', self.upcoming_cmd))
         application.add_handler(CommandHandler('unschedule', self.unschedule_cmd))
         application.add_handler(CommandHandler('clear_day', self.clear_day_cmd))
+
+        # Theme commands (catalog + LLM fallback, with confirmation step)
+        application.add_handler(CommandHandler('themes', self.themes_cmd))
+        application.add_handler(CommandHandler('theme_day', self.theme_day_cmd))
+        application.add_handler(CommandHandler('theme_week', self.theme_week_cmd))
+        application.add_handler(CommandHandler('confirm_theme', self.confirm_theme_cmd))
+        application.add_handler(CommandHandler('cancel_theme', self.cancel_theme_cmd))
 
         # Ensure commands are not processed as chat
         application.add_handler(MessageHandler(filters.TEXT & (~filters.COMMAND), self.chat))

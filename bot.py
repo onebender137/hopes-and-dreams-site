@@ -304,6 +304,196 @@ class HopesAndDreamsBot:
         ],
     }
 
+    # ===== THEME CATALOG =====
+    # Curated topic sets per theme. Used by /theme_day and /theme_week.
+    # Keys are matched case-insensitively against user input.
+    # Each theme has 4-6 ready-to-go topics; bot samples 3 per day.
+    # If no catalog match, bot falls back to LLM brainstorm in that domain.
+    THEME_CATALOG = {
+        'mushrooms': [
+            "Lion's Mane Neurogenesis Protocols",
+            "Cordyceps Mitochondrial ATP Production",
+            "Reishi Immune Modulation",
+            "Chaga Antioxidant Profile",
+            "Psilocybin DMN Suppression Mechanism",
+            "Turkey Tail PSK Beta-Glucans",
+        ],
+        'peptides': [
+            "BPC-157 Healing Protocols",
+            "TB-500 Tissue Repair Mechanism",
+            "GHK-Cu Skin & Wound Healing",
+            "Thymosin Alpha-1 Immune Optimization",
+            "Ipamorelin Growth Hormone Pulsing",
+            "AOD-9604 Lipolysis Protocol",
+        ],
+        'sleep': [
+            "Glycine NMDA Modulation for Deep Sleep",
+            "Magnesium Bisglycinate Sleep Architecture",
+            "Low-Dose Melatonin Circadian Entrainment",
+            "L-Theanine GABAergic Calming",
+            "Apigenin Anxiolytic Pathway",
+            "DSIP Sleep-Inducing Peptide",
+        ],
+        'cognitive': [
+            "The Neurobiology of Sulbutiamine",
+            "Aniracetam AMPA Receptor Modulation",
+            "Noopept Synaptic Plasticity",
+            "Phenylpiracetam Stim-Cognitive Stack",
+            "Bacopa Monnieri Memory Enhancement",
+            "Phosphatidylserine Membrane Optimization",
+        ],
+        'mitochondrial': [
+            "PQQ Mitochondrial Biogenesis",
+            "CoQ10 vs Ubiquinol Bioavailability",
+            "Methylene Blue Microdosing Protocol",
+            "Urolithin A Mitophagy Activation",
+            "MOTS-c Mitochondrial Peptide",
+            "Creatine Monohydrate ATP Reservoir",
+        ],
+        'recovery': [
+            "Cold Thermogenesis HRV Optimization",
+            "Sauna Heat Shock Protein Activation",
+            "Compression Therapy Lymphatic Flow",
+            "Ashwagandha Cortisol Modulation",
+            "Tart Cherry Sleep & Inflammation",
+            "Magnesium L-Threonate Recovery Stack",
+        ],
+        'longevity': [
+            "Rapamycin mTOR Suppression",
+            "Spermidine Autophagy Activation",
+            "Senolytic Fisetin Protocol",
+            "Glycine + NAC Methionine Restriction Mimetic",
+            "Berberine AMPK Activation",
+            "Hyperbaric Oxygen Telomere Studies",
+        ],
+        'gaba_calm': [
+            "GABA Receptor Pharmacology",
+            "Kava Kavalactone Anxiolytic Mechanism",
+            "L-Theanine GABAergic Calming",
+            "Ashwagandha HPA Axis Regulation",
+            "Magnolia Honokiol GABA-A Modulation",
+            "Valerian Root Sedative Profile",
+        ],
+        'nootropics': [
+            "Aniracetam AMPA Receptor Modulation",
+            "Noopept Synaptic Plasticity",
+            "Phenylpiracetam Stim-Cognitive Stack",
+            "Modafinil Histaminergic Wakefulness",
+            "L-Theanine + Caffeine Synergy",
+            "Tyrosine Catecholamine Precursor",
+        ],
+        'nicotine': [
+            "Nicotine nAChR Pharmacology",
+            "Nicotine Patch Cognitive Stack",
+            "Asprey-Style Low-Dose Nicotine",
+            "Cytisine Smoking Cessation",
+            "Nicotine + Caffeine Synergy",
+            "Nicotinic Receptor Subtypes Explained",
+        ],
+        'kratom': [
+            "Mitragynine 7-OH Pharmacology",
+            "Kratom Strain Alkaloid Profiles",
+            "Kratom Tolerance Rotation",
+            "Mitragyna Speciosa Botany & Origin",
+            "Kratom Harm Reduction Framework",
+            "Kratom Receptor Binding Studies",
+        ],
+        'dreams': [
+            "WBTB Lucid Dreaming Protocol",
+            "Galantamine Cholinergic REM Stack",
+            "Huperzine-A Dream Recall Enhancement",
+            "MILD vs WILD Induction Techniques",
+            "Mugwort Vivid Dream Tradition",
+            "Choline Bitartrate Dream Cofactor",
+        ],
+    }
+
+    def _resolve_theme(self, theme_name):
+        """
+        Returns list of topics for a theme name (case-insensitive, partial match).
+        Returns None if no catalog match (caller falls back to LLM).
+        """
+        if not theme_name:
+            return None
+        key = theme_name.lower().strip().replace(' ', '_').replace('-', '_')
+        # Direct match
+        if key in self.THEME_CATALOG:
+            return self.THEME_CATALOG[key]
+        # Singular/plural normalization
+        if key.endswith('s') and key[:-1] in self.THEME_CATALOG:
+            return self.THEME_CATALOG[key[:-1]]
+        if (key + 's') in self.THEME_CATALOG:
+            return self.THEME_CATALOG[key + 's']
+        # Partial substring match (e.g. "mushroom" hits "mushrooms")
+        for catalog_key in self.THEME_CATALOG:
+            if key in catalog_key or catalog_key in key:
+                return self.THEME_CATALOG[catalog_key]
+        return None
+
+    def list_available_themes(self):
+        """Returns the list of catalog theme names for /themes display."""
+        return sorted(self.THEME_CATALOG.keys())
+
+    def brainstorm_theme_topics(self, theme_name, count=3, exclude=None):
+        """
+        Generate `count` topics for a theme. Tries catalog first, falls back to LLM.
+        `exclude` is a list of topic strings to skip (e.g. already-queued ones across
+        multiple days in /theme_week so we don't repeat).
+        Returns list of topic strings (may be < count if LLM fallback fails).
+        """
+        exclude = set(exclude or [])
+
+        # Catalog path
+        catalog_topics = self._resolve_theme(theme_name)
+        if catalog_topics:
+            available = [t for t in catalog_topics if t not in exclude]
+            if len(available) >= count:
+                return random.sample(available, count)
+            # Catalog didn't have enough fresh — return what we have and let caller decide
+            if available:
+                return available[:count]
+
+        # LLM fallback path (no catalog match OR catalog exhausted)
+        print(f"[THEME] No catalog match for '{theme_name}' — invoking LLM brainstorm.")
+        system_msg = (
+            "You are the Syndicate's Lead Content Strategist. You generate fresh, "
+            "technical, pharmacology-driven topic ideas for biohacking content."
+        )
+        exclude_str = ', '.join(sorted(exclude)) if exclude else "(none)"
+        prompt = (
+            f"Brainstorm exactly {count} distinct, specific biohacking topics about: \"{theme_name}\".\n\n"
+            f"AVOID THESE (already-queued or recently-posted): {exclude_str}\n\n"
+            "RULES:\n"
+            "1. Each topic should be a specific compound, protocol, or mechanism — not a vague category.\n"
+            "2. Stick to technical pharmacology and physiology. No wellness fluff.\n"
+            "3. Each topic must be 3-8 words long. Punchy and professional.\n"
+            "4. Format example: 'Lion's Mane Neurogenesis Protocols' or 'BPC-157 Healing Mechanism'.\n"
+            "5. Return ONLY the topic names, one per line. No numbering, no preamble, no quotes, no commentary.\n"
+            f"6. Do NOT include any of the avoided topics above.\n\n"
+            f"Output {count} topics now, one per line:"
+        )
+        try:
+            raw = self.llm.generate_response(prompt, system_msg)
+            if not raw:
+                return []
+            # Parse: split by lines, sanitize each line through our topic sanitizer
+            results = []
+            for line in raw.split('\n'):
+                line = line.strip()
+                # Strip leading numbers/bullets that LLMs sometimes add despite instructions
+                line = re.sub(r'^[\d\.\)\-\*\s]+', '', line)
+                if not line:
+                    continue
+                clean = self._sanitize_topic(line)
+                if clean and clean not in exclude and clean not in results:
+                    results.append(clean)
+                if len(results) >= count:
+                    break
+            return results
+        except Exception as e:
+            print(f"[THEME] LLM brainstorm failed: {e}")
+            return []
+
     def _topic_cluster(self, topic):
         """Returns the cluster name a topic belongs to, or None if no cluster matched."""
         if not topic:
