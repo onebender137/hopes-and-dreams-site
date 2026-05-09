@@ -47,6 +47,21 @@ class SyndicateDatabase:
                     replied_at DATETIME DEFAULT CURRENT_TIMESTAMP
                 )
             ''')
+
+            # Table for scheduled future topics (manual queue)
+            # status: 'pending' (waiting), 'used' (consumed by post), 'cancelled'
+            cursor.execute('''
+                CREATE TABLE IF NOT EXISTS scheduled_topics (
+                    id INTEGER PRIMARY KEY AUTOINCREMENT,
+                    scheduled_date TEXT NOT NULL,
+                    slot TEXT NOT NULL,
+                    topic TEXT NOT NULL,
+                    status TEXT DEFAULT 'pending',
+                    created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
+                    used_at DATETIME,
+                    UNIQUE(scheduled_date, slot)
+                )
+            ''')
             conn.commit()
 
     def add_posted_topic(self, topic, slot=None):
@@ -127,6 +142,100 @@ class SyndicateDatabase:
                 print(f"Error migrating replied comments: {e}")
 
         return migrated
+
+    # ===== SCHEDULED TOPIC QUEUE =====
+    # Manual queue for pre-planning days/weeks of content
+    # Bot reads from this queue FIRST when it's time to post.
+
+    def schedule_topic(self, scheduled_date, slot, topic):
+        """
+        Queues a topic for a specific date+slot. Replaces any existing entry for that slot.
+        scheduled_date: 'YYYY-MM-DD'
+        slot: '07:00' / '12:00' / '15:00'
+        topic: free-form topic string
+        Returns True on success.
+        """
+        with self._get_connection() as conn:
+            cursor = conn.cursor()
+            # UPSERT — if already scheduled for this slot, replace it
+            cursor.execute('''
+                INSERT INTO scheduled_topics (scheduled_date, slot, topic, status)
+                VALUES (?, ?, ?, 'pending')
+                ON CONFLICT(scheduled_date, slot)
+                DO UPDATE SET topic=excluded.topic, status='pending', created_at=CURRENT_TIMESTAMP, used_at=NULL
+            ''', (scheduled_date, slot, topic))
+            conn.commit()
+            return cursor.rowcount > 0
+
+    def get_scheduled_topic(self, scheduled_date, slot):
+        """
+        Returns the pending topic for a date+slot, or None if nothing scheduled.
+        """
+        with self._get_connection() as conn:
+            cursor = conn.cursor()
+            cursor.execute('''
+                SELECT topic FROM scheduled_topics
+                WHERE scheduled_date=? AND slot=? AND status='pending'
+            ''', (scheduled_date, slot))
+            row = cursor.fetchone()
+            return row[0] if row else None
+
+    def mark_scheduled_used(self, scheduled_date, slot):
+        """
+        Marks a scheduled topic as consumed (after the bot uses it).
+        """
+        with self._get_connection() as conn:
+            cursor = conn.cursor()
+            cursor.execute('''
+                UPDATE scheduled_topics
+                SET status='used', used_at=CURRENT_TIMESTAMP
+                WHERE scheduled_date=? AND slot=? AND status='pending'
+            ''', (scheduled_date, slot))
+            conn.commit()
+
+    def list_scheduled_upcoming(self, from_date=None, limit=50):
+        """
+        Returns all pending scheduled topics from a given date forward.
+        If from_date is None, returns from today.
+        Returns list of (date, slot, topic) tuples ordered chronologically.
+        """
+        from datetime import datetime as _dt
+        if from_date is None:
+            from_date = _dt.now().strftime('%Y-%m-%d')
+        with self._get_connection() as conn:
+            cursor = conn.cursor()
+            cursor.execute('''
+                SELECT scheduled_date, slot, topic FROM scheduled_topics
+                WHERE scheduled_date >= ? AND status='pending'
+                ORDER BY scheduled_date, slot
+                LIMIT ?
+            ''', (from_date, limit))
+            return cursor.fetchall()
+
+    def unschedule_topic(self, scheduled_date, slot):
+        """
+        Cancels (removes) a scheduled topic for a date+slot.
+        Returns True if anything was deleted.
+        """
+        with self._get_connection() as conn:
+            cursor = conn.cursor()
+            cursor.execute('''
+                DELETE FROM scheduled_topics
+                WHERE scheduled_date=? AND slot=? AND status='pending'
+            ''', (scheduled_date, slot))
+            conn.commit()
+            return cursor.rowcount > 0
+
+    def clear_scheduled_for_date(self, scheduled_date):
+        """Removes all pending scheduled topics for a given date. Useful for re-planning."""
+        with self._get_connection() as conn:
+            cursor = conn.cursor()
+            cursor.execute('''
+                DELETE FROM scheduled_topics
+                WHERE scheduled_date=? AND status='pending'
+            ''', (scheduled_date,))
+            conn.commit()
+            return cursor.rowcount
 
 if __name__ == "__main__":
     # Quick standalone test
