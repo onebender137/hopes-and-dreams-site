@@ -692,14 +692,27 @@ class TelegramBot:
         content = await asyncio.to_thread(self.llm.create_biohacking_post, topic, local_context)
 
         if content:
+            # Generate topic-specific image FIRST (same flow as scheduled posts)
+            await update.message.reply_text(f"🎨 Generating topic image for: {topic}")
+            image_path = await asyncio.to_thread(self.hdbot._generate_topic_image, topic)
+            if not image_path:
+                # Fallback chain: smart-image (FB media) → random media
+                image_path = self.hdbot.fb.get_smart_image(content)
+            if not image_path:
+                image_path = self.hdbot._get_random_media()
+            if image_path:
+                self.hdbot._log_uplink(f"POST_CMD: Image resolved for FB upload: {image_path}")
+            else:
+                self.hdbot._log_uplink("POST_CMD: No image available, posting text-only.")
+
             print("EXECUTIVE EXECUTION: Hitting FB Graph API for /post command.")
-            result = self.hdbot.fb.post_to_page(content)
+            result = self.hdbot.fb.post_to_page(content, image_path=image_path)
             if result:
                 await self._send_long_message(update, f"🚀 **LIVE ON FACEBOOK (SYNDICATE MASTERCLASS):**\n\n{content}")
 
-                # 5. Website Transmission Uplink
+                # 5. Website Transmission Uplink — pass the same image_path so site matches FB
                 print(f"[{datetime.now()}] EXECUTIVE EXECUTION: Initiating website transmission uplink via Telegram...")
-                asyncio.create_task(asyncio.to_thread(self.hdbot._post_to_website, content, topic))
+                asyncio.create_task(asyncio.to_thread(self.hdbot._post_to_website, content, topic, image_path))
 
                 # Record the topic as posted to avoid repeats
                 self.hdbot._record_posted_topic(topic)
