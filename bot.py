@@ -643,13 +643,15 @@ class HopesAndDreamsBot:
 
     def generate_and_post_daily_tip(self, topic=None, slot=None):
         """Generates a daily Syndicate Masterclass and posts it to the Facebook Page."""
+        slot_label = slot or "(no-slot)"
+        self._log_uplink(f"POST FIRED: Starting masterclass generation for slot {slot_label}")
         try:
             # Prevent double-posting for the same slot
             scheduled_used = False  # track whether we pulled from queue (for marking done later)
             if slot:
                 date_str = datetime.now().strftime("%Y-%m-%d")
                 if self.db.is_slot_posted(date_str, slot):
-                    print(f"[{datetime.now()}] EXECUTIVE GUARD: Slot {slot} already posted today ({date_str}). Skipping.")
+                    self._log_uplink(f"POST GUARD: Slot {slot} already posted today ({date_str}). Skipping.")
                     return None
 
             # === TOPIC SELECTION PRIORITY ORDER ===
@@ -661,15 +663,15 @@ class HopesAndDreamsBot:
                 date_str = datetime.now().strftime("%Y-%m-%d")
                 queued = self.db.get_scheduled_topic(date_str, slot)
                 if queued:
-                    print(f"[{datetime.now()}] EXECUTIVE QUEUE: Found scheduled topic for {date_str} {slot}: {queued}")
+                    self._log_uplink(f"POST QUEUE: Found scheduled topic for {date_str} {slot}: {queued}")
                     topic = queued
                     scheduled_used = True
 
             if not topic:
-                print(f"[{datetime.now()}] EXECUTIVE EXECUTION: Identifying topic from chat memory for slot {slot}...")
+                self._log_uplink(f"POST: Identifying topic from chat memory for slot {slot_label}...")
                 topic = self.get_recent_topics_from_memory(slot=slot)
 
-            print(f"[{datetime.now()}] EXECUTIVE EXECUTION: Triggering scheduled Masterclass for topic: {topic}...")
+            self._log_uplink(f"POST: Topic confirmed for slot {slot_label}: '{topic}'")
 
             # 1. RAG Check (Query local knowledge base)
             print(f"[{datetime.now()}] EXECUTIVE EXECUTION: Querying local knowledge base...")
@@ -857,23 +859,55 @@ class HopesAndDreamsBot:
                     print(f"Replied to comment {comment_id}")
 
     def _get_random_media(self):
-        """Scans the media/ folder and subfolders for a random jpg or png image."""
+        """
+        Last-resort fallback: scans media/ folder for a random JPG/PNG.
+        Prefers curated subfolders (nicotine/, kratom/, etc) over media/general/
+        because media/general/ contains recent topic-specific FLUX images that
+        would be visually misleading if used for a different topic.
+        """
         media_dir = "media"
         if not os.path.exists(media_dir):
+            self._log_uplink("RANDOM MEDIA: media/ directory missing.")
             return None
 
         try:
             valid_extensions = ('.jpg', '.png', '.jpeg', '.webp')
-            all_files = []
-            for root, dirs, files in os.walk(media_dir):
-                for f in files:
-                    if f.lower().endswith(valid_extensions):
-                        all_files.append(os.path.join(root, f))
+            curated_files = []  # from subfolders (nicotine/kratom/etc — generic stock)
+            general_files = []  # from media/general/ (recent topic-specific) — last resort
 
-            if all_files:
-                return random.choice(all_files)
+            for root, dirs, files in os.walk(media_dir):
+                # Skip the video_backgrounds dir entirely (those are vertical video assets)
+                if 'video_backgrounds' in root:
+                    continue
+                for f in files:
+                    if not f.lower().endswith(valid_extensions):
+                        continue
+                    full_path = os.path.join(root, f)
+                    # If file is in media/general/ AND has a YYYY-MM-DD prefix, it's a
+                    # recent topic-specific FLUX image — DEPRIORITIZE so we don't accidentally
+                    # use yesterday's "Psilocybin" image for today's "Lion's Mane" post.
+                    is_general = (os.path.basename(root) == 'general')
+                    is_dated_topic = bool(re.match(r'\d{4}-\d{2}-\d{2}-', f))
+                    if is_general and is_dated_topic:
+                        general_files.append(full_path)
+                    else:
+                        curated_files.append(full_path)
+
+            # Prefer curated stock images
+            if curated_files:
+                pick = random.choice(curated_files)
+                self._log_uplink(f"RANDOM MEDIA: Using curated stock fallback: {pick}")
+                return pick
+
+            # Only fall back to dated/general if NO curated images exist
+            if general_files:
+                pick = random.choice(general_files)
+                self._log_uplink(f"RANDOM MEDIA: WARNING — no curated stock available, using recent topic image as last resort: {pick} (this may visually mismatch the post)")
+                return pick
+
+            self._log_uplink("RANDOM MEDIA: No images found anywhere in media/.")
         except Exception as e:
-            print(f"Error scanning media directory: {e}")
+            self._log_uplink(f"RANDOM MEDIA: Error scanning directory: {e}")
 
         return None
 
@@ -1500,49 +1534,58 @@ class HopesAndDreamsBot:
         except Exception as e:
             self._log_uplink(f"WEBSITE ERROR: Failed to update transmissions.json: {e}")
 
+    # Timeout (seconds) for git network operations.
+    # 60s is plenty for GitHub fetches/pushes; if it takes longer something is wrong.
+    GIT_NET_TIMEOUT = 60
+    GIT_LOCAL_TIMEOUT = 30  # Local git ops (status, add, commit) should be near-instant
+
     def _git_push_changes(self, commit_message):
-        """Automates the git workflow to push changes to the repository."""
+        """Automates the git workflow to push changes to the repository.
+        Every subprocess call has a timeout — the bot must NEVER hang on git.
+        """
         self._log_uplink("GIT: Synchronizing repository...")
+        T_NET = self.GIT_NET_TIMEOUT
+        T_LOCAL = self.GIT_LOCAL_TIMEOUT
         try:
             # 0. Emergency Cleanup: Ensure we aren't in a broken state from a previous run
             git_dir = ".git"
             if os.path.exists(os.path.join(git_dir, "rebase-merge")) or os.path.exists(os.path.join(git_dir, "rebase-apply")):
                 self._log_uplink("GIT: Detected stuck rebase. Aborting...")
-                subprocess.run(["git", "rebase", "--abort"], capture_output=True)
+                subprocess.run(["git", "rebase", "--abort"], capture_output=True, timeout=T_LOCAL)
             if os.path.exists(os.path.join(git_dir, "MERGE_HEAD")):
                 self._log_uplink("GIT: Detected stuck merge. Aborting...")
-                subprocess.run(["git", "merge", "--abort"], capture_output=True)
+                subprocess.run(["git", "merge", "--abort"], capture_output=True, timeout=T_LOCAL)
 
             # 1. Detect target branch reliably
             self._log_uplink("GIT: Fetching from origin...")
-            subprocess.run(["git", "fetch", "origin"], capture_output=True)
-            remote_branches = subprocess.run(["git", "ls-remote", "--heads", "origin"], capture_output=True, text=True).stdout
+            subprocess.run(["git", "fetch", "origin"], capture_output=True, timeout=T_NET)
+            remote_branches = subprocess.run(["git", "ls-remote", "--heads", "origin"], capture_output=True, text=True, timeout=T_NET).stdout
 
             if "refs/heads/main" in remote_branches:
                 target_branch = "main"
             elif "refs/heads/master" in remote_branches:
                 target_branch = "master"
             else:
-                branch_res = subprocess.run(["git", "rev-parse", "--abbrev-ref", "HEAD"], capture_output=True, text=True)
+                branch_res = subprocess.run(["git", "rev-parse", "--abbrev-ref", "HEAD"], capture_output=True, text=True, timeout=T_LOCAL)
                 target_branch = branch_res.stdout.strip()
                 if target_branch == "HEAD":
                     target_branch = "main"
 
             # 2. Sync with remote BEFORE applying local changes to minimize conflicts
             self._log_uplink(f"GIT: Syncing with origin {target_branch} (Pre-sync)...")
-            subprocess.run(["git", "stash", "push", "--include-untracked", "-m", "Syndicate Pre-Sync Stash"], capture_output=True)
+            subprocess.run(["git", "stash", "push", "--include-untracked", "-m", "Syndicate Pre-Sync Stash"], capture_output=True, timeout=T_LOCAL)
             try:
-                subprocess.run(["git", "pull", "origin", target_branch, "--rebase"], capture_output=True)
+                subprocess.run(["git", "pull", "origin", target_branch, "--rebase"], capture_output=True, timeout=T_NET)
             finally:
-                stash_list = subprocess.run(["git", "stash", "list"], capture_output=True, text=True)
+                stash_list = subprocess.run(["git", "stash", "list"], capture_output=True, text=True, timeout=T_LOCAL)
                 if "Syndicate Pre-Sync Stash" in stash_list.stdout:
-                    subprocess.run(["git", "stash", "pop"], capture_output=True)
+                    subprocess.run(["git", "stash", "pop"], capture_output=True, timeout=T_LOCAL)
 
             # 3. Ensure we only stage the intended files (including generated media)
-            subprocess.run(["git", "add", "intel.html", "transmissions.html", "transmissions.json", "articles/", "media/"], check=True, capture_output=True, text=True)
+            subprocess.run(["git", "add", "intel.html", "transmissions.html", "transmissions.json", "articles/", "media/"], check=True, capture_output=True, text=True, timeout=T_LOCAL)
 
             # 4. Check if there are staged changes to commit
-            status = subprocess.run(["git", "status", "--porcelain"], capture_output=True, text=True)
+            status = subprocess.run(["git", "status", "--porcelain"], capture_output=True, text=True, timeout=T_LOCAL)
             staged_changes = [line for line in status.stdout.splitlines() if line.startswith(('A', 'M', 'D', 'R', 'C'))]
 
             if not staged_changes:
@@ -1550,72 +1593,79 @@ class HopesAndDreamsBot:
                 return
 
             # 5. Commit the staged changes
-            subprocess.run(["git", "commit", "-m", commit_message], check=True, capture_output=True, text=True)
+            subprocess.run(["git", "commit", "-m", commit_message], check=True, capture_output=True, text=True, timeout=T_LOCAL)
 
             # 6. Final Push with Rebase handling
             self._log_uplink(f"GIT: Final sync and push to {target_branch}...")
 
             # Stash any remaining noise
-            subprocess.run(["git", "stash", "push", "--include-untracked", "-m", "Syndicate Final Stash"], capture_output=True)
+            subprocess.run(["git", "stash", "push", "--include-untracked", "-m", "Syndicate Final Stash"], capture_output=True, timeout=T_LOCAL)
 
             try:
                 # Add all relevant files again just in case (e.g. transmissions.json)
-                subprocess.run(["git", "add", "intel.html", "transmissions.html", "transmissions.json", "articles/", "media/"], capture_output=True)
+                subprocess.run(["git", "add", "intel.html", "transmissions.html", "transmissions.json", "articles/", "media/"], capture_output=True, timeout=T_LOCAL)
 
                 # Update commit message if we missed files initially
-                subprocess.run(["git", "commit", "--amend", "--no-edit"], capture_output=True)
+                subprocess.run(["git", "commit", "--amend", "--no-edit"], capture_output=True, timeout=T_LOCAL)
 
                 # Pull with rebase
-                pull_res = subprocess.run(["git", "pull", "origin", target_branch, "--rebase"], capture_output=True, text=True)
+                pull_res = subprocess.run(["git", "pull", "origin", target_branch, "--rebase"], capture_output=True, text=True, timeout=T_NET)
                 if pull_res.returncode != 0:
                     self._log_uplink(f"GIT REBASE CONFLICT: {pull_res.stderr}")
-                    subprocess.run(["git", "rebase", "--abort"], capture_output=True)
+                    subprocess.run(["git", "rebase", "--abort"], capture_output=True, timeout=T_LOCAL)
 
                     self._log_uplink("GIT: Falling back to merge strategy...")
-                    merge_res = subprocess.run(["git", "pull", "origin", target_branch, "--no-rebase", "--no-edit"], capture_output=True, text=True)
+                    merge_res = subprocess.run(["git", "pull", "origin", target_branch, "--no-rebase", "--no-edit"], capture_output=True, text=True, timeout=T_NET)
                     if merge_res.returncode != 0:
                         self._log_uplink(f"GIT MERGE ERROR: {merge_res.stderr}")
                         return
 
                 # Push explicitly to the target branch
-                push_res = subprocess.run(["git", "push", "origin", f"HEAD:{target_branch}"], check=True, capture_output=True, text=True)
+                push_res = subprocess.run(["git", "push", "origin", f"HEAD:{target_branch}"], check=True, capture_output=True, text=True, timeout=T_NET)
                 self._log_uplink(f"GIT PUSH: {push_res.stdout.strip()}")
                 # Also push to website remote (serves hopes-and-dreams.ca)
                 # Self-healing: pull from website FIRST to absorb any divergent commits, then push
                 try:
                     self._log_uplink("GIT: Pre-syncing with website remote...")
-                    subprocess.run(["git", "fetch", "website"], capture_output=True, timeout=30)
+                    subprocess.run(["git", "fetch", "website"], capture_output=True, timeout=T_NET)
                     # Pull with merge (no-rebase) to absorb any commits website has that we don't
                     subprocess.run(
                         ["git", "pull", "website", target_branch, "--no-rebase", "--no-edit"],
-                        capture_output=True, text=True, timeout=60
+                        capture_output=True, text=True, timeout=T_NET
                     )
                     # Now push - should succeed since we just synced
                     website_push = subprocess.run(
                         ["git", "push", "website", f"HEAD:{target_branch}"],
-                        check=True, capture_output=True, text=True, timeout=60
+                        check=True, capture_output=True, text=True, timeout=T_NET
                     )
                     self._log_uplink(f"GIT PUSH (website): Success - site updating")
                     # Push the merge commit back to origin too so they stay in lockstep
                     try:
                         subprocess.run(
                             ["git", "push", "origin", f"HEAD:{target_branch}"],
-                            check=True, capture_output=True, text=True, timeout=60
+                            check=True, capture_output=True, text=True, timeout=T_NET
                         )
                         self._log_uplink("GIT: origin re-synced with website merge")
                     except subprocess.CalledProcessError:
                         pass  # not critical if this fails
+                    except subprocess.TimeoutExpired:
+                        self._log_uplink("GIT TIMEOUT: origin re-sync timed out (non-critical, skipping)")
                 except subprocess.CalledProcessError as e:
                     self._log_uplink(f"GIT PUSH (website) FAILED: {e.stderr.strip() if e.stderr else 'unknown error'}")
+                except subprocess.TimeoutExpired:
+                    self._log_uplink(f"GIT TIMEOUT: website remote operation exceeded {T_NET}s, skipping website push for this cycle.")
                 except Exception as e:
                     self._log_uplink(f"GIT PUSH (website) FAILED (unexpected): {str(e)}")
             finally:
                 # Restore the stash
-                stash_list = subprocess.run(["git", "stash", "list"], capture_output=True, text=True)
+                stash_list = subprocess.run(["git", "stash", "list"], capture_output=True, text=True, timeout=T_LOCAL)
                 if "Syndicate Final Stash" in stash_list.stdout:
-                    subprocess.run(["git", "stash", "pop"], capture_output=True)
+                    subprocess.run(["git", "stash", "pop"], capture_output=True, timeout=T_LOCAL)
 
             self._log_uplink("GIT: Uplink successful.")
+        except subprocess.TimeoutExpired as e:
+            cmd_str = ' '.join(e.cmd) if hasattr(e, 'cmd') else 'unknown'
+            self._log_uplink(f"GIT TIMEOUT: '{cmd_str}' exceeded {e.timeout}s — aborting git sync to prevent bot hang.")
         except subprocess.CalledProcessError as e:
             err_msg = f"GIT ERROR in '{' '.join(e.cmd)}': {e.stderr}"
             self._log_uplink(err_msg)
@@ -1660,8 +1710,15 @@ def main():
         bot.knowledge.rebuild_index()
         return
 
-    # Initialize Scheduler with misfire grace time to allow retries of missed jobs
-    scheduler = BackgroundScheduler(timezone=pytz_timezone('America/Halifax'))
+    # Initialize Scheduler with misfire grace time to allow retries of missed jobs.
+    # Explicit ThreadPoolExecutor with max_workers=3 — one thread per slot —
+    # so if one post hangs (e.g. on git, on FB API), subsequent slots can still fire.
+    from apscheduler.executors.pool import ThreadPoolExecutor as APSThreadPoolExecutor
+    scheduler = BackgroundScheduler(
+        timezone=pytz_timezone('America/Halifax'),
+        executors={'default': APSThreadPoolExecutor(max_workers=3)},
+        job_defaults={'max_instances': 1, 'coalesce': True}
+    )
 
     # Schedule daily tips at 7:00 AM, 12:00 PM, and 3:00 PM ADT
     # misfire_grace_time=3600 (1 hour) allows the job to run if the bot starts within an hour of the scheduled time
