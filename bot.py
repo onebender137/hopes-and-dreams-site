@@ -193,6 +193,148 @@ class HopesAndDreamsBot:
         """Deprecated: SQLite saves automatically."""
         pass
 
+    def _sanitize_topic(self, topic):
+        """
+        Robust topic sanitizer that handles LLM meta-commentary leakage.
+        Returns cleaned topic string, or None if topic is unsalvageable
+        (caller should fall back to autonomous brainstorm).
+        """
+        if not topic or not isinstance(topic, str):
+            return None
+
+        cleaned = topic.strip()
+
+        # 1. Strip outer quote wrappers
+        if (cleaned.startswith('"') and cleaned.endswith('"')) or \
+           (cleaned.startswith("'") and cleaned.endswith("'")):
+            cleaned = cleaned[1:-1].strip()
+
+        # 2. Normalize whitespace and remove leaked formatting
+        cleaned = cleaned.replace('\n', ' ').replace('|', ' ')
+        cleaned = re.sub(r"['\"]", '', cleaned)
+
+        # 3. Strip known meta-commentary lead-in patterns (covers LLM rephrasings)
+        # Matches: "the specific topic...", "the single most relevant...", "he wants to post about...",
+        # "the topic requested...", "based on...", etc. Stops at " is " / " : " / colon followed by topic.
+        meta_patterns = [
+            # "The single most relevant specific topic or supplement he wants to post about for the 07:00 post is NAD+"
+            r'(?i)^\s*the\s+(single\s+most\s+|most\s+|specific\s+)?(relevant\s+)?(specific\s+)?(topic|supplement|biohack|protocol)[^:]{0,200}\bis\b\s+',
+            # "The topic requested by the CEO for the XX:XX post is..."
+            r'(?i)^\s*the\s+topic\s+requested[^:]{0,150}\bis\b\s+',
+            # "He wants to post about..."
+            r"(?i)^\s*(he|she|they|the\s+ceo|the\s+admin)\s+wants?\s+to\s+post\s+about[\s:]+",
+            # "Based on recent messages..." / "Looking at the chat..."
+            r"(?i)^\s*(based\s+on|looking\s+at|analyzing|from\s+the)[^:]{0,150}[:,]\s+",
+            # "Post with title ..." / "Masterclass: ..."
+            r"(?i)^\s*(post\s+with\s+title|masterclass|article)[\s:]+",
+            # "Today's post is about X" / "Tomorrow's post will be on X"
+            r"(?i)^\s*(today'?s|tomorrow'?s|the\s+next)\s+(post|article|topic)[^:]{0,80}\b(is|will\s+be)\b\s+(about\s+|on\s+|regarding\s+)?",
+            # "The {time} post is..." (fallback for time-prefixed garbage)
+            r"(?i)^\s*the\s+\d{1,2}[:\.]\d{2}\s+post\s+(is|will\s+be)\s+",
+        ]
+
+        for pattern in meta_patterns:
+            new_cleaned = re.sub(pattern, '', cleaned, count=1)
+            if new_cleaned != cleaned:
+                cleaned = new_cleaned.strip()
+                # Strip leftover punctuation/articles after meta removal
+                cleaned = re.sub(r'^[:\-\.\s]+', '', cleaned)
+                cleaned = re.sub(r'^(a|an|the|about|on|regarding|concerning)\s+', '', cleaned, flags=re.IGNORECASE)
+
+        # 4. Trim trailing punctuation/period
+        cleaned = cleaned.rstrip('.!?;:,').strip()
+
+        # 5. Collapse multiple spaces
+        cleaned = re.sub(r'\s+', ' ', cleaned)
+
+        # 6. SANITY CHECK — reject if topic is implausibly long or still contains meta-commentary signals
+        if not cleaned:
+            return None
+        word_count = len(cleaned.split())
+        if word_count > 12:
+            print(f"[SANITIZER] REJECTED — topic too long ({word_count} words): {cleaned[:80]}...")
+            return None
+        # Detect lingering meta-commentary phrases that survived the strips
+        meta_signals = [
+            r'\bhe\s+wants\b', r'\bshe\s+wants\b', r'\brequested\b', r'\bis\s+about\b',
+            r'\bpost\s+is\b', r'\btopic\s+is\b', r'\bcontent\s+is\b',
+            r'\bbased\s+on\b', r'\bfor\s+the\s+\d{1,2}[:\.]\d{2}\s+post\b',
+        ]
+        for sig in meta_signals:
+            if re.search(sig, cleaned, re.IGNORECASE):
+                print(f"[SANITIZER] REJECTED — meta-commentary signal detected: {cleaned[:80]}...")
+                return None
+
+        return cleaned
+
+    # Domain clusters — topics in the same cluster count as "recently posted"
+    # so the bot doesn't churn through NAD+/NMN/NR/Sirtuin variants in a row.
+    TOPIC_CLUSTERS = {
+        'nad_pathway': [
+            'nad', 'nad+', 'nmn', 'nr', 'nicotinamide', 'niacin', 'niacinamide',
+            'sirtuin', 'resveratrol', 'longevity precursor', 'cellular vitality',
+        ],
+        'cholinergic': [
+            'choline', 'alpha-gpc', 'alpha gpc', 'cdp-choline', 'citicoline',
+            'huperzine', 'galantamine', 'acetylcholine',
+        ],
+        'mitochondrial': [
+            'mitochondri', 'pqq', 'coq10', 'ubiquinol', 'urolithin',
+            'mots-c', 'methylene blue', 'atp synthesis',
+        ],
+        'sleep_dream': [
+            'sleep', 'melatonin', 'lucid dream', 'galantamine', 'wbtb', 'mild',
+            'wild', 'dsip', 'glycine', 'magnesium glycinate', 'rem',
+        ],
+        'peptides_healing': [
+            'bpc-157', 'bpc 157', 'tb-500', 'tb 500', 'ghk-cu', 'ghk cu',
+            'thymosin', 'ipamorelin', 'aod-9604', 'peptide healing',
+        ],
+        'nootropics_racetam': [
+            'noopept', 'aniracetam', 'piracetam', 'phenylpiracetam', 'oxiracetam',
+            'pramiracetam', 'racetam',
+        ],
+        'stim_focus': [
+            'caffeine', 'l-theanine', 'theanine', 'modafinil', 'tyrosine',
+            'phenylethylamine', 'pea',
+        ],
+        'gaba_calm': [
+            'gaba', 'kava', 'valerian', 'phenibut', 'l-theanine',
+            'ashwagandha', 'magnolia',
+        ],
+    }
+
+    def _topic_cluster(self, topic):
+        """Returns the cluster name a topic belongs to, or None if no cluster matched."""
+        if not topic:
+            return None
+        lower = topic.lower()
+        for cluster_name, keywords in self.TOPIC_CLUSTERS.items():
+            for kw in keywords:
+                if kw in lower:
+                    return cluster_name
+        return None
+
+    def _is_topic_on_cooldown(self, topic, cooldown=5):
+        """
+        Returns True if this topic OR a topic from the same cluster has been posted
+        in the last `cooldown` posts. Prevents NAD+/NMN/NR rotation spam.
+        """
+        if not topic:
+            return False
+        recent = self.posted_topics[-cooldown:] if self.posted_topics else []
+        # Direct match
+        if topic in recent:
+            return True
+        # Cluster match
+        new_cluster = self._topic_cluster(topic)
+        if new_cluster:
+            for past in recent:
+                if self._topic_cluster(past) == new_cluster:
+                    print(f"[COOLDOWN] '{topic}' is in same cluster ({new_cluster}) as recent '{past}' — blocking.")
+                    return True
+        return False
+
     def get_recent_topics_from_memory(self, slot=None):
         """Extracts potential topics from the Telegram chat history, prioritizing the Admin."""
         if os.path.exists(CHAT_MEMORY_FILE):
@@ -232,16 +374,17 @@ class HopesAndDreamsBot:
                         system_msg = "You are an expert content strategist for the Hopes and Dreams Syndicate. You listen to the CEO's specific requests."
                         topic = self.llm.generate_response(prompt, system_msg)
                         
-                        if topic and "RANDOM" not in topic.upper() and len(topic) < 150:
-                            # Robust sanitization: strip newlines, pipes, and extra spaces
-                            topic = topic.replace('\n', ' ').replace('|', ' ').strip()
-                            topic = topic.replace("'", "").replace("\"", "")
-                            # Meta-commentary cleanup for requested topics
-                            topic = re.sub(r'(?i)The specific topic requested by the CEO for the \d{2}:\d{2} post is\s+', '', topic)
-                            topic = re.sub(r'(?i)post with title\s+', '', topic)
-                            topic = re.sub(r'(?i)Masterclass:\s*', '', topic)
-                            topic = re.sub(r'\s+', ' ', topic) # Collapse multiple spaces
-                            return topic.strip()
+                        if topic and "RANDOM" not in topic.upper() and len(topic) < 200:
+                            # Robust sanitization via centralized helper
+                            cleaned = self._sanitize_topic(topic)
+                            if cleaned is None:
+                                print(f"[CHAT MEMORY] Topic rejected by sanitizer; falling back to autonomous brainstorm.")
+                                return self.brainstorm_autonomous_topic()
+                            # Cooldown — don't keep rotating through the same domain cluster
+                            if self._is_topic_on_cooldown(cleaned, cooldown=5):
+                                print(f"[CHAT MEMORY] '{cleaned}' on cooldown; falling back to autonomous brainstorm.")
+                                return self.brainstorm_autonomous_topic()
+                            return cleaned
             except (json.JSONDecodeError, IOError, Exception) as e:
                 print(f"Error reading chat memory for topics: {e}")
 
@@ -252,10 +395,24 @@ class HopesAndDreamsBot:
         """Uses the LLM to brainstorm a fresh, diverse biohacking topic from the Syndicate Pool."""
         print(f"[{datetime.now()}] EXECUTIVE BRAINSTORM: Generating fresh intelligence...")
 
-        # Filter pool to avoid very recent repeats
-        available_pool = [t for t in SYNDICATE_TOPIC_POOL if t not in self.posted_topics]
+        # Filter pool: remove exact recent repeats AND topics in same cluster as recent posts
+        recent_for_filter = self.posted_topics[-10:] if self.posted_topics else []
+        recent_clusters = set(filter(None, (self._topic_cluster(t) for t in recent_for_filter[-5:])))
+
+        available_pool = []
+        for t in SYNDICATE_TOPIC_POOL:
+            if t in self.posted_topics:
+                continue
+            t_cluster = self._topic_cluster(t)
+            if t_cluster and t_cluster in recent_clusters:
+                continue  # skip — same domain as something recent
+            available_pool.append(t)
+
         if not available_pool:
-            available_pool = SYNDICATE_TOPIC_POOL # Reset if somehow exhausted
+            # If cluster filtering wiped everything, relax the cluster filter but keep recent-exact filter
+            available_pool = [t for t in SYNDICATE_TOPIC_POOL if t not in self.posted_topics]
+        if not available_pool:
+            available_pool = SYNDICATE_TOPIC_POOL  # ultimate reset
 
         # Sample a subset to give the LLM choices without overwhelming context
         sample_size = min(30, len(available_pool))
@@ -268,38 +425,55 @@ class HopesAndDreamsBot:
 
         prompt = (
             f"Brainstorm a specific, compelling topic for today's Facebook Masterclass.\n\n"
-            f"RECENTLY POSTED TOPICS: {', '.join(self.posted_topics[-10:])}\n\n"
+            f"RECENTLY POSTED TOPICS (avoid these and closely related ones): {', '.join(self.posted_topics[-10:])}\n\n"
             f"POTENTIAL SEED KEYWORDS: {', '.join(candidates)}\n\n"
             "INSTRUCTIONS:\n"
             "1. Pick a keyword from the seed list OR brainstorm a closely related alternative biohack/supplement.\n"
             "2. STICK TO TECHNICAL PHARMACOLOGY AND PHYSIOLOGY. No 'wellness', 'mindfulness', or 'spirituality'.\n"
             "3. DO NOT mix unrelated topics (e.g., do NOT link astral projection with telomeres).\n"
             "4. AVOID esoteric topics unless they are being analyzed through a strictly biological/pharmacological lens.\n"
-            "5. Ensure it has NOT been posted recently.\n"
+            "5. AVOID NAD+, NMN, NR, Sirtuins, or anything in the same cluster as the recently posted topics.\n"
             "6. The topic should be punchy and professional (e.g., 'The Neurobiology of Sulbutiamine' or 'Optimizing HRV with Cold Thermogenesis').\n"
-            "7. Return ONLY the topic name. No fluff. No punctuation."
+            "7. Return ONLY the topic name. NO meta-commentary, no 'The topic is...', no quotes, no punctuation, no preamble."
         )
 
         try:
             topic = self.llm.generate_response(prompt, system_msg)
-            if topic and len(topic) < 100:
-                final_topic = topic.strip().replace("'", "").replace("\"", "")
-                return final_topic
+            if topic and len(topic) < 200:
+                cleaned = self._sanitize_topic(topic)
+                if cleaned and not self._is_topic_on_cooldown(cleaned, cooldown=5):
+                    return cleaned
+                else:
+                    print(f"[BRAINSTORM] LLM result rejected (sanitized={cleaned}, on_cooldown=cluster check); using direct pool pick.")
         except Exception as e:
             print(f"Brainstorming failed: {e}")
 
-        # Ultimate fallback from the pool
+        # Ultimate fallback — pick directly from cluster-filtered pool, no LLM involved
         return random.choice(available_pool)
 
     def generate_and_post_daily_tip(self, topic=None, slot=None):
         """Generates a daily Syndicate Masterclass and posts it to the Facebook Page."""
         try:
             # Prevent double-posting for the same slot
+            scheduled_used = False  # track whether we pulled from queue (for marking done later)
             if slot:
                 date_str = datetime.now().strftime("%Y-%m-%d")
                 if self.db.is_slot_posted(date_str, slot):
                     print(f"[{datetime.now()}] EXECUTIVE GUARD: Slot {slot} already posted today ({date_str}). Skipping.")
                     return None
+
+            # === TOPIC SELECTION PRIORITY ORDER ===
+            # 1. Explicit topic argument (e.g. /post <topic>)
+            # 2. Pre-scheduled topic from queue (THE BOSS'S PLAN — always wins over chat memory)
+            # 3. Chat memory inference
+            # 4. Autonomous brainstorm fallback
+            if not topic and slot:
+                date_str = datetime.now().strftime("%Y-%m-%d")
+                queued = self.db.get_scheduled_topic(date_str, slot)
+                if queued:
+                    print(f"[{datetime.now()}] EXECUTIVE QUEUE: Found scheduled topic for {date_str} {slot}: {queued}")
+                    topic = queued
+                    scheduled_used = True
 
             if not topic:
                 print(f"[{datetime.now()}] EXECUTIVE EXECUTION: Identifying topic from chat memory for slot {slot}...")
@@ -353,6 +527,12 @@ class HopesAndDreamsBot:
 
                     # Record the topic as posted to avoid repeats
                     self._record_posted_topic(topic, slot=slot)
+
+                    # If we pulled this from the schedule queue, mark it consumed
+                    if scheduled_used and slot:
+                        date_str = datetime.now().strftime("%Y-%m-%d")
+                        self.db.mark_scheduled_used(date_str, slot)
+                        print(f"[{datetime.now()}] EXECUTIVE QUEUE: Marked scheduled topic '{topic}' as USED for {date_str} {slot}")
 
                     # Add affiliate recommendation in the comments
                     post_id = result.get('id')
@@ -760,10 +940,14 @@ class HopesAndDreamsBot:
 
     def _beautify_for_blog(self, content, topic, image_path):
         """Uses the LLM to beautify content and then injects it into the HTML template."""
-        # Scrub topic meta-commentary
-        topic = re.sub(r'(?i)The specific topic requested by the CEO for the \d{2}:\d{2} post is\s+', '', topic)
-        topic = re.sub(r'(?i)post with title\s+', '', topic)
-        topic = re.sub(r'(?i)Masterclass:\s*', '', topic)
+        # Defensive: scrub any meta-commentary that might have leaked through earlier stages
+        sanitized = self._sanitize_topic(topic)
+        if sanitized:
+            topic = sanitized
+        else:
+            # If the topic is hopelessly mangled by this stage, use a safe fallback
+            print(f"[BLOG] WARNING: topic '{topic[:80]}' failed late sanitation, using generic fallback")
+            topic = "Biohacking Protocol"
         system_msg = (
             "You are the Syndicate's Digital Architect. Your job is to take raw biohacking intel "
             "and format it for a high-end article for our website."
@@ -910,10 +1094,13 @@ class HopesAndDreamsBot:
         date_display = now.strftime("%B %Y")
         timestamp_str = f"[ LIVE FEED ] RECEIVED: {now.strftime('%Y-%m-%d %H:%M:%S')} AST"
 
-        # Final scrub of meta-commentary from the clean_title
-        clean_title = re.sub(r'(?i)The specific topic requested by the CEO for the \d{2}:\d{2} post is\s+', '', clean_title)
-        clean_title = re.sub(r'(?i)post with title\s+', '', clean_title)
-        clean_title = re.sub(r'(?i)Masterclass:\s*', '', clean_title)
+        # Final scrub of meta-commentary from the clean_title (last line of defense)
+        sanitized_title = self._sanitize_topic(clean_title)
+        if sanitized_title:
+            clean_title = sanitized_title
+        else:
+            print(f"[BLOG] WARNING: clean_title '{clean_title[:80]}' failed sanitation; using fallback")
+            clean_title = "Biohacking Protocol"
 
         final_html = template.replace("{{SYNDICATE_TITLE}}", clean_title)
         final_html = final_html.replace("{{WEBSITE_API_KEY}}", Config.WEBSITE_API_KEY or "")

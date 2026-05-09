@@ -120,6 +120,13 @@ class TelegramBot:
             "<b>/affiliate [keyword]</b> - Amazon search\n"
             "<b>/video [topic]</b> - Video generation\n"
             "<b>/index</b> - Rebuild knowledge index\n"
+            "\n<b>📅 SCHEDULE QUEUE</b>\n"
+            "<b>/schedule YYYY-MM-DD HH:MM | topic</b> - Queue ONE post (slot is 07:00, 12:00, or 15:00)\n"
+            "<b>/schedule_day YYYY-MM-DD | t1 | t2 | t3</b> - Queue all 3 slots in one shot\n"
+            "<b>/upcoming</b> - List all queued posts\n"
+            "<b>/unschedule YYYY-MM-DD HH:MM</b> - Remove ONE queued post\n"
+            "<b>/clear_day YYYY-MM-DD</b> - Wipe all queued posts for a date\n"
+            "\n<b>🛠 SYSTEM</b>\n"
             "<b>/status</b> - System status report\n"
             "<b>/debug</b> - View uplink logs\n"
             "<b>/test_uplink</b> - Diagnostic website post\n"
@@ -136,6 +143,259 @@ class TelegramBot:
             self.chat_history[user_id] = []
             self._save_history()
         await update.message.reply_text("Memory reset. Re-initializing Syndicate context.")
+
+    # ===== SCHEDULE QUEUE COMMANDS =====
+    # Manual planning system. The bot reads from this queue FIRST when it's time
+    # to post — overrides chat memory inference and autonomous brainstorm.
+
+    VALID_SLOTS = {'07:00', '12:00', '15:00'}
+
+    def _parse_date_slot(self, raw_date, raw_slot):
+        """Validates date and slot args. Returns (date_str, slot_str) or raises ValueError."""
+        from datetime import datetime as _dt
+        # Validate date format
+        try:
+            parsed = _dt.strptime(raw_date.strip(), '%Y-%m-%d')
+        except ValueError:
+            raise ValueError(f"Bad date format '{raw_date}'. Use YYYY-MM-DD (e.g. 2026-05-12).")
+        date_str = parsed.strftime('%Y-%m-%d')
+        # Validate slot
+        slot_clean = raw_slot.strip()
+        # Accept '7:00' or '07:00', normalize
+        if ':' in slot_clean:
+            try:
+                hh, mm = slot_clean.split(':')
+                slot_clean = f"{int(hh):02d}:{int(mm):02d}"
+            except Exception:
+                raise ValueError(f"Bad slot format '{raw_slot}'. Use HH:MM (e.g. 07:00).")
+        if slot_clean not in self.VALID_SLOTS:
+            raise ValueError(f"Slot must be one of {sorted(self.VALID_SLOTS)}; got '{raw_slot}'.")
+        return date_str, slot_clean
+
+    @restricted
+    async def schedule_topic_cmd(self, update: Update, context: ContextTypes.DEFAULT_TYPE):
+        """
+        Queues a single topic for a date+slot.
+        Usage: /schedule YYYY-MM-DD HH:MM | topic
+        Or:    /schedule YYYY-MM-DD HH:MM topic words here
+        """
+        # Lazy import to avoid circular issues at module load
+        from bot import HopesAndDreamsBot
+        if not hasattr(self, '_db_for_schedule'):
+            # We use the live bot's DB if available, otherwise spin up a thin connection
+            try:
+                if hasattr(self, 'bot_instance') and self.bot_instance:
+                    self._db_for_schedule = self.bot_instance.db
+                else:
+                    # Fallback: instantiate just enough to get DB access
+                    from database_client import SyndicateDatabase
+                    self._db_for_schedule = SyndicateDatabase()
+            except Exception:
+                from database_client import SyndicateDatabase
+                self._db_for_schedule = SyndicateDatabase()
+
+        raw = " ".join(context.args).strip()
+        if not raw:
+            await update.message.reply_text(
+                "Usage: <code>/schedule YYYY-MM-DD HH:MM | topic</code>\n"
+                "Example: <code>/schedule 2026-05-12 07:00 | The Yuschak Method</code>",
+                parse_mode='HTML'
+            )
+            return
+
+        # Two parse styles supported:
+        # A) pipe-delimited: "2026-05-12 07:00 | The Yuschak Method"
+        # B) space-separated: "2026-05-12 07:00 The Yuschak Method"
+        if '|' in raw:
+            head, _, topic = raw.partition('|')
+            head_parts = head.strip().split()
+            topic = topic.strip()
+        else:
+            parts = raw.split(maxsplit=2)
+            if len(parts) < 3:
+                await update.message.reply_text(
+                    "Need date, slot, AND topic. Try:\n<code>/schedule 2026-05-12 07:00 | The Yuschak Method</code>",
+                    parse_mode='HTML'
+                )
+                return
+            head_parts = parts[:2]
+            topic = parts[2]
+
+        if len(head_parts) != 2 or not topic:
+            await update.message.reply_text(
+                "Format: <code>/schedule YYYY-MM-DD HH:MM | topic</code>",
+                parse_mode='HTML'
+            )
+            return
+
+        try:
+            date_str, slot_str = self._parse_date_slot(head_parts[0], head_parts[1])
+        except ValueError as e:
+            await update.message.reply_text(f"⚠️ {e}")
+            return
+
+        # Sanity check topic length
+        if len(topic) > 200:
+            await update.message.reply_text("⚠️ Topic too long (max 200 chars). Tighten it up.")
+            return
+
+        try:
+            self._db_for_schedule.schedule_topic(date_str, slot_str, topic)
+            # Show what's now queued for that day so the user can confirm
+            await update.message.reply_text(
+                f"✅ <b>QUEUED</b>\n📅 {date_str} @ {slot_str}\n📝 {topic}",
+                parse_mode='HTML'
+            )
+        except Exception as e:
+            await update.message.reply_text(f"❌ Failed to schedule: {e}")
+
+    @restricted
+    async def schedule_day_cmd(self, update: Update, context: ContextTypes.DEFAULT_TYPE):
+        """
+        Queues all three slots for a single date in one command.
+        Usage: /schedule_day YYYY-MM-DD | topic1 | topic2 | topic3
+        Slots assigned in order: 07:00, 12:00, 15:00
+        """
+        if not hasattr(self, '_db_for_schedule'):
+            from database_client import SyndicateDatabase
+            self._db_for_schedule = SyndicateDatabase()
+
+        raw = " ".join(context.args).strip()
+        if '|' not in raw:
+            await update.message.reply_text(
+                "Usage: <code>/schedule_day YYYY-MM-DD | topic1 | topic2 | topic3</code>\n\n"
+                "Example: <code>/schedule_day 2026-05-12 | The Yuschak Method | Lion's Mane Neurogenesis | Sulbutiamine</code>\n\n"
+                "Slots assigned in order: 07:00, 12:00, 15:00",
+                parse_mode='HTML'
+            )
+            return
+
+        parts = [p.strip() for p in raw.split('|')]
+        if len(parts) != 4:
+            await update.message.reply_text(
+                f"Need exactly DATE + 3 topics (got {len(parts)} pipe-separated parts). "
+                "Format: <code>/schedule_day YYYY-MM-DD | t1 | t2 | t3</code>",
+                parse_mode='HTML'
+            )
+            return
+
+        date_raw = parts[0]
+        topics = parts[1:]
+        slots = ['07:00', '12:00', '15:00']
+
+        try:
+            from datetime import datetime as _dt
+            parsed = _dt.strptime(date_raw, '%Y-%m-%d')
+            date_str = parsed.strftime('%Y-%m-%d')
+        except ValueError:
+            await update.message.reply_text(f"⚠️ Bad date '{date_raw}'. Use YYYY-MM-DD.")
+            return
+
+        results = []
+        for slot, topic in zip(slots, topics):
+            if not topic:
+                results.append(f"⚠️ {slot}: SKIPPED (empty)")
+                continue
+            if len(topic) > 200:
+                results.append(f"⚠️ {slot}: TOO LONG (max 200 chars)")
+                continue
+            try:
+                self._db_for_schedule.schedule_topic(date_str, slot, topic)
+                results.append(f"✅ {slot}: {topic[:60]}")
+            except Exception as e:
+                results.append(f"❌ {slot}: {e}")
+
+        msg = f"<b>📅 DAY QUEUED — {date_str}</b>\n\n" + "\n".join(results)
+        await update.message.reply_text(msg, parse_mode='HTML')
+
+    @restricted
+    async def upcoming_cmd(self, update: Update, context: ContextTypes.DEFAULT_TYPE):
+        """Lists all pending scheduled posts from today forward."""
+        if not hasattr(self, '_db_for_schedule'):
+            from database_client import SyndicateDatabase
+            self._db_for_schedule = SyndicateDatabase()
+
+        rows = self._db_for_schedule.list_scheduled_upcoming(limit=30)
+        if not rows:
+            await update.message.reply_text("📭 No scheduled posts queued. Use /schedule or /schedule_day to add some.")
+            return
+
+        # Group by date
+        from collections import defaultdict
+        by_date = defaultdict(list)
+        for date_str, slot, topic in rows:
+            by_date[date_str].append((slot, topic))
+
+        lines = ["<b>📅 UPCOMING SYNDICATE QUEUE</b>\n"]
+        for date_str in sorted(by_date.keys()):
+            lines.append(f"\n<b>{date_str}</b>")
+            for slot, topic in sorted(by_date[date_str]):
+                # Truncate long topics for display
+                display = topic if len(topic) <= 70 else topic[:67] + '…'
+                lines.append(f"  • <code>{slot}</code> — {display}")
+
+        msg = "\n".join(lines)
+        # Telegram has a 4096 char limit; truncate if needed
+        if len(msg) > 4000:
+            msg = msg[:3950] + "\n\n…(truncated)"
+        await update.message.reply_text(msg, parse_mode='HTML')
+
+    @restricted
+    async def unschedule_cmd(self, update: Update, context: ContextTypes.DEFAULT_TYPE):
+        """
+        Cancels a scheduled post.
+        Usage: /unschedule YYYY-MM-DD HH:MM
+        """
+        if not hasattr(self, '_db_for_schedule'):
+            from database_client import SyndicateDatabase
+            self._db_for_schedule = SyndicateDatabase()
+
+        if len(context.args) < 2:
+            await update.message.reply_text(
+                "Usage: <code>/unschedule YYYY-MM-DD HH:MM</code>",
+                parse_mode='HTML'
+            )
+            return
+
+        try:
+            date_str, slot_str = self._parse_date_slot(context.args[0], context.args[1])
+        except ValueError as e:
+            await update.message.reply_text(f"⚠️ {e}")
+            return
+
+        removed = self._db_for_schedule.unschedule_topic(date_str, slot_str)
+        if removed:
+            await update.message.reply_text(f"🗑 Removed scheduled post for {date_str} @ {slot_str}")
+        else:
+            await update.message.reply_text(f"ℹ️ Nothing was scheduled for {date_str} @ {slot_str} (already used or never queued).")
+
+    @restricted
+    async def clear_day_cmd(self, update: Update, context: ContextTypes.DEFAULT_TYPE):
+        """
+        Wipes all pending scheduled posts for a date.
+        Usage: /clear_day YYYY-MM-DD
+        """
+        if not hasattr(self, '_db_for_schedule'):
+            from database_client import SyndicateDatabase
+            self._db_for_schedule = SyndicateDatabase()
+
+        if not context.args:
+            await update.message.reply_text("Usage: <code>/clear_day YYYY-MM-DD</code>", parse_mode='HTML')
+            return
+
+        from datetime import datetime as _dt
+        try:
+            parsed = _dt.strptime(context.args[0], '%Y-%m-%d')
+            date_str = parsed.strftime('%Y-%m-%d')
+        except ValueError:
+            await update.message.reply_text(f"⚠️ Bad date '{context.args[0]}'. Use YYYY-MM-DD.")
+            return
+
+        count = self._db_for_schedule.clear_scheduled_for_date(date_str)
+        if count:
+            await update.message.reply_text(f"🗑 Wiped {count} scheduled post(s) for {date_str}.")
+        else:
+            await update.message.reply_text(f"ℹ️ Nothing pending for {date_str}.")
 
     @restricted
     async def draft_post_cmd(self, update: Update, context: ContextTypes.DEFAULT_TYPE):
@@ -614,6 +874,13 @@ class TelegramBot:
         application.add_handler(CommandHandler('regen_img', self.regen_img_cmd))
         application.add_handler(CommandHandler('cancel', self.cancel_draft_cmd))
         application.add_handler(CommandHandler('index', self.rebuild_index_cmd))
+
+        # Schedule queue commands
+        application.add_handler(CommandHandler('schedule', self.schedule_topic_cmd))
+        application.add_handler(CommandHandler('schedule_day', self.schedule_day_cmd))
+        application.add_handler(CommandHandler('upcoming', self.upcoming_cmd))
+        application.add_handler(CommandHandler('unschedule', self.unschedule_cmd))
+        application.add_handler(CommandHandler('clear_day', self.clear_day_cmd))
 
         # Ensure commands are not processed as chat
         application.add_handler(MessageHandler(filters.TEXT & (~filters.COMMAND), self.chat))
