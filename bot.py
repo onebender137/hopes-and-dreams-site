@@ -1257,6 +1257,8 @@ class HopesAndDreamsBot:
             beautified_body = re.sub(r'(?:Masterclass|Topic|Title):\s*', '', beautified_body, flags=re.IGNORECASE)
             # 4. Remove any ** stars that might have leaked into HTML
             beautified_body = beautified_body.replace('**', '')
+            # 4.1 Replace literal "DOUBLE NEWLINE" markers with paragraph breaks
+            beautified_body = re.sub(r'(?i)\s*DOUBLE[\s-]*NEWLINE\s*', '</p><p>', beautified_body)
             # 5. Ensure multiple <br> tags are replaced with proper paragraph structure if leaked
             beautified_body = re.sub(r'(?:<br\s*/?>\s*){2,}', '</p><p>', beautified_body)
             # 5.1 Fallback: Convert double newlines to paragraph breaks if the LLM returned loose text
