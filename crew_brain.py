@@ -46,6 +46,7 @@ class SyndicateCrew:
                 "CRITICAL: Be concise. Aim for high-impact, gritty formatting. Do not write endless academic essays. "
                 "Keep the final output substantial but focused. "
                 "STRICT CONSTRAINTS: Forbidden terms include 'wellness', 'mindfulness', 'spiritual', 'healing', 'meditation', 'astral projection'. "
+                "SAFETY CRITICAL: NEVER recommend protocols that involve dangerous physiological manipulation (e.g., extreme heart rate lowering). "
                 "Do NOT mix unrelated esoteric topics with technical pharmacology."
             ),
             allow_delegation=False,
