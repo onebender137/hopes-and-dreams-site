@@ -229,7 +229,10 @@ class LLMClient:
         # 9. Strip any remaining HTML tags (Safety pass for Facebook/Telegram)
         out = re.sub(r'<[^>]+>', '', out)
 
-        # 10. Trim trailing whitespace per line
+        # 10. Replace literal "DOUBLE NEWLINE" markers with actual newlines
+        out = re.sub(r'(?i)\s*DOUBLE[\s-]*NEWLINE\s*', '\n\n', out)
+
+        # 11. Trim trailing whitespace per line
         out = '\n'.join(line.rstrip() for line in out.split('\n'))
 
         return out.strip()

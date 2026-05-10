@@ -76,7 +76,7 @@ class SyndicateCrew:
             description=(
                 f"Take the researcher's report on {topic} and draft a Facebook Masterclass.\n"
                 "Structure it using three section labels as a single line in CAPS: THE MECHANICS, THE BIOLOGICAL LEVERAGE, and THE TACTICAL IMPLEMENTATION.\n"
-                "CRITICAL: Use DOUBLE NEWLINES between section labels and paragraphs. Use DOUBLE NEWLINES between paragraphs.\n"
+                "CRITICAL: Ensure there is an empty line (two newline characters) between section labels and paragraphs. Use empty lines between paragraphs.\n"
                 "MANDATORY: Each section must contain at least TWO substantial paragraphs of 3-4 sentences each. No one-sentence paragraphs.\n"
                 "Do NOT use HTML tags. Do NOT use markdown headers or bolding. Use plain text only.\n"
                 "Ensure the tone is gritty, professional, and science-heavy. No fluff. No polite intros. "
