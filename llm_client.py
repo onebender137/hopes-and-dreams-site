@@ -43,6 +43,9 @@ class LLMClient:
             "ABSOLUTE PROHIBITIONS:\n"
             "- NEVER claim a compound 'cures' or 'prevents' diseases like cancer, dementia, etc. "
             "Use language like 'may support', 'has shown promise for', 'modulates pathways involved in'.\n"
+            "- SAFETY CRITICAL: NEVER recommend protocols that involve dangerous physiological manipulation, "
+            "such as extreme heart rate lowering, induction of 'incapacity', or any state that poses a risk "
+            "to physical safety. Technical optimization must always remain within safe biological parameters.\n"
             "- NEVER invent chemical names or IUPAC nomenclature. If you don't know the exact "
             "chemistry, describe the compound by class (e.g., 'an arginine-derived neuromodulator') "
             "rather than fabricating a structure.\n"
@@ -100,6 +103,8 @@ class LLMClient:
 
             "ABSOLUTE PROHIBITIONS:\n"
             "- NEVER claim compounds cure diseases. Use 'modulates', 'supports', 'has shown promise'.\n"
+            "- SAFETY CRITICAL: NEVER suggest protocols that involve dangerous physiological manipulation "
+            "(e.g., extreme heart rate lowering). Keep biohacking advice grounded in safe, technical parameters.\n"
             "- NEVER invent chemistry, trials, or studies.\n"
             "- NEVER use bracketed citation markers like [1], [2]. NEVER include a 'References' section.\n"
             "- NEVER use markdown formatting: no ### headers, no ** bold **, no * italics *, no --- "

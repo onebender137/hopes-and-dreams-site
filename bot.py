@@ -95,7 +95,7 @@ SYNDICATE_TOPIC_POOL = [
     "BPC-157 Healing Protocols", "TB-500 Tissue Repair", "GHK-Cu (Copper Peptide)",
     "Selank for Anxiolytic Calm", "Semax for Cognitive Drive", "Epitalon for Telomere Length",
     "MOTS-c Mitochondrial Peptide", "Thymosin Alpha-1 Immune Modulation",
-    "Ipamorelin GH Pulse", "DSIP Sleep Peptide", "AOD-9604 Fat Loss Peptide",
+    "DSIP Sleep Peptide", "AOD-9604 Fat Loss Peptide",
     "Pinealon Cognitive Peptide",
 
     # === MITOCHONDRIAL & ENERGY (8) ===
@@ -218,7 +218,7 @@ class HopesAndDreamsBot:
         # "the topic requested...", "based on...", etc. Stops at " is " / " : " / colon followed by topic.
         meta_patterns = [
             # "The single most relevant specific topic or supplement he wants to post about for the 07:00 post is NAD+"
-            r'(?i)^\s*the\s+(single\s+most\s+|most\s+|specific\s+)?(relevant\s+)?(specific\s+)?(topic|supplement|biohack|protocol)[^:]{0,200}\bis\b\s+',
+            r'(?i)^\s*the\s+(single\s+most\s+|most\s+|specific\s+)?(relevant\s+)?(specific\s+)?(topic|supplement|biohack|protocol|biohacking\s+topic|supplement\s+or\s+topic)[^:]{0,200}\bis\b\s+',
             # "The topic requested by the CEO for the XX:XX post is..."
             r'(?i)^\s*the\s+topic\s+requested[^:]{0,150}\bis\b\s+',
             # "He wants to post about..."
@@ -288,7 +288,7 @@ class HopesAndDreamsBot:
         ],
         'peptides_healing': [
             'bpc-157', 'bpc 157', 'tb-500', 'tb 500', 'ghk-cu', 'ghk cu',
-            'thymosin', 'ipamorelin', 'aod-9604', 'peptide healing',
+            'thymosin', 'aod-9604', 'peptide healing',
         ],
         'nootropics_racetam': [
             'noopept', 'aniracetam', 'piracetam', 'phenylpiracetam', 'oxiracetam',
@@ -323,7 +323,7 @@ class HopesAndDreamsBot:
             "TB-500 Tissue Repair Mechanism",
             "GHK-Cu Skin & Wound Healing",
             "Thymosin Alpha-1 Immune Optimization",
-            "Ipamorelin Growth Hormone Pulsing",
+
             "AOD-9604 Lipolysis Protocol",
         ],
         'sleep': [
