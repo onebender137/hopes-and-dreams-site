@@ -48,6 +48,7 @@ from fb_client import FBClient
 from llm_client import LLMClient
 from telegram_bot import TelegramBot
 from knowledge_client import KnowledgeClient
+from dsda_print import dsda_print, heartbeat as _dsda_heartbeat
 from research_client import ResearchClient
 from affiliate_client import AffiliateClient
 from database_client import SyndicateDatabase
@@ -715,7 +716,7 @@ class HopesAndDreamsBot:
                     # 5. Website Transmission Uplink
                     print(f"[{datetime.now()}] EXECUTIVE EXECUTION: Initiating website transmission uplink...")
                     self._post_to_website(tip_content, topic, image_path)
-                    print(f"Syndicate Masterclass posted successfully at {datetime.now()}!")
+                    dsda_print(f"Syndicate Masterclass posted successfully at {datetime.now()}!")
 
                     # Record the topic as posted to avoid repeats
                     self._record_posted_topic(topic, slot=slot)
@@ -732,11 +733,11 @@ class HopesAndDreamsBot:
 
                     return result
                 else:
-                    print(f"[{datetime.now()}] EXECUTIVE EXECUTION ERROR: Facebook API call failed.")
+                    dsda_print(f"[{datetime.now()}] EXECUTIVE EXECUTION ERROR: Facebook API call failed.")
             else:
-                print(f"[{datetime.now()}] EXECUTIVE EXECUTION ERROR: Content generation failed even without reflection.")
+                dsda_print(f"[{datetime.now()}] EXECUTIVE EXECUTION ERROR: Content generation failed even without reflection.")
         except Exception as e:
-            print(f"[{datetime.now()}] EXECUTIVE EXECUTION CRITICAL FAILURE: {e}")
+            dsda_print(f"[{datetime.now()}] EXECUTIVE EXECUTION CRITICAL FAILURE: {e}")
 
         return None
 
@@ -1740,6 +1741,17 @@ def main():
             coalesce=True,
             id=f"daily_tip_{slot_str}"
         )
+
+    # DSDA bus heartbeat — every 5 minutes
+    scheduler.add_job(
+        _dsda_heartbeat,
+        'interval',
+        minutes=5,
+        args=['hopes_bot'],
+        id='dsda_heartbeat',
+        max_instances=1,
+        coalesce=True,
+    )
 
     scheduler.start()
     print("Scheduler started: Daily Syndicate Masterclasses scheduled for 07:00, 12:00, and 15:00 ADT.")
