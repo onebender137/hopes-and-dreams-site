@@ -52,3 +52,7 @@ chat_memory.json.poisoned
 FETCH_HEAD
 main
 articles_backup_footer_change/
+
+# --- DSDA INFRASTRUCTURE (Private CEO bus) ---
+dsda_bus.py
+dsda_print.py
