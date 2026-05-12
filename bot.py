@@ -711,7 +711,9 @@ class HopesAndDreamsBot:
                     print(f"[{datetime.now()}] EXECUTIVE EXECUTION: No media found, proceeding with text-only payload.")
 
                 print(f"[{datetime.now()}] EXECUTIVE EXECUTION: Hitting FB Graph API for daily tip (Content length: {len(tip_content)}).")
-                result = self.fb.post_to_page(tip_content, image_path=image_path)
+                # Prepend topic as ALL-CAPS title — FBClient._apply_unicode_style turns it bold
+                fb_message = f"{topic.upper()}\n\n{tip_content}"
+                result = self.fb.post_to_page(fb_message, image_path=image_path)
                 if result:
                     # 5. Website Transmission Uplink
                     print(f"[{datetime.now()}] EXECUTIVE EXECUTION: Initiating website transmission uplink...")
