@@ -737,7 +737,29 @@ class HopesAndDreamsBot:
             else:
                 dsda_print(f"[{datetime.now()}] EXECUTIVE EXECUTION ERROR: Content generation failed even without reflection.")
         except Exception as e:
-            dsda_print(f"[{datetime.now()}] EXECUTIVE EXECUTION CRITICAL FAILURE: {e}")
+            import traceback
+            tb_str = traceback.format_exc()
+            # Log as P1 graceful skip with full traceback context — not a P0 panic.
+            # Bot continues to next slot. Original payload preserved for forensics.
+            try:
+                from dsda_bus import log_event
+                log_event(
+                    "hopes_bot",
+                    "P1",
+                    "post_skipped",
+                    {
+                        "message": f"EXECUTIVE EXECUTION skipped post: {type(e).__name__}: {e}",
+                        "topic": topic if 'topic' in dir() else None,
+                        "slot": slot_label if 'slot_label' in dir() else None,
+                        "error_type": type(e).__name__,
+                        "traceback": tb_str[:3000],
+                    },
+                    raise_on_error=False,
+                )
+            except Exception:
+                pass
+            # Also keep stdout visibility for live tmux watching
+            print(f"[{datetime.now()}] EXECUTIVE EXECUTION skipped: {type(e).__name__}: {e}")
 
         return None
 
