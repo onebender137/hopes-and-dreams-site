@@ -652,9 +652,9 @@ document.addEventListener('DOMContentLoaded', () => {
             // Logic for Stack Recommendation
             if (goal === 'focus') {
                 stackName = "The Architect Protocol";
-                components = ["alpha-gpc", "citicoline", "l-theanine", "bacopa"];
-                dosage = "Alpha GPC: 300mg, Citicoline: 250mg, L-Theanine: 200mg, Bacopa: 300mg.";
-                details = "Designed for sustained neural plasticity and linguistic fluidity. The cholinergic foundation paired with L-Theanine ensures sharp focus, while Bacopa supports long-term memory consolidation.";
+                components = ["alpha-gpc", "citicoline", "l-theanine", "bacopa", "mag-threonate"];
+                dosage = "Alpha GPC: 300mg, Citicoline: 250mg, L-Theanine: 200mg, Bacopa: 300mg, Mag-Threonate: 144mg (as elemental).";
+                details = "Designed for sustained neural plasticity and linguistic fluidity. The cholinergic foundation paired with L-Theanine ensures sharp focus, while Bacopa and Magnesium L-Threonate support synapse density and memory consolidation.";
                 if (level === 'elite') {
                     components.push("nicotine");
                     dosage += " Nicotine: 2mg patch (optional for high-stakes windows).";
@@ -666,9 +666,9 @@ document.addEventListener('DOMContentLoaded', () => {
                 details = "Optimizes the transition into deep sleep. Phosphatidylserine helps lower nocturnal cortisol, while L-Theanine increases alpha-wave activity for restorative rest.";
             } else if (goal === 'energy') {
                 stackName = "The Kinetic Engine";
-                components = ["agmatine", "alpha-gpc", "nalt", "creatine"];
-                dosage = "Agmatine: 500mg, Alpha GPC: 150mg, N-Acetyl L-Tyrosine: 350mg, Creatine: 5g.";
-                details = "Focused on dopamine synthesis and cellular energy. NALT provides the precursor for drive, while Creatine ensures ATP availability for high-output neural sessions.";
+                components = ["agmatine", "alpha-gpc", "nalt", "creatine", "pqq", "coq10"];
+                dosage = "Agmatine: 500mg, Alpha GPC: 150mg, NALT: 350mg, Creatine: 5g, PQQ: 20mg, CoQ10: 100mg.";
+                details = "Focused on dopamine synthesis and mitochondrial energy. NALT and Agmatine optimize drive, while the PQQ/CoQ10 synergy ensures peak cellular ATP output.";
             } else if (goal === 'dream') {
                 stackName = "The Oneironaut Stack";
                 components = ["huperzine", "alpha-gpc", "citicoline", "uridine"];
@@ -676,14 +676,14 @@ document.addEventListener('DOMContentLoaded', () => {
                 details = "Maximizes acetylcholine concentration during the REM-dominant hours. Uridine supports the synaptic plasticity required for vivid dream recall.";
             } else if (goal === 'resilience') {
                 stackName = "The Zen Master";
-                components = ["ashwagandha", "rhodiola", "l-theanine", "magnesium"];
-                dosage = "Ashwagandha (KSM-66): 600mg, Rhodiola: 300mg, L-Theanine: 200mg, Magnesium: 200mg.";
-                details = "The ultimate shield against burnout. Rhodiola provides acute anti-fatigue effects, while Ashwagandha and Magnesium manage systemic stress loads.";
+                components = ["ashwagandha", "rhodiola", "l-theanine", "magnesium", "kratom"];
+                dosage = "Ashwagandha: 600mg, Rhodiola: 300mg, L-Theanine: 200mg, Magnesium: 200mg, Kratom: As directed.";
+                details = "The ultimate shield against burnout. Rhodiola provides acute anti-fatigue effects, while Ashwagandha, Magnesium, and Kratom manage systemic stress and resilience.";
             } else if (goal === 'maintenance') {
                 stackName = "The Neuro-Vanguard";
-                components = ["lions-mane", "omega-3", "citicoline", "uridine", "creatine"];
-                dosage = "Lion's Mane: 1000mg, Omega-3: 2000mg, Citicoline: 250mg, Uridine: 250mg, Creatine: 3g.";
-                details = "The ultimate foundation for long-term brain health. This stack focuses on neuro-genesis (Lion's Mane), membrane integrity (Omega-3/Citicoline/Uridine), and metabolic support (Creatine).";
+                components = ["lions-mane", "omega-3", "citicoline", "uridine", "creatine", "nac", "pqq", "d3-k2", "nattokinase", "turkey-tail"];
+                dosage = "Lion's Mane: 1000mg, Omega-3: 2000mg, Citicoline: 250mg, Uridine: 250mg, Creatine: 3g, NAC: 600mg, PQQ: 20mg, D3+K2: 5000IU, Nattokinase: 2000FU, Turkey Tail: 500mg.";
+                details = "The ultimate foundation for long-term biological sovereignty. Combines neuro-genesis (Lion's Mane) and mitochondrial support (PQQ) with systemic antioxidant (NAC), cardiovascular (Nattokinase), and immune (Turkey Tail) optimization.";
             }
 
             if (output) {
