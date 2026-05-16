@@ -50,6 +50,10 @@ class TelegramBot:
         self.news = NewsClient()
         self.affiliate = AffiliateClient()
         self.video = VideoCreator()
+        # Video human-in-loop state
+        self.last_video_script = None
+        self.last_video_topic = None
+        self.last_video_started_at = None
         self.knowledge = KnowledgeClient()
         self.last_topic = None
 
@@ -1002,22 +1006,156 @@ class TelegramBot:
             f"\nBegin the script now about: {topic}"
         )
         content = await asyncio.to_thread(self.llm.generate_response, prompt)
-
-        # Sanitizer — strip any LLM preamble that slipped through
         content = self._strip_script_preamble(content) if content else content
+        if not content:
+            await update.message.reply_text("Could not generate script.")
+            return
+        # Stash for human-in-loop review
+        import time as _t
+        self.last_video_script = content
+        self.last_video_topic = topic
+        self.last_video_started_at = _t.time()
+        await update.message.reply_text(
+            f"📜 DRAFT SCRIPT (topic: {topic})\n\n'{content}'\n\n"
+            "Reply:\n"
+            "✅ /confirm_video — render + publish\n"
+            "🔄 /reroll_video — regenerate script, same topic\n"
+            "✏️ /edit_video <instructions> — refine via natural language\n"
+            "🗑️ /cancel_video — discard\n\n"
+            "⏱️ Auto-expires in 5min."
+        )
+        if context.job_queue:
+            context.job_queue.run_once(
+                self._video_draft_timeout,
+                300,
+                chat_id=update.effective_chat.id,
+                name=f"video_draft_timeout_{update.effective_chat.id}",
+            )
 
-        if content:
-            await update.message.reply_text(f"🎥 **PRODUCTION STARTED**\n\nScript:\n'{content}'\n\nGenerating Intel-optimized voiceover...")
+    async def confirm_video_cmd(self, update: Update, context: ContextTypes.DEFAULT_TYPE):
+        """Render + publish the stashed video script."""
+        if not self.last_video_script:
+            await update.message.reply_text("No video draft. Use /video first.")
+            return
+        topic = self.last_video_topic
+        content = self.last_video_script
+        self.last_video_script = None
+        self.last_video_topic = None
+        self.last_video_started_at = None
+        await update.message.reply_text(f"🎥 PRODUCTION STARTED — generating voiceover + video for: {topic}")
+        try:
             file_path = await self.video.generate_biohacking_snippet(topic, content)
-
-            if file_path.endswith('.mp4'):
+            if file_path and file_path.endswith('.mp4'):
                 await update.message.reply_video(video=open(file_path, 'rb'))
-            elif file_path.endswith('.mp3'):
+            elif file_path and file_path.endswith('.mp3'):
                 await update.message.reply_audio(audio=open(file_path, 'rb'))
             else:
-                await update.message.reply_text("Issue generating snippet.")
+                await update.message.reply_text("⚠️ Issue generating snippet.")
+        except Exception as e:
+            await update.message.reply_text(f"❌ Video generation failed: {type(e).__name__}: {str(e)[:200]}")
+
+    async def reroll_video_cmd(self, update: Update, context: ContextTypes.DEFAULT_TYPE):
+        """Regenerate script for the same topic."""
+        if not self.last_video_topic:
+            await update.message.reply_text("No active video draft. Use /video first.")
+            return
+        topic = self.last_video_topic
+        await context.bot.send_chat_action(chat_id=update.effective_chat.id, action="typing")
+        prompt = (
+            f"Write the spoken script ONLY for a 30-second Syndicate-style biohacking video about: {topic}. "
+            "OUTPUT RULES (CRITICAL):\n"
+            "- Begin with the first sentence of the actual script. NO preamble.\n"
+            "- DO NOT write 'Sure', 'Let\'s', 'Alright', 'Okay', 'Here is', 'Here\'s the script', or any acknowledgment.\n"
+            "- DO NOT write headings, labels, stage directions, brackets, or notes.\n"
+            "- DO NOT mention forums, posts, or that this is a script.\n"
+            "- Plain spoken prose only. Direct, technical, authoritative tone.\n"
+            "- Target ~75 words (about 30 seconds at conversational pace).\n"
+            "- Start with a hook sentence. End with a forward-looking statement.\n"
+            f"\nBegin the script now about: {topic}"
+        )
+        content = await asyncio.to_thread(self.llm.generate_response, prompt)
+        content = self._strip_script_preamble(content) if content else content
+        if not content:
+            await update.message.reply_text("Could not regenerate script.")
+            return
+        import time as _t
+        self.last_video_script = content
+        self.last_video_started_at = _t.time()
+        await update.message.reply_text(
+            f"🔄 REROLLED (topic: {topic})\n\n'{content}'\n\n"
+            "✅ /confirm_video  🔄 /reroll_video  ✏️ /edit_video  🗑️ /cancel_video — 5min timeout"
+        )
+
+    async def edit_video_cmd(self, update: Update, context: ContextTypes.DEFAULT_TYPE):
+        """Refine the pending draft via natural-language edit instructions."""
+        if not self.last_video_script or not self.last_video_topic:
+            await update.message.reply_text("No active video draft. Use /video first.")
+            return
+        instructions = " ".join(context.args).strip()
+        if not instructions:
+            await update.message.reply_text(
+                "Usage: /edit_video <instructions>\n\n"
+                "Examples:\n"
+                "  /edit_video Make it 2x longer and dive deeper into mechanisms\n"
+                "  /edit_video Add a hook about REM sleep at the start\n"
+                "  /edit_video Replace galantamine with mugwort"
+            )
+            return
+        topic = self.last_video_topic
+        original = self.last_video_script
+        await context.bot.send_chat_action(chat_id=update.effective_chat.id, action="typing")
+        prompt = (
+            f"You are revising a 30-second Syndicate-style biohacking video script about: {topic}.\n\n"
+            f"ORIGINAL SCRIPT:\n{original}\n\n"
+            f"REVISION REQUEST:\n{instructions}\n\n"
+            "OUTPUT RULES (CRITICAL):\n"
+            "- Output ONLY the revised script. NO preamble.\n"
+            "- DO NOT write 'Sure', 'Here is', 'Here\'s the revised script', or any acknowledgment.\n"
+            "- DO NOT write headings, labels, stage directions, brackets, or notes.\n"
+            "- DO NOT mention forums, posts, or that this is a script.\n"
+            "- Plain spoken prose only. Direct, technical, authoritative tone.\n"
+            "- Apply the revision request faithfully but preserve the spoken-script format.\n"
+            "- Start with a hook sentence. End with a forward-looking statement.\n"
+            "\nBegin the revised script now:"
+        )
+        revised = await asyncio.to_thread(self.llm.generate_response, prompt)
+        revised = self._strip_script_preamble(revised) if revised else revised
+        if not revised:
+            await update.message.reply_text("Could not generate revised script.")
+            return
+        import time as _t
+        self.last_video_script = revised
+        self.last_video_started_at = _t.time()
+        await update.message.reply_text(
+            f"✏️ EDITED (topic: {topic})\n\n'{revised}'\n\n"
+            "✅ /confirm_video  🔄 /reroll_video  ✏️ /edit_video  🗑️ /cancel_video — 5min timeout"
+        )
+
+    async def cancel_video_cmd(self, update: Update, context: ContextTypes.DEFAULT_TYPE):
+        """Drop the pending video draft."""
+        if self.last_video_script:
+            self.last_video_script = None
+            self.last_video_topic = None
+            self.last_video_started_at = None
+            await update.message.reply_text("🗑️ Video draft discarded.")
         else:
-            await update.message.reply_text("Could not generate script.")
+            await update.message.reply_text("No video draft to cancel.")
+
+    async def _video_draft_timeout(self, context: ContextTypes.DEFAULT_TYPE):
+        """JobQueue callback: clear draft if still pending after 5min."""
+        import time as _t
+        if self.last_video_started_at and (_t.time() - self.last_video_started_at) >= 300:
+            if self.last_video_script:
+                self.last_video_script = None
+                self.last_video_topic = None
+                self.last_video_started_at = None
+                try:
+                    await context.bot.send_message(
+                        chat_id=context.job.chat_id,
+                        text="⏱️ Video draft expired (5min). Send /video again to retry."
+                    )
+                except Exception:
+                    pass
 
     def _strip_script_preamble(self, text: str) -> str:
         """
@@ -1103,7 +1241,15 @@ class TelegramBot:
             return
 
         print("Starting Syndicate Intel Hub...")
-        application = ApplicationBuilder().token(self.token).build()
+        application = (
+            ApplicationBuilder()
+            .token(self.token)
+            .read_timeout(60)
+            .write_timeout(180)
+            .connect_timeout(30)
+            .pool_timeout(30)
+            .build()
+        )
 
         # Add handlers
         application.add_handler(CommandHandler('start', self.start))
@@ -1124,6 +1270,10 @@ class TelegramBot:
         application.add_handler(CommandHandler('news', self.search_news))
         application.add_handler(CommandHandler('affiliate', self.search_affiliate))
         application.add_handler(CommandHandler('video', self.generate_video))
+        application.add_handler(CommandHandler('confirm_video', self.confirm_video_cmd))
+        application.add_handler(CommandHandler('reroll_video', self.reroll_video_cmd))
+        application.add_handler(CommandHandler('edit_video', self.edit_video_cmd))
+        application.add_handler(CommandHandler('cancel_video', self.cancel_video_cmd))
         application.add_handler(CommandHandler('regen_img', self.regen_img_cmd))
         application.add_handler(CommandHandler('cancel', self.cancel_draft_cmd))
         application.add_handler(CommandHandler('index', self.rebuild_index_cmd))
