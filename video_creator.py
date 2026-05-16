@@ -20,7 +20,7 @@ from moviepy.config import change_settings
 # Explicitly tell MoviePy where the binary is
 change_settings({"IMAGEMAGICK_BINARY": "/usr/bin/convert"})
 
-from moviepy.editor import TextClip, AudioFileClip, ImageClip, ColorClip, CompositeVideoClip
+from moviepy.editor import TextClip, AudioFileClip, ImageClip, ColorClip, CompositeVideoClip, VideoFileClip, concatenate_videoclips
 from config import Config
 
 class VideoCreator:
@@ -231,11 +231,44 @@ class VideoCreator:
         
         # Step 2: Video Composition
         try:
-            video_path = self.create_daily_short(content, audio_path, topic, video_file)
-            return video_path
+            # This is your core bot video
+            core_video_path = self.create_daily_short(content, audio_path, topic, video_file)
+            
+            # --- NEW STEP 3: STITCHING THE VEO INTRO ---
+            print("Stitching Syndicate Intro sequence...")
+            
+            # Load the vertical intro we made in Step 1 (make sure it's in your media folder)
+            intro_clip = VideoFileClip(f"{self.base_media_path}/intro_vertical.mp4")
+            
+            # Load the newly generated bot video
+            main_clip = VideoFileClip(core_video_path)
+            
+            # Stitch them together (method="compose" handles slight framerate/size differences)
+            final_stitched_video = concatenate_videoclips([intro_clip, main_clip], method="compose")
+            
+            # Set the final output path (we'll just overwrite the original for cleanliness)
+            final_path = f"{self.output_dir}/FINAL_{video_file}"
+            
+            final_stitched_video.write_videofile(
+                final_path, 
+                fps=24, 
+                codec='libx264', 
+                audio_codec='aac', 
+                threads=4, 
+                preset='ultrafast',
+                logger='bar'
+            )
+            
+            # Clean up memory
+            intro_clip.close()
+            main_clip.close()
+            
+            return final_path
+            
         except Exception as e:
             print(f"Critical error in video production: {e}")
-            return audio_path
+            return audio_path       
+    
 
 if __name__ == "__main__":
     # Internal Test Harness

@@ -137,6 +137,36 @@ j=d.createElement(s),dl=l!='dataLayer'?'&l='+l:'';j.async=true;j.src=
     </style>
 </head>
 <body>
+<div id="splash-screen" style="position: fixed; top: 0; left: 0; width: 100%; height: 100%; background-color: #000; z-index: 9999; display: flex; justify-content: center; align-items: center; transition: opacity 0.8s ease-out;">
+    <video autoplay muted playsinline id="splash-video" style="width: 100%; max-width: 800px;">
+        <source src="lander.mp4" type="video/mp4">
+    </video>
+</div>
+
+<script>
+    // Check browser memory: Has the user been here during this session?
+    const hasSeenSplash = sessionStorage.getItem("hopesSplashSeen");
+
+    if (hasSeenSplash) {
+        // If yes, instantly nuke the splash screen with CSS so it doesn't flash
+        document.write('<style>#splash-screen { display: none !important; }</style>');
+    } else {
+        // If no, wait for the page to load, play the video, then fade it out
+        document.addEventListener("DOMContentLoaded", function() {
+            const splash = document.getElementById("splash-screen");
+            const video = document.getElementById("splash-video");
+
+            video.onended = function() {
+                splash.style.opacity = "0"; // Trigger CSS fade
+                
+                setTimeout(() => {
+                    splash.style.display = "none"; // Remove from flow
+                    sessionStorage.setItem("hopesSplashSeen", "true"); // Save memory
+                }, 800); 
+            };
+        });
+    }
+</script>
 <!-- Google Tag Manager (noscript) -->
 <noscript><iframe src="https://www.googletagmanager.com/ns.html?id=GTM-P9TBCF2X"
 height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
