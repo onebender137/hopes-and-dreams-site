@@ -11,6 +11,23 @@ document.addEventListener('DOMContentLoaded', () => {
         }
     });
 
+    // --- Video Splash Intro Skip Logic ---
+    const skipBtn = document.getElementById('skip-video-btn');
+    if (skipBtn) {
+        skipBtn.addEventListener('click', () => {
+            const splash = document.getElementById('splash-screen');
+            if (splash) {
+                splash.style.transition = 'opacity 0.5s ease';
+                splash.style.opacity = '0';
+                setTimeout(() => {
+                    splash.remove();
+                    // Set the session token so it remembers they skipped it
+                    sessionStorage.setItem('hopesSplashSeen', "true");
+                }, 500);
+            }
+        });
+    }
+
     const observerOptions = {
         threshold: 0.1,
         rootMargin: '0px 0px -50px 0px'
