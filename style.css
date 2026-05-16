@@ -2065,3 +2065,25 @@ body.light-mode .intel-cta {
     box-shadow: 0 0 15px var(--neon-blue, #00f0ff);
     font-weight: bold;
 }
+/* --- Mainframe Navigation Layout Optimization --- */
+header nav {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    flex-wrap: nowrap;     /* Forcibly stops links from breaking into a messy double row */
+    gap: 16px;             /* Standard comfortable gap */
+}
+
+header nav a {
+    white-space: nowrap;   /* Keeps multi-word links like Intel Hub strictly on one line */
+}
+
+/* Laptop and Tablet Layout Defenses */
+@media (max-width: 1200px) {
+    header nav {
+        gap: 10px;         /* Automatically pinches links closer together */
+    }
+    header nav a {
+        font-size: 0.85rem; /* Scales text down slightly to preserve horizontal real estate */
+    }
+}
