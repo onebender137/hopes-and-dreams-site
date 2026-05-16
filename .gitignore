@@ -56,3 +56,7 @@ articles_backup_footer_change/
 # --- DSDA INFRASTRUCTURE (Private CEO bus) ---
 dsda_bus.py
 dsda_print.py
+
+# Backup files from surgical edits
+*.bak-*
+*.bak

@@ -30,6 +30,14 @@ LangChainInstrumentor().instrument(tracer_provider=tracer_provider)
 CrewAIInstrumentor().instrument(tracer_provider=tracer_provider)
 LiteLLMInstrumentor().instrument(tracer_provider=tracer_provider)
 # ---------------------------------------------
+# --- LOGGING: mute noisy libraries that leak credentials in URLs ---
+import logging
+logging.basicConfig(level=logging.INFO, format='%(asctime)s - %(name)s - %(levelname)s - %(message)s')
+logging.getLogger("httpx").setLevel(logging.WARNING)
+logging.getLogger("httpcore").setLevel(logging.WARNING)
+logging.getLogger("telegram").setLevel(logging.WARNING)
+logging.getLogger("urllib3").setLevel(logging.WARNING)
+# -----------------------------------------------------------------
 
 import subprocess
 import re
@@ -1066,43 +1074,86 @@ class HopesAndDreamsBot:
             # Bottom dark band for footer
             draw.rectangle([(0, H-90), (W, H)], fill=(3, 9, 31, 220))
 
-            # TITLE — uppercase, centered, gold
+            # TITLE — uppercase, centered, gold — width-aware fit
             title = topic.upper()
-            # Wrap if too long
-            if len(title) > 60:
-                words = title.split()
-                mid = len(words) // 2
-                line1 = ' '.join(words[:mid])
-                line2 = ' '.join(words[mid:])
-                draw.rectangle([(0, 0), (W, 220)], fill=(3, 9, 31, 200))
-                font_3line = load_font(36, bold=True)
-                bbox1 = draw.textbbox((0, 0), line1, font=font_3line)
-                bbox2 = draw.textbbox((0, 0), line2, font=font_3line)
-                w1 = bbox1[2] - bbox1[0]
-                w2 = bbox2[2] - bbox2[0]
-                draw.text(((W-w1)//2, 20), line1, font=font_3line, fill=(251, 191, 36))
-                draw.text(((W-w2)//2, 70), line2, font=font_3line, fill=(251, 191, 36))
-                tagline_y = 130
-            elif len(title) > 32:
-                words = title.split()
-                mid = len(words) // 2
-                line1 = ' '.join(words[:mid])
-                line2 = ' '.join(words[mid:])
-                # Extend the top dark band for 2-line titles
-                draw.rectangle([(0, 0), (W, 220)], fill=(3, 9, 31, 200))
-                font_2line = load_font(52, bold=True)
-                bbox1 = draw.textbbox((0, 0), line1, font=font_2line)
-                bbox2 = draw.textbbox((0, 0), line2, font=font_2line)
-                w1 = bbox1[2] - bbox1[0]
-                w2 = bbox2[2] - bbox2[0]
-                draw.text(((W-w1)//2, 20), line1, font=font_2line, fill=(251, 191, 36))
-                draw.text(((W-w2)//2, 90), line2, font=font_2line, fill=(251, 191, 36))
-                # Push tagline down too
-                tagline_y = 175
-            else:
-                bbox = draw.textbbox((0, 0), title, font=title_font)
-                w = bbox[2] - bbox[0]
-                draw.text(((W-w)//2, 40), title, font=title_font, fill=(251, 191, 36))
+            words = title.split()
+            MAX_WIDTH = int(W * 0.92)  # leave 4% margin each side
+
+            def measure(text, font):
+                bbox = draw.textbbox((0, 0), text, font=font)
+                return bbox[2] - bbox[0]
+
+            def best_split(words):
+                """Find split point that minimizes max line width difference."""
+                if len(words) < 2:
+                    return [' '.join(words)]
+                best = None
+                best_max_len = float('inf')
+                for i in range(1, len(words)):
+                    a = ' '.join(words[:i])
+                    b = ' '.join(words[i:])
+                    m = max(len(a), len(b))
+                    if m < best_max_len:
+                        best_max_len = m
+                        best = [a, b]
+                return best
+
+            def split_3(words):
+                """Split into 3 balanced lines."""
+                if len(words) < 3:
+                    return [' '.join(words)]
+                n = len(words)
+                a = n // 3
+                b = 2 * n // 3
+                return [' '.join(words[:a]), ' '.join(words[a:b]), ' '.join(words[b:])]
+
+            rendered = False
+
+            # Attempt 1: single line at full size, shrink if needed
+            for size in (72, 64, 58, 52, 46, 40):
+                font_try = load_font(size, bold=True)
+                if measure(title, font_try) <= MAX_WIDTH:
+                    w = measure(title, font_try)
+                    draw.text(((W-w)//2, 40), title, font=font_try, fill=(251, 191, 36))
+                    tagline_y = 125
+                    rendered = True
+                    break
+
+            # Attempt 2: 2 lines
+            if not rendered:
+                lines2 = best_split(words)
+                for size in (52, 46, 40, 36, 32):
+                    font_try = load_font(size, bold=True)
+                    widths = [measure(L, font_try) for L in lines2]
+                    if max(widths) <= MAX_WIDTH:
+                        draw.rectangle([(0, 0), (W, 220)], fill=(3, 9, 31, 200))
+                        draw.text(((W-widths[0])//2, 20), lines2[0], font=font_try, fill=(251, 191, 36))
+                        draw.text(((W-widths[1])//2, 20+size+18), lines2[1], font=font_try, fill=(251, 191, 36))
+                        tagline_y = 175
+                        rendered = True
+                        break
+
+            # Attempt 3: 3 lines, smallest font
+            if not rendered:
+                lines3 = split_3(words)
+                for size in (36, 32, 28, 24, 20):
+                    font_try = load_font(size, bold=True)
+                    widths = [measure(L, font_try) for L in lines3]
+                    if max(widths) <= MAX_WIDTH:
+                        draw.rectangle([(0, 0), (W, 260)], fill=(3, 9, 31, 200))
+                        y = 20
+                        for i, L in enumerate(lines3):
+                            draw.text(((W-widths[i])//2, y), L, font=font_try, fill=(251, 191, 36))
+                            y += size + 12
+                        tagline_y = 210
+                        rendered = True
+                        break
+
+            # Last resort: 1 line at tiny size (should basically never hit)
+            if not rendered:
+                font_try = load_font(20, bold=True)
+                w = measure(title, font_try)
+                draw.text(((W-w)//2, 40), title, font=font_try, fill=(251, 191, 36))
                 tagline_y = 125
 
             # Tagline below title — neon cyan
@@ -1183,8 +1234,19 @@ class HopesAndDreamsBot:
         self._update_transmissions_json(clean_title, filename, date_str)
 
         # 6. Git Commit and Push
-        self._git_push_changes(f"Syndicate Transmission: {topic}")
-
+        git_ok = self._git_push_changes(f"Syndicate Transmission: {topic}")
+        if not git_ok:
+            # Article exists on disk but couldn't push to GitHub Pages — fire P1 to bus
+            try:
+                from dsda_bus import log_event
+                log_event("hopes_bot", "P1", "website_push_failed", {
+                    "topic": topic,
+                    "filename": filename,
+                    "msg": f"Article saved locally but git push failed: {topic}"
+                })
+            except Exception:
+                pass
+            return False
         return True
 
     def _beautify_for_blog(self, content, topic, image_path):
@@ -1617,7 +1679,7 @@ class HopesAndDreamsBot:
 
             if not staged_changes:
                 self._log_uplink("GIT: No relevant changes staged. Skipping commit/push.")
-                return
+                return True  # nothing to push is not a failure
 
             # 5. Commit the staged changes
             subprocess.run(["git", "commit", "-m", commit_message], check=True, capture_output=True, text=True, timeout=T_LOCAL)
@@ -1645,7 +1707,7 @@ class HopesAndDreamsBot:
                     merge_res = subprocess.run(["git", "pull", "origin", target_branch, "--no-rebase", "--no-edit"], capture_output=True, text=True, timeout=T_NET)
                     if merge_res.returncode != 0:
                         self._log_uplink(f"GIT MERGE ERROR: {merge_res.stderr}")
-                        return
+                        return False
 
                 # Push explicitly to the target branch
                 push_res = subprocess.run(["git", "push", "origin", f"HEAD:{target_branch}"], check=True, capture_output=True, text=True, timeout=T_NET)
@@ -1690,14 +1752,18 @@ class HopesAndDreamsBot:
                     subprocess.run(["git", "stash", "pop"], capture_output=True, timeout=T_LOCAL)
 
             self._log_uplink("GIT: Uplink successful.")
+            return True
         except subprocess.TimeoutExpired as e:
             cmd_str = ' '.join(e.cmd) if hasattr(e, 'cmd') else 'unknown'
             self._log_uplink(f"GIT TIMEOUT: '{cmd_str}' exceeded {e.timeout}s — aborting git sync to prevent bot hang.")
+            return False
         except subprocess.CalledProcessError as e:
             err_msg = f"GIT ERROR in '{' '.join(e.cmd)}': {e.stderr}"
             self._log_uplink(err_msg)
+            return False
         except Exception as e:
             self._log_uplink(f"GIT CRITICAL ERROR: {str(e)}")
+            return False
     def run_fb_loop(self, interval_seconds=3600):
         """Main Facebook bot loop for polling comments."""
         print("Facebook comment monitor loop started.")

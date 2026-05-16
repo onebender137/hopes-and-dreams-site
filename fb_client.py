@@ -102,9 +102,14 @@ class FBClient:
                     print(f"Syndicate posting with image: {final_image}")
                     return self.page_graph.put_photo(image=img, message=message)
             except Exception as e:
-                print(f"Error posting photo to Page: {e}. Falling back to text-only.")
+                # CRITICAL: put_photo can raise AFTER the post succeeded server-side
+                # (timeout, malformed response, network blip). Falling back to text-only
+                # creates a duplicate post on FB. Abort instead — operator can retry manually.
+                print(f"Error posting photo to Page: {e}")
+                print("ABORTING to prevent duplicate post. Check FB manually — image post may have actually succeeded.")
+                return None
 
-        # Text-only fallback
+        # Text-only fallback (only reached when no image was attempted)
         try:
             return self.page_graph.put_object(self.page_id, "feed", message=message)
         except facebook.GraphAPIError as e:
