@@ -143,7 +143,7 @@ j=d.createElement(s),dl=l!='dataLayer'?'&l='+l:'';j.async=true;j.src=
         .archive-item:hover .title { color: var(--neon-blue); }
         .archive-item .date { font-family: 'Courier New', Courier, monospace; font-size: 0.85rem; color: var(--text-dim); }
 
-        /* --- DESKTOP STICKY MONITOR WRAPPER --- */
+        /* --- STABLE COCKPIT BRAIN OVERLAY MATRIX --- */
         .brain-visualizer-container {
             display: flex;
             justify-content: center;
@@ -160,26 +160,26 @@ j=d.createElement(s),dl=l!='dataLayer'?'&l='+l:'';j.async=true;j.src=
         .interactive-brain-wrapper {
             position: relative;
             width: 100%;
-            max-width: 440px;
+            max-width: 500px;
             display: block;
             margin: 0 auto;
             background: #000;
             border-radius: 12px;
             overflow: hidden;
-            aspect-ratio: 4 / 3;
+            /* Aspect ratio removed entirely to prevent mobile WebKit collapse bugs */
         }
 
+        /* Let the image drive the natural height of the wrapper */
         .native-brain-graphic {
             width: 100%;
-            height: 100%;
-            object-fit: cover;
+            height: auto; 
             display: block;
             user-select: none;
             -webkit-user-drag: none;
             filter: brightness(0.95) contrast(1.05);
         }
 
-        /* HIGH-PRECISION 4:3 INTERACTIVE OVERLAY MAP */
+        /* HIGH-PRECISION 800x533 INTERACTIVE OVERLAY MAP */
         .centerpiece-brain-svg-overlay {
             position: absolute;
             top: 0;
@@ -194,8 +194,8 @@ j=d.createElement(s),dl=l!='dataLayer'?'&l='+l:'';j.async=true;j.src=
         .hotspot-trigger-ring {
             fill: rgba(56, 189, 248, 0.02);
             stroke: rgba(56, 189, 248, 0.5);
-            stroke-width: 1.5;
-            stroke-dasharray: 4 4;
+            stroke-width: 2.5;
+            stroke-dasharray: 6 6;
             transition: all 0.3s ease;
         }
         .brain-svg-hotspot:hover .hotspot-trigger-ring,
@@ -211,11 +211,11 @@ j=d.createElement(s),dl=l!='dataLayer'?'&l='+l:'';j.async=true;j.src=
         .brain-svg-hotspot:hover .hotspot-center-dot,
         .brain-svg-hotspot.active-target .hotspot-center-dot {
             fill: var(--neon-gold);
-            r: 4.5px;
+            r: 9px;
         }
         .hotspot-label {
             font-family: 'Courier New', Courier, monospace;
-            font-size: 12px;
+            font-size: 18px;
             font-weight: bold;
             fill: rgba(248, 250, 252, 0.95);
             text-anchor: middle;
@@ -389,7 +389,7 @@ j=d.createElement(s),dl=l!='dataLayer'?'&l='+l:'';j.async=true;j.src=
                 width: 100%;
             }
             
-            .interactive-brain-wrapper { max-width: 320px; }
+            .interactive-brain-wrapper { max-width: 440px; }
             .intel-matrix-grid, .hardware-matrix-grid { grid-template-columns: 1fr; }
             .syndicate-promo-housing { margin-bottom: 30px; }
             .archive-item { flex-direction: column; align-items: flex-start; gap: 5px; }
@@ -470,30 +470,30 @@ height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
                     <div class="interactive-brain-wrapper">
                         <img src="https://images.unsplash.com/photo-1559757175-5700dde675bc?auto=format&fit=crop&w=800&q=80" alt="Syndicate Left-Facing Neuroanatomy Centerpiece Map" class="native-brain-graphic" fetchpriority="high">
                         
-                        <svg viewBox="0 0 400 300" class="centerpiece-brain-svg-overlay" xmlns="http://www.w3.org/2000/svg">
+                        <svg viewBox="0 0 800 533" class="centerpiece-brain-svg-overlay" xmlns="http://www.w3.org/2000/svg">
                             
                             <g class="brain-svg-hotspot" id="svg-region-pfc" onclick="triggerBrainIntel('pfc')">
-                                <circle cx="110" cy="115" r="24" class="hotspot-trigger-ring"/>
-                                <circle cx="110" cy="115" r="3" class="hotspot-center-dot"/>
-                                <text x="110" y="119" class="hotspot-label">PFC</text>
+                                <circle cx="340" cy="240" r="40" class="hotspot-trigger-ring"/>
+                                <circle cx="340" cy="240" r="6" class="hotspot-center-dot"/>
+                                <text x="340" y="246" class="hotspot-label">PFC</text>
                             </g>
 
                             <g class="brain-svg-hotspot" id="svg-region-hippo" onclick="triggerBrainIntel('hippo')">
-                                <circle cx="220" cy="140" r="22" class="hotspot-trigger-ring"/>
-                                <circle cx="220" cy="140" r="3" class="hotspot-center-dot"/>
-                                <text x="220" y="144" class="hotspot-label">HIPPO</text>
+                                <circle cx="520" cy="280" r="40" class="hotspot-trigger-ring"/>
+                                <circle cx="520" cy="280" r="6" class="hotspot-center-dot"/>
+                                <text x="520" y="286" class="hotspot-label">HIPPO</text>
                             </g>
 
                             <g class="brain-svg-hotspot" id="svg-region-amygdala" onclick="triggerBrainIntel('amygdala')">
-                                <circle cx="185" cy="175" r="20" class="hotspot-trigger-ring"/>
-                                <circle cx="185" cy="175" r="3" class="hotspot-center-dot"/>
-                                <text x="185" y="179" class="hotspot-label">AMYG</text>
+                                <circle cx="470" cy="340" r="38" class="hotspot-trigger-ring"/>
+                                <circle cx="470" cy="340" r="6" class="hotspot-center-dot"/>
+                                <text x="470" y="346" class="hotspot-label">AMYG</text>
                             </g>
 
                             <g class="brain-svg-hotspot" id="svg-region-vagus" onclick="triggerBrainIntel('vagus')">
-                                <circle cx="235" cy="220" r="20" class="hotspot-trigger-ring"/>
-                                <circle cx="235" cy="220" r="3" class="hotspot-center-dot"/>
-                                <text x="235" y="224" class="hotspot-label">VAGUS</text>
+                                <circle cx="580" cy="460" r="38" class="hotspot-trigger-ring"/>
+                                <circle cx="580" cy="460" r="6" class="hotspot-center-dot"/>
+                                <text x="580" y="466" class="hotspot-label">VAGUS</text>
                             </g>
                         </svg>
                     </div>
@@ -725,7 +725,7 @@ height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
                         linkNode.className = "mini-scanned-link";
                         linkNode.innerHTML = `
                             <span>${article.title}</span>
-                            <span class="mini-date">${article.date}</span>
+                            <span class=\"mini-date\">${article.date}</span>
                         `;
                         scannedFeed.appendChild(linkNode);
                     });
