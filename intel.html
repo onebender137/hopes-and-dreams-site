@@ -9,7 +9,8 @@ j=d.createElement(s),dl=l!='dataLayer'?'&l='+l:'';j.async=true;j.src=
 <script async src="https://www.googletagmanager.com/gtag/js?id=G-5RWXX320YW"></script>
 <script>
   window.dataLayer = window.dataLayer || [];
-  function gtag(){dataLayer.push(arguments);}\n  gtag('js', new Date());
+  function gtag(){dataLayer.push(arguments);}
+  gtag('js', new Date());
 
   gtag('config', 'G-5RWXX320YW');
 </script>
@@ -141,15 +142,15 @@ j=d.createElement(s),dl=l!='dataLayer'?'&l='+l:'';j.async=true;j.src=
         .archive-item:hover .title { color: var(--neon-blue); }
         .archive-item .date { font-family: 'Courier New', Courier, monospace; font-size: 0.85rem; color: var(--text-dim); }
 
-        /* --- FIXED COCKPIT BRAIN HYBRID SCALING MATRIX --- */
+        /* --- STABLE COCKPIT BRAIN OVERLAY MATRIX --- */
         .brain-visualizer-container {
             display: flex;
             justify-content: center;
             align-items: center;
-            background: rgba(0,0,0,0.2);
+            background: rgba(0,0,0,0.4);
             border-radius: 16px;
-            padding: 10px;
-            border: 1px solid rgba(255,255,255,0.01);
+            padding: 12px;
+            border: 1px solid rgba(255,255,255,0.02);
             position: sticky;
             top: 40px; 
             width: 100%;
@@ -161,19 +162,22 @@ j=d.createElement(s),dl=l!='dataLayer'?'&l='+l:'';j.async=true;j.src=
             max-width: 440px;
             display: block;
             margin: 0 auto;
+            background: #000;
+            border-radius: 12px;
+            overflow: hidden;
         }
 
-        /* Bulletproof HTML Base Image Node */
+        /* Hotlink-Safe Public CDN Asset Layer */
         .native-brain-graphic {
             width: 100%;
             height: auto;
             display: block;
-            border-radius: 12px;
             user-select: none;
             -webkit-user-drag: none;
+            filter: brightness(0.9) contrast(1.05);
         }
 
-        /* TRANSPARENT VECTOR HOTSPOT OVERLAY INTERFACE */
+        /* COORDINATE INVARIANT INTERACTIVE SVG LAYER */
         .centerpiece-brain-svg-overlay {
             position: absolute;
             top: 0;
@@ -186,18 +190,18 @@ j=d.createElement(s),dl=l!='dataLayer'?'&l='+l:'';j.async=true;j.src=
             cursor: pointer;
         }
         .hotspot-trigger-ring {
-            fill: rgba(56, 189, 248, 0.01);
-            stroke: rgba(56, 189, 248, 0.45);
+            fill: rgba(56, 189, 248, 0.02);
+            stroke: rgba(56, 189, 248, 0.5);
             stroke-width: 1.2;
             stroke-dasharray: 3 3;
             transition: all 0.3s ease;
         }
         .brain-svg-hotspot:hover .hotspot-trigger-ring,
         .brain-svg-hotspot.active-target .hotspot-trigger-ring {
-            fill: rgba(251, 191, 36, 0.08);
+            fill: rgba(251, 191, 36, 0.1);
             stroke: var(--neon-gold);
             stroke-dasharray: none;
-            filter: drop-shadow(0 0 10px var(--neon-gold));
+            filter: drop-shadow(0 0 12px var(--neon-gold));
         }
         .hotspot-center-dot {
             fill: var(--neon-blue);
@@ -206,13 +210,13 @@ j=d.createElement(s),dl=l!='dataLayer'?'&l='+l:'';j.async=true;j.src=
         .brain-svg-hotspot:hover .hotspot-center-dot,
         .brain-svg-hotspot.active-target .hotspot-center-dot {
             fill: var(--neon-gold);
-            r: 2.5;
+            r: 2.2;
         }
         .hotspot-label {
             font-family: 'Courier New', Courier, monospace;
             font-size: 3.5px;
             font-weight: bold;
-            fill: rgba(248, 250, 252, 0.9);
+            fill: rgba(248, 250, 252, 0.95);
             text-anchor: middle;
             pointer-events: none;
             letter-spacing: 0.2px;
@@ -402,7 +406,7 @@ height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
 
     <header>
         <div class="logo-wrap">
-            <a href="index.html"><img alt="Hopes and Dreams Syndicate Neuro-Optimization" tensor-id="1" fetchpriority="high" height="1050" src="topper.png" width="1780"/></a>
+            <a href="index.html"><img alt="Hopes and Dreams Syndicate Neuro-Optimization" fetchpriority="high" height="1050" src="topper.png" width="1780"/></a>
         </div>
         <nav>
             <a href="index.html">Home</a>
@@ -464,32 +468,32 @@ height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
             <div class="inner-content anatomy-grid-core">
                 <div class="brain-visualizer-container">
                     <div class="interactive-brain-wrapper">
-                        <img src="https://png.pngtree.com/thumb_back/fh260/background/20251108/pngtree-a-realistic-3d-rendering-of-human-brain-on-black-background-image_20242950.webp" alt="Syndicate Neural Mapping centerpiece cockpit visual" class="native-brain-graphic" fetchpriority="high">
+                        <img src="https://images.unsplash.com/photo-1559757175-5700dde675bc?auto=format&fit=crop&w=800&q=80" alt="Syndicate Left-Facing Neuroanatomy Centerpiece Map" class="native-brain-graphic" fetchpriority="high">
                         
                         <svg viewBox="0 0 100 100" class="centerpiece-brain-svg-overlay" xmlns="http://www.w3.org/2000/svg">
                             
                             <g class="brain-svg-hotspot" id="svg-region-pfc" onclick="triggerBrainIntel('pfc')">
-                                <circle cx="26" cy="36" r="7.5" class="hotspot-trigger-ring"/>
-                                <circle cx="26" cy="36" r="0.9" class="hotspot-center-dot"/>
-                                <text x="26" y="37.2" class="hotspot-label">PFC</text>
+                                <circle cx="25" cy="38" r="7.5" class="hotspot-trigger-ring"/>
+                                <circle cx="25" cy="38" r="0.8" class="hotspot-center-dot"/>
+                                <text x="25" y="39.2" class="hotspot-label">PFC</text>
                             </g>
 
                             <g class="brain-svg-hotspot" id="svg-region-hippo" onclick="triggerBrainIntel('hippo')">
                                 <circle cx="56" cy="50" r="7" class="hotspot-trigger-ring"/>
-                                <circle cx="56" cy="50" r="0.9" class="hotspot-center-dot"/>
+                                <circle cx="56" cy="50" r="0.8" class="hotspot-center-dot"/>
                                 <text x="56" y="51.2" class="hotspot-label">HIPPO</text>
                             </g>
 
                             <g class="brain-svg-hotspot" id="svg-region-amygdala" onclick="triggerBrainIntel('amygdala')">
-                                <circle cx="46" cy="58" r="6.5" class="hotspot-trigger-ring"/>
-                                <circle cx="46" cy="58" r="0.9" class="hotspot-center-dot"/>
-                                <text x="46" y="59.2" class="hotspot-label">AMYG</text>
+                                <circle cx="48" cy="58" r="6.5" class="hotspot-trigger-ring"/>
+                                <circle cx="48" cy="58" r="0.8" class="hotspot-center-dot"/>
+                                <text x="48" y="59.2" class="hotspot-label">AMYG</text>
                             </g>
 
                             <g class="brain-svg-hotspot" id="svg-region-vagus" onclick="triggerBrainIntel('vagus')">
-                                <circle cx="62" cy="76" r="6.5" class="hotspot-trigger-ring"/>
-                                <circle cx="62" cy="76" r="0.9" class="hotspot-center-dot"/>
-                                <text x="62" y="77.2" class="hotspot-label">VAGUS</text>
+                                <circle cx="62" cy="74" r="6.5" class="hotspot-trigger-ring"/>
+                                <circle cx="62" cy="74" r="0.8" class="hotspot-center-dot"/>
+                                <text x="62" y="75.2" class="hotspot-label">VAGUS</text>
                             </g>
                         </svg>
                     </div>
