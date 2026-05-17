@@ -61,7 +61,7 @@ j=d.createElement(s),dl=l!='dataLayer'?'&l='+l:'';j.async=true;j.src=
     <style>
         .container { max-width: 1100px; margin: 0 auto; padding: 0 24px 100px; text-align: center; }
         h1 { color: var(--neon-gold); text-transform: uppercase; letter-spacing: 4px; margin-bottom: 10px; font-size: 2.5rem; font-weight: 900; }
-        .subtitle { color: var(--text-dim); margin-bottom: 60px; font-size: 1.1rem; text-transform: uppercase; letter-spacing: 2px; }
+        .subtitle { color: var(--text-dim); margin-bottom: 40px; font-size: 1.1rem; text-transform: uppercase; letter-spacing: 2px; }
 
         .shop-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap: 25px; margin-bottom: 50px; }
         .item-card { background-color: var(--card-bg); padding: 30px; border-radius: 20px; border: 1px solid rgba(56, 189, 248, 0.06); text-align: left; transition: 0.3s; display: flex; flex-direction: column; justify-content: space-between; }
@@ -86,6 +86,7 @@ j=d.createElement(s),dl=l!='dataLayer'?'&l='+l:'';j.async=true;j.src=
         .shop-category-section {
             margin-bottom: 60px;
             text-align: left;
+            scroll-margin-top: 100px;
         }
         .category-header {
             display: flex;
@@ -110,6 +111,50 @@ j=d.createElement(s),dl=l!='dataLayer'?'&l='+l:'';j.async=true;j.src=
             margin-bottom: 25px;
             max-width: 900px;
             line-height: 1.5;
+        }
+
+        /* --- INTERACTIVE CATEGORY SELECTOR SYSTEM --- */
+        .category-selector-container {
+            display: flex;
+            justify-content: center;
+            gap: 12px;
+            margin: 40px auto 30px auto;
+            flex-wrap: wrap;
+            max-width: 950px;
+        }
+        .selector-btn {
+            background: rgba(0, 0, 0, 0.6);
+            border: 1px solid rgba(56, 189, 248, 0.15);
+            color: var(--text-dim);
+            font-family: 'Courier New', Courier, monospace;
+            font-size: 0.8rem;
+            padding: 10px 18px;
+            border-radius: 8px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            font-weight: bold;
+        }
+        .selector-btn:hover {
+            border-color: var(--neon-blue);
+            color: var(--text-main);
+            background: rgba(56, 189, 248, 0.04);
+            box-shadow: 0 0 15px rgba(56, 189, 248, 0.1);
+        }
+        .selector-btn.active {
+            border-color: var(--neon-gold);
+            color: var(--neon-gold);
+            background: rgba(251, 191, 36, 0.05);
+            box-shadow: 0 0 20px rgba(251, 191, 36, 0.15);
+        }
+        body.light-mode .selector-btn {
+            background: #ffffff;
+            border-color: rgba(2, 132, 199, 0.2);
+        }
+        body.light-mode .selector-btn.active {
+            background: rgba(180, 83, 9, 0.08);
+            border-color: var(--neon-gold);
         }
     </style>
 </head>
@@ -159,9 +204,17 @@ height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
             </div>
         </div>
 
-        <section class="shop-category-section">
+        <div class="category-selector-container" data-reveal>
+            <button class="selector-btn active" onclick="filterSector('all')">[ ALL_SYSTEMS ]</button>
+            <button class="selector-btn" onclick="filterSector('neuro')">[ NEURO_CORE ]</button>
+            <button class="selector-btn" onclick="filterSector('kinetics')">[ CELL_KINETICS ]</button>
+            <button class="selector-btn" onclick="filterSector('base')">[ METABOLIC_BASE ]</button>
+            <button class="selector-btn" onclick="filterSector('infra')">[ INFRASTRUCTURE ]</button>
+        </div>
+
+        <section class="shop-category-section" id="sector-neuro">
             <div class="category-header">
-                <h2>SCTR_01 // INTEL NEUROLOGICAL</h2>
+                <h2>Neurological Framework & Cholinergics</h2>
             </div>
             <p class="category-description">Targeted neural precursors, cholinergics, and chemical buffers designed to expand cognitive bandwidth, protect memory consolidation, and optimize REM sleep stability.</p>
             
@@ -258,9 +311,9 @@ height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
             </div>
         </section>
 
-        <section class="shop-category-section">
+        <section class="shop-category-section" id="sector-kinetics">
             <div class="category-header">
-                <h2>SCTR_02 // CELLULAR KINETICS</h2>
+                <h2>Cellular Kinetics & Detox Clearance</h2>
             </div>
             <p class="category-description">Advanced metabolic modulators designed to stimulate mitochondrial efficiency, optimize vascular blood flow, and provide heavy metal clearance mechanisms.</p>
             
@@ -321,9 +374,9 @@ height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
             </div>
         </section>
 
-        <section class="shop-category-section">
+        <section class="shop-category-section" id="sector-base">
             <div class="category-header">
-                <h2>SCTR_03 // METABOLIC BASE</h2>
+                <h2>Systemic Foundations & Stress Adaptation</h2>
             </div>
             <p class="category-description">Essential baseline substrates and botanicals designed to down-regulate cortisol markers, repair core micro-deficiencies, and solidify physiological nervous system resilience.</p>
             
@@ -411,11 +464,11 @@ height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
             </div>
         </section>
 
-        <section class="shop-category-section">
+        <section class="shop-category-section" id="sector-infra">
             <div class="category-header">
-                <h2>SCTR_04 // SYSTEM INFRASTRUCTURE</h2>
+                <h2>Infrastructure & Automated Hardware</h2>
             </div>
-            <p class="category-description">Physical computing architectures, local multi-agent environments, and biometric instrumentation to monitor, log, and process localized data feeds.</p>
+            <p class="category-description">Physical computing architectures, local multi-agent environments, and biometric instrumentation to monitor, log, and process localized internal data feeds.</p>
             
             <div class="shop-grid">
                 <div class="item-card" id="mini-pc" data-reveal data-product="mini-pc">
@@ -476,5 +529,29 @@ height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
         </footer>
     </div>
 
+    <script>
+        function filterSector(sectorId) {
+            // Unset current active selectors
+            const buttons = document.querySelectorAll('.selector-btn');
+            buttons.forEach(btn => btn.classList.remove('active'));
+            
+            // Set clicked element to active state
+            if (window.event && window.event.currentTarget) {
+                window.event.currentTarget.classList.add('active');
+            }
+
+            // Route layouts based on system code
+            const sections = document.querySelectorAll('.shop-category-section');
+            sections.forEach(section => {
+                if (sectorId === 'all') {
+                    section.style.display = 'block';
+                } else if (section.id === 'sector-' + sectorId) {
+                    section.style.display = 'block';
+                } else {
+                    section.style.display = 'none';
+                }
+            });
+        }
+    </script>
 </body>
 </html>
