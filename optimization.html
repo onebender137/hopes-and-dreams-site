@@ -65,6 +65,35 @@ j=d.createElement(s),dl=l!='dataLayer'?'&l='+l:'';j.async=true;j.src=
             box-shadow: 0 20px 40px rgba(0,0,0,0.5);
         }
 
+        /* DYNAMIC INTEL DISPLAY SUB-TERMINAL BOX */
+        .parameter-intel-box {
+            margin-top: 25px;
+            padding: 18px;
+            background: rgba(56, 189, 248, 0.02);
+            border: 1px dashed rgba(56, 189, 248, 0.15);
+            border-radius: 14px;
+            min-height: 95px;
+            transition: all var(--transition-speed);
+        }
+        .intel-box-title {
+            font-family: 'Courier New', Courier, monospace;
+            font-size: 0.75rem;
+            color: var(--neon-blue);
+            font-weight: bold;
+            letter-spacing: 1px;
+            margin-bottom: 8px;
+            text-transform: uppercase;
+        }
+        .intel-box-body {
+            font-size: 0.88rem;
+            color: var(--text-dim);
+            line-height: 1.5;
+            transition: color 0.2s ease;
+        }
+        .intel-box-body strong {
+            color: var(--text-main);
+        }
+
         /* UNIFIED VARIABLE PARAMETER MATRIX */
         .variable-matrix-container {
             background: var(--card-bg);
@@ -86,22 +115,23 @@ j=d.createElement(s),dl=l!='dataLayer'?'&l='+l:'';j.async=true;j.src=
         }
 
         /* Gauge Layout Rules */
-        .gauge-wrapper { display: flex; flex-direction: column; align-items: center; margin: 20px 0; }
+        .gauge-wrapper { display: flex; flex-direction: column; align-items: center; margin: 10px 0; }
         .gauge-svg { width: 220px; height: 220px; transform: rotate(-90deg); }
         .gauge-bg { fill: none; stroke: rgba(255,255,255,0.03); stroke-width: 14; }
         .gauge-fill { fill: none; stroke: var(--neon-blue); stroke-width: 14; stroke-linecap: round; transition: stroke-dasharray 0.6s cubic-bezier(0.4, 0, 0.2, 1); }
         .gauge-text { font-size: 2.2rem; font-weight: 900; fill: var(--text-main); font-family: 'Inter', sans-serif; }
         .gauge-label { font-size: 0.85rem; fill: var(--text-dim); letter-spacing: 2px; text-transform: uppercase; font-family: 'Inter', sans-serif; }
 
-        .sub-gauges { display: grid; grid-template-columns: 1fr 1fr; gap: 20px; margin-top: 25px; border-top: 1px solid rgba(256,256,256,0.05); padding-top: 25px; }
+        .sub-gauges { display: grid; grid-template-columns: 1fr 1fr; gap: 20px; margin-top: 20px; border-top: 1px solid rgba(256,256,256,0.05); padding-top: 20px; }
         .sub-gauge-bar { width: 100%; height: 6px; background: rgba(255,255,255,0.05); border-radius: 3px; margin-top: 8px; overflow: hidden; position: relative; }
         .sub-gauge-fill { height: 100%; width: 50%; background: var(--neon-gold); border-radius: 3px; transition: width 0.5s ease; }
 
         /* Variable Inputs Custom Styling */
-        .control-group { margin-bottom: 24px; background: rgba(255,255,255,0.01); padding: 15px 20px; border-radius: 14px; border: 1px solid rgba(255,255,255,0.02); }
+        .control-group { margin-bottom: 24px; background: rgba(255,255,255,0.01); padding: 15px 20px; border-radius: 14px; border: 1px solid rgba(255,255,255,0.02); transition: border-color 0.3s; }
+        .control-group:hover, .control-group:focus-within { border-color: rgba(56, 189, 248, 0.2); background: rgba(56, 189, 248, 0.01); }
         .control-group:last-of-type { margin-bottom: 0; }
         .control-label-wrap { display: flex; justify-content: space-between; align-items: center; margin-bottom: 10px; }
-        .control-label { font-size: 0.9rem; font-weight: 700; color: var(--text-main); text-transform: uppercase; letter-spacing: 1px; }
+        .control-label { font-size: 0.9rem; font-weight: 700; color: var(--text-main); text-transform: uppercase; letter-spacing: 1px; cursor: pointer; }
         .control-value { font-family: 'Courier New', Courier, monospace; font-size: 1rem; color: var(--neon-blue); font-weight: bold; }
         
         /* Premium Range Slider Overrides */
@@ -186,6 +216,11 @@ height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
                         </div>
                         <div class="sub-gauge-bar"><div class="sub-gauge-fill" id="rec-bar"></div></div>
                     </div>
+                </div>
+
+                <div class="parameter-intel-box">
+                    <div class="intel-box-title" id="intel-title">SYS_INTEL // MATRIX INITIALIZED</div>
+                    <div class="intel-box-body" id="intel-body">Adjust or tap any parameter slider on the right to project localized, real-life biological tracking intelligence onto this terminal display module.</div>
                 </div>
             </div>
 
@@ -323,7 +358,43 @@ height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
                 cogVal: document.getElementById('cog-val'),
                 cogBar: document.getElementById('cog-bar'),
                 recVal: document.getElementById('rec-val'),
-                recBar: document.getElementById('rec-bar')
+                recBar: document.getElementById('rec-bar'),
+
+                // New Sub-Terminal Displays
+                intelTitle: document.getElementById('intel-title'),
+                intelBody: document.getElementById('intel-body')
+            };
+
+            // Real-Life Real Estate Description Library Mapping
+            const intelLibrary = {
+                sleepDur: {
+                    title: "SYS_INTEL // REST_DURATION",
+                    text: "Total continuous sleep duration. Essential for running the full sequence of 90-minute sleep cycles (C1-C7) needed to process daily cellular residue and clear metabolic waste from neural tissues."
+                },
+                sleepQual: {
+                    title: "SYS_INTEL // Rest_Efficiency",
+                    text: "The ratio of deep/REM sleep to light sleep. High architecture stability signifies unfragmented rest, which directly facilitates optimal acetylcholine production and solidifies long-term memory consolidation."
+                },
+                hrv: {
+                    title: "SYS_INTEL // Autonomic_Resilience",
+                    text: "Heart Rate Variability. Measures milliseconds of variation between heartbeats. A high baseline reveals dominance of the parasympathetic nervous system, proving your body is ready for strenuous loads."
+                },
+                stress: {
+                    title: "SYS_INTEL // Allostatic_Load",
+                    text: "Calculates environmental toxins, physical stressors (like grinding dust or welding fumes), and high-output psychological load. Elevated metrics aggressively bottleneck your nervous recovery reserve."
+                },
+                deepWork: {
+                    title: "SYS_INTEL // Cognitive_Drain",
+                    text: "Sustained periods of high-concentration neural execution. Deep task focus draws heavily on cerebral glucose reserves and baseline neurotransmitter pipelines, requiring compounding cofactors to recharge."
+                },
+                caffeine: {
+                    title: "SYS_INTEL // Adenosine_Antagonist",
+                    text: "Temporary metabolic catalyst. While doses up to 200mg reliably down-regulate perceived tiredness and expand active focus, crossing 300mg spikes nervous system jitters and fractures subsequent REM sleep cycles."
+                },
+                hydration: {
+                    title: "SYS_INTEL // Intracellular_Viscosity",
+                    text: "Fluid balance substrate. Fluid volume governs active blood viscosity and cellular hydration, dictating how efficiently oxygen passes the blood-brain barrier to maintain optimal cognitive conduction speed."
+                }
             };
 
             function calculateMetrics() {
@@ -385,10 +456,19 @@ height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
                 views.recBar.style.width = recoveryReserve + '%';
             }
 
-            // Bind update listeners to inputs
-            Object.values(inputs).forEach(input => {
+            // Bind listeners to inputs for BOTH math calculations AND live descriptions
+            Object.entries(inputs).forEach(([key, input]) => {
                 if(input) {
+                    // Update descriptions in real-time as they slide or click
+                    const updateIntelBox = () => {
+                        views.intelTitle.textContent = intelLibrary[key].title;
+                        views.intelBody.innerHTML = `<strong>Current Parameter Impact:</strong> ${intelLibrary[key].text}`;
+                    };
+                    
                     input.addEventListener('input', calculateMetrics);
+                    input.addEventListener('input', updateIntelBox);
+                    input.addEventListener('focus', updateIntelBox);
+                    input.addEventListener('click', updateIntelBox);
                 }
             });
 
