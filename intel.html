@@ -96,7 +96,7 @@ j=d.createElement(s),dl=l!='dataLayer'?'&l='+l:'';j.async=true;j.src=
         body.light-mode .archive-item { background: #ffffff; border-color: rgba(0, 0, 0, 0.05); }
         body.light-mode .archive-item:hover { background: rgba(2, 132, 199, 0.03); border-color: var(--neon-blue); }
 
-        /* --- THE NEW 3D NEURAL ANATOMY COCKPIT INTERFACE --- */
+        /* --- THE LOCK-GRID 3D NEURAL COCKPIT COGNITIVE MATRIX --- */
         .neural-anatomy-panel {
             background: var(--card-bg);
             border: 1px solid rgba(251, 191, 36, 0.08);
@@ -105,13 +105,14 @@ j=d.createElement(s),dl=l!='dataLayer'?'&l='+l:'';j.async=true;j.src=
             margin-bottom: 50px;
             text-align: left;
             display: grid;
-            grid-template-columns: 1.25fr 1fr;
+            /* Explicit structural lock: prevents column compression under any data volume conditions */
+            grid-template-columns: minmax(460px, 1.25fr) minmax(0, 1fr);
             gap: 35px;
             align-items: start;
             box-shadow: 0 20px 40px rgba(0,0,0,0.5);
         }
         
-        /* THE STICKY BRAIN CENTER PIECE VISUALIZER */
+        /* SOLID UNIFIED CONTAINER FOR BRAIN FRAMEWORK */
         .brain-visualizer-container {
             display: flex;
             justify-content: center;
@@ -121,25 +122,30 @@ j=d.createElement(s),dl=l!='dataLayer'?'&l='+l:'';j.async=true;j.src=
             padding: 20px;
             border: 1px solid rgba(255,255,255,0.01);
             position: sticky;
-            top: 40px; /* Locked centerpiece alignment */
+            top: 40px; 
+            width: 100%;
+            box-sizing: border-box;
         }
         
         .interactive-brain-wrapper {
             position: relative;
             width: 100%;
-            max-width: 480px;
+            max-width: 440px;
+            display: block;
+            margin: 0 auto;
         }
         
-        /* Pristine high-resolution detailed neural mapping center piece */
         .centerpiece-brain-image {
             width: 100%;
             height: auto;
             object-fit: contain;
             display: block;
             border-radius: 12px;
+            user-select: none;
+            -webkit-user-drag: none;
         }
         
-        /* TACTICAL CLICKABLE OVERLAY MAP */
+        /* TACTICAL OVERLAY LAYER MATRIX */
         .tactical-brain-map {
             position: absolute;
             top: 0; left: 0; width: 100%; height: 100%;
@@ -151,33 +157,32 @@ j=d.createElement(s),dl=l!='dataLayer'?'&l='+l:'';j.async=true;j.src=
             border: 2px dashed transparent;
             cursor: pointer;
             transition: all 0.3s ease;
-            border-radius: 50%; /* Flexible node shapes */
-            background: rgba(56, 189, 248, 0.01);
+            border-radius: 50%;
+            background: rgba(56, 189, 248, 0.005);
         }
         
-        /* Visual selection confirms on centerpiece visual with neon-gold local halo */
+        /* Visual selection local bloom effect */
         .brain-region-trigger:hover, .brain-region-trigger.active-target {
             border-color: var(--neon-gold);
-            background: rgba(251, 191, 36, 0.06);
-            box-shadow: 0 0 15px var(--neon-gold);
+            background: rgba(251, 191, 36, 0.07);
+            box-shadow: 0 0 20px var(--neon-gold);
         }
         
-        /* Local selection pointer dot on center piece */
         .brain-region-trigger::after {
             content: "";
             position: absolute;
             top: 50%; left: 50%;
-            width: 4px; height: 4px;
+            width: 6px; height: 6px;
             background: var(--neon-blue);
             border-radius: 50%;
             transform: translate(-50%, -50%);
-            opacity: 0.5;
-            transition: opacity 0.2s;
+            opacity: 0.3;
+            transition: all 0.2s;
         }
         .brain-region-trigger:hover::after, .brain-region-trigger.active-target::after {
             opacity: 1;
             background: var(--neon-gold);
-            width: 6px; height: 6px;
+            scale: 1.5;
         }
 
         /* Anatomy Diagnostics Panel Box */
@@ -186,10 +191,11 @@ j=d.createElement(s),dl=l!='dataLayer'?'&l='+l:'';j.async=true;j.src=
             border: 1px dashed rgba(56, 189, 248, 0.2);
             border-radius: 16px;
             padding: 25px;
-            min-height: 420px; /* Robust terminal height */
+            min-height: 420px; 
             display: flex;
             flex-direction: column;
             justify-content: flex-start;
+            box-sizing: border-box;
         }
         .diagnostics-header {
             font-family: 'Courier New', Courier, monospace;
@@ -373,34 +379,35 @@ j=d.createElement(s),dl=l!='dataLayer'?'&l='+l:'';j.async=true;j.src=
         .hardware-card:hover { border-color: rgba(56, 189, 248, 0.2); }
         .hardware-card h3 { color: var(--text-main); font-size: 1.5rem; margin-top: 0; margin-bottom: 12px; letter-spacing: 0.5px; }
 
+        /* --- MOBILE COCKPIT BREAKPOINT ADAPTATION --- */
         @media (max-width: 1080px) {
             h1 { font-size: 1.8rem; }
             .subtitle { font-size: 0.9rem; margin-bottom: 30px; }
             
             .neural-anatomy-panel { 
-                grid-template-columns: 1fr; 
+                grid-template-columns: 1fr !important; 
                 gap: 20px;
                 padding: 15px;
                 margin-bottom: 30px;
             }
             
-            /* MOBILE HUD: PIN THE CENTERPIECE BRAIN VISUAL TO DIRECT TOP */
+            /* STICKY HUD VIEWPORT STABILIZER FOR MOBILE SCREEN */
             .brain-visualizer-container { 
                 position: sticky; 
                 top: 0; 
                 z-index: 1000;
-                background: rgba(11, 11, 11, 0.96); /* Black solid glass backdrop */
+                background: rgba(11, 11, 11, 0.97); 
                 border-radius: 0 0 16px 16px;
-                padding: 10px 15px; 
+                padding: 15px; 
                 border-bottom: 1px solid rgba(251, 191, 36, 0.15);
                 backdrop-filter: blur(15px);
                 -webkit-backdrop-filter: blur(15px);
-                margin: -15px -15px 15px -15px; /* Pull visual tight to screen edge */
+                margin: -15px -15px 15px -15px;
+                width: calc(100% + 30px);
             }
             
-            .centerpiece-brain-image {
-                max-width: 260px; /* Highly detailed small cockpit view */
-                margin: 0 auto;
+            .interactive-brain-wrapper {
+                max-width: 270px; /* Locked explicit layout dimensions */
             }
             
             .hardware-matrix-grid { grid-template-columns: 1fr; }
@@ -478,7 +485,7 @@ height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
         <div class="neural-anatomy-panel" data-reveal="">
             <div class="brain-visualizer-container">
                 <div class="interactive-brain-wrapper">
-                    <img src="https://png.pngtree.com/thumb_back/fh260/background/20251108/pngtree-a-realistic-3d-rendering-of-human-brain-on-black-background-image_20242950.webp" alt="Syndicate Neural Mapping center piece cockpit visual" class="centerpiece-brain-image" width="1780" height="1050" fetchpriority="high">
+                    <img src="https://png.pngtree.com/thumb_back/fh260/background/20251108/pngtree-a-realistic-3d-rendering-of-human-brain-on-black-background-image_20242950.webp" alt="Syndicate Neural Mapping centerpiece cockpit visual" class="centerpiece-brain-image" width="1780" height="1050" fetchpriority="high">
                     
                     <div class="tactical-brain-map">
                         <div class="brain-region-trigger" id="region-pfc" onclick="triggerBrainIntel('pfc')" style="top: 15%; left: 5%; width: 35%; height: 45%;"></div>
@@ -611,7 +618,6 @@ height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
     <script>
         let cachedTransmissionsArray = [];
 
-        // ASYNC CORE: Synchronize with transmissions.json on boot
         document.addEventListener('DOMContentLoaded', () => {
             fetch('transmissions.json')
                 .then(res => res.json())
@@ -622,7 +628,6 @@ height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
         });
 
         function triggerBrainIntel(regionId) {
-            // Confirm epicenter visual selection with halo on centerpiece visual
             document.querySelectorAll('.brain-region-trigger').forEach(node => {
                 node.classList.remove('active-target');
             });
@@ -688,14 +693,12 @@ height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
                 viewTitle.textContent = data.title;
                 viewBody.innerHTML = data.body;
                 
-                // Build Primary Static Vector Links
                 viewActions.innerHTML = `
                     <a href="${data.procureUrl}" class="diagnostics-btn procure">${data.procureText} 🚀</a>
                     <a href="${data.tuneUrl}" class="diagnostics-btn tune">${data.tuneText} 🎛️</a>
                 `;
                 viewActions.style.display = "flex";
 
-                // DYNAMIC SEARCH ENGINE LAYER: Scan local copy of array against sector keywords
                 scannedFeed.innerHTML = ""; 
                 const matches = cachedTransmissionsArray.filter(article => {
                     const cleanTitle = article.title.toLowerCase();
@@ -715,7 +718,6 @@ height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
                     });
                     scannedWrapper.style.display = "block";
                 } else {
-                    // Fail-safe standby visualization if array is currently empty
                     scannedFeed.innerHTML = `<div style="font-family:monospace; font-size:0.75rem; color:var(--text-dim); text-align:center; padding:10px; border:1px dashed rgba(255,255,255,0.03); border-radius:8px;">[ NO ACTIVE TRANSMISSIONS LINKED // SYSTEM STANDBY ]</div>`;
                     scannedWrapper.style.display = "block";
                 }
