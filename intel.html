@@ -41,7 +41,8 @@ j=d.createElement(s),dl=l!='dataLayer'?'&l='+l:'';j.async=true;j.src=
     <script>window.SYNDICATE_CONFIG = { API_KEY: "{{WEBSITE_API_KEY}}" };</script>
     <script src="script.js" defer></script>
     <style>
-        .container { max-width: 1200px; margin: 0 auto; padding: 0 24px 100px; text-align: center; }
+        html, body { overflow-x: hidden; width: 100%; position: relative; }
+        .container { max-width: 1200px; margin: 0 auto; padding: 0 24px 100px; text-align: center; box-sizing: border-box; }
         h1 { color: var(--neon-gold); text-transform: uppercase; letter-spacing: 4px; margin-bottom: 10px; font-size: 2.5rem; font-weight: 900; }
         .subtitle { color: var(--text-dim); margin-bottom: 50px; font-size: 1.1rem; text-transform: uppercase; letter-spacing: 2px; }
 
@@ -105,11 +106,11 @@ j=d.createElement(s),dl=l!='dataLayer'?'&l='+l:'';j.async=true;j.src=
             margin-bottom: 50px;
             text-align: left;
             display: grid;
-            /* Explicit structural lock: prevents column compression under any data volume conditions */
             grid-template-columns: minmax(460px, 1.25fr) minmax(0, 1fr);
             gap: 35px;
             align-items: start;
             box-shadow: 0 20px 40px rgba(0,0,0,0.5);
+            box-sizing: border-box;
         }
         
         /* SOLID UNIFIED CONTAINER FOR BRAIN FRAMEWORK */
@@ -161,7 +162,6 @@ j=d.createElement(s),dl=l!='dataLayer'?'&l='+l:'';j.async=true;j.src=
             background: rgba(56, 189, 248, 0.005);
         }
         
-        /* Visual selection local bloom effect */
         .brain-region-trigger:hover, .brain-region-trigger.active-target {
             border-color: var(--neon-gold);
             background: rgba(251, 191, 36, 0.07);
@@ -379,7 +379,7 @@ j=d.createElement(s),dl=l!='dataLayer'?'&l='+l:'';j.async=true;j.src=
         .hardware-card:hover { border-color: rgba(56, 189, 248, 0.2); }
         .hardware-card h3 { color: var(--text-main); font-size: 1.5rem; margin-top: 0; margin-bottom: 12px; letter-spacing: 0.5px; }
 
-        /* --- MOBILE COCKPIT BREAKPOINT ADAPTATION --- */
+        /* --- STABILIZED MOBILE COCKPIT BREAKPOINT --- */
         @media (max-width: 1080px) {
             h1 { font-size: 1.8rem; }
             .subtitle { font-size: 0.9rem; margin-bottom: 30px; }
@@ -391,23 +391,23 @@ j=d.createElement(s),dl=l!='dataLayer'?'&l='+l:'';j.async=true;j.src=
                 margin-bottom: 30px;
             }
             
-            /* STICKY HUD VIEWPORT STABILIZER FOR MOBILE SCREEN */
+            /* STABILIZED HUD VIEWPORT CONSTRAINTS (NO OVERFLOWS) */
             .brain-visualizer-container { 
                 position: sticky; 
                 top: 0; 
                 z-index: 1000;
-                background: rgba(11, 11, 11, 0.97); 
+                background: rgba(11, 11, 11, 0.98); 
                 border-radius: 0 0 16px 16px;
                 padding: 15px; 
                 border-bottom: 1px solid rgba(251, 191, 36, 0.15);
                 backdrop-filter: blur(15px);
                 -webkit-backdrop-filter: blur(15px);
-                margin: -15px -15px 15px -15px;
-                width: calc(100% + 30px);
+                margin: 0;
+                width: 100%;
             }
             
             .interactive-brain-wrapper {
-                max-width: 270px; /* Locked explicit layout dimensions */
+                max-width: 250px; 
             }
             
             .hardware-matrix-grid { grid-template-columns: 1fr; }
