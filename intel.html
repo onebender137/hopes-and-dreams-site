@@ -111,7 +111,7 @@ j=d.createElement(s),dl=l!='dataLayer'?'&l='+l:'';j.async=true;j.src=
         .card-padding { padding: 30px; display: flex; flex-direction: column; justify-content: space-between; }
         .hardware-padding { padding: 35px; display: flex; flex-direction: column; justify-content: space-between; }
 
-        /* FLUID FLUID LAYOUT GRID — ELIMINATES 100% ZOOM TRUNCATION */
+        /* FLUID RESPONSIVE COCKPIT LAYOUT GRID */
         .anatomy-grid-core {
             padding: 35px;
             display: grid;
@@ -143,7 +143,7 @@ j=d.createElement(s),dl=l!='dataLayer'?'&l='+l:'';j.async=true;j.src=
         .archive-item:hover .title { color: var(--neon-blue); }
         .archive-item .date { font-family: 'Courier New', Courier, monospace; font-size: 0.85rem; color: var(--text-dim); }
 
-        /* --- STABLE COCKPIT BRAIN OVERLAY MATRIX --- */
+        /* --- DESKTOP STICKY MONITOR WRAPPER --- */
         .brain-visualizer-container {
             display: flex;
             justify-content: center;
@@ -166,18 +166,20 @@ j=d.createElement(s),dl=l!='dataLayer'?'&l='+l:'';j.async=true;j.src=
             background: #000;
             border-radius: 12px;
             overflow: hidden;
+            aspect-ratio: 4 / 3;
         }
 
         .native-brain-graphic {
             width: 100%;
-            height: auto;
+            height: 100%;
+            object-fit: cover;
             display: block;
             user-select: none;
             -webkit-user-drag: none;
             filter: brightness(0.95) contrast(1.05);
         }
 
-        /* COORDINATE INVARIANT INTERACTIVE SVG LAYER */
+        /* HIGH-PRECISION 4:3 INTERACTIVE OVERLAY MAP */
         .centerpiece-brain-svg-overlay {
             position: absolute;
             top: 0;
@@ -192,8 +194,8 @@ j=d.createElement(s),dl=l!='dataLayer'?'&l='+l:'';j.async=true;j.src=
         .hotspot-trigger-ring {
             fill: rgba(56, 189, 248, 0.02);
             stroke: rgba(56, 189, 248, 0.5);
-            stroke-width: 1.2;
-            stroke-dasharray: 3 3;
+            stroke-width: 1.5;
+            stroke-dasharray: 4 4;
             transition: all 0.3s ease;
         }
         .brain-svg-hotspot:hover .hotspot-trigger-ring,
@@ -201,7 +203,6 @@ j=d.createElement(s),dl=l!='dataLayer'?'&l='+l:'';j.async=true;j.src=
             fill: rgba(251, 191, 36, 0.1);
             stroke: var(--neon-gold);
             stroke-dasharray: none;
-            filter: drop-shadow(0 0 12px var(--neon-gold));
         }
         .hotspot-center-dot {
             fill: var(--neon-blue);
@@ -210,16 +211,16 @@ j=d.createElement(s),dl=l!='dataLayer'?'&l='+l:'';j.async=true;j.src=
         .brain-svg-hotspot:hover .hotspot-center-dot,
         .brain-svg-hotspot.active-target .hotspot-center-dot {
             fill: var(--neon-gold);
-            r: 2.2;
+            r: 4.5px;
         }
         .hotspot-label {
             font-family: 'Courier New', Courier, monospace;
-            font-size: 3.8px;
+            font-size: 12px;
             font-weight: bold;
             fill: rgba(248, 250, 252, 0.95);
             text-anchor: middle;
             pointer-events: none;
-            letter-spacing: 0.2px;
+            letter-spacing: 0.5px;
         }
         .brain-svg-hotspot:hover .hotspot-label,
         .brain-svg-hotspot.active-target .hotspot-label {
@@ -364,7 +365,7 @@ j=d.createElement(s),dl=l!='dataLayer'?'&l='+l:'';j.async=true;j.src=
             100% { transform: rotate(360deg); }
         }
 
-        /* --- STABILIZED RESPONSIVE BREAKPOINT MATRIX --- */
+        /* --- REMOVES PROBLEMATIC STICKY CALCULATION ON MOBILE VIEWPORTS --- */
         @media (max-width: 1150px) {
             h1 { font-size: 1.8rem; }
             .subtitle { font-size: 0.9rem; margin-bottom: 30px; }
@@ -372,24 +373,23 @@ j=d.createElement(s),dl=l!='dataLayer'?'&l='+l:'';j.async=true;j.src=
             .anatomy-grid-core { 
                 grid-template-columns: 1fr !important; 
                 gap: 25px;
-                padding: 20px;
+                padding: 15px;
             }
             
             .brain-visualizer-container { 
-                position: sticky; 
-                top: 0; 
-                z-index: 1000;
-                background: rgba(11, 11, 11, 0.98); 
-                border-radius: 0 0 16px 16px;
+                position: relative !important; 
+                top: auto !important;
+                background: rgba(11, 11, 11, 0.4); 
+                border-radius: 16px;
                 padding: 15px; 
-                border-bottom: 1px solid rgba(251, 191, 36, 0.15);
-                backdrop-filter: blur(15px);
-                -webkit-backdrop-filter: blur(15px);
-                margin: 0;
+                border: 1px solid rgba(255,255,255,0.01);
+                backdrop-filter: none;
+                -webkit-backdrop-filter: none;
+                margin: 0 0 20px 0;
                 width: 100%;
             }
             
-            .interactive-brain-wrapper { max-width: 280px; }
+            .interactive-brain-wrapper { max-width: 320px; }
             .intel-matrix-grid, .hardware-matrix-grid { grid-template-columns: 1fr; }
             .syndicate-promo-housing { margin-bottom: 30px; }
             .archive-item { flex-direction: column; align-items: flex-start; gap: 5px; }
@@ -470,30 +470,30 @@ height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
                     <div class="interactive-brain-wrapper">
                         <img src="https://images.unsplash.com/photo-1559757175-5700dde675bc?auto=format&fit=crop&w=800&q=80" alt="Syndicate Left-Facing Neuroanatomy Centerpiece Map" class="native-brain-graphic" fetchpriority="high">
                         
-                        <svg viewBox="0 0 100 100" class="centerpiece-brain-svg-overlay" xmlns="http://www.w3.org/2000/svg">
+                        <svg viewBox="0 0 400 300" class="centerpiece-brain-svg-overlay" xmlns="http://www.w3.org/2000/svg">
                             
                             <g class="brain-svg-hotspot" id="svg-region-pfc" onclick="triggerBrainIntel('pfc')">
-                                <circle cx="32" cy="38" r="7.5" class="hotspot-trigger-ring"/>
-                                <circle cx="32" cy="38" r="0.8" class="hotspot-center-dot"/>
-                                <text x="32" y="39.2" class="hotspot-label">PFC</text>
+                                <circle cx="110" cy="115" r="24" class="hotspot-trigger-ring"/>
+                                <circle cx="110" cy="115" r="3" class="hotspot-center-dot"/>
+                                <text x="110" y="119" class="hotspot-label">PFC</text>
                             </g>
 
                             <g class="brain-svg-hotspot" id="svg-region-hippo" onclick="triggerBrainIntel('hippo')">
-                                <circle cx="55" cy="46" r="7" class="hotspot-trigger-ring"/>
-                                <circle cx="55" cy="46" r="0.8" class="hotspot-center-dot"/>
-                                <text x="55" y="47.2" class="hotspot-label">HIPPO</text>
+                                <circle cx="220" cy="140" r="22" class="hotspot-trigger-ring"/>
+                                <circle cx="220" cy="140" r="3" class="hotspot-center-dot"/>
+                                <text x="220" y="144" class="hotspot-label">HIPPO</text>
                             </g>
 
                             <g class="brain-svg-hotspot" id="svg-region-amygdala" onclick="triggerBrainIntel('amygdala')">
-                                <circle cx="48" cy="54" r="6.5" class="hotspot-trigger-ring"/>
-                                <circle cx="48" cy="54" r="0.8" class="hotspot-center-dot"/>
-                                <text x="48" y="55.2" class="hotspot-label">AMYG</text>
+                                <circle cx="185" cy="175" r="20" class="hotspot-trigger-ring"/>
+                                <circle cx="185" cy="175" r="3" class="hotspot-center-dot"/>
+                                <text x="185" y="179" class="hotspot-label">AMYG</text>
                             </g>
 
                             <g class="brain-svg-hotspot" id="svg-region-vagus" onclick="triggerBrainIntel('vagus')">
-                                <circle cx="58" cy="70" r="6.5" class="hotspot-trigger-ring"/>
-                                <circle cx="58" cy="70" r="0.8" class="hotspot-center-dot"/>
-                                <text x="58" y="71.2" class="hotspot-label">VAGUS</text>
+                                <circle cx="235" cy="220" r="20" class="hotspot-trigger-ring"/>
+                                <circle cx="235" cy="220" r="3" class="hotspot-center-dot"/>
+                                <text x="235" y="224" class="hotspot-label">VAGUS</text>
                             </g>
                         </svg>
                     </div>
