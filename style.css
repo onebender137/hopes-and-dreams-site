@@ -2200,3 +2200,209 @@ header nav a {
     border: 1px solid rgba(56, 189, 248, 0.06); /* Subdued neon-blue border */
     margin: 0; 
 }
+/* --- SMOOTH SCROLL INTEGRATION --- */
+html {
+    scroll-behavior: smooth;
+    scroll-padding-top: 90px; /* Prevents sticky navbar headers from blocking category titles */
+}
+
+/* --- TERMINAL SECTOR NAV MATRIX --- */
+.shop-nav-matrix {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 12px;
+    margin: 35px auto 55px auto;
+    max-width: 1200px;
+    width: 100%;
+    box-sizing: border-box;
+}
+
+.matrix-btn {
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: flex-start;
+    background: var(--card-bg); /* Match OLED graphite #0b0b0b */
+    border: 1px solid rgba(56, 189, 248, 0.08);
+    padding: 16px 20px;
+    border-radius: 8px;
+    text-decoration: none;
+    font-family: 'Courier New', Courier, monospace;
+    transition: all 0.3s cubic-bezier(0.25, 0.8, 0.25, 1);
+    position: relative;
+    overflow: hidden;
+}
+
+/* Left neon side-accent strip */
+.matrix-btn::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 3px;
+    height: 100%;
+    background: var(--neon-blue);
+    opacity: 0.2;
+    transition: opacity 0.3s ease, background-color 0.3s ease;
+}
+
+.matrix-id {
+    font-size: 0.65rem;
+    color: var(--neon-gold);
+    letter-spacing: 1.5px;
+    margin-bottom: 5px;
+    font-weight: bold;
+}
+
+.matrix-title {
+    font-size: 0.85rem;
+    color: var(--text-main);
+    font-weight: bold;
+    letter-spacing: 0.5px;
+    text-transform: uppercase;
+}
+
+/* Cybernetic Hover System */
+.matrix-btn:hover {
+    border-color: var(--neon-blue);
+    box-shadow: 0 0 20px rgba(56, 189, 248, 0.15);
+    transform: translateY(-2px);
+    background: rgba(56, 189, 248, 0.02);
+}
+
+.matrix-btn:hover::before {
+    opacity: 1;
+    background-color: var(--neon-blue);
+}
+
+.matrix-btn:hover .matrix-title {
+    color: var(--neon-blue);
+}
+
+/* --- MOBILE RESPONSIVE MAP --- */
+@media (max-width: 850px) {
+    .shop-nav-matrix {
+        grid-template-columns: repeat(2, 1fr); /* Uniform 2x2 layout on mobile screens */
+        gap: 10px;
+        margin: 25px auto 40px auto;
+        padding: 0 5px;
+    }
+    
+    .matrix-btn {
+        padding: 14px 16px;
+    }
+    
+    .matrix-title {
+        font-size: 0.75rem;
+    }
+}
+/* --- MAIN PAGE: STACK BUILDER PROMO PROTOCOL --- */
+.stack-builder-promo {
+    position: relative;
+    width: 100%;
+    margin: 40px 0;
+    padding: 3px; /* Space for the pulsing border */
+    border-radius: 20px;
+    background: transparent;
+    overflow: hidden;
+    cursor: pointer;
+    transition: transform var(--transition-speed);
+}
+
+/* The Pulsing Neon Border Gradient */
+.stack-builder-promo::before {
+    content: '';
+    position: absolute;
+    top: -50%;
+    left: -50%;
+    width: 200%;
+    height: 200%;
+    background: conic-gradient(
+        var(--neon-blue) 0deg,
+        rgba(56, 189, 248, 0.1) 90deg,
+        var(--neon-gold) 180deg,
+        rgba(251, 191, 36, 0.1) 270deg,
+        var(--neon-blue) 360deg
+    );
+    animation: borderRotate 10s linear infinite;
+    z-index: 1;
+}
+
+/* Inner Glass Content Area */
+.stack-builder-promo .promo-content {
+    position: relative;
+    background: #000000; /* Must match bg-main */
+    border-radius: 17px; /* Matches inner curve */
+    padding: 40px 30px;
+    z-index: 2;
+    backdrop-filter: blur(5px);
+    -webkit-backdrop-filter: blur(5px);
+    text-align: center;
+}
+
+/* Background Depth Grid Effect */
+.stack-builder-promo .matrix-background {
+    position: absolute;
+    top: 0; left: 0; width: 100%; height: 100%;
+    background-image: 
+        linear-gradient(rgba(56, 189, 248, 0.05) 1px, transparent 1px),
+        linear-gradient(90deg, rgba(56, 189, 248, 0.05) 1px, transparent 1px);
+    background-size: 30px 30px;
+    opacity: 0.5;
+    z-index: 1;
+}
+
+/* Text & Title Styling */
+.stack-builder-promo h3 {
+    font-size: 2rem;
+    color: var(--text-main);
+    text-transform: uppercase;
+    font-weight: 900;
+    letter-spacing: 2px;
+    margin-bottom: 15px;
+    background: linear-gradient(90deg, var(--text-main), var(--neon-gold), var(--text-main));
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+}
+
+.stack-builder-promo p {
+    color: var(--text-dim);
+    max-width: 750px;
+    margin: 0 auto 35px auto;
+    font-size: 1.05rem;
+    line-height: 1.6;
+}
+
+/* Hover Interactivity */
+.stack-builder-promo:hover {
+    transform: translateY(-5px);
+}
+.stack-builder-promo:hover::before {
+    animation-duration: 5s; /* Speed up border on hover */
+    opacity: 1;
+}
+
+/* Add specialized gold buy button style */
+.gold-btn {
+    border-color: var(--neon-gold);
+    color: var(--neon-gold);
+    font-weight: bold;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 10px;
+    max-width: 320px;
+    margin: 0 auto;
+}
+
+.gold-btn:hover {
+    background: rgba(251, 191, 36, 0.1);
+    box-shadow: 0 0 20px rgba(251, 191, 36, 0.3);
+}
+
+/* Animations Matrix */
+@keyframes borderRotate {
+    100% {
+        transform: rotate(360deg);
+    }
+}
