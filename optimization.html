@@ -47,7 +47,7 @@ j=d.createElement(s),dl=l!='dataLayer'?'&l='+l:'';j.async=true;j.src=
         /* --- THE SPLIT COMMAND CENTER DASHBOARD GRID --- */
         .dashboard-grid {
             display: grid;
-            grid-template-columns: 1.1fr 1.3fr;
+            grid-template-columns: minmax(0, 1.1fr) minmax(0, 1.3fr);
             gap: 30px;
             margin-bottom: 50px;
             text-align: left;
@@ -155,9 +155,9 @@ j=d.createElement(s),dl=l!='dataLayer'?'&l='+l:'';j.async=true;j.src=
         .chart-labels { display: flex; justify-content: space-between; padding: 0 5px; color: var(--text-dim); font-size: 0.8rem; font-family: 'Courier New', Courier, monospace; }
         .chart-labels span { flex-grow: 1; text-align: center; }
 
-        @media (max-width: 900px) {
+        @media (max-width: 1080px) {
             .dashboard-grid { grid-template-columns: 1fr; }
-            .gauge-panel-sticky { position: static; }
+            .gauge-panel-sticky { position: static; margin-bottom: 30px; }
         }
     </style>
 </head>
