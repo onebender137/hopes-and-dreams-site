@@ -2193,8 +2193,3 @@ header nav a {
     margin: 0; /* Clear global margins; gap handles spacing now */
 }
 
-/* Ensure data-reveal works cleanly on section reveal */
-.shop-category-section[data-reveal] {
-    opacity: 0;
-    transform: translateY(20px);
-}
