@@ -2124,3 +2124,27 @@ header nav a {
         border-radius: 14px;
     }
 }
+
+
+/* Merch Video Sub-Terminal Caption */
+.merch-video-caption {
+    font-family: 'Courier New', Courier, monospace;
+    font-size: 0.75rem;
+    color: var(--text-dim);
+    text-align: center;
+    margin-top: 12px;
+    letter-spacing: 1px;
+    line-height: 1.4;
+    text-transform: uppercase;
+    transition: color 0.3s ease;
+}
+
+.terminal-prompt {
+    color: var(--neon-blue);
+    font-weight: bold;
+}
+
+/* Make the text illuminate when the user hovers over the video */
+.merch-video-link:hover .merch-video-caption {
+    color: var(--text-main);
+}
