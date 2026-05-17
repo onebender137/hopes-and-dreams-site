@@ -638,6 +638,240 @@ height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
                 <p style="margin-top: 10px;"><strong>Application:</strong> Use a wearable to track your HRV across these cycles. If your HRV is consistently low during C3-C5, your system isn't recovering; consider increasing magnesium intake or extending your meditation protocol before bed.</p>
             </div>
         </div>
+        <div class="lower-info-panel" data-reveal style="margin-top: 30px;">
+            <div class="matrix-sector-title">SYS_AUDIO // BINAURAL ENTRAINMENT FREQUENCIES</div>
+            <h3 style="color:var(--text-main); font-size:1.4rem; text-transform:uppercase; margin-bottom:10px; font-weight:900;">Neural Waveform Entrainment Console</h3>
+            <p style="color:var(--text-dim); line-height:1.6; font-size:0.95rem; margin-bottom:30px;">Sync your brainwaves with precise stereo audio offsets. Binaural beats require headphones to create an internal auditory third-tone inside the brain, steering your mental posture toward targeted states from deep cell repair to high-bandwidth computation.</p>
+            
+            <style>
+                .binaural-grid {
+                    display: grid;
+                    grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
+                    gap: 20px;
+                    margin-bottom: 20px;
+                }
+                .binaural-card {
+                    background: rgba(255, 255, 255, 0.01);
+                    border: 1px solid rgba(256, 256, 256, 0.03);
+                    border-radius: 16px;
+                    padding: 24px;
+                    text-align: left;
+                    display: flex;
+                    flex-direction: column;
+                    justify-content: space-between;
+                    transition: all var(--transition-speed);
+                }
+                .binaural-card:hover {
+                    border-color: var(--neon-blue);
+                    background: rgba(56, 189, 248, 0.02);
+                }
+                .binaural-card h4 {
+                    color: var(--text-main);
+                    font-size: 1.1rem;
+                    text-transform: uppercase;
+                    letter-spacing: 1px;
+                    margin: 0 0 8px 0;
+                    display: flex;
+                    align-items: center;
+                    justify-content: space-between;
+                }
+                .binaural-frequency {
+                    font-family: 'Courier New', Courier, monospace;
+                    font-size: 0.85rem;
+                    color: var(--neon-gold);
+                    font-weight: bold;
+                }
+                .binaural-card p {
+                    color: var(--text-dim);
+                    font-size: 0.88rem;
+                    line-height: 1.5;
+                    margin: 0 0 20px 0;
+                    flex-grow: 1;
+                }
+                .audio-controls-wrap {
+                    display: flex;
+                    align-items: center;
+                    gap: 12px;
+                    border-top: 1px dashed rgba(255, 255, 255, 0.04);
+                    padding-top: 15px;
+                }
+                .play-binaural-btn {
+                    background: transparent;
+                    border: 1px solid var(--neon-blue);
+                    color: var(--neon-blue);
+                    font-family: 'Courier New', Courier, monospace;
+                    font-size: 0.72rem;
+                    font-weight: bold;
+                    text-transform: uppercase;
+                    padding: 8px 16px;
+                    border-radius: 6px;
+                    cursor: pointer;
+                    transition: all 0.2s ease;
+                    white-space: nowrap;
+                }
+                .play-binaural-btn:hover, .play-binaural-btn.playing {
+                    background: var(--neon-blue);
+                    color: #000;
+                    box-shadow: 0 0 12px rgba(56, 189, 248, 0.3);
+                }
+                .play-binaural-btn.playing {
+                    border-color: var(--neon-gold);
+                    background: var(--var-neon-gold);
+                }
+                .wave-anim {
+                    display: none;
+                    align-items: flex-end;
+                    gap: 3px;
+                    height: 14px;
+                }
+                .wave-bar {
+                    width: 3px;
+                    height: 100%;
+                    background: var(--neon-blue);
+                    animation: synthWave 0.8s ease-in-out infinite alternate;
+                }
+                .wave-bar:nth-child(2) { animation-delay: 0.2s; background: var(--neon-gold); }
+                .wave-bar:nth-child(3) { animation-delay: 0.4s; }
+                @keyframes synthWave {
+                    0% { height: 20%; }
+                    100% { height: 100%; }
+                }
+            </style>
+
+            <div class="binaural-grid">
+                <div class="binaural-card">
+                    <div>
+                        <h4><span>Delta Waves</span> <span class="binaural-frequency">2.5 Hz</span></h4>
+                        <p>Triggers deep, dreamless rest states and physical repair loops. Amplifies human growth hormone release, drives cell rejuvenation, and speeds up systemic detoxification from industrial workday environments.</p>
+                    </div>
+                    <div class="audio-controls-wrap">
+                        <button class="play-binaural-btn" onclick="toggleBinaural(200, 202.5, this)">Listen 🎧</button>
+                        <div class="wave-anim"><div class="wave-bar"></div><div class="wave-bar"></div><div class="wave-bar"></div></div>
+                    </div>
+                </div>
+
+                <div class="binaural-card">
+                    <div>
+                        <h4><span>Theta Waves</span> <span class="binaural-frequency">6.0 Hz</span></h4>
+                        <p>The gateway frequency for lucid dreaming, deep meditation, and creative download loops. Ideal for stabilizing sub-conscious navigation scripts and loading complex nootropic stacks into long-term retention grids.</p>
+                    </div>
+                    <div class="audio-controls-wrap">
+                        <button class="play-binaural-btn" onclick="toggleBinaural(200, 206, this)">Listen 🎧</button>
+                        <div class="wave-anim"><div class="wave-bar"></div><div class="wave-bar"></div><div class="wave-bar"></div></div>
+                    </div>
+                </div>
+
+                <div class="binaural-card">
+                    <div>
+                        <h4><span>Alpha Waves</span> <span class="binaural-frequency">10.5 Hz</span></h4>
+                        <p>Induces a flow state of relaxed alertness. Dissolves performance anxiety, lowers the systemic cortisol baseline, and acts as a smooth accelerator for sustained reading or deep architectural code reviews.</p>
+                    </div>
+                    <div class="audio-controls-wrap">
+                        <button class="play-binaural-btn" onclick="toggleBinaural(200, 210.5, this)">Listen 🎧</button>
+                        <div class="wave-anim"><div class="wave-bar"></div><div class="wave-bar"></div><div class="wave-bar"></div></div>
+                    </div>
+                </div>
+
+                <div class="binaural-card">
+                    <div>
+                        <h4><span>Beta Waves</span> <span class="binaural-frequency">22.0 Hz</span></h4>
+                        <p>Forces maximum cognitive focus, high-speed analytical calculation, and total logical processing. Perfect for high-intensity problem solving, data tracking, or blasting through dense study sprints.</p>
+                    </div>
+                    <div class="audio-controls-wrap">
+                        <button class="play-binaural-btn" onclick="toggleBinaural(200, 222, this)">Listen 🎧</button>
+                        <div class="wave-anim"><div class="wave-bar"></div><div class="wave-bar"></div><div class="wave-bar"></div></div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <script>
+            let audioCtx = null;
+            let leftOsc = null;
+            let rightOsc = null;
+            let leftPanner = null;
+            let rightPanner = null;
+            let masterGain = null;
+            let currentPlayingBtn = null;
+
+            function toggleBinaural(baseFreq, targetFreq, btn) {
+                if (currentPlayingBtn === btn) {
+                    stopBinaural();
+                    return;
+                }
+                if (currentPlayingBtn) {
+                    stopBinaural();
+                }
+                try {
+                    if (!audioCtx) {
+                        audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+                    }
+                    if (audioCtx.state === 'suspended') {
+                        audioCtx.resume();
+                    }
+                    masterGain = audioCtx.createGain();
+                    masterGain.gain.setValueAtTime(0.08, audioCtx.currentTime);
+                    
+                    leftOsc = audioCtx.createOscillator();
+                    leftOsc.type = 'sine';
+                    leftOsc.frequency.setValueAtTime(baseFreq, audioCtx.currentTime);
+                    if (audioCtx.createStereoPanner) {
+                        leftPanner = audioCtx.createStereoPanner();
+                        leftPanner.pan.setValueAtTime(-1, audioCtx.currentTime);
+                    } else {
+                        leftPanner = audioCtx.createPanner();
+                        leftPanner.panningModel = 'HRTF';
+                        leftPanner.setPosition(-1, 0, 0);
+                    }
+                    
+                    rightOsc = audioCtx.createOscillator();
+                    rightOsc.type = 'sine';
+                    rightOsc.frequency.setValueAtTime(targetFreq, audioCtx.currentTime);
+                    if (audioCtx.createStereoPanner) {
+                        rightPanner = audioCtx.createStereoPanner();
+                        rightPanner.pan.setValueAtTime(1, audioCtx.currentTime);
+                    } else {
+                        rightPanner = audioCtx.createPanner();
+                        rightPanner.panningModel = 'HRTF';
+                        rightPanner.setPosition(1, 0, 0);
+                    }
+                    
+                    leftOsc.connect(leftPanner);
+                    leftPanner.connect(masterGain);
+                    rightOsc.connect(rightPanner);
+                    rightPanner.connect(masterGain);
+                    masterGain.connect(audioCtx.destination);
+                    
+                    leftOsc.start(0);
+                    rightOsc.start(0);
+                    
+                    currentPlayingBtn = btn;
+                    btn.textContent = "Stop ⏹️";
+                    btn.style.backgroundColor = "var(--neon-gold)";
+                    btn.style.color = "#000";
+                    btn.style.borderColor = "var(--neon-gold)";
+                    const anim = btn.nextElementSibling;
+                    if (anim) anim.style.display = 'inline-flex';
+                } catch (e) {
+                    console.error("Failed to initialize sound matrix:", e);
+                }
+            }
+
+            function stopBinaural() {
+                if (leftOsc) { try { leftOsc.stop(0); } catch(e){} leftOsc.disconnect(); leftOsc = null; }
+                if (rightOsc) { try { rightOsc.stop(0); } catch(e){} rightOsc.disconnect(); rightOsc = null; }
+                if (masterGain) { masterGain.disconnect(); masterGain = null; }
+                if (currentPlayingBtn) {
+                    currentPlayingBtn.textContent = "Listen 🎧";
+                    currentPlayingBtn.style.backgroundColor = "transparent";
+                    currentPlayingBtn.style.color = "var(--neon-blue)";
+                    currentPlayingBtn.style.borderColor = "var(--neon-blue)";
+                    const anim = currentPlayingBtn.nextElementSibling;
+                    if (anim) anim.style.display = 'none';
+                    currentPlayingBtn = null;
+                }
+            }
+        </script>
 
         <footer>
             <p>&copy; 2026 Dream Syndicate Digital Assets. All Rights Reserved.</p>
