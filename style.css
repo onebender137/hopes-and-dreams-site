@@ -2087,3 +2087,40 @@ header nav a {
         font-size: 0.85rem; /* Scales text down slightly to preserve horizontal real estate */
     }
 }
+
+/* --- MERCHANDISE VIDEO LOOP SHOWCASE --- */
+.merch-video-container {
+    width: 100%;
+    max-width: 850px;
+    margin: 40px auto 20px auto;
+    padding: 0 10px;
+    box-sizing: border-box;
+    display: flex;
+    justify-content: center;
+}
+
+.merch-loop-video {
+    width: 100%;
+    height: auto;
+    border-radius: 20px;
+    border: 1px solid rgba(56, 189, 248, 0.15); /* Sleek neon-blue subtle border */
+    box-shadow: 0 0 30px rgba(56, 189, 248, 0.08); /* Glowing laboratory ambience */
+    object-fit: cover;
+    transition: transform 0.4s ease, border-color 0.4s ease, box-shadow 0.4s ease;
+}
+
+/* Cyberpunk hover elevation effect */
+.merch-loop-video:hover {
+    transform: scale(1.01) translateY(-4px);
+    border-color: var(--neon-blue);
+    box-shadow: 0 15px 40px -10px rgba(56, 189, 248, 0.35);
+}
+
+@media (max-width: 600px) {
+    .merch-video-container {
+        margin: 25px auto 10px auto;
+    }
+    .merch-loop-video {
+        border-radius: 14px;
+    }
+}
