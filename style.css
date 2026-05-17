@@ -1,14 +1,23 @@
 :root {
-    --bg-main: #0a0f2b; 
-    --card-bg: #0d162d; 
+    /* DEFAULT = Absolute Dark Mode (Updated for H&D Protocol) */
+    --bg-main: #000000;         /* Absolute True Black Canvas */
+    --card-bg: #0b0b0b;         /* Elevated Dark Surface for depth and contrast */
+    
+    /* Advanced Glassmorphism Transparencies adjusted for Pure Black */
+    --chat-window-bg: rgba(0, 0, 0, 0.99); /* Deepest transparency */
+    --chat-bot-msg-bg: rgba(255, 255, 255, 0.02); /* Subtle contrast boost */
+    --chat-secondary-bg: rgba(255, 255, 255, 0.015); /* Subtle contrast boost */
+    
+    /* Core Neon Variables */
     --neon-blue: #38bdf8;
     --neon-gold: #fbbf24;
+    
+    /* Typography */
     --text-main: #f8fafc;
     --text-dim: #94a3b8;
+    
+    /* Mechanics */
     --transition-speed: 0.3s;
-    --chat-window-bg: rgba(10, 10, 15, 0.95);
-    --chat-bot-msg-bg: rgba(255, 255, 255, 0.05);
-    --chat-secondary-bg: rgba(0, 0, 0, 0.2);
 }
 
 body.light-mode {
