@@ -132,34 +132,36 @@ j=d.createElement(s),dl=l!='dataLayer'?'&l='+l:'';j.async=true;j.src=
         .control-group:hover, .control-group:focus-within { border-color: rgba(56, 189, 248, 0.2); background: rgba(56, 189, 248, 0.01); }
         .control-group:last-of-type { margin-bottom: 0; }
         .control-label-wrap { display: flex; justify-content: space-between; align-items: center; margin-bottom: 10px; gap: 10px; }
-        .label-title-area { display: flex; align-items: center; gap: 8px; }
+        .label-title-area { display: flex; align-items: center; gap: 10px; }
         .control-label { font-size: 0.9rem; font-weight: 700; color: var(--text-main); text-transform: uppercase; letter-spacing: 1px; cursor: pointer; }
         .control-value { font-family: 'Courier New', Courier, monospace; font-size: 1rem; color: var(--neon-blue); font-weight: bold; }
         
-        /* SLEEK "?" INFO TERMINAL TRIGGER BUTTONS */
+        /* SQUARE TERMINAL EXPLAIN LED BUTTONS */
         .info-trigger-btn {
-            background: transparent;
+            background: rgba(56, 189, 248, 0.02);
             border: 1px solid rgba(56, 189, 248, 0.3);
             color: var(--neon-blue);
             font-family: 'Courier New', Courier, monospace;
-            font-size: 0.75rem;
-            font-weight: bold;
-            width: 18px;
-            height: 18px;
-            border-radius: 50%;
+            font-size: 0.65rem;
+            font-weight: 900;
+            letter-spacing: 1px;
+            padding: 4px 8px;
+            border-radius: 4px;
             display: inline-flex;
             align-items: center;
             justify-content: center;
             cursor: pointer;
             transition: all 0.2s ease;
-            padding: 0;
+            text-transform: uppercase;
+            box-shadow: inset 0 0 4px rgba(56, 189, 248, 0.1);
             line-height: 1;
         }
         .info-trigger-btn:hover {
             border-color: var(--neon-gold);
             color: var(--neon-gold);
-            box-shadow: 0 0 8px rgba(251, 191, 36, 0.4);
-            transform: scale(1.1);
+            background: rgba(251, 191, 36, 0.08);
+            box-shadow: 0 0 10px rgba(251, 191, 36, 0.3), inset 0 0 6px rgba(251, 191, 36, 0.2);
+            transform: translateY(-1px);
         }
 
         /* Premium Range Slider Overrides */
@@ -422,7 +424,7 @@ height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
 
                 <div class="parameter-intel-box">
                     <div class="intel-box-title" id="intel-title">SYS_INTEL // MATRIX INITIALIZED</div>
-                    <div class="intel-box-body" id="intel-body">Adjust any slider or click a <strong style="color:var(--neon-blue);">[?]</strong> icon on the right to project real-life tracking specifications onto this display module.</div>
+                    <div class="intel-box-body" id="intel-body">Adjust any slider or click an <strong style="color:var(--neon-blue);">[EXPLAIN]</strong> switch on the right to project real-life tracking specifications onto this display module.</div>
                 </div>
             </div>
 
@@ -433,7 +435,7 @@ height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
                     <div class="control-label-wrap">
                         <div class="label-title-area">
                             <label class="control-label" for="sleep-duration">Sleep Duration</label>
-                            <button class="info-trigger-btn" onclick="scrollToIntel('sleepDur')" title="Review Detailed Intel Profile">?</button>
+                            <button class="info-trigger-btn" onclick="scrollToIntel('sleepDur')" title="Review Detailed Intel Profile">Explain</button>
                         </div>
                         <span class="control-value" id="sleep-duration-val">7.5 hrs</span>
                     </div>
@@ -444,7 +446,7 @@ height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
                     <div class="control-label-wrap">
                         <div class="label-title-area">
                             <label class="control-label" for="sleep-quality">Sleep Quality</label>
-                            <button class="info-trigger-btn" onclick="scrollToIntel('sleepQual')" title="Review Detailed Intel Profile">?</button>
+                            <button class="info-trigger-btn" onclick="scrollToIntel('sleepQual')" title="Review Detailed Intel Profile">Explain</button>
                         </div>
                         <span class="control-value" id="sleep-quality-val">75%</span>
                     </div>
@@ -455,7 +457,7 @@ height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
                     <div class="control-label-wrap">
                         <div class="label-title-area">
                             <label class="control-label" for="hrv-score">Heart Rate Variability (HRV)</label>
-                            <button class="info-trigger-btn" onclick="scrollToIntel('hrv')" title="Review Detailed Intel Profile">?</button>
+                            <button class="info-trigger-btn" onclick="scrollToIntel('hrv')" title="Review Detailed Intel Profile">Explain</button>
                         </div>
                         <span class="control-value" id="hrv-score-val">55 ms</span>
                     </div>
@@ -466,7 +468,7 @@ height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
                     <div class="control-label-wrap">
                         <div class="label-title-area">
                             <label class="control-label" for="stress-level">Systemic Stress Index</label>
-                            <button class="info-trigger-btn" onclick="scrollToIntel('stress')" title="Review Detailed Intel Profile">?</button>
+                            <button class="info-trigger-btn" onclick="scrollToIntel('stress')" title="Review Detailed Intel Profile">Explain</button>
                         </div>
                         <span class="control-value" id="stress-level-val">40%</span>
                     </div>
@@ -477,7 +479,7 @@ height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
                     <div class="control-label-wrap">
                         <div class="label-title-area">
                             <label class="control-label" for="deep-work">Target Deep Work Output</label>
-                            <button class="info-trigger-btn" onclick="scrollToIntel('deepWork')" title="Review Detailed Intel Profile">?</button>
+                            <button class="info-trigger-btn" onclick="scrollToIntel('deepWork')" title="Review Detailed Intel Profile">Explain</button>
                         </div>
                         <span class="control-value" id="deep-work-val">3.0 hrs</span>
                     </div>
@@ -488,7 +490,7 @@ height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
                     <div class="control-label-wrap">
                         <div class="label-title-area">
                             <label class="control-label" for="caffeine-input">Caffeine Load</label>
-                            <button class="info-trigger-btn" onclick="scrollToIntel('caffeine')" title="Review Detailed Intel Profile">?</button>
+                            <button class="info-trigger-btn" onclick="scrollToIntel('caffeine')" title="Review Detailed Intel Profile">Explain</button>
                         </div>
                         <span class="control-value" id="caffeine-val">200 mg</span>
                     </div>
@@ -496,11 +498,10 @@ height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
                 </div>
 
                 <div class="control-group">
-                    <div class="control-group">
                     <div class="control-label-wrap">
                         <div class="label-title-area">
                             <label class="control-label" for="hydration-input">System Hydration</label>
-                            <button class="info-trigger-btn" onclick="scrollToIntel('hydration')" title="Review Detailed Intel Profile">?</button>
+                            <button class="info-trigger-btn" onclick="scrollToIntel('hydration')" title="Review Detailed Intel Profile">Explain</button>
                         </div>
                         <span class="control-value" id="hydration-val">2.5 L</span>
                     </div>
@@ -513,7 +514,7 @@ height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
         <div class="codex-matrix-panel" data-reveal id="syndicate-codex">
             <div class="matrix-sector-title">CODEX_DATA // BIOLOGICAL PARAMETER SPECS</div>
             <h3 style="color:var(--text-main); font-size:1.4rem; text-transform:uppercase; margin-bottom:10px; font-weight:900;">Systemic Parameter Encyclopedia</h3>
-            <p style="color:var(--text-dim); line-height:1.6; font-size:0.95rem; margin-bottom:25px;">A granular, human-understandable breakdown tracking the exact mechanisms of each input vector. Click any slider's <strong style="color:var(--neon-blue);">[?]</strong> button above to instantly call up that variable's detailed node profile.</p>
+            <p style="color:var(--text-dim); line-height:1.6; font-size:0.95rem; margin-bottom:25px;">A granular, human-understandable breakdown tracking the exact mechanisms of each input vector. Click any slider's <strong style="color:var(--neon-blue);">[EXPLAIN]</strong> switch above to instantly call up that variable's detailed node profile.</p>
             
             <div class="codex-grid">
                 <div class="codex-node" id="node-sleepDur">
