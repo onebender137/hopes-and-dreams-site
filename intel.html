@@ -9,8 +9,7 @@ j=d.createElement(s),dl=l!='dataLayer'?'&l='+l:'';j.async=true;j.src=
 <script async src="https://www.googletagmanager.com/gtag/js?id=G-5RWXX320YW"></script>
 <script>
   window.dataLayer = window.dataLayer || [];
-  function gtag(){dataLayer.push(arguments);}
-  gtag('js', new Date());
+  function gtag(){dataLayer.push(arguments);}\n  gtag('js', new Date());
 
   gtag('config', 'G-5RWXX320YW');
 </script>
@@ -68,6 +67,51 @@ j=d.createElement(s),dl=l!='dataLayer'?'&l='+l:'';j.async=true;j.src=
             margin-bottom: 50px;
             text-align: left;
             box-shadow: 0 20px 40px rgba(0,0,0,0.5);
+        }
+
+        /* DYNAMIC RECENT ARTICLES INLINE SYSTEM (MATCHES TRANSMISSIONS) */
+        .archive-item {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 16px 20px;
+            background: rgba(255, 255, 255, 0.01);
+            border: 1px solid rgba(256, 256, 256, 0.03);
+            border-radius: 12px;
+            margin-bottom: 12px;
+            text-decoration: none;
+            transition: all var(--transition-speed) ease;
+        }
+        .archive-item:last-of-type {
+            margin-bottom: 0;
+        }
+        .archive-item:hover {
+            background: rgba(56, 189, 248, 0.03);
+            border-color: var(--neon-blue);
+            box-shadow: 0 0 15px rgba(56, 189, 248, 0.1);
+        }
+        .archive-item .title {
+            color: var(--text-main);
+            font-weight: 700;
+            font-size: 1rem;
+            text-transform: capitalize;
+        }
+        .archive-item:hover .title {
+            color: var(--neon-blue);
+        }
+        .archive-item .date {
+            font-family: 'Courier New', Courier, monospace;
+            font-size: 0.85rem;
+            color: var(--text-dim);
+        }
+        
+        body.light-mode .archive-item {
+            background: #ffffff;
+            border-color: rgba(0, 0, 0, 0.05);
+        }
+        body.light-mode .archive-item:hover {
+            background: rgba(2, 132, 199, 0.03);
+            border-color: var(--neon-blue);
         }
 
         /* CONTENT SEGMENTATION GRIDS */
@@ -173,6 +217,14 @@ j=d.createElement(s),dl=l!='dataLayer'?'&l='+l:'';j.async=true;j.src=
             .intel-modular-card, .hardware-card {
                 padding: 24px;
             }
+            .archive-item {
+                flex-direction: column;
+                align-items: flex-start;
+                gap: 5px;
+            }
+            .archive-item .date {
+                align-self: flex-end;
+            }
         }
     </style>
 </head>
@@ -202,9 +254,40 @@ height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
         <div class="subtitle" data-reveal="">Vetted Protocols &amp; Biological Research</div>
 
         <div class="live-broadcast-frame" data-reveal="">
-            <div class="intel-sector-title" style="border:none; margin-bottom:10px; padding:0;">ALPHA_FEED // TRANSMISSION STATUS: ACTIVE</div>
+            <div class="intel-sector-title" style="border:none; margin-bottom:15px; padding:0;">ALPHA_FEED // TRANSMISSION STATUS: ACTIVE</div>
+            
             <div class="intel-feed-wrapper">
-                <p style="color:var(--text-main); font-size:1.1rem; line-height:1.6; margin:0;">Monitoring active global datasets. Cognitive blueprint changes, localized stack modifications, and verification updates are compiled below into clean, protected storage blocks for system deployment.</p>
+                <a href="articles/2026-05-17-cilantro-tincture-and-chlorella-heavy-metal-detox.html" class="archive-item">
+                    <span class="title">cilantro tincture and chlorella heavy metal detox</span>
+                    <span class="date">2026-05-17</span>
+                </a>
+                <a href="articles/2026-05-17-chlorella.html" class="archive-item">
+                    <span class="title">chlorella</span>
+                    <span class="date">2026-05-17</span>
+                </a>
+                <a href="articles/2026-05-17-lucid-dreaming.html" class="archive-item">
+                    <span class="title">Lucid Dreaming</span>
+                    <span class="date">2026-05-17</span>
+                </a>
+                <a href="articles/2026-05-16-lucid-dreaming.html" class="archive-item">
+                    <span class="title">Lucid Dreaming</span>
+                    <span class="date">2026-05-16</span>
+                </a>
+                <a href="articles/2026-05-16-senolytics-quercetin-fisetin.html" class="archive-item">
+                    <span class="title">Senolytics (Quercetin/Fisetin)</span>
+                    <span class="date">2026-05-16</span>
+                </a>
+                <a href="articles/2026-05-16-melatonin.html" class="archive-item">
+                    <span class="title">Melatonin</span>
+                    <span class="date">2026-05-16</span>
+                </a>
+                </div>
+
+            <div style="margin-top: 25px; text-align: right;">
+                <a href="transmissions.html" class="intel-action-link">
+                    View Full Transmission Archive
+                    <svg width="16" height="16" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"></path></svg>
+                </a>
             </div>
         </div>
 
@@ -214,7 +297,7 @@ height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
             <div class="intel-modular-card" data-reveal="">
                 <div>
                     <span class="intel-card-tag">Circadian_Optimization</span>
-                    <h3>Sleep Architecture Blueprint</h3>
+                    $### Sleep Architecture Blueprint
                     <p>Granular structural breakdowns of 90-minute sleep cycles (C1-C7). Understand how stabilizing REM and deep sleep thresholds directly accelerates executive function patterns.</p>
                 </div>
                 <a href="optimization.html" class="intel-action-link">
