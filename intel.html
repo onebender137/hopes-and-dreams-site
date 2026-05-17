@@ -9,7 +9,8 @@ j=d.createElement(s),dl=l!='dataLayer'?'&l='+l:'';j.async=true;j.src=
 <script async src="https://www.googletagmanager.com/gtag/js?id=G-5RWXX320YW"></script>
 <script>
   window.dataLayer = window.dataLayer || [];
-  function gtag(){dataLayer.push(arguments);}\n  gtag('js', new Date());
+  function gtag(){dataLayer.push(arguments);}
+  gtag('js', new Date());
 
   gtag('config', 'G-5RWXX320YW');
 </script>
@@ -69,7 +70,7 @@ j=d.createElement(s),dl=l!='dataLayer'?'&l='+l:'';j.async=true;j.src=
             box-shadow: 0 20px 40px rgba(0,0,0,0.5);
         }
 
-        /* DYNAMIC RECENT ARTICLES INLINE SYSTEM (MATCHES TRANSMISSIONS) */
+        /* DYNAMIC RECENT ARTICLES INLINE SYSTEM */
         .archive-item {
             display: flex;
             justify-content: space-between;
@@ -82,36 +83,185 @@ j=d.createElement(s),dl=l!='dataLayer'?'&l='+l:'';j.async=true;j.src=
             text-decoration: none;
             transition: all var(--transition-speed) ease;
         }
-        .archive-item:last-of-type {
-            margin-bottom: 0;
-        }
+        .archive-item:last-of-type { margin-bottom: 0; }
         .archive-item:hover {
             background: rgba(56, 189, 248, 0.03);
             border-color: var(--neon-blue);
             box-shadow: 0 0 15px rgba(56, 189, 248, 0.1);
         }
-        .archive-item .title {
-            color: var(--text-main);
-            font-weight: 700;
-            font-size: 1rem;
-            text-transform: capitalize;
+        .archive-item .title { color: var(--text-main); font-weight: 700; font-size: 1rem; text-transform: capitalize; }
+        .archive-item:hover .title { color: var(--neon-blue); }
+        .archive-item .date { font-family: 'Courier New', Courier, monospace; font-size: 0.85rem; color: var(--text-dim); }
+        
+        body.light-mode .archive-item { background: #ffffff; border-color: rgba(0, 0, 0, 0.05); }
+        body.light-mode .archive-item:hover { background: rgba(2, 132, 199, 0.03); border-color: var(--neon-blue); }
+
+        /* --- GLOW-MAPPED NEURAL ANATOMY SIMULATOR INTERFACE --- */
+        .neural-anatomy-panel {
+            background: var(--card-bg);
+            border: 1px solid rgba(251, 191, 36, 0.08);
+            border-radius: 24px;
+            padding: 35px;
+            margin-bottom: 50px;
+            text-align: left;
+            display: grid;
+            grid-template-columns: 1.14fr 1.36fr;
+            gap: 35px;
+            align-items: start;
+            box-shadow: 0 20px 40px rgba(0,0,0,0.5);
         }
-        .archive-item:hover .title {
-            color: var(--neon-blue);
+        .brain-visualizer-container {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            background: rgba(0,0,0,0.2);
+            border-radius: 16px;
+            padding: 20px;
+            border: 1px solid rgba(255,255,255,0.01);
+            position: sticky;
+            top: 40px;
         }
-        .archive-item .date {
+        .interactive-brain-svg {
+            width: 100%;
+            max-width: 420px;
+            height: auto;
+        }
+        /* Clickable Anatomical Vectors */
+        .brain-region-node {
+            fill: rgba(56, 189, 248, 0.06);
+            stroke: rgba(56, 189, 248, 0.4);
+            stroke-width: 1.5;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+        .brain-region-node:hover, .brain-region-node.selected-node {
+            fill: rgba(251, 191, 36, 0.15);
+            stroke: var(--neon-gold);
+            filter: drop-shadow(0 0 8px var(--neon-gold));
+        }
+        .brain-outline-silhouette {
+            fill: none;
+            stroke: rgba(256,256,256,0.08);
+            stroke-width: 2;
+            stroke-dasharray: 4 4;
+        }
+        /* Anatomy Diagnostics Panel Box */
+        .anatomy-diagnostics-box {
+            background: rgba(11, 11, 11, 0.6);
+            border: 1px dashed rgba(56, 189, 248, 0.2);
+            border-radius: 16px;
+            padding: 25px;
+            min-height: 380px;
+            display: flex;
+            flex-direction: column;
+            justify-content: flex-start;
+        }
+        .diagnostics-header {
             font-family: 'Courier New', Courier, monospace;
-            font-size: 0.85rem;
+            font-size: 0.78rem;
+            color: var(--neon-blue);
+            font-weight: bold;
+            letter-spacing: 1px;
+            margin-bottom: 10px;
+            text-transform: uppercase;
+        }
+        .diagnostics-title {
+            color: var(--text-main);
+            font-size: 1.4rem;
+            font-weight: 900;
+            margin: 0 0 12px 0;
+            text-transform: uppercase;
+        }
+        .diagnostics-body {
             color: var(--text-dim);
+            font-size: 0.95rem;
+            line-height: 1.6;
+            margin: 0 0 20px 0;
         }
         
-        body.light-mode .archive-item {
-            background: #ffffff;
-            border-color: rgba(0, 0, 0, 0.05);
+        /* INTERCONNECTED SYSTEM CROSS-LINKS */
+        .diagnostics-actions-matrix {
+            display: flex;
+            gap: 12px;
+            border-top: 1px dashed rgba(56, 189, 248, 0.15);
+            padding-top: 15px;
+            margin-bottom: 20px;
         }
-        body.light-mode .archive-item:hover {
-            background: rgba(2, 132, 199, 0.03);
+        .diagnostics-btn {
+            flex: 1;
+            padding: 10px 14px;
+            font-size: 0.75rem;
+            font-weight: bold;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            text-align: center;
+            text-decoration: none;
+            border-radius: 6px;
+            transition: all var(--transition-speed);
+        }
+        .diagnostics-btn.procure {
+            border: 1px solid var(--neon-gold);
+            color: var(--neon-gold);
+            background: transparent;
+        }
+        .diagnostics-btn.procure:hover {
+            background: rgba(251, 191, 36, 0.08);
+            box-shadow: 0 0 12px rgba(251, 191, 36, 0.25);
+        }
+        .diagnostics-btn.tune {
+            border: 1px solid var(--neon-blue);
+            color: var(--neon-blue);
+            background: transparent;
+        }
+        .diagnostics-btn.tune:hover {
+            background: rgba(56, 189, 248, 0.08);
+            box-shadow: 0 0 12px rgba(56, 189, 248, 0.25);
+        }
+
+        /* DYNAMIC SCANNED TRANSMISSIONS READOUT SUB-TERMINAL */
+        .scanned-transmissions-title {
+            font-family: 'Courier New', Courier, monospace;
+            font-size: 0.72rem;
+            color: var(--neon-gold);
+            font-weight: bold;
+            letter-spacing: 1px;
+            margin-bottom: 12px;
+            text-transform: uppercase;
+        }
+        .scanned-links-feed {
+            display: flex;
+            flex-direction: column;
+            gap: 8px;
+        }
+        .mini-scanned-link {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 10px 14px;
+            background: rgba(255,255,255,0.02);
+            border: 1px solid rgba(255,255,255,0.04);
+            border-radius: 8px;
+            text-decoration: none;
+            font-size: 0.85rem;
+            color: var(--text-main);
+            transition: all 0.2s ease;
+        }
+        .mini-scanned-link:hover {
             border-color: var(--neon-blue);
+            background: rgba(56, 189, 248, 0.04);
+        }
+        .mini-scanned-link span {
+            text-transform: capitalize;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            white-space: nowrap;
+            max-width: 78%;
+            text-align: left;
+        }
+        .mini-scanned-link .mini-date {
+            font-family: 'Courier New', Courier, monospace;
+            font-size: 0.72rem;
+            color: var(--text-dim);
         }
 
         /* CONTENT SEGMENTATION GRIDS */
@@ -122,7 +272,6 @@ j=d.createElement(s),dl=l!='dataLayer'?'&l='+l:'';j.async=true;j.src=
             margin-bottom: 50px;
             text-align: left;
         }
-
         .intel-modular-card {
             background: var(--card-bg);
             border: 1px solid rgba(256, 256, 256, 0.03);
@@ -148,19 +297,8 @@ j=d.createElement(s),dl=l!='dataLayer'?'&l='+l:'';j.async=true;j.src=
             margin-bottom: 12px;
             display: block;
         }
-        .intel-modular-card h3 {
-            color: var(--text-main);
-            font-size: 1.3rem;
-            margin: 0 0 12px 0;
-            font-weight: 700;
-        }
-        .intel-modular-card p {
-            color: var(--text-dim);
-            font-size: 0.95rem;
-            line-height: 1.5;
-            margin-bottom: 25px;
-            flex-grow: 1;
-        }
+        .intel-modular-card h3 { color: var(--text-main); font-size: 1.3rem; margin: 0 0 12px 0; font-weight: 700; }
+        .intel-modular-card p { color: var(--text-dim); font-size: 0.95rem; line-height: 1.5; margin-bottom: 25px; flex-grow: 1; }
 
         /* CLEAN CTA LINK SWITCHES */
         .intel-action-link {
@@ -175,20 +313,14 @@ j=d.createElement(s),dl=l!='dataLayer'?'&l='+l:'';j.async=true;j.src=
             text-decoration: none;
             transition: color 0.2s;
         }
-        .intel-action-link:hover {
-            color: var(--text-main);
-        }
-        .intel-action-link svg {
-            transition: transform 0.2s;
-        }
-        .intel-action-link:hover svg {
-            transform: translateX(4px);
-        }
+        .intel-action-link:hover { color: var(--text-main); }
+        .intel-action-link svg { transition: transform 0.2s; }
+        .intel-action-link:hover svg { transform: translateX(4px); }
 
         /* BIOMETRIC HARDWARE MATRIX */
         .hardware-matrix-grid {
             display: grid;
-            grid-template-columns: 1fr 1fr;
+            grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
             gap: 25px;
             margin-bottom: 60px;
             text-align: left;
@@ -201,30 +333,19 @@ j=d.createElement(s),dl=l!='dataLayer'?'&l='+l:'';j.async=true;j.src=
             display: flex;
             flex-direction: column;
             justify-content: space-between;
+            transition: all var(--transition-speed) ease;
         }
-        .hardware-card h3 {
-            color: var(--text-main);
-            font-size: 1.5rem;
-            margin-top: 0;
-            margin-bottom: 12px;
-            letter-spacing: 0.5px;
-        }
+        .hardware-card:hover { border-color: rgba(56, 189, 248, 0.2); }
+        .hardware-card h3 { color: var(--text-main); font-size: 1.5rem; margin-top: 0; margin-bottom: 12px; letter-spacing: 0.5px; }
 
-        @media (max-width: 900px) {
-            .hardware-matrix-grid {
-                grid-template-columns: 1fr;
-            }
-            .intel-modular-card, .hardware-card {
-                padding: 24px;
-            }
-            .archive-item {
-                flex-direction: column;
-                align-items: flex-start;
-                gap: 5px;
-            }
-            .archive-item .date {
-                align-self: flex-end;
-            }
+        @media (max-width: 1080px) {
+            .neural-anatomy-panel { grid-template-columns: 1fr; gap: 25px; }
+            .brain-visualizer-container { position: static; }
+            .hardware-matrix-grid { grid-template-columns: 1fr; }
+            .intel-modular-card, .hardware-card { padding: 24px; }
+            .archive-item { flex-direction: column; align-items: flex-start; gap: 5px; }
+            .archive-item .date { align-self: flex-end; }
+            .diagnostics-actions-matrix { flex-direction: column; gap: 10px; }
         }
     </style>
 </head>
@@ -291,13 +412,47 @@ height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
             </div>
         </div>
 
+        <div class="intel-sector-title" data-reveal="">ANATOMY_SIM // INTERACTIVE NEURAL MAPPING SIMULATOR</div>
+        <div class="neural-anatomy-panel" data-reveal="">
+            <div class="brain-visualizer-container">
+                <svg class="interactive-brain-svg" viewBox="0 0 400 300" xmlns="http://www.w3.org/2000/svg">
+                    <path class="brain-outline-silhouette" d="M120,60 C180,30 290,30 330,80 C370,120 370,190 320,220 C290,240 260,220 240,240 C210,270 170,270 150,230 C100,220 60,180 60,130 C60,80 90,70 120,60 Z"/>
+                    
+                    <path class="brain-region-node" id="region-pfc" onclick="triggerBrainIntel('pfc')" d="M65,120 C65,85 95,70 130,65 C140,95 135,140 115,160 C90,165 70,145 65,120 Z"/>
+                    <text x="85" y="115" font-family="monospace" font-size="10" fill="var(--text-main)" style="pointer-events:none; font-weight:bold;">PFC</text>
+                    
+                    <path class="brain-region-node" id="region-hippo" onclick="triggerBrainIntel('hippo')" d="M160,140 C190,120 230,120 250,145 C230,175 190,175 160,140 Z"/>
+                    <text x="180" y="148" font-family="monospace" font-size="10" fill="var(--text-main)" style="pointer-events:none; font-weight:bold;">HIPPO</text>
+                    
+                    <path class="brain-region-node" id="region-amygdala" onclick="triggerBrainIntel('amygdala')" d="M 155,180 A 18,18 0 1,1 155,180.1 Z"/>
+                    <text x="143" y="183" font-family="monospace" font-size="9" fill="var(--text-main)" style="pointer-events:none; font-weight:bold;">AMYG</text>
+                    
+                    <path class="brain-region-node" id="region-vagus" onclick="triggerBrainIntel('vagus')" d="M225,200 C245,200 255,220 245,255 C230,255 220,245 225,200 Z"/>
+                    <text x="242" y="235" font-family="monospace" font-size="9" fill="var(--text-main)" style="pointer-events:none; font-weight:bold;">VAGUS</text>
+                </svg>
+            </div>
+            
+            <div class="anatomy-diagnostics-box" id="diagnostics-terminal-box">
+                <div class="diagnostics-header" id="brain-intel-header">SYS_ANATOMY // STATUS: INITIALIZED</div>
+                <h3 class="diagnostics-title" id="brain-intel-title">Neural Mapping Console</h3>
+                <p class="diagnostics-body" id="brain-intel-body">Click or select any active coordinate sector on the visual layout matrix to project granular anatomical tracking data, specialized procurement vectors, and dynamically filtered database articles directly into this view screen.</p>
+                
+                <div class="diagnostics-actions-matrix" id="brain-intel-actions" style="display:none;"></div>
+                
+                <div id="scanned-transmissions-wrapper" style="display:none; margin-top:5px; border-top:1px solid rgba(255,255,255,0.05); padding-top:15px;">
+                    <div class="scanned-transmissions-title">SYS_DATABASE // MATCHED_TRANSMISSIONS</div>
+                    <div class="scanned-links-feed" id="scanned-links-feed"></div>
+                </div>
+            </div>
+        </div>
+
         <div class="intel-sector-title" data-reveal="">SECTOR_01 // CORE BIOLOGICAL PROTOCOLS</div>
         <div class="intel-matrix-grid">
             
             <div class="intel-modular-card" data-reveal="">
                 <div>
                     <span class="intel-card-tag">Circadian_Optimization</span>
-                    $### Sleep Architecture Blueprint
+                    <h3>Sleep Architecture Blueprint</h3>
                     <p>Granular structural breakdowns of 90-minute sleep cycles (C1-C7). Understand how stabilizing REM and deep sleep thresholds directly accelerates executive function patterns.</p>
                 </div>
                 <a href="optimization.html" class="intel-action-link">
@@ -332,7 +487,7 @@ height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
 
         </div>
 
-        <div class="intel-sector-title" data-reveal="">SECTOR_02 // BIOMETRIC INSTRUMENTATION resource matrix</div>
+        <div class="intel-sector-title" data-reveal="">SECTOR_02 // BIOMETRIC INSTRUMENTATION &amp; DATA CAPTURE</div>
         <div class="hardware-matrix-grid">
             
             <div class="hardware-card" data-reveal="">
@@ -351,6 +506,15 @@ height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
                     <p>Advanced real-time performance analytics. Compiles systemic VO2 max metrics, active exertion load parameters, and biometric data loops necessary to monitor high-output states.</p>
                 </div>
                 <a class="cta-button" href="https://www.garmin.com/" style="font-size: 0.8rem; padding: 10px 20px; width: auto; align-self: flex-start; margin-top: 15px;" target="_blank" rel="noopener noreferrer">Explore Garmin Platform</a>
+            </div>
+
+            <div class="hardware-card" data-reveal="">
+                <div>
+                    <span class="intel-card-tag">Cognitive_Vault // Node_03</span>
+                    <h3>Obsidian Second Brain Integration</h3>
+                    <p>Your local markdown knowledge repository matrix. Organize complex biohacking research pipelines, map supplement stacks, and synchronize personal ideation logs into an uncompromised graph-network architecture.</p>
+                </div>
+                <a class="cta-button" href="https://obsidian.md/" style="font-size: 0.8rem; padding: 10px 20px; width: auto; align-self: flex-start; margin-top: 15px;" target="_blank" rel="noopener noreferrer">Access Obsidian Vault</a>
             </div>
 
         </div>
@@ -383,5 +547,119 @@ height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
             <p style="font-size: 0.7rem; color: var(--text-dim); margin-top: 10px;">Location: Saint John, New Brunswick, Canada</p>
         </footer>
     </div>
+
+    <script>
+        let cachedTransmissionsArray = [];
+
+        // ASYNC CORE: Synchronize with transmissions.json on boot
+        document.addEventListener('DOMContentLoaded', () => {
+            fetch('transmissions.json')
+                .then(res => res.json())
+                .then(data => {
+                    cachedTransmissionsArray = data;
+                })
+                .catch(err => console.error("Database connection fault in transmissions.json pipeline:", err));
+        });
+
+        function triggerBrainIntel(regionId) {
+            document.querySelectorAll('.brain-region-node').forEach(node => {
+                node.classList.remove('selected-node');
+            });
+
+            const activeNode = document.getElementById('region-' + regionId);
+            const viewHeader = document.getElementById('brain-intel-header');
+            const viewTitle = document.getElementById('brain-intel-title');
+            const viewBody = document.getElementById('brain-intel-body');
+            const viewActions = document.getElementById('brain-intel-actions');
+            const scannedWrapper = document.getElementById('scanned-transmissions-wrapper');
+            const scannedFeed = document.getElementById('scanned-links-feed');
+
+            if (activeNode) {
+                activeNode.classList.add('selected-node');
+            }
+
+            const anatomyLibrary = {
+                pfc: {
+                    header: "SYS_ANATOMY // REG_01 // COGNITIVE_CORE",
+                    title: "Prefrontal Cortex (PFC)",
+                    body: "The absolute command center for executive functioning, logic sequence calculations, focus stabilization, and long-term planning matrix generation. Draws heavily on clean <strong>Alpha GPC Choline</strong> substrates to synthesize high-bandwidth acetylcholine under strenuous computational loads.",
+                    procureUrl: "shop.html#alpha-gpc",
+                    procureText: "Deploy Alpha GPC Vector",
+                    tuneUrl: "optimization.html",
+                    tuneText: "Monitor Deep Work Output",
+                    keywords: ['choline', 'alpha gpc', 'cognitive', 'focus', 'work', 'neuro', 'nootropics', 'foundation']
+                },
+                hippo: {
+                    header: "SYS_ANATOMY // REG_02 // MEMORY_GRID",
+                    title: "Hippocampus Architecture",
+                    body: "The master storage grid router for declarative and short-term memory compilation. Highly active during deep non-REM and REM sleep architectures. Targeted protocols like <strong>Huperzine-A</strong> temporarily bottleneck acetylcholinesterase down-regulation here, creating high-vividness dream states.",
+                    procureUrl: "shop.html#huperzine",
+                    procureText: "Deploy Huperzine Vector",
+                    tuneUrl: "optimization.html",
+                    tuneText: "Tune Sleep Architecture",
+                    keywords: ['sleep', 'dream', 'huperzine', 'memory', 'lucid', 'rest', 'melatonin', '5-htp', 'circadian', 'architecture']
+                },
+                amygdala: {
+                    header: "SYS_ANATOMY // REG_03 // threat_mitigation",
+                    title: "Amygdala Center",
+                    body: "The central nervous system trigger node for psychological stress, threat tracking, and structural anxiety calculation. When overstimulated by heavy workspace loads or environmental pressure, it forces a rigid sympathetic fight-or-flight posture. Counteract with <strong>Ashwagandha (KSM-66)</strong> to force cortisol levels down.",
+                    procureUrl: "shop.html#ashwagandha",
+                    procureText: "Deploy Cortisol Mitigation",
+                    tuneUrl: "optimization.html",
+                    tuneText: "Calibrate Systemic Stress Index",
+                    keywords: ['stress', 'cortisol', 'ashwagandha', 'anxiety', 'hpa', 'allostatic', 'mitigation', 'bacopa', 'gaba', 'senolytics', 'quercetin', 'fisetin', 'detox', 'chlorella', 'cilantro', 'heavy metal']
+                },
+                vagus: {
+                    header: "SYS_ANATOMY // REG_04 // AUTONOMIC_CONDUIT",
+                    title: "Vagus Nerve Complex Link",
+                    body: "The master parasympathetic pipeline running from the brainstem down to the thoracic core. Your absolute recovery highway. High tone here establishes an elite, wide **Heart Rate Variability (HRV)** baseline profile, confirming your biological hardware is ready for heavy exertion inputs.",
+                    procureUrl: "shop.html#creatine",
+                    procureText: "Deploy Cellular Hydration",
+                    tuneUrl: "optimization.html",
+                    tuneText: "Review HRV Index",
+                    keywords: ['hrv', 'heart', 'variability', 'recovery', 'hydration', 'creatine', 'electrolyte', 'potassium', 'pulse', 'separation', 'wright']
+                }
+            };
+
+            if (anatomyLibrary[regionId]) {
+                const data = anatomyLibrary[regionId];
+                viewHeader.textContent = data.header;
+                viewTitle.textContent = data.title;
+                viewBody.innerHTML = data.body;
+                
+                // Build Primary Static Vector Links
+                viewActions.innerHTML = `
+                    <a href="${data.procureUrl}" class="diagnostics-btn procure">${data.procureText} 🚀</a>
+                    <a href="${data.tuneUrl}" class="diagnostics-btn tune">${data.tuneText} 🎛️</a>
+                `;
+                viewActions.style.display = "flex";
+
+                // DYNAMIC SEARCH ENGINE LAYER: Scan local copy of array against sector keywords
+                scannedFeed.innerHTML = ""; 
+                const matches = cachedTransmissionsArray.filter(article => {
+                    const cleanTitle = article.title.toLowerCase();
+                    return data.keywords.some(kw => cleanTitle.includes(kw));
+                });
+
+                if (matches.length > 0) {
+                    matches.forEach(article => {
+                        const linkNode = document.createElement('a');
+                        linkNode.href = article.href;
+                        linkNode.className = "mini-scanned-link";
+                        linkNode.innerHTML = `
+                            <span>${article.title}</span>
+                            <span class="mini-date">${article.date}</span>
+                        `;
+                        scannedFeed.appendChild(linkNode);
+                    });
+                    scannedWrapper.style.display = "block";
+                } else {
+                    // Fail-safe standby visualization if array is currently empty
+                    scannedFeed.innerHTML = `<div style="font-family:monospace; font-size:0.75rem; color:var(--text-dim); text-align:center; padding:10px; border:1px dashed rgba(255,255,255,0.03); border-radius:8px;">[ NO ACTIVE TRANSMISSIONS LINKED // SYSTEM STANDBY ]</div>`;
+                    scannedWrapper.style.display = "block";
+                }
+            }
+        }
+    </script>
 </body>
 </html>
