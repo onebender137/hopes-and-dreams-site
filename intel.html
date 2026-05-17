@@ -164,7 +164,7 @@ j=d.createElement(s),dl=l!='dataLayer'?'&l='+l:'';j.async=true;j.src=
             margin: 0 auto;
         }
 
-        /* HIGH PRECISION VECTOR INTEGRATED HOTSPOTS */
+        /* HIGH-PRECISION INTEGRATED HOTSPOTS */
         .centerpiece-brain-svg {
             width: 100%;
             height: auto;
@@ -454,30 +454,30 @@ height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
                 <div class="brain-visualizer-container">
                     <div class="interactive-brain-wrapper">
                         <svg viewBox="0 0 500 380" class="centerpiece-brain-svg" xmlns="http://www.w3.org/2000/svg">
-                            <image href="https://png.pngtree.com/thumb_back/fh260/background/20251108/pngtree-a-realistic-3d-rendering-of-human-brain-on-black-background-image_20242950.webp" x="0" y="0" width="500" height="380" preserveAspectRatio="xMidYMid slice"/>
+                            <image href="https://png.pngtree.com/thumb_back/fh260/background/20251108/pngtree-a-realistic-3d-rendering-of-human-brain-on-black-background-image_20242950.webp" x="0" y="0" width="500" height="380" preserveAspectRatio="xMidYMid meet"/>
                             
                             <g class="brain-svg-hotspot" id="svg-region-pfc" onclick="triggerBrainIntel('pfc')">
-                                <circle cx="170" cy="160" r="32" class="hotspot-trigger-ring"/>
-                                <circle cx="170" cy="160" r="3.5" class="hotspot-center-dot"/>
-                                <text x="170" y="164" class="hotspot-label">PFC</text>
+                                <circle cx="160" cy="150" r="30" class="hotspot-trigger-ring"/>
+                                <circle cx="160" cy="150" r="3.5" class="hotspot-center-dot"/>
+                                <text x="160" y="154" class="hotspot-label">PFC</text>
                             </g>
 
                             <g class="brain-svg-hotspot" id="svg-region-hippo" onclick="triggerBrainIntel('hippo')">
-                                <circle cx="280" cy="180" r="28" class="hotspot-trigger-ring"/>
-                                <circle cx="280" cy="180" r="3.5" class="hotspot-center-dot"/>
-                                <text x="280" y="184" class="hotspot-label">HIPPO</text>
+                                <circle cx="260" cy="185" r="28" class="hotspot-trigger-ring"/>
+                                <circle cx="260" cy="185" r="3.5" class="hotspot-center-dot"/>
+                                <text x="260" y="189" class="hotspot-label">HIPPO</text>
                             </g>
 
                             <g class="brain-svg-hotspot" id="svg-region-amygdala" onclick="triggerBrainIntel('amygdala')">
-                                <circle cx="240" cy="225" r="25" class="hotspot-trigger-ring"/>
-                                <circle cx="240" cy="225" r="3.5" class="hotspot-center-dot"/>
-                                <text x="240" y="229" class="hotspot-label">AMYG</text>
+                                <circle cx="225" cy="205" r="25" class="hotspot-trigger-ring"/>
+                                <circle cx="225" cy="205" r="3.5" class="hotspot-center-dot"/>
+                                <text x="225" y="209" class="hotspot-label">AMYG</text>
                             </g>
 
                             <g class="brain-svg-hotspot" id="svg-region-vagus" onclick="triggerBrainIntel('vagus')">
-                                <circle cx="315" cy="265" r="25" class="hotspot-trigger-ring"/>
-                                <circle cx="315" cy="265" r="3.5" class="hotspot-center-dot"/>
-                                <text x="315" y="269" class="hotspot-label">VAGUS</text>
+                                <circle cx="270" cy="245" r="25" class="hotspot-trigger-ring"/>
+                                <circle cx="270" cy="245" r="3.5" class="hotspot-center-dot"/>
+                                <text x="270" y="249" class="hotspot-label">VAGUS</text>
                             </g>
                         </svg>
                     </div>
@@ -625,7 +625,6 @@ height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
         });
 
         function triggerBrainIntel(regionId) {
-            // Unify selection states across active SVG groups
             document.querySelectorAll('.brain-svg-hotspot').forEach(node => {
                 node.classList.remove('active-target');
             });
