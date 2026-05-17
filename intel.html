@@ -111,10 +111,11 @@ j=d.createElement(s),dl=l!='dataLayer'?'&l='+l:'';j.async=true;j.src=
         .card-padding { padding: 30px; display: flex; flex-direction: column; justify-content: space-between; }
         .hardware-padding { padding: 35px; display: flex; flex-direction: column; justify-content: space-between; }
 
+        /* FLUID FLUID LAYOUT GRID — ELIMINATES 100% ZOOM TRUNCATION */
         .anatomy-grid-core {
             padding: 35px;
             display: grid;
-            grid-template-columns: minmax(460px, 1.25fr) minmax(0, 1fr);
+            grid-template-columns: 1.2fr 1fr;
             gap: 35px;
             align-items: start;
         }
@@ -167,14 +168,13 @@ j=d.createElement(s),dl=l!='dataLayer'?'&l='+l:'';j.async=true;j.src=
             overflow: hidden;
         }
 
-        /* Hotlink-Safe Public CDN Asset Layer */
         .native-brain-graphic {
             width: 100%;
             height: auto;
             display: block;
             user-select: none;
             -webkit-user-drag: none;
-            filter: brightness(0.9) contrast(1.05);
+            filter: brightness(0.95) contrast(1.05);
         }
 
         /* COORDINATE INVARIANT INTERACTIVE SVG LAYER */
@@ -214,7 +214,7 @@ j=d.createElement(s),dl=l!='dataLayer'?'&l='+l:'';j.async=true;j.src=
         }
         .hotspot-label {
             font-family: 'Courier New', Courier, monospace;
-            font-size: 3.5px;
+            font-size: 3.8px;
             font-weight: bold;
             fill: rgba(248, 250, 252, 0.95);
             text-anchor: middle;
@@ -364,15 +364,15 @@ j=d.createElement(s),dl=l!='dataLayer'?'&l='+l:'';j.async=true;j.src=
             100% { transform: rotate(360deg); }
         }
 
-        /* --- STABILIZED MOBILE BREAKPOINT MATRIX --- */
-        @media (max-width: 1080px) {
+        /* --- STABILIZED RESPONSIVE BREAKPOINT MATRIX --- */
+        @media (max-width: 1150px) {
             h1 { font-size: 1.8rem; }
             .subtitle { font-size: 0.9rem; margin-bottom: 30px; }
             
             .anatomy-grid-core { 
                 grid-template-columns: 1fr !important; 
-                gap: 20px;
-                padding: 15px;
+                gap: 25px;
+                padding: 20px;
             }
             
             .brain-visualizer-container { 
@@ -389,7 +389,7 @@ j=d.createElement(s),dl=l!='dataLayer'?'&l='+l:'';j.async=true;j.src=
                 width: 100%;
             }
             
-            .interactive-brain-wrapper { max-width: 250px; }
+            .interactive-brain-wrapper { max-width: 280px; }
             .intel-matrix-grid, .hardware-matrix-grid { grid-template-columns: 1fr; }
             .syndicate-promo-housing { margin-bottom: 30px; }
             .archive-item { flex-direction: column; align-items: flex-start; gap: 5px; }
@@ -473,27 +473,27 @@ height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
                         <svg viewBox="0 0 100 100" class="centerpiece-brain-svg-overlay" xmlns="http://www.w3.org/2000/svg">
                             
                             <g class="brain-svg-hotspot" id="svg-region-pfc" onclick="triggerBrainIntel('pfc')">
-                                <circle cx="25" cy="38" r="7.5" class="hotspot-trigger-ring"/>
-                                <circle cx="25" cy="38" r="0.8" class="hotspot-center-dot"/>
-                                <text x="25" y="39.2" class="hotspot-label">PFC</text>
+                                <circle cx="32" cy="38" r="7.5" class="hotspot-trigger-ring"/>
+                                <circle cx="32" cy="38" r="0.8" class="hotspot-center-dot"/>
+                                <text x="32" y="39.2" class="hotspot-label">PFC</text>
                             </g>
 
                             <g class="brain-svg-hotspot" id="svg-region-hippo" onclick="triggerBrainIntel('hippo')">
-                                <circle cx="56" cy="50" r="7" class="hotspot-trigger-ring"/>
-                                <circle cx="56" cy="50" r="0.8" class="hotspot-center-dot"/>
-                                <text x="56" y="51.2" class="hotspot-label">HIPPO</text>
+                                <circle cx="55" cy="46" r="7" class="hotspot-trigger-ring"/>
+                                <circle cx="55" cy="46" r="0.8" class="hotspot-center-dot"/>
+                                <text x="55" y="47.2" class="hotspot-label">HIPPO</text>
                             </g>
 
                             <g class="brain-svg-hotspot" id="svg-region-amygdala" onclick="triggerBrainIntel('amygdala')">
-                                <circle cx="48" cy="58" r="6.5" class="hotspot-trigger-ring"/>
-                                <circle cx="48" cy="58" r="0.8" class="hotspot-center-dot"/>
-                                <text x="48" y="59.2" class="hotspot-label">AMYG</text>
+                                <circle cx="48" cy="54" r="6.5" class="hotspot-trigger-ring"/>
+                                <circle cx="48" cy="54" r="0.8" class="hotspot-center-dot"/>
+                                <text x="48" y="55.2" class="hotspot-label">AMYG</text>
                             </g>
 
                             <g class="brain-svg-hotspot" id="svg-region-vagus" onclick="triggerBrainIntel('vagus')">
-                                <circle cx="62" cy="74" r="6.5" class="hotspot-trigger-ring"/>
-                                <circle cx="62" cy="74" r="0.8" class="hotspot-center-dot"/>
-                                <text x="62" y="75.2" class="hotspot-label">VAGUS</text>
+                                <circle cx="58" cy="70" r="6.5" class="hotspot-trigger-ring"/>
+                                <circle cx="58" cy="70" r="0.8" class="hotspot-center-dot"/>
+                                <text x="58" y="71.2" class="hotspot-label">VAGUS</text>
                             </g>
                         </svg>
                     </div>
