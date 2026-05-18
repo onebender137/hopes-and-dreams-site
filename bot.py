@@ -1599,10 +1599,27 @@ class HopesAndDreamsBot:
             clean_topic = re.sub('<[^<]+?>', '', topic).strip()
             clean_date = re.sub('<[^<]+?>', '', date_str).strip()
 
+            # Extract image_url from the article we just wrote
+            image_url = "media/fallback.jpg"
+            try:
+                article_path = f"articles/{filename}"
+                if os.path.exists(article_path):
+                    with open(article_path, 'r', encoding='utf-8') as af:
+                        article_html = af.read()
+                    img_match = re.search(r'<img\s+src="([^"]+)"[^>]*class="article-img"', article_html)
+                    if not img_match:
+                        img_match = re.search(r'<img\s+[^>]*class="article-img"[^>]*src="([^"]+)"', article_html)
+                    if img_match:
+                        raw_src = img_match.group(1).strip()
+                        # Normalize ../media/... to media/...
+                        image_url = raw_src.lstrip('./').replace('../', '')
+            except Exception as _e:
+                pass  # fallback already set
             transmissions.insert(0, {
                 "href": f"articles/{filename}",
                 "title": clean_topic,
-                "date": clean_date
+                "date": clean_date,
+                "image_url": image_url
             })
 
             # Keep it unique by href to avoid duplicates on retries
@@ -1627,6 +1644,77 @@ class HopesAndDreamsBot:
     # 60s is plenty for GitHub fetches/pushes; if it takes longer something is wrong.
     GIT_NET_TIMEOUT = 60
     GIT_LOCAL_TIMEOUT = 30  # Local git ops (status, add, commit) should be near-instant
+
+    def _write_empire_stats_json(self):
+        """Write public empire_stats.json from DSDA bus telemetry, then commit + push."""
+        import json
+        from datetime import datetime, timezone, timedelta
+        from pathlib import Path as _Path
+
+        try:
+            from dsda_bus import get_last_heartbeats, get_event_counts_since
+        except Exception:
+            return False
+
+        now = datetime.now(timezone.utc)
+        seven_days_ago = now - timedelta(days=7)
+
+        try:
+            heartbeats = get_last_heartbeats()
+        except Exception:
+            heartbeats = {}
+
+        def _age_sec(t):
+            if t is None:
+                return 999999
+            if t.tzinfo is None:
+                t = t.replace(tzinfo=timezone.utc)
+            return (now - t).total_seconds()
+
+        active_bots = sum(1 for v in heartbeats.values() if _age_sec(v) < 600)
+
+        try:
+            counts_7d = get_event_counts_since(seven_days_ago)
+        except Exception:
+            counts_7d = {}
+
+        bus_events_total = sum(counts_7d.values()) if counts_7d else 0
+        heartbeat_events = sum(v for (b, s), v in counts_7d.items() if s == "heartbeat") if counts_7d else 0
+        expected = len(heartbeats) * 2016 if heartbeats else 0
+        integrity = round(min(100.0, (heartbeat_events / expected * 100) if expected else 0), 1)
+
+        try:
+            articles_7d = sum(
+                1 for f in _Path("articles").glob("*.html")
+                if f.name != "template.html" and (now.timestamp() - f.stat().st_mtime) < 604800
+            )
+        except Exception:
+            articles_7d = 0
+
+        stats = {
+            "generated_at": now.strftime("%Y-%m-%dT%H:%M:%SZ"),
+            "empire": {
+                "articles_published_7d": articles_7d,
+                "bus_events_total_7d": bus_events_total,
+                "active_bots": active_bots,
+                "heartbeat_integrity_pct": integrity
+            },
+            "next_update_in_minutes": 15
+        }
+
+        try:
+            with open("empire_stats.json", "w") as f:
+                json.dump(stats, f, indent=2)
+        except Exception as e:
+            print(f"[empire_stats] write failed: {e}")
+            return False
+
+        try:
+            self._git_push_changes("data: update empire_stats.json")
+        except Exception as e:
+            print(f"[empire_stats] git push failed: {e}")
+            return False
+        return True
 
     def _git_push_changes(self, commit_message):
         """Automates the git workflow to push changes to the repository.
@@ -1671,7 +1759,7 @@ class HopesAndDreamsBot:
                     subprocess.run(["git", "stash", "pop"], capture_output=True, timeout=T_LOCAL)
 
             # 3. Ensure we only stage the intended files (including generated media)
-            subprocess.run(["git", "add", "intel.html", "transmissions.html", "transmissions.json", "articles/", "media/"], check=True, capture_output=True, text=True, timeout=T_LOCAL)
+            subprocess.run(["git", "add", "intel.html", "transmissions.html", "transmissions.json", "empire_stats.json", "articles/", "media/"], check=True, capture_output=True, text=True, timeout=T_LOCAL)
 
             # 4. Check if there are staged changes to commit
             status = subprocess.run(["git", "status", "--porcelain"], capture_output=True, text=True, timeout=T_LOCAL)
@@ -1692,7 +1780,7 @@ class HopesAndDreamsBot:
 
             try:
                 # Add all relevant files again just in case (e.g. transmissions.json)
-                subprocess.run(["git", "add", "intel.html", "transmissions.html", "transmissions.json", "articles/", "media/"], capture_output=True, timeout=T_LOCAL)
+                subprocess.run(["git", "add", "intel.html", "transmissions.html", "transmissions.json", "empire_stats.json", "articles/", "media/"], capture_output=True, timeout=T_LOCAL)
 
                 # Update commit message if we missed files initially
                 subprocess.run(["git", "commit", "--amend", "--no-edit"], capture_output=True, timeout=T_LOCAL)
@@ -1841,6 +1929,18 @@ def main():
         id='dsda_heartbeat',
         max_instances=1,
         coalesce=True,
+    )
+
+    # Empire stats JSON — every 15 minutes (public telemetry for intel.html vitals widget)
+    from datetime import timedelta as _td
+    scheduler.add_job(
+        bot._write_empire_stats_json,
+        "interval",
+        minutes=15,
+        next_run_time=datetime.now() + _td(seconds=30),
+        id="empire_stats_writer",
+        misfire_grace_time=300,
+        replace_existing=True
     )
 
     scheduler.start()
