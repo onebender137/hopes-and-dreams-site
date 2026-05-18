@@ -792,6 +792,19 @@ height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
                 .then(res => res.json())
                 .then(data => {
                     cachedTransmissionsArray = data;
+                    
+                    // Automatically compile and mount the 6 newest articles into ALPHA_FEED
+                    const feedWrapper = document.querySelector('.intel-feed-wrapper');
+                    if (feedWrapper && Array.isArray(data)) {
+                        const recentPosts = data.slice(0, 6); // Grab top 6 entries
+                        
+                        feedWrapper.innerHTML = recentPosts.map(article => `
+                            <a href="${article.href}" class="archive-item">
+                                <span class="title">${article.title}</span>
+                                <span class="date">${article.date}</span>
+                            </a>
+                        `).join('');
+                    }
                 })
                 .catch(err => console.error("Database connection fault in transmissions.json pipeline:", err));
         });
