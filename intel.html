@@ -418,7 +418,7 @@ j=d.createElement(s),dl=l!='dataLayer'?'&l='+l:'';j.async=true;j.src=
             transition: all 0.2s ease;
         }
         .mini-scanned-link:hover { border-color: var(--neon-blue); background: rgba(56, 189, 248, 0.04); }
-        .mini-scanned-link span { text-transform: capitalize; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; max-width: 78%; text-align: left; }
+        .mini-scanned-link span { text-transform: capitalize; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; max-width: 78%; text-align: left; min-width: 0; }
         .mini-scanned-link .mini-date { font-family: 'Courier New', Courier, monospace; font-size: 0.72rem; color: var(--text-dim); }
 
         /* CONTENT SEGMENTATION GRIDS */
@@ -477,10 +477,14 @@ j=d.createElement(s),dl=l!='dataLayer'?'&l='+l:'';j.async=true;j.src=
             .subtitle { font-size: 0.9rem; margin-bottom: 30px; }
             
             .anatomy-grid-core { 
-                grid-template-columns: 1fr !important; 
+                grid-template-columns: minmax(0, 1fr) !important; 
                 gap: 25px;
                 padding: 15px;
             }
+            .anatomy-grid-core > * { min-width: 0; }
+            .anatomy-diagnostics-box { min-width: 0; overflow-wrap: anywhere; }
+            .mini-scanned-link { min-width: 0; }
+            .mini-scanned-link span { white-space: normal !important; max-width: 100% !important; }
             
             .brain-visualizer-container { 
                 position: relative !important; 
