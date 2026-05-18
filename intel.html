@@ -93,7 +93,7 @@ j=d.createElement(s),dl=l!='dataLayer'?'&l='+l:'';j.async=true;j.src=
         
         .syndicate-promo-housing .inner-content {
             position: relative;
-            background: #000000 !important;
+            background: var(--card-bg) !important; /* Fix: Hooked into your light/dark theme var */
             border-radius: 22px;
             z-index: 2;
             height: 100%;
@@ -103,8 +103,13 @@ j=d.createElement(s),dl=l!='dataLayer'?'&l='+l:'';j.async=true;j.src=
                 linear-gradient(rgba(56, 189, 248, 0.03) 1px, transparent 1px),
                 linear-gradient(90deg, rgba(56, 189, 248, 0.03) 1px, transparent 1px) !important;
             background-size: 24px 24px !important;
-            box-shadow: inset 0 0 30px rgba(0, 0, 0, 0.95) !important;
             text-align: left;
+            transition: background var(--transition-speed) ease;
+        }
+
+        /* Fix: Only apply the heavy dark shadow vignette when in Dark Mode */
+        body:not(.light-mode) .syndicate-promo-housing .inner-content {
+            box-shadow: inset 0 0 30px rgba(0, 0, 0, 0.95) !important;
         }
 
         .live-broadcast-padding { padding: 35px; }
@@ -164,9 +169,10 @@ j=d.createElement(s),dl=l!='dataLayer'?'&l='+l:'';j.async=true;j.src=
             max-width: 500px;
             display: block;
             margin: 0 auto;
-            background: #000;
+            background: var(--card-bg); /* Fix: Replaced hardcoded #000 */
             border-radius: 12px;
             overflow: hidden;
+            transition: background var(--transition-speed) ease;
             /* Aspect ratio removed entirely to prevent mobile WebKit collapse bugs */
         }
 
