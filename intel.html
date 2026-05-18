@@ -406,9 +406,9 @@ j=d.createElement(s),dl=l!='dataLayer'?'&l='+l:'';j.async=true;j.src=
         .scanned-links-feed { display: flex; flex-direction: column; gap: 8px; }
         .mini-scanned-link {
             display: flex;
-            justify-content: space-between;
             align-items: center;
-            padding: 10px 14px;
+            gap: 12px;
+            padding: 8px 14px 8px 8px;
             background: rgba(255,255,255,0.02);
             border: 1px solid rgba(255,255,255,0.04);
             border-radius: 8px;
@@ -418,8 +418,26 @@ j=d.createElement(s),dl=l!='dataLayer'?'&l='+l:'';j.async=true;j.src=
             transition: all 0.2s ease;
         }
         .mini-scanned-link:hover { border-color: var(--neon-blue); background: rgba(56, 189, 248, 0.04); }
-        .mini-scanned-link span { text-transform: capitalize; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; max-width: 78%; text-align: left; min-width: 0; }
-        .mini-scanned-link .mini-date { font-family: 'Courier New', Courier, monospace; font-size: 0.72rem; color: var(--text-dim); }
+        .mini-scanned-link:hover .mini-scanned-thumb { box-shadow: 0 0 8px rgba(56, 189, 248, 0.4); }
+        .mini-scanned-thumb {
+            width: 44px;
+            height: 44px;
+            object-fit: cover;
+            border-radius: 6px;
+            flex-shrink: 0;
+            background: rgba(0,0,0,0.3);
+            transition: box-shadow 0.2s ease;
+        }
+        .mini-scanned-text {
+            flex: 1;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            gap: 10px;
+            min-width: 0;
+        }
+        .mini-scanned-link .mini-title { text-transform: capitalize; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; flex: 1; min-width: 0; text-align: left; }
+        .mini-scanned-link .mini-date { font-family: 'Courier New', Courier, monospace; font-size: 0.72rem; color: var(--text-dim); flex-shrink: 0; }
 
         /* CONTENT SEGMENTATION GRIDS */
         .intel-matrix-grid {
@@ -991,9 +1009,13 @@ height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
                         const linkNode = document.createElement('a');
                         linkNode.href = article.href;
                         linkNode.className = "mini-scanned-link";
+                        const thumbSrc = article.image_url || 'media/fallback.jpg';
                         linkNode.innerHTML = `
-                            <span>${article.title}</span>
-                            <span class=\"mini-date\">${article.date}</span>
+                            <img class="mini-scanned-thumb" src="${thumbSrc}" alt="" loading="lazy" onerror="this.src='media/fallback.jpg'">
+                            <span class="mini-scanned-text">
+                                <span class="mini-title">${article.title}</span>
+                                <span class="mini-date">${article.date}</span>
+                            </span>
                         `;
                         scannedFeed.appendChild(linkNode);
                     });
