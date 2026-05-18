@@ -181,29 +181,81 @@ class VideoCreator:
             bg = ColorClip(size=(1080, 1920), color=(0, 0, 40)).set_duration(duration).set_position((0, 0))
             background_group = [bg]
 
-        # 3. Text Safety Logic
-        # ImageMagick crashes if text is too long. Cap at 450 chars.
-        display_text = (text[:450] + "...") if len(text) > 450 else text
-
-        # 4. Create Text Overlay with ImageMagick
+        # 3. Dynamic Teleprompter Text Scroll (Hardened for ImageMagick)
         try:
-            # 'caption' method handles word wrapping automatically
-            txt_clip = TextClip(
-                display_text, 
-                fontsize=60, 
-                color='white', 
-                font='Arial-Bold', 
-                method='caption', 
-                size=(900, None), 
-                align='center'
-            )
-            txt_clip = txt_clip.set_pos('center').set_duration(duration)
+            # Split into paragraphs, then further chunk any long paragraph.
+            # ImageMagick caption: builds one tall image per clip — long paragraphs
+            # exceed policy.xml width/height limits.
+            MAX_PARAGRAPH_CHARS = 600
+            raw_paragraphs = [p.strip() for p in text.split('\n') if p.strip()]
+            paragraphs = []
+            for p in raw_paragraphs:
+                if len(p) <= MAX_PARAGRAPH_CHARS:
+                    paragraphs.append(p)
+                    continue
+                sentences = re.split(r'(?<=[.!?])\s+', p)
+                buf = ""
+                for sent in sentences:
+                    if len(buf) + len(sent) + 1 <= MAX_PARAGRAPH_CHARS:
+                        buf = (buf + " " + sent).strip() if buf else sent
+                    else:
+                        if buf:
+                            paragraphs.append(buf)
+                        while len(sent) > MAX_PARAGRAPH_CHARS:
+                            paragraphs.append(sent[:MAX_PARAGRAPH_CHARS])
+                            sent = sent[MAX_PARAGRAPH_CHARS:]
+                        buf = sent
+                if buf:
+                    paragraphs.append(buf)
+            
+            text_clips = []
+            current_y_offset = 0
+            
+            for p in paragraphs:
+                tc = TextClip(
+                    p, 
+                    fontsize=55, # Slightly scaled down to prevent word-wrap clipping
+                    color='white', 
+                    font='Arial-Bold', 
+                    method='caption', 
+                    size=(900, None), 
+                    align='center',
+                    bg_color='transparent' # CRITICAL: Forces ImageMagick to preserve text opacity
+                )
+                text_clips.append({'clip': tc, 'y_offset': current_y_offset})
+                current_y_offset += tc.h + 60  # 60px gap
+                
+            total_text_height = current_y_offset
+            screen_height = 1920
+            
+            # Start lower so it glides in naturally
+            start_y = screen_height * 0.8  
+            end_y = (screen_height * 0.2) - total_text_height 
+            total_travel = start_y - end_y
+
+            # Enforce strict integer casting for MoviePy positional math
+            def make_mover(offset):
+                return lambda t: ('center', int(start_y + offset - (total_travel * (t / duration))))
+
+            animated_clips = []
+            for item in text_clips:
+                clip = item['clip']
+                offset = item['y_offset']
+                
+                animated_clip = clip.set_pos(make_mover(offset)).set_duration(duration)
+                animated_clips.append(animated_clip)
             
             # 5. Composite Layers
-            video = CompositeVideoClip(background_group + [txt_clip], size=(1080, 1920))
+            video = CompositeVideoClip(background_group + animated_clips, size=(1080, 1920))
+            
+            # CRITICAL: Force FPS inheritance before rendering
+            video.fps = 24
+            
         except Exception as e:
             print(f"WARNING: ImageMagick text rendering failed: {e}")
-            video = CompositeVideoClip(background_group)
+            # Fallback to a simple title if the full scroll fails
+            fallback_text = TextClip("AUDIO TRANSCRIPT UNAVAILABLE", fontsize=50, color='red').set_pos('center').set_duration(duration)
+            video = CompositeVideoClip(background_group + [fallback_text], size=(1080, 1920))
 
         video.audio = audio
 
@@ -221,33 +273,58 @@ class VideoCreator:
         
 
     async def generate_biohacking_snippet(self, topic: str, content: str):
-        """Higher-level production method to produce a full snippet."""
+        """Higher-level production method to produce a full snippet with dynamic intro titles."""
         safe_topic = topic.replace(' ', '_').lower()
         audio_file = f"{safe_topic}_audio.mp3"
         video_file = f"{safe_topic}_video.mp4"
 
-        # Step 1: Voiceover
+        # Step 1: Voiceover synthesis
         audio_path = await self.generate_voiceover(content, audio_file)
         
-        # Step 2: Video Composition
+        # Step 2: Main Video Composition
         try:
-            # This is your core bot video
             core_video_path = self.create_daily_short(content, audio_path, topic, video_file)
             
-            # --- NEW STEP 3: STITCHING THE VEO INTRO ---
-            print("Stitching Syndicate Intro sequence...")
+            # --- STEP 3: STITCHING WITH DYNAMIC INTRO OVERLAY ---
+            print("Processing customized Syndicate Intro sequence...")
             
-            # Load the vertical intro we made in Step 1 (make sure it's in your media folder)
+            # Load the base intro clip
             intro_clip = VideoFileClip(f"{self.base_media_path}/intro_vertical.mp4")
             
-            # Load the newly generated bot video
+            # Clean up topic string for the visual hook
+            clean_title = topic.replace('_', ' ').replace('-', ' ').upper()
+            
+            # Generate the transient title clip via ImageMagick
+            intro_title = TextClip(
+                clean_title, 
+                fontsize=92, 
+                color='white', 
+                font='Arial-Bold', 
+                stroke_color='black',  
+                stroke_width=7,
+                method='caption', 
+                size=(960, None), 
+                align='center'
+            )
+            # Use a lambda function to guarantee compatibility across MoviePy versions
+            intro_title = intro_title.set_duration(intro_clip.duration).set_pos(lambda t: ('center', 150))
+            
+            # Layer the title directly over the intro file
+            custom_intro = CompositeVideoClip([intro_clip, intro_title], size=(1080, 1920))
+            
+            # CRITICAL HARDENING FIX: Force FPS inheritance so the video track doesn't render black
+            custom_intro.fps = intro_clip.fps
+            custom_intro.audio = intro_clip.audio  # Lock and maintain native intro sound track
+            
+            # Load the newly generated core content video
             main_clip = VideoFileClip(core_video_path)
             
-            # Stitch them together (method="compose" handles slight framerate/size differences)
-            final_stitched_video = concatenate_videoclips([intro_clip, main_clip], method="compose")
+            # Stitch customized intro together with your main asset
+            final_stitched_video = concatenate_videoclips([custom_intro, main_clip], method="compose")
             
-            # Set the final output path (we'll just overwrite the original for cleanliness)
-            final_path = f"{self.output_dir}/FINAL_{video_file}"
+            # Set the clean final output path
+            final_path = os.path.join(self.output_dir, f"FINAL_{video_file}")
+            print(f"Baking final video file asset to: {final_path}...")
             
             final_stitched_video.write_videofile(
                 final_path, 
@@ -256,17 +333,21 @@ class VideoCreator:
                 audio_codec='aac', 
                 threads=4, 
                 preset='ultrafast',
-                logger='bar'
+                logger='bar',
+                ffmpeg_params=["-nostdin"]
             )
             
-            # Clean up memory
+            # Clean up memory allocations to prevent file lock drops
             intro_clip.close()
+            intro_title.close()
+            custom_intro.close()
             main_clip.close()
+            final_stitched_video.close()
             
             return final_path
             
         except Exception as e:
-            print(f"Critical error in video production: {e}")
+            print(f"Critical error in video production pipeline: {e}")
             return audio_path       
     
 
@@ -275,6 +356,7 @@ if __name__ == "__main__":
     async def test():
         creator = VideoCreator()
         test_text = "Lead researcher protocols indicate that Nicotine and Huperzine-A stacking is optimal."
-        await creator.generate_biohacking_snippet("test", test_text)
+        # Running this will now produce a video with "NICOTINE DETOX PROTOCOL" burned into the intro
+        await creator.generate_biohacking_snippet("Nicotine Detox Protocol", test_text)
 
     asyncio.run(test())
