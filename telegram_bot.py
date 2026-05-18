@@ -1046,7 +1046,12 @@ class TelegramBot:
         try:
             file_path = await self.video.generate_biohacking_snippet(topic, content)
             if file_path and file_path.endswith('.mp4'):
-                await update.message.reply_video(video=open(file_path, 'rb'))
+                await update.message.reply_video(
+                    video=open(file_path, 'rb'),
+                    read_timeout=120,
+                    write_timeout=180,
+                    connect_timeout=120
+                )
             elif file_path and file_path.endswith('.mp3'):
                 await update.message.reply_audio(audio=open(file_path, 'rb'))
             else:
