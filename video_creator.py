@@ -216,7 +216,7 @@ class VideoCreator:
                     p, 
                     fontsize=55, # Slightly scaled down to prevent word-wrap clipping
                     color='white', 
-                    font='Arial-Bold', 
+                    font='Helvetica-Bold', 
                     method='caption', 
                     size=(900, None), 
                     align='center',
@@ -299,7 +299,7 @@ class VideoCreator:
                 clean_title, 
                 fontsize=92, 
                 color='white', 
-                font='Arial-Bold', 
+                font='Helvetica-Bold', 
                 stroke_color='black',  
                 stroke_width=7,
                 method='caption', 
