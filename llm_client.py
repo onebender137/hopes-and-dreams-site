@@ -216,6 +216,8 @@ class LLMClient:
         # 5. Strip horizontal rule separators
         out = re.sub(r'^\s*---+\s*$', '', out, flags=re.MULTILINE)
         out = re.sub(r'^\s*\*\*\*+\s*$', '', out, flags=re.MULTILINE)
+        out = re.sub(r'^\s*===+\s*$', '', out, flags=re.MULTILINE)
+        out = re.sub(r'^\s*___+\s*$', '', out, flags=re.MULTILINE)
 
         # 6. Convert markdown links [text](url) to just text
         out = re.sub(r'\[([^\]]+)\]\([^)]+\)', r'\1', out)
