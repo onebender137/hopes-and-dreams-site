@@ -1,9 +1,16 @@
 [
     {
+<<<<<<< Updated upstream
         "href": "articles/2026-05-24-nicotinic-receptor-subtypes-explained.html",
         "title": "Nicotinic Receptor Subtypes Explained",
         "date": "2026-05-24",
         "image_url": "media/general/2026-05-24-nicotinic-receptor-subtypes-explained.jpg"
+=======
+        "href": "articles/2026-05-24-nicotine-caffeine-synergy.html",
+        "title": "Nicotine + Caffeine Synergy",
+        "date": "2026-05-24",
+        "image_url": "media/general/2026-05-24-nicotine-caffeine-synergy.jpg"
+>>>>>>> Stashed changes
     },
     {
         "href": "articles/2026-05-23-inflammation-and-neurological-protection-the-science-of-flair.html",
