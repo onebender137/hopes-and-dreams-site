@@ -721,29 +721,38 @@ class HopesAndDreamsBot:
                 print(f"[{datetime.now()}] EXECUTIVE EXECUTION: Hitting FB Graph API for daily tip (Content length: {len(tip_content)}).")
                 # Prepend topic as ALL-CAPS title — FBClient._apply_unicode_style turns it bold
                 fb_message = f"{topic.upper()}\n\n{tip_content}"
-                result = self.fb.post_to_page(fb_message, image_path=image_path)
+                
+                # --- NEW ARMOR BLOCK ---
+                try:
+                    result = self.fb.post_to_page(fb_message, image_path=image_path)
+                except Exception as e:
+                    print(f"[{datetime.now()}] EXECUTIVE WARNING: Facebook API crashed or lagged: {e}")
+                    result = None
+
+                # 5. Website Transmission Uplink (RUNS NO MATTER WHAT)
+                print(f"[{datetime.now()}] EXECUTIVE EXECUTION: Initiating website transmission uplink...")
+                self._post_to_website(tip_content, topic, image_path)
+                dsda_print(f"Syndicate Masterclass saved and site synced at {datetime.now()}!")
+
+                # Record the topic as posted to avoid repeats
+                self._record_posted_topic(topic, slot=slot)
+
+                # If we pulled this from the schedule queue, mark it consumed
+                if scheduled_used and slot:
+                    date_str = datetime.now().strftime("%Y-%m-%d")
+                    self.db.mark_scheduled_used(date_str, slot)
+                    print(f"[{datetime.now()}] EXECUTIVE QUEUE: Marked scheduled topic '{topic}' as USED for {date_str} {slot}")
+
+                # If FB succeeded, do the FB-specific stuff
                 if result:
-                    # 5. Website Transmission Uplink
-                    print(f"[{datetime.now()}] EXECUTIVE EXECUTION: Initiating website transmission uplink...")
-                    self._post_to_website(tip_content, topic, image_path)
-                    dsda_print(f"Syndicate Masterclass posted successfully at {datetime.now()}!")
-
-                    # Record the topic as posted to avoid repeats
-                    self._record_posted_topic(topic, slot=slot)
-
-                    # If we pulled this from the schedule queue, mark it consumed
-                    if scheduled_used and slot:
-                        date_str = datetime.now().strftime("%Y-%m-%d")
-                        self.db.mark_scheduled_used(date_str, slot)
-                        print(f"[{datetime.now()}] EXECUTIVE QUEUE: Marked scheduled topic '{topic}' as USED for {date_str} {slot}")
-
-                    # Add affiliate recommendation in the comments
                     post_id = result.get('id')
                     self._add_affiliate_comment(post_id, topic, tip_content)
-
                     return result
                 else:
-                    dsda_print(f"[{datetime.now()}] EXECUTIVE EXECUTION ERROR: Facebook API call failed.")
+                    dsda_print(f"[{datetime.now()}] EXECUTIVE WARNING: Facebook API failed, but website was successfully updated anyway.")
+                    return None
+                # --- END ARMOR BLOCK ---
+
             else:
                 dsda_print(f"[{datetime.now()}] EXECUTIVE EXECUTION ERROR: Content generation failed even without reflection.")
         except Exception as e:
