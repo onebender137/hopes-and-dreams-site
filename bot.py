@@ -1787,14 +1787,20 @@ class HopesAndDreamsBot:
         return True
 
     def _git_push_changes(self, commit_message):
-        """Automates the git workflow to push changes to the repository.
-        Every subprocess call has a timeout — the bot must NEVER hang on git.
+        """Automates the git workflow to push generated content to the repository.
+        Every subprocess call has a timeout - the bot must NEVER hang on git.
+
+        Design contract: this routine OWNS a fixed set of generated files (OWNED).
+        It commits ONLY those, then integrates remote work with --rebase --autostash.
+        It must NEVER blanket-stash the working tree, so in-progress dev edits to
+        bot.py / telegram_bot.py / anything else are never swept into a stash.
         """
         self._log_uplink("GIT: Synchronizing repository...")
         T_NET = self.GIT_NET_TIMEOUT
         T_LOCAL = self.GIT_LOCAL_TIMEOUT
+        OWNED = ["intel.html", "transmissions.html", "transmissions.json",
+                 "empire_stats.json", "articles/", "media/"]
         try:
-            # 0. Emergency Cleanup: Ensure we aren't in a broken state from a previous run
             git_dir = ".git"
             if os.path.exists(os.path.join(git_dir, "rebase-merge")) or os.path.exists(os.path.join(git_dir, "rebase-apply")):
                 self._log_uplink("GIT: Detected stuck rebase. Aborting...")
@@ -1803,124 +1809,73 @@ class HopesAndDreamsBot:
                 self._log_uplink("GIT: Detected stuck merge. Aborting...")
                 subprocess.run(["git", "merge", "--abort"], capture_output=True, timeout=T_LOCAL)
 
-            # 1. Detect target branch reliably
             self._log_uplink("GIT: Fetching from origin...")
             subprocess.run(["git", "fetch", "origin"], capture_output=True, timeout=T_NET)
-            remote_branches = subprocess.run(["git", "ls-remote", "--heads", "origin"], capture_output=True, text=True, timeout=T_NET).stdout
-
+            remote_branches = subprocess.run(
+                ["git", "ls-remote", "--heads", "origin"],
+                capture_output=True, text=True, timeout=T_NET
+            ).stdout
             if "refs/heads/main" in remote_branches:
                 target_branch = "main"
             elif "refs/heads/master" in remote_branches:
                 target_branch = "master"
             else:
-                branch_res = subprocess.run(["git", "rev-parse", "--abbrev-ref", "HEAD"], capture_output=True, text=True, timeout=T_LOCAL)
-                target_branch = branch_res.stdout.strip()
+                branch_res = subprocess.run(["git", "rev-parse", "--abbrev-ref", "HEAD"],
+                                            capture_output=True, text=True, timeout=T_LOCAL)
+                target_branch = branch_res.stdout.strip() or "main"
                 if target_branch == "HEAD":
                     target_branch = "main"
 
-            # 2. Sync with remote BEFORE applying local changes to minimize conflicts
-            self._log_uplink(f"GIT: Syncing with origin {target_branch} (Pre-sync)...")
-            subprocess.run(["git", "stash", "push", "--include-untracked", "-m", "Syndicate Pre-Sync Stash"], capture_output=True, timeout=T_LOCAL)
-            try:
-                subprocess.run(["git", "pull", "origin", target_branch, "--rebase"], capture_output=True, timeout=T_NET)
-            finally:
-                stash_list = subprocess.run(["git", "stash", "list"], capture_output=True, text=True, timeout=T_LOCAL)
-                if "Syndicate Pre-Sync Stash" in stash_list.stdout:
-                    subprocess.run(["git", "stash", "pop"], capture_output=True, timeout=T_LOCAL)
+            subprocess.run(["git", "add"] + OWNED, capture_output=True, timeout=T_LOCAL)
 
-            # 3. Ensure we only stage the intended files (including generated media)
-            subprocess.run(["git", "add", "intel.html", "transmissions.html", "transmissions.json", "empire_stats.json", "articles/", "media/"], check=True, capture_output=True, text=True, timeout=T_LOCAL)
+            staged = subprocess.run(["git", "diff", "--cached", "--name-only"],
+                                    capture_output=True, text=True, timeout=T_LOCAL)
+            if staged.stdout.strip():
+                subprocess.run(["git", "commit", "-m", commit_message],
+                               check=True, capture_output=True, text=True, timeout=T_LOCAL)
+                self._log_uplink(f"GIT: Committed {len(staged.stdout.strip().splitlines())} owned file(s).")
+            else:
+                self._log_uplink("GIT: No owned-file changes to commit.")
 
-            # 4. Check if there are staged changes to commit
-            status = subprocess.run(["git", "status", "--porcelain"], capture_output=True, text=True, timeout=T_LOCAL)
-            staged_changes = [line for line in status.stdout.splitlines() if line.startswith(('A', 'M', 'D', 'R', 'C'))]
+            self._log_uplink(f"GIT: Rebasing onto origin/{target_branch}...")
+            pull_res = subprocess.run(
+                ["git", "pull", "origin", target_branch, "--rebase", "--autostash"],
+                capture_output=True, text=True, timeout=T_NET
+            )
+            if pull_res.returncode != 0:
+                self._log_uplink(f"GIT REBASE CONFLICT: {pull_res.stderr.strip()}")
+                subprocess.run(["git", "rebase", "--abort"], capture_output=True, timeout=T_LOCAL)
+                self._log_uplink("GIT: Falling back to merge strategy...")
+                merge_res = subprocess.run(
+                    ["git", "pull", "origin", target_branch, "--no-rebase", "--no-edit", "--autostash"],
+                    capture_output=True, text=True, timeout=T_NET
+                )
+                if merge_res.returncode != 0:
+                    self._log_uplink(f"GIT MERGE ERROR: {merge_res.stderr.strip()}")
+                    return False
 
-            if not staged_changes:
-                self._log_uplink("GIT: No relevant changes staged. Skipping commit/push.")
-                return True  # nothing to push is not a failure
+            ahead = subprocess.run(
+                ["git", "rev-list", "--count", f"origin/{target_branch}..HEAD"],
+                capture_output=True, text=True, timeout=T_LOCAL
+            )
+            if ahead.stdout.strip() == "0":
+                self._log_uplink("GIT: Nothing to push - already in sync.")
+                return True
 
-            # 5. Commit the staged changes
-            subprocess.run(["git", "commit", "-m", commit_message], check=True, capture_output=True, text=True, timeout=T_LOCAL)
-
-            # 6. Final Push with Rebase handling
-            self._log_uplink(f"GIT: Final sync and push to {target_branch}...")
-
-            # Stash any remaining noise
-            subprocess.run(["git", "stash", "push", "--include-untracked", "-m", "Syndicate Final Stash"], capture_output=True, timeout=T_LOCAL)
-
-            try:
-                # Add all relevant files again just in case (e.g. transmissions.json)
-                subprocess.run(["git", "add", "intel.html", "transmissions.html", "transmissions.json", "empire_stats.json", "articles/", "media/"], capture_output=True, timeout=T_LOCAL)
-
-                # Update commit message if we missed files initially
-                subprocess.run(["git", "commit", "--amend", "--no-edit"], capture_output=True, timeout=T_LOCAL)
-
-                # Pull with rebase
-                pull_res = subprocess.run(["git", "pull", "origin", target_branch, "--rebase"], capture_output=True, text=True, timeout=T_NET)
-                if pull_res.returncode != 0:
-                    self._log_uplink(f"GIT REBASE CONFLICT: {pull_res.stderr}")
-                    subprocess.run(["git", "rebase", "--abort"], capture_output=True, timeout=T_LOCAL)
-
-                    self._log_uplink("GIT: Falling back to merge strategy...")
-                    merge_res = subprocess.run(["git", "pull", "origin", target_branch, "--no-rebase", "--no-edit"], capture_output=True, text=True, timeout=T_NET)
-                    if merge_res.returncode != 0:
-                        self._log_uplink(f"GIT MERGE ERROR: {merge_res.stderr}")
-                        return False
-
-                # Push explicitly to the target branch
-                push_res = subprocess.run(["git", "push", "origin", f"HEAD:{target_branch}"], check=True, capture_output=True, text=True, timeout=T_NET)
-                self._log_uplink(f"GIT PUSH: {push_res.stdout.strip()}")
-                # Also push to website remote (serves hopes-and-dreams.ca)
-                # Self-healing: pull from website FIRST to absorb any divergent commits, then push
-                try:
-                    self._log_uplink("GIT: Pre-syncing with website remote...")
-                    subprocess.run(["git", "fetch", "website"], capture_output=True, timeout=T_NET)
-                    # Pull with merge (no-rebase) to absorb any commits website has that we don't
-                    subprocess.run(
-                        ["git", "pull", "website", target_branch, "--no-rebase", "--no-edit"],
-                        capture_output=True, text=True, timeout=T_NET
-                    )
-                    # Now push - should succeed since we just synced
-                    website_push = subprocess.run(
-                        ["git", "push", "website", f"HEAD:{target_branch}"],
-                        check=True, capture_output=True, text=True, timeout=T_NET
-                    )
-                    self._log_uplink(f"GIT PUSH (website): Success - site updating")
-                    # Push the merge commit back to origin too so they stay in lockstep
-                    try:
-                        subprocess.run(
-                            ["git", "push", "origin", f"HEAD:{target_branch}"],
-                            check=True, capture_output=True, text=True, timeout=T_NET
-                        )
-                        self._log_uplink("GIT: origin re-synced with website merge")
-                    except subprocess.CalledProcessError:
-                        pass  # not critical if this fails
-                    except subprocess.TimeoutExpired:
-                        self._log_uplink("GIT TIMEOUT: origin re-sync timed out (non-critical, skipping)")
-                except subprocess.CalledProcessError as e:
-                    self._log_uplink(f"GIT PUSH (website) FAILED: {e.stderr.strip() if e.stderr else 'unknown error'}")
-                except subprocess.TimeoutExpired:
-                    self._log_uplink(f"GIT TIMEOUT: website remote operation exceeded {T_NET}s, skipping website push for this cycle.")
-                except Exception as e:
-                    self._log_uplink(f"GIT PUSH (website) FAILED (unexpected): {str(e)}")
-            finally:
-                # Restore the stash
-                stash_list = subprocess.run(["git", "stash", "list"], capture_output=True, text=True, timeout=T_LOCAL)
-                if "Syndicate Final Stash" in stash_list.stdout:
-                    subprocess.run(["git", "stash", "pop"], capture_output=True, timeout=T_LOCAL)
-
+            push_res = subprocess.run(
+                ["git", "push", "origin", f"HEAD:{target_branch}"],
+                check=True, capture_output=True, text=True, timeout=T_NET
+            )
+            self._log_uplink(f"GIT PUSH: {push_res.stdout.strip() or 'ok'}")
             self._log_uplink("GIT: Uplink successful.")
             return True
+
         except subprocess.TimeoutExpired as e:
-            cmd_str = ' '.join(e.cmd) if hasattr(e, 'cmd') else 'unknown'
-            self._log_uplink(f"GIT TIMEOUT: '{cmd_str}' exceeded {e.timeout}s — aborting git sync to prevent bot hang.")
+            cmd_str = ' '.join(e.cmd) if getattr(e, 'cmd', None) else 'unknown'
+            self._log_uplink(f"GIT TIMEOUT: '{cmd_str}' exceeded {getattr(e, 'timeout', '?')}s - aborting git sync to prevent bot hang.")
             return False
         except subprocess.CalledProcessError as e:
-            err_msg = f"GIT ERROR in '{' '.join(e.cmd)}': {e.stderr}"
-            self._log_uplink(err_msg)
-            return False
-        except Exception as e:
-            self._log_uplink(f"GIT CRITICAL ERROR: {str(e)}")
+            self._log_uplink(f"GIT ERROR in '{' '.join(e.cmd)}': {e.stderr}")
             return False
     def run_fb_loop(self, interval_seconds=3600):
         """Main Facebook bot loop for polling comments."""
