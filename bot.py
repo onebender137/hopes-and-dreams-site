@@ -287,6 +287,10 @@ class HopesAndDreamsBot:
             'choline', 'alpha-gpc', 'alpha gpc', 'cdp-choline', 'citicoline',
             'huperzine', 'galantamine', 'acetylcholine',
         ],
+        'psychedelic_tryptamine': [
+            'dmt', 'dimethyltryptamine', 'ayahuasca', 'inmt',
+            'entity encounter', 'dmtx',
+        ],
         'mitochondrial': [
             'mitochondri', 'pqq', 'coq10', 'ubiquinol', 'urolithin',
             'mots-c', 'methylene blue', 'atp synthesis',
@@ -326,14 +330,20 @@ class HopesAndDreamsBot:
             "Chaga Antioxidant Profile",
             "Psilocybin DMN Suppression Mechanism",
             "Turkey Tail PSK Beta-Glucans",
+            "Maitake D-Fraction Beta-Glucan",
+            "Shiitake Lentinan Immune Activation",
+            "Agarikon Antiviral Triterpenoids",
         ],
         'peptides': [
             "BPC-157 Healing Protocols",
             "TB-500 Tissue Repair Mechanism",
             "GHK-Cu Skin & Wound Healing",
             "Thymosin Alpha-1 Immune Optimization",
-
             "AOD-9604 Lipolysis Protocol",
+            "Semaglutide GLP-1 Metabolic Pathway",
+            "Epitalon Telomerase Activation",
+            "Selank Anxiolytic Nootropic Peptide",
+            "CJC-1295 Ipamorelin GH Pulse",
         ],
         'sleep': [
             "Glycine NMDA Modulation for Deep Sleep",
@@ -342,6 +352,9 @@ class HopesAndDreamsBot:
             "L-Theanine GABAergic Calming",
             "Apigenin Anxiolytic Pathway",
             "DSIP Sleep-Inducing Peptide",
+            "L-Tryptophan Serotonin-Melatonin Pathway",
+            "Saffron Crocin Sleep Quality",
+            "Inositol Sleep Onset Modulation",
         ],
         'cognitive': [
             "The Neurobiology of Sulbutiamine",
@@ -350,6 +363,9 @@ class HopesAndDreamsBot:
             "Phenylpiracetam Stim-Cognitive Stack",
             "Bacopa Monnieri Memory Enhancement",
             "Phosphatidylserine Membrane Optimization",
+            "Citicoline Acetylcholine Synthesis",
+            "Alpha-GPC Choline Donor Stack",
+            "Rhodiola Rosea Mental Fatigue",
         ],
         'mitochondrial': [
             "PQQ Mitochondrial Biogenesis",
@@ -358,6 +374,9 @@ class HopesAndDreamsBot:
             "Urolithin A Mitophagy Activation",
             "MOTS-c Mitochondrial Peptide",
             "Creatine Monohydrate ATP Reservoir",
+            "NMN NAD+ Bioenergetics",
+            "Shilajit Fulvic Acid Synergy",
+            "SS-31 Elamipretide Cardiolipin Protection",
         ],
         'recovery': [
             "Cold Thermogenesis HRV Optimization",
@@ -366,6 +385,9 @@ class HopesAndDreamsBot:
             "Ashwagandha Cortisol Modulation",
             "Tart Cherry Sleep & Inflammation",
             "Magnesium L-Threonate Recovery Stack",
+            "Tongkat Ali Testosterone Recovery",
+            "Curcumin Phytosome Inflammation Resolution",
+            "Omega-3 SPM Resolvins",
         ],
         'longevity': [
             "Rapamycin mTOR Suppression",
@@ -374,6 +396,9 @@ class HopesAndDreamsBot:
             "Glycine + NAC Methionine Restriction Mimetic",
             "Berberine AMPK Activation",
             "Hyperbaric Oxygen Telomere Studies",
+            "Taurine Healthspan Research",
+            "Dasatinib Quercetin Senolytic Combination",
+            "Sulforaphane Nrf2 Activation",
         ],
         'gaba_calm': [
             "GABA Receptor Pharmacology",
@@ -382,6 +407,9 @@ class HopesAndDreamsBot:
             "Ashwagandha HPA Axis Regulation",
             "Magnolia Honokiol GABA-A Modulation",
             "Valerian Root Sedative Profile",
+            "Taurine GABA-A Modulation",
+            "Lemon Balm Melissa Anxiolytic",
+            "Saffron Affron Mood Support",
         ],
         'nootropics': [
             "Aniracetam AMPA Receptor Modulation",
@@ -390,6 +418,9 @@ class HopesAndDreamsBot:
             "Modafinil Histaminergic Wakefulness",
             "L-Theanine + Caffeine Synergy",
             "Tyrosine Catecholamine Precursor",
+            "Semax BDNF Heptapeptide",
+            "Fasoracetam mGluR Modulation",
+            "Pramiracetam High-Affinity Choline Uptake",
         ],
         'nicotine': [
             "Nicotine nAChR Pharmacology",
@@ -398,6 +429,9 @@ class HopesAndDreamsBot:
             "Cytisine Smoking Cessation",
             "Nicotine + Caffeine Synergy",
             "Nicotinic Receptor Subtypes Explained",
+            "Nicotine Parkinson's Neuroprotection Research",
+            "Alpha-7 nAChR Cognitive Pathway",
+            "Nicotine Gum Pharmacokinetics",
         ],
         'kratom': [
             "Mitragynine 7-OH Pharmacology",
@@ -406,6 +440,9 @@ class HopesAndDreamsBot:
             "Mitragyna Speciosa Botany & Origin",
             "Kratom Harm Reduction Framework",
             "Kratom Receptor Binding Studies",
+            "7-Hydroxymitragynine Metabolite Potency",
+            "Kratom Mu-Opioid Partial Agonism",
+            "Kratom Drug Interaction Safety",
         ],
         'dreams': [
             "WBTB Lucid Dreaming Protocol",
@@ -414,6 +451,30 @@ class HopesAndDreamsBot:
             "MILD vs WILD Induction Techniques",
             "Mugwort Vivid Dream Tradition",
             "Choline Bitartrate Dream Cofactor",
+            "Alpha-GPC REM Dream Intensity",
+            "Vitamin B6 Dream Recall",
+            "Calea Zacatechichi Oneirogen",
+        ],
+        'dmt': [
+            "DMT 5-HT2A Receptor Agonism",
+            "DMT Sigma-1 Receptor Debate",
+            "Endogenous DMT INMT Biosynthesis",
+            "DMT Default Mode Network Disintegration",
+            "Ayahuasca MAO-A Oral Bioavailability",
+            "DMT Entity Encounter Phenomenology",
+            "Pineal Gland DMT Hypothesis",
+            "DMT Prevalence & Harm Reduction",
+            "Extended-State DMT Infusion (DMTx)",
+        ],
+        # Retrieves almost entirely from the KB (OBE/AP is not a PubMed
+        # domain) — these topics make the astral source vein earn its keep.
+        'astral_projection': [
+            "Muldoon Rope Technique OBE",
+            "Vibrational State Astral Separation",
+            "Hypnagogic Exit Projection Onset",
+            "Astral Projection vs Lucid Dreaming",
+            "OBE Induction Relaxation Protocol",
+            "Astral Travel Beginner Framework",
         ],
     }
 
