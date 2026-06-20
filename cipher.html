@@ -102,6 +102,11 @@ j=d.createElement(s),dl=l!='dataLayer'?'&l='+l:'';j.async=true;j.src=
         .cph-x .xnote { font-size: 0.84rem; color: var(--text-dim); margin-top: 6px; line-height: 1.6; }
         .cph-x .xmath { font-family: 'Courier New', monospace; font-size: 0.74rem; color: var(--neon-blue); margin-top: 8px; }
 
+        /* synthesis capstone */
+        .cph-synth { background: var(--card-bg); border: 1px solid rgba(251,191,36,0.18); border-left: 3px solid var(--neon-gold); border-radius: 16px; padding: 26px 28px; }
+        .cph-synth h2 { font-size: 1.25rem; color: var(--neon-gold); margin: 0 0 12px; font-weight: 900; }
+        .cph-synth p { font-size: 1.02rem; color: var(--text-main); line-height: 1.78; }
+
         /* actions */
         .cph-actions { display: flex; flex-wrap: wrap; gap: 12px; margin-top: 30px; }
         .cph-actions button { flex: 1 1 160px; border-radius: 50px; cursor: pointer; font-weight: 900; font-size: 0.82rem; letter-spacing: 2px; text-transform: uppercase; padding: 14px 18px; transition: .3s; font-family: 'Inter', sans-serif; }
@@ -271,6 +276,56 @@ const PINTXT={1:'independence, self-assertion and new ventures — a phase to le
 const CHALTXT={0:'the “challenge of choice” — no single fixed weakness; you set your own growth edges.',1:'standing on your own without domineering — finding will without ego.',2:'oversensitivity and self-doubt — handling others without losing yourself.',3:'scattered energy and self-criticism — channelling expression instead of hiding it.',4:'rigidity and disorganization — discipline without becoming a prisoner of it.',5:'impulsiveness and overindulgence — using freedom wisely instead of escaping through it.',6:'unrealistic ideals and over-responsibility — serving without becoming a martyr.',7:'isolation and skepticism — trusting and connecting instead of hiding in your head.',8:'fixation on money and power — material drive balanced with integrity.'};
 const CAREER={1:'leadership, founding ventures, anything where you run the show',2:'mediation, counselling, partnerships, support and diplomacy, music',3:'writing, performing, design, media — anything expressive',4:'engineering, the trades, construction, systems and operations',5:'sales, travel, media, entrepreneurship — anything with variety and motion',6:'teaching, healing, caregiving, hospitality, community work',7:'research, analysis, science, tech, investigation — specialist depth',8:'business, finance, executive leadership, large-scale management',9:'the arts, humanitarian work, healing, teaching — serving the many',11:'inspiration, spiritual teaching, the arts, counselling, visionary work',22:'large-scale building — architecture, engineering, founding institutions',33:'teaching, healing, ministry, large-scale uplift'};
 
+/* ====== SYNTHESIS (personalized narrative composer) ====== */
+const GROUP={1:'mind',5:'mind',7:'mind',3:'soul',6:'soul',9:'soul',2:'biz',4:'biz',8:'biz'};
+function hsh(s){let h=2166136261>>>0;for(let i=0;i<s.length;i++){h^=s.charCodeAt(i);h=Math.imul(h,16777619)>>>0;}return h>>>0;}
+const SYN_LP={1:'a drive to lead, initiate, and carve your own road',2:'a gift for partnership, peace-making, and quiet diplomacy',3:'a need to create, express, and connect through words and feeling',4:'a builder’s instinct for order, discipline, and foundations that last',5:'a hunger for freedom, change, and lived experience',6:'a pull toward responsibility, care, and looking after your people',7:'a seeker’s mind that digs beneath the surface for what’s true',8:'an ambition to master the material world — money, power, scale',9:'an old-soul compassion and a reach toward the bigger picture',11:'a high-voltage intuition and a visionary’s antennae',22:'the master-builder’s capacity to turn vast visions into real structures',33:'a teacher’s heart wired for service and uplift'};
+const SYN_EXPR={1:'leading from the front and starting what others won’t',2:'working through people, reading the room, holding things in balance',3:'communicating, creating, and lighting up whatever space you’re in',4:'building systems and getting the hard, real work done',5:'adapting fast, selling an idea, and thriving on variety',6:'nurturing, teaching, and carrying responsibility for others',7:'analysing, researching, and mastering a subject in depth',8:'organising, directing, and operating at scale',9:'giving, creating, and serving something larger than yourself',11:'inspiring others and channelling intuition into vision',22:'turning blueprints into something concrete and enduring',33:'healing and teaching through sheer care'};
+const SYN_SOUL={1:'to stand on your own and be recognised for what you build',2:'connection, harmony, and someone to share the road with',3:'to express yourself and feel joy moving through you',4:'security, structure, and the quiet satisfaction of solid work',5:'freedom and the next experience just over the horizon',6:'to love and be needed, with a home and people to tend',7:'understanding — to work out how it all actually fits together',8:'to achieve, to be capable, and to build something substantial',9:'to matter to the many and leave things better than you found them',11:'to grasp the meaning beneath things and pass the light on',22:'to leave a structure standing long after you’re gone',33:'to lift the people around you, even at a cost to yourself'};
+const SYN_PERS={1:'confident, self-directed presence',2:'gentle, easy-to-be-around manner',3:'bright, expressive spark',4:'steady, has-it-handled solidity',5:'restless, magnetic energy',6:'warm, dependable presence',7:'reserved, slightly mysterious air',8:'capable, no-nonsense authority',9:'gracious, worldly air',11:'charismatic, high-voltage intensity',22:'grounded, quietly formidable presence',33:'immediately nurturing warmth'};
+const SYN_GIFT={1:'taking initiative and leading',2:'cooperation and reading people',3:'creative self-expression',4:'organisation and steady execution',5:'adaptability and versatility',6:'caretaking and responsibility',7:'analysis and deep focus',8:'managing resources and landing results',9:'compassion and a broad perspective',11:'intuition and inspiration',22:'building things that last',33:'caring for others at scale'};
+const SYN_PY={1:'planting seeds and starting fresh, the opening of a new cycle',2:'patience, partnership, and letting things develop slowly',3:'creativity, expression, and a lighter, more social chapter',4:'heads-down work and laying foundations that will hold',5:'change, movement, and the unexpected — a year to stay loose',6:'home, love, and responsibility taking the centre seat',7:'reflection and depth, a quieter and more inward year',8:'harvest and ambition, the year results tend to land',9:'completion and release, clearing the deck for what’s next'};
+
+function buildSynthesis(o){
+  const reduce=reduce1;
+  const lpR=reduce(o.lp),exprR=reduce(o.expr),soulR=reduce(o.soul),persR=reduce(o.pers);
+  const G=n=>GROUP[reduce(n)];
+  const pick=(arr,tag)=>arr[hsh(o.seed+tag)%arr.length];
+
+  const openers=[
+    `${o.fullName}, the spine of your chart is a Life Path ${o.lp} — ${SYN_LP[o.lp]}.`,
+    `Read as a whole, ${o.fullName}, your numbers circle a Life Path ${o.lp}: ${SYN_LP[o.lp]}.`,
+    `${o.fullName} — strip the chart down and what’s left at the centre is a Life Path ${o.lp}, ${SYN_LP[o.lp]}.`
+  ];
+
+  let rel1;
+  if(exprR===lpR) rel1=`Your Expression ${o.expr} points at that same energy, which lends you an unusual single-mindedness — what you’re built to do is what you’re here to do, with little internal argument.`;
+  else if(G(o.expr)===G(o.lp)) rel1=`Your Expression ${o.expr} — ${SYN_EXPR[o.expr]} — sits in the same family as your path, so your talents pull in the direction you’re already headed.`;
+  else rel1=`Your Expression ${o.expr} — ${SYN_EXPR[o.expr]} — meets life from a different angle than your path, and that friction is part of the point: your work is making the two serve each other rather than fight.`;
+
+  let rel2;
+  const aligned=(soulR===persR)||(G(o.soul)===G(o.pers));
+  if(aligned) rel2=`Underneath, what you actually want is ${SYN_SOUL[o.soul]} — and the ${SYN_PERS[o.pers]} the world meets lines up with it. The face and the engine run the same way.`;
+  else rel2=`Beneath the ${SYN_PERS[o.pers]} the world tends to meet, what you privately want is ${SYN_SOUL[o.soul]}. There’s a real gap there — people don’t always guess what’s driving you.`;
+
+  let extra='';
+  if(o.masters.length) extra+=` The master ${o.masters.length>1?'numbers':'number'} in your chart (${o.masters.join(', ')}) ${o.masters.length>1?'raise':'raises'} the stakes of all of this — more raw potential, and more pressure to live up to it.`;
+  if(o.debts.length) extra+=` There’s also a karmic-debt thread (${o.debts.join(', ')}), an old pattern asking to be worked through rather than walked around.`;
+  if(o.maxc>=3 && o.passions.length===1) extra+=` And one number, ${o.passions[0]}, repeats through your name enough to act like a dominant key — it tints everything else.`;
+
+  const p2a=`Layered over that is your Birthday ${o.birth}, a specific knack for ${SYN_GIFT[o.birth]||SYN_GIFT[reduce(o.birth)]}.`;
+  const nowLine=`Right now you’re moving through your ${o.pinName} and a Personal Year ${o.py} — ${SYN_PY[o.py]}.`;
+  const closers=[
+    `Taken together, ${o.first}, none of this reads as fixed fate — it’s a set of tendencies, and the useful question is which ones you lean into and which you decide to push against.`,
+    `Put it all together and the chart is less a verdict than a map, ${o.first}: leanings you can work with, edges you can choose to grow.`,
+    `None of it is destiny, ${o.first} — it’s a description of your defaults, and defaults are exactly the thing you get to override on purpose.`
+  ];
+
+  const p1=[pick(openers,'o'),rel1,rel2,extra.trim()].filter(Boolean).join(' ');
+  const p2=[p2a,nowLine,pick(closers,'c')].join(' ');
+  return `<p>${p1}</p><p style="margin-top:14px">${p2}</p>`;
+}
+
 /* ====== COMPATIBILITY ====== */
 function compat(a,b){
   const ra=reduce1(a),rb=reduce1(b);
@@ -354,6 +409,14 @@ function runReading(rawName,dob){
   const careerNum=exprVal;const careerTxt=CAREER[careerNum]||CAREER[reduce1(careerNum)];
   const lucky=[lp.val,birthVal,exprVal].filter((v,i,a)=>a.indexOf(v)===i).join(' · ');
 
+  const masters=[lp.val,exprVal,soulVal,persVal,birthVal].filter(v=>v===11||v===22||v===33).filter((v,i,a)=>a.indexOf(v)===i);
+  const synthHtml=buildSynthesis({
+    fullName:escapeHtml(rawName), first:escapeHtml(rawName.split(/\s+/)[0]),
+    lp:lp.val, expr:exprVal, soul:soulVal, pers:persVal, birth:birthVal,
+    py:py.val, pinName:pinNames[curPin], masters,
+    debts:[...debts].map(t=>KARMIC[t]), passions, maxc, seed:rawName+'|'+dob
+  });
+
   const html=`
     <div class="cph-who">${escapeHtml(rawName)}<small>${dateStr} · ${list.length} letters · ${vowelsL.length} vowels / ${consL.length} consonants · currently age ${age}</small></div>
 
@@ -382,6 +445,9 @@ function runReading(rawName,dob){
       <div class="cph-x"><h3>Hidden Passion</h3><div class="xval">${passions.join(' & ')} — ${passions.map(p=>MEAN[p].kw).join(', ')}</div><div class="xnote">The number(s) showing up most in your name (${maxc}× each). A talent so baked-in it almost runs on autopilot.</div></div>
       ${debts.size?`<div class="cph-x"><h3>Karmic Debt</h3>${[...debts].map(t=>`<div class="xval">${KARMIC[t]}</div><div class="xnote">${KARMIC_NOTE[t]}</div>`).join('')}</div>`:`<div class="cph-x"><h3>Karmic Debt</h3><div class="xval">None present</div><div class="xnote">No 13/14/16/19 totals in your core numbers — clean slate on that front.</div></div>`}
     </div>
+
+    <div class="cph-sector">SYNTHESIS // FULL READING</div>
+    <div class="cph-synth"><h2>A reading for ${escapeHtml(rawName)}</h2>${synthHtml}</div>
 
     <div class="cph-actions">
       <button class="pri" id="shareReportBtn">Share my reading</button>
