@@ -175,9 +175,12 @@ j=d.createElement(s),dl=l!='dataLayer'?'&l='+l:'';j.async=true;j.src=
           .print-footer { display: block; position: fixed; bottom: 6mm; left: 0; right: 0; text-align: center; font-style: italic; font-size: 9pt; color: #9a7a1f; }
 
           /* ---- sector headers -> elegant centered dividers ---- */
-          .cph-sector { font-family: 'Cormorant', serif !important; font-size: 13pt !important; font-weight: 600; letter-spacing: 3px; color: #9a7a1f !important; text-transform: uppercase; text-align: center; border: none !important; margin: 14mm 0 6mm !important; padding: 0 0 4mm !important; position: relative; break-after: avoid; }
+          .cph-sector { font-family: 'Cormorant', serif !important; font-size: 13pt !important; font-weight: 600; letter-spacing: 3px; color: #9a7a1f !important; text-transform: uppercase; text-align: center; border: none !important; margin: 11mm 0 6mm !important; padding: 0 0 4mm !important; position: relative; break-inside: avoid !important; page-break-inside: avoid !important; break-after: avoid !important; page-break-after: avoid !important; }
           .cph-sector::after { content: '✶'; display: block; font-size: 10pt; color: #c9a44c; margin-top: 4mm; }
-          .cph-sector-synth { break-before: page; }
+          /* glue each header to the block that follows it so it never orphans at a page bottom */
+          .cph-sector + * { break-before: avoid !important; page-break-before: avoid !important; }
+          .cph-sector-synth { break-before: page !important; page-break-before: always !important; }
+          .cph-sector-synth + * { break-before: avoid !important; page-break-before: avoid !important; }
 
           /* ---- core cards -> typographic sections ---- */
           .cph-card, .cph-x, .cph-pin, .cph-synth { background: none !important; border: none !important; border-radius: 0 !important; box-shadow: none !important; padding: 4mm 0 !important; margin: 0 !important; break-inside: avoid; border-bottom: 1px solid #e7e1d2 !important; }
@@ -372,9 +375,9 @@ function buildSynthesis(o){
   const pick=(arr,tag)=>arr[hsh(o.seed+tag)%arr.length];
 
   const openers=[
-    `${o.fullName}, the spine of your chart is a Life Path ${o.lp} — ${SYN_LP[o.lp]}.`,
-    `Read as a whole, ${o.fullName}, your numbers circle a Life Path ${o.lp}: ${SYN_LP[o.lp]}.`,
-    `${o.fullName} — strip the chart down and what’s left at the centre is a Life Path ${o.lp}, ${SYN_LP[o.lp]}.`
+    `Taken as a whole, ${o.fullName}, the spine of your chart is a Life Path ${o.lp} — ${SYN_LP[o.lp]}.`,
+    `Read end to end, ${o.fullName}, your numbers circle a Life Path ${o.lp}: ${SYN_LP[o.lp]}.`,
+    `Strip the chart to its core, ${o.fullName}, and what remains at the centre is a Life Path ${o.lp}, ${SYN_LP[o.lp]}.`
   ];
 
   let rel1;
