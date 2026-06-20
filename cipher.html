@@ -35,6 +35,7 @@ j=d.createElement(s),dl=l!='dataLayer'?'&l='+l:'';j.async=true;j.src=
     <link rel="dns-prefetch" href="https://fonts.googleapis.com">
     <link rel="dns-prefetch" href="https://fonts.gstatic.com">
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;700;900&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Cormorant:ital,wght@0,400;0,500;0,600;1,400;1,500&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="style.css">
     <link rel="icon" type="image/x-icon" href="favicon.ico">
     <link rel="icon" type="image/png" sizes="32x32" href="favicon-32x32.png">
@@ -136,6 +137,83 @@ j=d.createElement(s),dl=l!='dataLayer'?'&l='+l:'';j.async=true;j.src=
         #toast { position: fixed; left: 50%; bottom: 26px; transform: translateX(-50%) translateY(20px); background: var(--neon-blue); color: var(--bg-main); font-family: 'Courier New', monospace; font-weight: 700; font-size: 0.8rem; letter-spacing: 1px; padding: 12px 20px; border-radius: 50px; opacity: 0; pointer-events: none; transition: opacity .25s, transform .25s; z-index: 60; }
         #toast.show { opacity: 1; transform: translateX(-50%) translateY(0); }
 
+        /* print-only elements hidden on screen */
+        .print-cover, .print-footer { display: none; }
+
+        /* ============================================================
+           PRINT — "Astral Document" edition. Screen stays dark Syndicate;
+           paper becomes an elegant light celestial manuscript.
+           ============================================================ */
+        @media print {
+          @page { margin: 16mm 15mm 20mm; }
+
+          html, body { background: #ffffff !important; }
+          body { color: #20202e !important; font-family: 'Cormorant', 'Palatino Linotype', Georgia, serif !important; line-height: 1.6; }
+
+          /* kill all screen chrome */
+          header, nav, #theme-toggle, #scroll-progress, #form, .lede, .hexline,
+          .subtitle, h1, .masthead, #compatCta, .newsletter-section,
+          .container > footer, .cph-actions, #toast, .cph-who,
+          body::before, body::after { display: none !important; }
+
+          .container { max-width: 100% !important; padding: 0 !important; }
+          #report { display: block !important; }
+
+          /* ---- title masthead ---- */
+          .print-cover { display: block; text-align: center; padding: 6mm 0 10mm; break-inside: avoid; break-after: avoid; }
+          .print-cover .pc-orn { font-size: 22pt; color: #9a7a1f; line-height: 1; }
+          .print-cover .pc-kicker { font-family: 'Courier New', monospace; font-size: 8pt; letter-spacing: 3px; text-transform: uppercase; color: #9a7a1f; margin-top: 10px; }
+          .print-cover .pc-title { font-size: 46pt; font-weight: 600; letter-spacing: 4px; color: #20202e; margin: 6px 0 0; text-transform: uppercase; }
+          .print-cover .pc-sub { font-style: italic; font-size: 16pt; color: #6b6a78; margin-top: 2px; }
+          .print-cover .pc-rule { width: 46%; height: 0; border-top: 1px solid #c9a44c; margin: 16px auto; }
+          .print-cover .pc-for { font-style: italic; font-size: 11pt; color: #6b6a78; }
+          .print-cover .pc-name { font-size: 26pt; font-weight: 600; color: #9a7a1f; margin: 2px 0; }
+          .print-cover .pc-date { font-family: 'Courier New', monospace; font-size: 9pt; letter-spacing: 2px; color: #6b6a78; text-transform: uppercase; }
+          .print-cover .pc-orn2 { font-size: 13pt; color: #c9a44c; margin-top: 12px; }
+
+          /* ---- running footer (repeats per page in Chrome) ---- */
+          .print-footer { display: block; position: fixed; bottom: 6mm; left: 0; right: 0; text-align: center; font-style: italic; font-size: 9pt; color: #9a7a1f; }
+
+          /* ---- sector headers -> elegant centered dividers ---- */
+          .cph-sector { font-family: 'Cormorant', serif !important; font-size: 13pt !important; font-weight: 600; letter-spacing: 3px; color: #9a7a1f !important; text-transform: uppercase; text-align: center; border: none !important; margin: 14mm 0 6mm !important; padding: 0 0 4mm !important; position: relative; break-after: avoid; }
+          .cph-sector::after { content: '✶'; display: block; font-size: 10pt; color: #c9a44c; margin-top: 4mm; }
+          .cph-sector-synth { break-before: page; }
+
+          /* ---- core cards -> typographic sections ---- */
+          .cph-card, .cph-x, .cph-pin, .cph-synth { background: none !important; border: none !important; border-radius: 0 !important; box-shadow: none !important; padding: 4mm 0 !important; margin: 0 !important; break-inside: avoid; border-bottom: 1px solid #e7e1d2 !important; }
+          .cph-head { gap: 6mm !important; }
+          .cph-glyph, .cph-pin .pg, .cph-match .g { border: 1.2pt solid #c9a44c !important; background: none !important; box-shadow: none !important; }
+          .cph-glyph b, .cph-pin .pg, .cph-match .g { color: #9a7a1f !important; font-family: 'Cormorant', serif !important; font-weight: 600 !important; }
+          .cph-glyph.master::after { border-color: #c9a44c !important; }
+          .cph-tt h2, .cph-x h3, .cph-pin .ph h3 { font-family: 'Courier New', monospace !important; font-size: 8pt !important; letter-spacing: 1.5px; color: #9a7a1f !important; }
+          .cph-tt .kw { font-family: 'Cormorant', serif !important; font-size: 19pt !important; font-weight: 600; color: #20202e !important; }
+          .cph-tt .gov, .cph-x .xnote, .cph-pin .ph .ptxt { color: #5d5c6a !important; font-size: 10.5pt !important; }
+          .cph-interp, .cph-x .xval, .cph-pin .ph .ages { color: #20202e !important; font-size: 11.5pt !important; }
+          .cph-interp .sh, .cph-pin .ph .pchal { color: #6b6a78 !important; }
+
+          /* arithmetic stays mono — the proof */
+          .cph-math, .cph-x .xmath { font-family: 'Courier New', monospace !important; background: none !important; border-left: 2pt solid #c9a44c !important; color: #585765 !important; font-size: 8.5pt !important; border-radius: 0 !important; padding: 2mm 3mm !important; white-space: normal !important; }
+
+          .cph-badge { color: #8a3a48 !important; border-color: #c8a2a9 !important; background: none !important; }
+          .cph-badge.gold { color: #9a7a1f !important; border-color: #c9a44c !important; }
+          .cph-pin.now { border-left: 2.5pt solid #c9a44c !important; padding-left: 4mm !important; background: none !important; }
+          .cph-nowtag { background: #9a7a1f !important; color: #fff !important; }
+          .cph-extras { display: block !important; }
+
+          /* ---- synthesis: the closing letter ---- */
+          .cph-synth { border-bottom: none !important; padding-top: 8mm !important; }
+          .cph-synth h2 { font-family: 'Cormorant', serif !important; font-style: italic; font-size: 22pt !important; color: #9a7a1f !important; text-align: center; margin-bottom: 6mm !important; }
+          .cph-synth p { color: #20202e !important; font-size: 12.5pt !important; line-height: 1.75 !important; text-align: justify; }
+          .cph-synth p:first-of-type::first-letter { font-family: 'Cormorant', serif; font-size: 34pt; font-weight: 600; color: #9a7a1f; float: left; line-height: 0.8; padding: 2px 8px 0 0; }
+
+          /* ---- credit block ---- */
+          .cph-plug { border-top: 1px solid #c9a44c !important; margin-top: 8mm !important; padding-top: 5mm !important; }
+          .cph-plug .b { color: #5d5c6a !important; font-size: 10pt !important; text-align: center; }
+          .cph-plug a { color: #9a7a1f !important; }
+          .cph-fine { color: #8a8996 !important; font-size: 8pt !important; text-align: justify; }
+          .cph-fine b { color: #5d5c6a !important; }
+        }
+
         @media (max-width: 600px){ h1{font-size:2rem;letter-spacing:4px} .cph-who{font-size:1.5rem} }
     </style>
 </head>
@@ -229,6 +307,7 @@ j=d.createElement(s),dl=l!='dataLayer'?'&l='+l:'';j.async=true;j.src=
     </div>
 
     <div id="toast"></div>
+<div class="print-footer">The Cipher · Decoded free at hopes-and-dreams.ca</div>
 
 <script>
 /* ====== CONFIG ====== */
@@ -418,6 +497,7 @@ function runReading(rawName,dob){
   });
 
   const html=`
+    <div class="print-cover"><div class="pc-orn">✦</div><div class="pc-kicker">Dream Syndicate · The Cipher</div><div class="pc-title">The Cipher</div><div class="pc-sub">A Numerology Reading</div><div class="pc-rule"></div><div class="pc-for">prepared for</div><div class="pc-name">${escapeHtml(rawName)}</div><div class="pc-date">${dateStr}</div><div class="pc-orn2">❖</div></div>
     <div class="cph-who">${escapeHtml(rawName)}<small>${dateStr} · ${list.length} letters · ${vowelsL.length} vowels / ${consL.length} consonants · currently age ${age}</small></div>
 
     <div class="cph-sector">DECODE // CORE SIGNATURE</div>
@@ -446,7 +526,7 @@ function runReading(rawName,dob){
       ${debts.size?`<div class="cph-x"><h3>Karmic Debt</h3>${[...debts].map(t=>`<div class="xval">${KARMIC[t]}</div><div class="xnote">${KARMIC_NOTE[t]}</div>`).join('')}</div>`:`<div class="cph-x"><h3>Karmic Debt</h3><div class="xval">None present</div><div class="xnote">No 13/14/16/19 totals in your core numbers — clean slate on that front.</div></div>`}
     </div>
 
-    <div class="cph-sector">SYNTHESIS // FULL READING</div>
+    <div class="cph-sector cph-sector-synth">SYNTHESIS // FULL READING</div>
     <div class="cph-synth"><h2>A reading for ${escapeHtml(rawName)}</h2>${synthHtml}</div>
 
     <div class="cph-actions">
@@ -466,7 +546,14 @@ function runReading(rawName,dob){
   const summary=`${rawName} — Life Path ${lp.val} (${(MEAN[lp.val]||MEAN[reduce1(lp.val)]).kw}), Expression ${exprVal}, Soul Urge ${soulVal}, Personality ${persVal}. Personal Year ${py.year}: ${py.val} (${PYEAR[py.val][0]}).`;
   document.getElementById('shareReportBtn').onclick=()=>shareReport(rawName,dob,summary);
   document.getElementById('shareAppBtn').onclick=shareApp;
-  document.getElementById('printBtn').onclick=()=>window.print();
+  document.getElementById('printBtn').onclick=()=>{
+    const prev=document.title;
+    const safe=(rawName||'Your').replace(/[\\/:*?"<>|]+/g,'').replace(/\s+/g,' ').trim();
+    document.title=safe+' - Numerology Report';
+    const restore=()=>{document.title=prev;window.removeEventListener('afterprint',restore);};
+    window.addEventListener('afterprint',restore);
+    window.print();
+  };
 
   document.getElementById('compatCta').style.display='block';
   LAST={name:rawName,dob,lp:lp.val};
