@@ -184,9 +184,8 @@ class VideoCreator:
         # 3. Dynamic Teleprompter Text Scroll (Hardened for ImageMagick)
         try:
             # Split into paragraphs, then further chunk any long paragraph.
-            # ImageMagick caption: builds one tall image per clip — long paragraphs
-            # exceed policy.xml width/height limits.
-            MAX_PARAGRAPH_CHARS = 600
+            # REDUCED CHUNK SIZE: Drops from 600 to 200 to prevent ImageMagick memory crashes on massive scripts
+            MAX_PARAGRAPH_CHARS = 200
             raw_paragraphs = [p.strip() for p in text.split('\n') if p.strip()]
             paragraphs = []
             for p in raw_paragraphs:
