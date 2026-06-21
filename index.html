@@ -172,6 +172,12 @@ j=d.createElement(s),dl=l!='dataLayer'?'&l='+l:'';j.async=true;j.src=
         .bento .feat p{font-size:1.14rem;}
         .bento .feat .cgo{margin-top:20px;}
         .bento .feat .fbadge{display:inline-block;font-family:'Courier New',monospace;font-size:.66rem;letter-spacing:2px;color:var(--neon-gold);border:1px solid rgba(251,191,36,.3);border-radius:50px;padding:5px 14px;margin-bottom:18px;text-transform:uppercase;}
+        /* featured: flex column so CTA anchors to bottom, + highlight row */
+        .bento .feat .card .inner{display:flex;flex-direction:column;}
+        .bento .feat .cgo{margin-top:auto;}
+        .bento .feat .feat-highlights{list-style:none;margin:22px 0 0;padding-top:18px;border-top:1px solid rgba(255,255,255,.08);display:flex;flex-direction:column;gap:11px;}
+        .bento .feat .feat-highlights li{position:relative;padding-left:24px;color:var(--text-main);font-size:.95rem;}
+        .bento .feat .feat-highlights li::before{content:'\25B8';position:absolute;left:2px;color:var(--neon-gold);font-weight:900;}
     </style>
 </head>
 <body>
@@ -455,6 +461,11 @@ height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
                         <svg class="card-icon" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M9.663 17h4.673M12 3v1m6.364 1.636l-.707.707M21 12h-1M4 12H3m3.343-5.657l-.707-.707m2.828 9.9a5 5 0 117.072 0l-.548.547A3.374 3.374 0 0014 18.469V19a2 2 0 11-4 0v-.531c0-.895-.356-1.754-.988-2.386l-.548-.547z"></path></svg>
                         <h3>Neuro-Optimization</h3>
                         <p>We explore the cutting edge of cognitive enhancement. Unlock the protocols in our <strong>Intel Hub</strong>.</p>
+                        <ul class="feat-highlights">
+                            <li>200+ research articles</li>
+                            <li>Updated daily</li>
+                            <li>Free &mdash; no paywall</li>
+                        </ul>
                         <span class="cgo">Enter Intel Hub &rarr;</span>
                     </div>
                 </div>
@@ -491,6 +502,11 @@ height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
                         <svg class="card-icon" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M13 10V3L4 14h7v7l9-11h-7z"></path></svg>
                         <h3>Alpha-GPC &amp; Uridine</h3>
                         <p>The foundational nootropic stack for memory retention, mental fluidity, and expanding your daily cognitive bandwidth.</p>
+                        <ul class="feat-highlights">
+                            <li>Real dosing ranges</li>
+                            <li>Honest risk breakdown</li>
+                            <li>No paywall, ever</li>
+                        </ul>
                         <span class="cgo">Read the Masterclass &rarr;</span>
                     </div>
                 </div>
