@@ -750,7 +750,7 @@ class HopesAndDreamsBot:
             # 2. Research Check (Query PubMed)
             print(f"[{datetime.now()}] EXECUTIVE EXECUTION: Searching PubMed studies...")
             pubmed_studies = self.research.search_studies(topic, limit=2)
-            research_context = "\n".join([f"Study: {s['title']} - {s['abstract'][:300]}..." for s in pubmed_studies])
+            research_context = "\n".join([f"Study: {s.get('title','Untitled')} - {(s.get('abstract') or '')[:300]}..." for s in (pubmed_studies or [])])
 
             combined_context = f"{local_context}\n\n### PUBMED RESEARCH:\n{research_context}"
 

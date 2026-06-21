@@ -24,7 +24,7 @@ class ResearchClient:
                 results.append({
                     "title": article.title,
                     "doi": f"https://doi.org/{article.doi}" if article.doi else None,
-                    "abstract": article.abstract,
+                    "abstract": article.abstract or "",
                     "journal": article.journal,
                     "year": article.year
                 })
