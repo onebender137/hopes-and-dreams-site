@@ -151,6 +151,27 @@ j=d.createElement(s),dl=l!='dataLayer'?'&l='+l:'';j.async=true;j.src=
         .cipher-cta { background: var(--neon-gold) !important; box-shadow: 0 0 25px rgba(251,191,36,0.25) !important; }
         .cipher-cta:hover { box-shadow: 0 0 35px rgba(251,191,36,0.45) !important; transform: translateX(4px); }
         @media (max-width: 600px) { .cipher-glyph { width: 48px; height: 48px; font-size: 1.2rem; } }
+
+        /* ===== Featured-card bento grids + full-send hover (homepage only) ===== */
+        .bento{display:grid;grid-template-columns:1.55fr 1fr;gap:30px;align-items:stretch;}
+        .bento .feat{grid-row:span 2;}
+        @media(max-width:760px){.bento{grid-template-columns:1fr;}.bento .feat{grid-row:auto;}}
+        /* sheen sweep */
+        .bento .card .sheen{position:absolute;top:0;left:-130%;width:65%;height:100%;background:linear-gradient(115deg,transparent,rgba(255,255,255,.13) 50%,transparent);transform:skewX(-18deg);transition:left .75s cubic-bezier(.2,.7,.2,1);pointer-events:none;z-index:4;}
+        .bento .card:hover .sheen{left:130%;}
+        /* "enter ->" affordance, reserved in-flow, revealed on hover */
+        .bento .cgo{display:inline-flex;align-items:center;gap:7px;margin-top:16px;color:var(--neon-blue);font-weight:700;font-size:.78rem;letter-spacing:1.5px;text-transform:uppercase;opacity:0;transform:translateX(-6px);transition:opacity .4s ease,transform .4s ease;}
+        .bento .card:hover .cgo{opacity:1;transform:translateX(0);}
+        /* featured card: blue->gold gradient frame that ignites on hover */
+        .bento .feat .card{padding:2px;border:none;border-radius:26px;overflow:hidden;height:100%;background:linear-gradient(135deg,rgba(56,189,248,.4),rgba(251,191,36,.22));transition:transform .4s ease,box-shadow .4s ease,background .5s ease;}
+        .bento .feat .card::before{display:none;}
+        .bento .feat .card .inner{position:relative;overflow:hidden;background:var(--card-bg);border-radius:24px;padding:48px 44px;height:100%;}
+        .bento .feat .card:hover{transform:translateY(-8px) scale(1.012);background:linear-gradient(135deg,var(--neon-blue),var(--neon-gold));box-shadow:0 30px 62px -20px rgba(56,189,248,.45),0 0 44px rgba(251,191,36,.14);}
+        .bento .feat .card-icon{width:60px;height:60px;}
+        .bento .feat h3{font-size:2rem;}
+        .bento .feat p{font-size:1.14rem;}
+        .bento .feat .cgo{margin-top:20px;}
+        .bento .feat .fbadge{display:inline-block;font-family:'Courier New',monospace;font-size:.66rem;letter-spacing:2px;color:var(--neon-gold);border:1px solid rgba(251,191,36,.3);border-radius:50px;padding:5px 14px;margin-bottom:18px;text-transform:uppercase;}
     </style>
 </head>
 <body>
@@ -425,26 +446,35 @@ height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
             </div>
         </section>
 
-        <div class="grid">
-            <a href="intel.html" class="card-link" data-reveal title="Explore Neuro-Optimization Protocols">
+        <div class="grid bento">
+            <a href="intel.html" class="card-link feat" data-reveal title="Explore Neuro-Optimization Protocols">
                 <div class="card">
-                    <svg class="card-icon" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M9.663 17h4.673M12 3v1m6.364 1.636l-.707.707M21 12h-1M4 12H3m3.343-5.657l-.707-.707m2.828 9.9a5 5 0 117.072 0l-.548.547A3.374 3.374 0 0014 18.469V19a2 2 0 11-4 0v-.531c0-.895-.356-1.754-.988-2.386l-.548-.547z"></path></svg>
-                    <h3>Neuro-Optimization</h3>
-                    <p>We explore the cutting edge of cognitive enhancement. Unlock the protocols in our <strong>Intel Hub</strong>.</p>
+                    <div class="inner">
+                        <span class="sheen"></span>
+                        <span class="fbadge">&#9670; Core Protocol</span>
+                        <svg class="card-icon" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M9.663 17h4.673M12 3v1m6.364 1.636l-.707.707M21 12h-1M4 12H3m3.343-5.657l-.707-.707m2.828 9.9a5 5 0 117.072 0l-.548.547A3.374 3.374 0 0014 18.469V19a2 2 0 11-4 0v-.531c0-.895-.356-1.754-.988-2.386l-.548-.547z"></path></svg>
+                        <h3>Neuro-Optimization</h3>
+                        <p>We explore the cutting edge of cognitive enhancement. Unlock the protocols in our <strong>Intel Hub</strong>.</p>
+                        <span class="cgo">Enter Intel Hub &rarr;</span>
+                    </div>
                 </div>
             </a>
             <a href="optimization.html" class="card-link" data-reveal title="Access Biohacking Tools">
                 <div class="card">
+                    <span class="sheen"></span>
                     <svg class="card-icon" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M13 10V3L4 14h7v7l9-11h-7z"></path></svg>
                     <h3>Applied Biohacking</h3>
                     <p>From sleep architecture to metabolic tuning. Upgrade your biological hardware with our <strong>Optimization Command Center</strong>.</p>
+                    <span class="cgo">Open Command Center &rarr;</span>
                 </div>
             </a>
             <a href="shop.html" class="card-link" data-reveal title="Visit the Procurement Hub">
                 <div class="card">
+                    <span class="sheen"></span>
                     <svg class="card-icon" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M5 3v4M3 5h4M6 17v4m-2-2h4m5-16l2.286 6.857L21 12l-5.714 2.143L13 21l-2.286-6.857L5 12l5.714-2.143L13 3z"></path></svg>
                     <h3>Procurement</h3>
                     <p>Integrating ancient wisdom with technical precision. Acquire the tools for your stack in our <strong>Syndicate Shop</strong>.</p>
+                    <span class="cgo">Browse the Shop &rarr;</span>
                 </div>
             </a>
         </div>
@@ -452,26 +482,35 @@ height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
         <div class="glow-divider"></div>
 
         <h2 class="section-title" data-reveal>The Optimization Stack</h2>
-        <div class="grid">
-            <a href="shop.html#alpha-gpc" class="card-link" data-reveal>
+        <div class="grid bento">
+            <a href="shop.html#alpha-gpc" class="card-link feat" data-reveal>
                 <div class="card">
-                    <svg class="card-icon" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M13 10V3L4 14h7v7l9-11h-7z"></path></svg>
-                    <h3>Alpha-GPC & Uridine</h3>
-                    <p>The foundational nootropic stack for memory retention, mental fluidity, and expanding your daily cognitive bandwidth.</p>
+                    <div class="inner">
+                        <span class="sheen"></span>
+                        <span class="fbadge">&#9670; Flagship Stack</span>
+                        <svg class="card-icon" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M13 10V3L4 14h7v7l9-11h-7z"></path></svg>
+                        <h3>Alpha-GPC &amp; Uridine</h3>
+                        <p>The foundational nootropic stack for memory retention, mental fluidity, and expanding your daily cognitive bandwidth.</p>
+                        <span class="cgo">View the Stack &rarr;</span>
+                    </div>
                 </div>
             </a>
             <a href="shop.html#lions-mane" class="card-link" data-reveal>
                 <div class="card">
+                    <span class="sheen"></span>
                     <svg class="card-icon" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z"></path></svg>
                     <h3>Lion's Mane Extract</h3>
                     <p>Crucial for promoting neurogenesis, repairing neural pathways, and ensuring long-term brain health for sustained building.</p>
+                    <span class="cgo">View &rarr;</span>
                 </div>
             </a>
             <a href="shop.html#rhodiola" class="card-link" data-reveal>
                 <div class="card">
+                    <span class="sheen"></span>
                     <svg class="card-icon" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M3 15a4 4 0 004 4h9a5 5 0 10-.1-9.999 5.002 5.002 0 10-9.78 2.096A4.001 4.001 0 003 15z"></path></svg>
                     <h3>Adaptogen Complex</h3>
                     <p>Utilizing Rhodiola and Ashwagandha to down-regulate cortisol, managing stress responses so you can operate calmly under pressure.</p>
+                    <span class="cgo">View &rarr;</span>
                 </div>
             </a>
         </div>
