@@ -138,6 +138,19 @@ j=d.createElement(s),dl=l!='dataLayer'?'&l='+l:'';j.async=true;j.src=
             .hero-description h1 { font-size: 1.8rem; }
             .section-title { font-size: 1.5rem; }
         }
+
+        /* Cipher promo block */
+        .cipher-promo h2 { color: var(--neon-gold); }
+        .cipher-glyph-row { display: flex; justify-content: center; gap: 16px; margin: 30px 0 34px; flex-wrap: wrap; }
+        .cipher-glyph {
+            width: 58px; height: 58px; border: 1px solid var(--neon-blue); border-radius: 50%;
+            display: grid; place-items: center; font-weight: 900; font-size: 1.5rem; color: var(--neon-gold);
+            background: radial-gradient(circle at 50% 35%, rgba(56,189,248,0.16), transparent 70%);
+            box-shadow: 0 0 18px rgba(56,189,248,0.14);
+        }
+        .cipher-cta { background: var(--neon-gold) !important; box-shadow: 0 0 25px rgba(251,191,36,0.25) !important; }
+        .cipher-cta:hover { box-shadow: 0 0 35px rgba(251,191,36,0.45) !important; transform: translateX(4px); }
+        @media (max-width: 600px) { .cipher-glyph { width: 48px; height: 48px; font-size: 1.2rem; } }
     </style>
 </head>
 <body>
@@ -234,6 +247,14 @@ height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
                     <circle class="pulse-hint pulse-hint-gold" cx="1090" cy="240" r="6"/>
                 </g>
 
+                <!-- THE CIPHER — Right hemisphere constellation -->
+                <g class="hotspot-group" data-section="Cipher" data-hex="43 49 50 48" data-page="cipher.html">
+                    <path class="hotspot-region" d="M 895 405 C 868 442, 873 515, 920 552 C 964 584, 1038 565, 1060 510 C 1080 466, 1056 408, 1008 388 C 957 366, 918 380, 895 405 Z"/>
+                    <circle class="hotspot-glow" cx="972" cy="472" r="80" filter="url(#hero-glow-filter)"/>
+                    <circle class="node-dot" cx="972" cy="472" r="8"/>
+                    <circle class="pulse-hint pulse-hint-gold" cx="972" cy="472" r="6"/>
+                </g>
+
                 <!-- HEX-DECODE LABELS -->
                 <g class="hex-label-group" id="label-group-Procurement">
                     <line class="conn-line" x1="630" y1="320" x2="540" y2="180"/>
@@ -269,6 +290,13 @@ height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
                     <text class="hex-text" x="1235" y="315" text-anchor="middle" style="fill:#fbbf24">50 56 43 59</text>
                     <text class="decoded-text" x="1235" y="355" text-anchor="middle">PRIVACY PROTOCOL</text>
                 </g>
+
+                <g class="hex-label-group" id="label-group-Cipher">
+                    <line class="conn-line" x1="972" y1="472" x2="1090" y2="650"/>
+                    <rect class="label-bg-gold" x="1015" y="645" width="400" height="100" rx="6"/>
+                    <text class="hex-text" x="1215" y="685" text-anchor="middle" style="fill:#fbbf24">43 49 50 48</text>
+                    <text class="decoded-text" x="1215" y="725" text-anchor="middle">CIPHER DECODER</text>
+                </g>
             </svg>
         </div>
 
@@ -276,6 +304,7 @@ height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
         <div id="hero-mobile-nav">
             <a href="shop.html" class="mobile-nav-item">▸ PROCUREMENT</a>
             <a href="optimization.html" class="mobile-nav-item">▸ OPTIMIZATION</a>
+            <a href="cipher.html" class="mobile-nav-item">▸ THE CIPHER</a>
             <a href="intel.html" class="mobile-nav-item">▸ INTEL HUB</a> 
             <a href="https://merch.hopes-and-dreams.ca" class="mobile-nav-item" target="_blank" rel="noopener noreferrer">▸ SYNDICATE GEAR</a>
             <a href="about.html" class="mobile-nav-item">▸ ABOUT</a>
@@ -376,6 +405,25 @@ height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
                 </div>
             </div>
         </div>
+
+        <section class="intel-advert cipher-promo" data-reveal>
+            <div class="intel-advert-card">
+                <div class="signal-badge gold"><span class="pulse-dot"></span> 43 49 50 48 // DECODE THE SIGNAL</div>
+                <h2>The Cipher — Decode Your Numbers</h2>
+                <p>Your name and birth date carry a numeric signature. The Cipher decodes it free — Life Path, Destiny, your four life Pinnacles, a forecast for the year you're in, even two-person compatibility. The same arithmetic the paywall sites charge for, run honest and open, with every number shown.</p>
+                <div class="cipher-glyph-row">
+                    <span class="cipher-glyph">1</span>
+                    <span class="cipher-glyph">3</span>
+                    <span class="cipher-glyph">7</span>
+                    <span class="cipher-glyph">11</span>
+                    <span class="cipher-glyph">9</span>
+                </div>
+                <a href="cipher.html" class="intel-cta cipher-cta">
+                    DECODE YOUR SIGNAL
+                    <svg fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M14 5l7 7m0 0l-7 7m7-7H3"></path></svg>
+                </a>
+            </div>
+        </section>
 
         <div class="grid">
             <a href="intel.html" class="card-link" data-reveal title="Explore Neuro-Optimization Protocols">
