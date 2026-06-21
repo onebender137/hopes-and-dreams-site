@@ -40,6 +40,7 @@ CORE_PAGES = [
     ("/intel.html",        "0.8"),
     ("/about.html",        "0.7"),
     ("/privacy.html",      "0.5"),
+    ("/alpha-gpc-uridine-stack.html", "0.8"),
 ]
 ARTICLE_PRIORITY = "0.6"
 
