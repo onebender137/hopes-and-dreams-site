@@ -32,8 +32,9 @@ j=d.createElement(s),dl=l!='dataLayer'?'&l='+l:'';j.async=true;j.src=
     <link rel="icon" type="image/png" sizes="16x16" href="favicon-16x16.png">
     <link rel="apple-touch-icon" sizes="180x180" href="apple-touch-icon.png">
 <script defer="" src="codex.js"></script>
-<script>window.SYNDICATE_CONFIG = { API_KEY: "wP7RJ73c87CV2gNdcOa52L1fAxEP79GA0Ur" };</script>
+<script>window.SYNDICATE_CONFIG = { API_KEY: "{{WEBSITE_API_KEY}}" };</script>
 <script defer="" src="script.js"></script>
+<script defer src="intel-search.js"></script>
 <style>
         .container { max-width: 900px; margin: 0 auto; padding: 0 24px 100px; }
         /* === TRANSMISSIONS CALENDAR === */
@@ -257,6 +258,7 @@ height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
 <div class="container">
 <h1 class="section-title">Syndicate Transmissions</h1>
 <p style="color: var(--text-dim); margin-bottom: 40px;">The complete archive of high-frequency biohacking intelligence and protocol updates.</p>
+<div id="intel-search" data-source="transmissions.json"></div>
 <div class="transmissions-calendar-shell">
     <div class="calendar-pane">
         <div class="calendar-header">
