@@ -219,3 +219,48 @@ html .buy-btn:hover {
 /* already-blue intel CTA: add a gold secondary shadow so it matches the dual tone */
 html .intel-cta { box-shadow: 0 0 20px rgba(56,189,248,0.40), 0 4px 16px rgba(251,191,36,0.16) !important; }
 html .intel-cta:hover { box-shadow: 0 0 26px rgba(56,189,248,0.55), 0 0 12px rgba(251,191,36,0.28) !important; }
+
+/* ============================================================================
+   14. OCCASIONAL CRT GLITCH  — irregular "monitor hiccup"
+       Two overlay layers on html::before / html::after (both free), driven by
+       de-synced cycles (13s + 19s) so bursts land at uneven intervals — reads
+       as a rustic CRT hiccup, not a metronome. Overlay-only: pointer-events
+       none, no layout shift, no content transform (fixed UI stays put).
+       Low-contrast tints + a thin tear line, brief. Fully disabled under
+       prefers-reduced-motion (photosensitivity). DELETE THIS BLOCK to remove.
+   ============================================================================ */
+html::before {
+  content: ""; position: fixed; inset: 0; z-index: 10000; pointer-events: none;
+  opacity: 0; mix-blend-mode: screen;
+  animation: glowop-hiccup-a 13s steps(1, end) -9s infinite;
+}
+html::after {
+  content: ""; position: fixed; left: 0; right: 0; top: 30%; height: 4px;
+  z-index: 10001; pointer-events: none; opacity: 0;
+  background: linear-gradient(90deg, rgba(255,0,128,0.5), rgba(56,189,248,0.6), rgba(0,255,200,0.5));
+  box-shadow: 0 0 16px rgba(56,189,248,0.6);
+  animation: glowop-hiccup-b 19s steps(1, end) -15s infinite;
+}
+@keyframes glowop-hiccup-a {
+  0%, 95.5% { opacity: 0; }
+  95.6% { opacity: 0.18; background: linear-gradient(90deg, rgba(56,189,248,0.5) 0 49%, rgba(255,0,128,0.45) 51% 100%); }
+  96.0% { opacity: 0.04; }
+  96.5% { opacity: 0.26; background: linear-gradient(90deg, rgba(255,0,128,0.45) 0 49%, rgba(56,189,248,0.5) 51% 100%); }
+  97.0% { opacity: 0.02; }
+  97.4% { opacity: 0.20; background: rgba(0,0,0,0.35); }
+  97.8% { opacity: 0; }
+  100%  { opacity: 0; }
+}
+@keyframes glowop-hiccup-b {
+  0%, 92% { opacity: 0; top: 30%; }
+  92.3% { opacity: 0.9; top: 18%; height: 3px; }
+  92.7% { opacity: 0; top: 18%; }
+  93.0% { opacity: 0.8; top: 62%; height: 6px; }
+  93.4% { opacity: 0; top: 62%; }
+  93.8% { opacity: 0.85; top: 44%; height: 2px; }
+  94.2% { opacity: 0; }
+  100%  { opacity: 0; }
+}
+@media (prefers-reduced-motion: reduce) {
+  html::before, html::after { animation: none; opacity: 0; }
+}
