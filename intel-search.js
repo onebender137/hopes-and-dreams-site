@@ -8,50 +8,50 @@
      1. Commit this file to the repo root.
      2. In any page <head>:  <script defer src="intel-search.js"></script>
      3. Drop a mount anywhere in the body:
-            <div id="intel-search"></div>
-        ...or for extra mounts on the same page:
-            <div data-intel-search></div>
+            <div id="intel-search"></div>            (primary)
+            <div data-intel-search></div>            (extra mounts)
 
    OPTIONAL data-attributes on the mount element:
-     data-source       index URL (default "transmissions.json")
+     data-index        full-text index URL (default "search-index.json")
+     data-source       title-only fallback URL (default "transmissions.json")
      data-limit        max results shown (default 40)
      data-placeholder  input placeholder text
-     data-label        Courier sector label above the bar
-                       (default "INTEL // SEARCH ARCHIVE"; set data-label="" to hide)
+     data-label        Courier sector label (default "INTEL // SEARCH ARCHIVE";
+                       set data-label="" to hide)
 
-   DATA SOURCE
-     Prefers transmissions.json  -> [{ href, title, date }, ...]
-     Falls back to scraping in-page .archive-item links if the JSON 404s,
-     so it still works on transmissions.html even with no JSON deployed.
+   DATA / LAZY LOAD
+     The index is NOT fetched on page load. The first time the box is focused (or
+     typed in), it lazy-loads search-index.json ([{href,title,date,body}], built by
+     build-search-index.py). Falls back to transmissions.json (title-only), then to
+     scraping in-page .archive-item links. So the page stays light and only
+     searchers pay the ~170 KB (gzipped) download.
 
-   THEME
-     Injects its own scoped CSS using your existing vars
-     (--neon-blue, --neon-gold, --text-main, --text-dim, --transition-speed),
-     with hard fallbacks. Honours body.light-mode. You touch style.css zero times.
+   MATCHING
+     Multi-token AND match across title + body. Title hits rank far above body hits.
+     When a result matches via body, a highlighted snippet of the surrounding text
+     is shown so it's obvious why it matched.
 
-   KEYBOARD
-     /            focus the first search box
-     ArrowUp/Down move selection
-     Enter        open selected (or first) result
-     Esc          clear, then blur
+   THEME / KEYBOARD
+     Injects scoped CSS off existing vars; honours body.light-mode.
+     "/" focus, ArrowUp/Down move, Enter open, Esc clear-then-blur.
+     Deep-link: "?q=term" prefills, "#intel-search" scrolls + focuses.
    ============================================================================ */
 (function () {
   'use strict';
 
+  var DEFAULT_INDEX = 'search-index.json';
   var DEFAULT_SOURCE = 'transmissions.json';
   var STYLE_ID = 'intel-search-styles';
 
-  /* ---- tiny helpers ------------------------------------------------------ */
+  /* ---- helpers ----------------------------------------------------------- */
   function escapeHtml(s) {
     return String(s).replace(/[&<>"']/g, function (c) {
       return { '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c];
     });
   }
-  function escapeAttr(s) {
-    return String(s).replace(/"/g, '&quot;');
-  }
+  function escapeAttr(s) { return String(s).replace(/"/g, '&quot;'); }
 
-  /* ---- styles (scoped, uses site vars + fallbacks) ----------------------- */
+  /* ---- styles ------------------------------------------------------------ */
   function injectStyles() {
     if (document.getElementById(STYLE_ID)) return;
     var css = [
@@ -93,28 +93,33 @@
       'letter-spacing:1.2px;text-transform:uppercase;color:var(--is-gold);',
       'margin:16px 2px 18px;min-height:0;}',
       '.intel-search-meta:empty{margin:0;}',
-      '.intel-search-meta .intel-cap,.intel-search-meta .intel-no{color:var(--is-dim);}',
+      '.intel-search-meta .intel-cap,.intel-search-meta .intel-no,.intel-search-meta .intel-load{color:var(--is-dim);}',
 
       '.intel-search-results{display:flex;flex-direction:column;gap:10px;}',
 
-      '.intel-search .intel-result{display:flex;justify-content:space-between;align-items:center;',
-      'gap:14px;padding:14px 18px;background:rgba(255,255,255,0.015);',
+      '.intel-search .intel-result{display:flex;flex-direction:column;align-items:stretch;',
+      'gap:6px;padding:14px 18px;background:rgba(255,255,255,0.015);',
       'border:1px solid rgba(255,255,255,0.05);border-radius:12px;text-decoration:none;',
       'transition:all var(--is-speed) ease;box-sizing:border-box;}',
       '.intel-search .intel-result:hover,.intel-search .intel-result.intel-active{',
       'background:rgba(56,189,248,0.05);border-color:var(--is-blue);',
       'box-shadow:0 0 15px rgba(56,189,248,0.12);}',
+      '.intel-search .intel-result-row{display:flex;justify-content:space-between;',
+      'align-items:center;gap:14px;}',
       '.intel-search .intel-result .title{color:var(--is-main);font-weight:700;font-size:1rem;',
       'text-transform:capitalize;line-height:1.35;}',
       '.intel-search .intel-result:hover .title,.intel-search .intel-result.intel-active .title{',
       'color:var(--is-blue);}',
-      '.intel-search .intel-result .title .intel-hit{color:var(--is-gold);',
+      '.intel-search .intel-result .title .intel-hit,',
+      '.intel-search .intel-result-snippet .intel-hit{color:var(--is-gold);',
       'background:rgba(251,191,36,0.10);border-radius:3px;padding:0 2px;}',
       '.intel-search .intel-result .date{font-family:"Courier New",Courier,monospace;',
       'font-size:0.82rem;color:var(--is-dim);flex-shrink:0;}',
+      '.intel-search .intel-result-snippet{font-size:0.82rem;color:var(--is-dim);',
+      'line-height:1.5;font-style:italic;}',
 
       '@media (max-width:600px){',
-      '.intel-search .intel-result{flex-direction:column;align-items:flex-start;gap:6px;}',
+      '.intel-search .intel-result-row{flex-direction:column;align-items:flex-start;gap:6px;}',
       '.intel-search .intel-result .date{align-self:flex-end;}}',
 
       'body.light-mode .intel-search-bar{background:rgba(245,245,250,0.6);',
@@ -128,11 +133,11 @@
     document.head.appendChild(el);
   }
 
-  /* ---- data load: prefer JSON, fall back to in-DOM archive items --------- */
+  /* ---- lazy index load: full-text -> title-only -> DOM scrape ------------ */
   var _cache = null;
   var _loading = null;
 
-  function normalize(arr) {
+  function normalize(arr, withBody) {
     if (!Array.isArray(arr)) return [];
     var out = [];
     for (var i = 0; i < arr.length; i++) {
@@ -140,7 +145,11 @@
       var title = (a.title || '').trim();
       var href = (a.href || '').trim();
       if (!title || !href) continue;
-      out.push({ href: href, title: title, date: (a.date || '').trim(), _t: title.toLowerCase() });
+      var body = withBody ? (a.body || '') : '';
+      out.push({
+        href: href, title: title, date: (a.date || '').trim(), body: body,
+        _t: title.toLowerCase(), _b: body.toLowerCase()
+      });
     }
     return out;
   }
@@ -158,22 +167,33 @@
       var title = t ? t.textContent.trim() : '';
       if (!href || !title || seen[href]) continue;
       seen[href] = 1;
-      out.push({ href: href, title: title, date: d ? d.textContent.trim() : '', _t: title.toLowerCase() });
+      out.push({ href: href, title: title, date: d ? d.textContent.trim() : '',
+                 body: '', _t: title.toLowerCase(), _b: '' });
     }
     return out;
   }
 
-  function loadIndex(source) {
+  function fetchJson(url, opts) {
+    return fetch(url, opts).then(function (r) {
+      if (!r.ok) throw new Error('http ' + r.status);
+      return r.json();
+    });
+  }
+
+  function ensureIndex(indexUrl, sourceUrl) {
     if (_cache) return Promise.resolve(_cache);
     if (_loading) return _loading;
-    _loading = fetch(source, { cache: 'no-cache' })
-      .then(function (r) { if (!r.ok) throw new Error('http ' + r.status); return r.json(); })
-      .then(function (data) { _cache = normalize(data); return _cache; })
+    _loading = fetchJson(indexUrl, { cache: 'force-cache' })
+      .then(function (d) { _cache = normalize(d, true); return _cache; })
+      .catch(function () {
+        return fetchJson(sourceUrl, { cache: 'no-cache' })
+          .then(function (d) { _cache = normalize(d, false); return _cache; });
+      })
       .catch(function () { _cache = scrapeDom(); return _cache; });
     return _loading;
   }
 
-  /* ---- search + ranking -------------------------------------------------- */
+  /* ---- search + ranking (title + body) ----------------------------------- */
   function runSearch(index, q, limit) {
     q = q.trim().toLowerCase();
     if (!q) return [];
@@ -181,32 +201,34 @@
     var scored = [];
     for (var i = 0; i < index.length; i++) {
       var it = index[i];
-      var hay = it._t + ' ' + it.date;
-      var ok = true, score = 0;
+      var ok = true, score = 0, titleCovers = true;
       for (var k = 0; k < tokens.length; k++) {
         var tk = tokens[k];
-        var pos = hay.indexOf(tk);
-        if (pos === -1) { ok = false; break; }
-        if (it._t.indexOf(tk) === 0) score += 100;        // title starts with token
-        else if (it._t.indexOf(' ' + tk) !== -1) score += 50; // word-boundary hit
-        else if (it._t.indexOf(tk) !== -1) score += 25;   // substring in title
-        else score += 5;                                  // matched only in date
-        score -= pos * 0.01;                              // earlier match = better
+        var inT = it._t.indexOf(tk);
+        var inDate = it.date.indexOf(tk);
+        var inB = it._b ? it._b.indexOf(tk) : -1;
+        if (inT === -1 && inB === -1 && inDate === -1) { ok = false; break; }
+        if (inT === 0) score += 100;
+        else if (it._t.indexOf(' ' + tk) !== -1) score += 50;
+        else if (inT !== -1) score += 25;
+        else if (inDate !== -1) score += 12;
+        else { score += 8; titleCovers = false; }   // matched only in body
+        if (inT !== -1) score -= inT * 0.01;
       }
-      if (ok) scored.push({ it: it, s: score });
+      if (ok) scored.push({ it: it, s: score, titleCovers: titleCovers });
     }
     scored.sort(function (a, b) {
       if (b.s !== a.s) return b.s - a.s;
-      return (b.it.date || '').localeCompare(a.it.date || ''); // tiebreak: newer first
+      return (b.it.date || '').localeCompare(a.it.date || '');
     });
     var out = [];
-    for (var j = 0; j < scored.length && j < limit; j++) out.push(scored[j].it);
+    for (var j = 0; j < scored.length && j < limit; j++) out.push(scored[j]);
     return out;
   }
 
-  function highlight(title, tokens) {
-    if (!tokens.length) return escapeHtml(title);
-    var lower = title.toLowerCase();
+  function highlight(text, tokens) {
+    if (!tokens.length) return escapeHtml(text);
+    var lower = text.toLowerCase();
     var ranges = [];
     for (var t = 0; t < tokens.length; t++) {
       var tk = tokens[t];
@@ -217,7 +239,7 @@
         from = idx + tk.length;
       }
     }
-    if (!ranges.length) return escapeHtml(title);
+    if (!ranges.length) return escapeHtml(text);
     ranges.sort(function (a, b) { return a[0] - b[0]; });
     var merged = [ranges[0].slice()];
     for (var r = 1; r < ranges.length; r++) {
@@ -227,25 +249,40 @@
     }
     var out = '', pos = 0;
     for (var m = 0; m < merged.length; m++) {
-      out += escapeHtml(title.slice(pos, merged[m][0]));
-      out += '<span class="intel-hit">' + escapeHtml(title.slice(merged[m][0], merged[m][1])) + '</span>';
+      out += escapeHtml(text.slice(pos, merged[m][0]));
+      out += '<span class="intel-hit">' + escapeHtml(text.slice(merged[m][0], merged[m][1])) + '</span>';
       pos = merged[m][1];
     }
-    out += escapeHtml(title.slice(pos));
+    out += escapeHtml(text.slice(pos));
     return out;
   }
 
-  /* ---- mount one search instance ----------------------------------------- */
+  function makeSnippet(body, tokens) {
+    if (!body) return '';
+    var lb = body.toLowerCase(), pos = -1;
+    for (var i = 0; i < tokens.length; i++) {
+      var p = lb.indexOf(tokens[i]);
+      if (p !== -1 && (pos === -1 || p < pos)) pos = p;
+    }
+    if (pos === -1) return '';
+    var start = Math.max(0, pos - 55), end = Math.min(body.length, pos + 95);
+    if (start > 0) { var sp = body.indexOf(' ', start); if (sp !== -1 && sp < pos) start = sp + 1; }
+    var frag = (start > 0 ? '\u2026' : '') + body.slice(start, end).trim() + (end < body.length ? '\u2026' : '');
+    return highlight(frag, tokens);
+  }
+
+  /* ---- mount ------------------------------------------------------------- */
   function mount(el) {
     if (el.getAttribute('data-intel-mounted')) return;
     el.setAttribute('data-intel-mounted', '1');
 
-    var source = el.getAttribute('data-source') || DEFAULT_SOURCE;
+    var indexUrl = el.getAttribute('data-index') || DEFAULT_INDEX;
+    var sourceUrl = el.getAttribute('data-source') || DEFAULT_SOURCE;
     var limit = parseInt(el.getAttribute('data-limit'), 10) || 40;
     var placeholder = el.hasAttribute('data-placeholder')
-      ? el.getAttribute('data-placeholder') : 'search transmissions by topic, compound, date\u2026';
-    var label = el.hasAttribute('data-label')
-      ? el.getAttribute('data-label') : 'INTEL // SEARCH ARCHIVE';
+      ? el.getAttribute('data-placeholder')
+      : 'search transmissions by topic, compound, content\u2026';
+    var label = el.hasAttribute('data-label') ? el.getAttribute('data-label') : 'INTEL // SEARCH ARCHIVE';
 
     el.classList.add('intel-search');
     el.innerHTML =
@@ -263,16 +300,16 @@
     var clearBtn = el.querySelector('.intel-search-clear');
     var meta = el.querySelector('.intel-search-meta');
     var results = el.querySelector('.intel-search-results');
-    var index = [];
+    var index = null;
     var sel = -1;
     var timer;
 
-    loadIndex(source).then(function (idx) {
-      index = idx;
-      if (input.value) run(); // in case they typed before the index landed
-    });
-
     function tokensOf(q) { return q.trim().toLowerCase().split(/\s+/).filter(Boolean); }
+
+    function warm() {
+      if (index) return Promise.resolve(index);
+      return ensureIndex(indexUrl, sourceUrl).then(function (idx) { index = idx; return idx; });
+    }
 
     function render(list, q) {
       sel = -1;
@@ -289,21 +326,30 @@
         (list.length >= limit ? ' <span class="intel-cap">// showing first ' + limit + '</span>' : '');
       var html = '';
       for (var i = 0; i < list.length; i++) {
-        var it = list[i];
+        var hit = list[i], it = hit.it;
+        var snippet = hit.titleCovers ? '' : makeSnippet(it.body, tokens);
         html +=
           '<a class="intel-result" role="option" tabindex="-1" data-i="' + i + '" ' +
             'href="' + escapeAttr(it.href) + '">' +
-            '<span class="title">' + highlight(it.title, tokens) + '</span>' +
-            '<span class="date">' + escapeHtml(it.date) + '</span>' +
+            '<span class="intel-result-row">' +
+              '<span class="title">' + highlight(it.title, tokens) + '</span>' +
+              '<span class="date">' + escapeHtml(it.date) + '</span>' +
+            '</span>' +
+            (snippet ? '<span class="intel-result-snippet">' + snippet + '</span>' : '') +
           '</a>';
       }
       results.innerHTML = html;
     }
 
-    function run() {
+    function doRun() {
       var q = input.value;
       clearBtn.hidden = !q;
       if (!q.trim()) { render([], q); return; }
+      if (!index) {
+        meta.innerHTML = '<span class="intel-load">INDEXING ARCHIVE\u2026</span>';
+        warm().then(function () { if (input.value === q) doRun(); });
+        return;
+      }
       render(runSearch(index, q, limit), q);
     }
 
@@ -314,41 +360,28 @@
       for (var i = 0; i < nodes.length; i++) nodes[i].classList.toggle('intel-active', i === sel);
       nodes[sel].scrollIntoView({ block: 'nearest' });
     }
-
     function openSel() {
       var nodes = results.querySelectorAll('.intel-result');
       var node = sel >= 0 ? nodes[sel] : nodes[0];
       if (node) window.location.href = node.getAttribute('href');
     }
 
+    input.addEventListener('focus', warm, { once: true }); // lazy-load on first focus
     input.addEventListener('input', function () {
       clearTimeout(timer);
-      timer = setTimeout(run, 80);
+      timer = setTimeout(doRun, 90);
       clearBtn.hidden = !input.value;
     });
     input.addEventListener('keydown', function (e) {
       if (e.key === 'ArrowDown') { e.preventDefault(); move(1); }
       else if (e.key === 'ArrowUp') { e.preventDefault(); move(-1); }
       else if (e.key === 'Enter') { e.preventDefault(); openSel(); }
-      else if (e.key === 'Escape') {
-        if (input.value) { input.value = ''; run(); } else { input.blur(); }
-      }
+      else if (e.key === 'Escape') { if (input.value) { input.value = ''; doRun(); } else { input.blur(); } }
     });
-    clearBtn.addEventListener('click', function () {
-      input.value = ''; run(); input.focus();
-    });
+    clearBtn.addEventListener('click', function () { input.value = ''; doRun(); input.focus(); });
   }
 
-  /* ---- boot -------------------------------------------------------------- */
-  function mountAll() {
-    injectStyles();
-    var mounts = document.querySelectorAll('#intel-search, [data-intel-search]');
-    for (var i = 0; i < mounts.length; i++) mount(mounts[i]);
-    deepLink();
-  }
-
-  // deep-link: ?q=term prefills the first box; #intel-search scrolls + focuses it.
-  // Lets the index.html "Decode Intel Search" button launch straight into search.
+  /* ---- boot + deep-link -------------------------------------------------- */
   function deepLink() {
     try {
       var firstInput = document.querySelector('.intel-search-input');
@@ -356,7 +389,8 @@
       var q = new URLSearchParams(window.location.search).get('q');
       if (q) {
         firstInput.value = q;
-        firstInput.dispatchEvent(new Event('input'));
+        firstInput.dispatchEvent(new Event('focus'));   // warms the index
+        firstInput.dispatchEvent(new Event('input'));   // runs (INDEXING -> results)
       }
       if (window.location.hash === '#intel-search') {
         var target = document.getElementById('intel-search') || firstInput.closest('.intel-search');
@@ -365,10 +399,16 @@
           try { firstInput.focus({ preventScroll: true }); } catch (e) { firstInput.focus(); }
         }, 350);
       }
-    } catch (e) { /* deep-link is best-effort */ }
+    } catch (e) { /* best-effort */ }
   }
 
-  // global "/" to focus the first search box
+  function mountAll() {
+    injectStyles();
+    var mounts = document.querySelectorAll('#intel-search, [data-intel-search]');
+    for (var i = 0; i < mounts.length; i++) mount(mounts[i]);
+    deepLink();
+  }
+
   document.addEventListener('keydown', function (e) {
     if (e.key !== '/' || e.metaKey || e.ctrlKey || e.altKey) return;
     var tag = (e.target && e.target.tagName ? e.target.tagName : '').toLowerCase();
@@ -377,12 +417,8 @@
     if (first) { e.preventDefault(); first.focus(); }
   });
 
-  if (document.readyState === 'loading') {
-    document.addEventListener('DOMContentLoaded', mountAll);
-  } else {
-    mountAll();
-  }
+  if (document.readyState === 'loading') document.addEventListener('DOMContentLoaded', mountAll);
+  else mountAll();
 
-  // programmatic surface
-  window.IntelSearch = { mountAll: mountAll, search: runSearch, loadIndex: loadIndex };
+  window.IntelSearch = { mountAll: mountAll, search: runSearch, ensureIndex: ensureIndex };
 })();
