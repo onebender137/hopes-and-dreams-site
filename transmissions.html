@@ -53,6 +53,16 @@ j=d.createElement(s),dl=l!='dataLayer'?'&l='+l:'';j.async=true;j.src=
             border-radius: 14px;
             padding: 22px;
         }
+        /* light mode: the 50%-black panels read as gray on white — flip to card white */
+        body.light-mode .calendar-pane,
+        body.light-mode .day-articles-pane {
+            background: var(--card-bg);
+            border-color: rgba(2, 132, 199, 0.30);
+        }
+        body.light-mode .day-article-card {
+            background: rgba(2, 132, 199, 0.04);
+            border-color: rgba(2, 132, 199, 0.12);
+        }
         .calendar-header {
             display: flex;
             justify-content: space-between;
