@@ -1,8 +1,8 @@
 {
-  "generated_at": "2026-06-27T11:01:39Z",
+  "generated_at": "2026-06-27T11:16:39Z",
   "empire": {
-    "articles_published_7d": 219,
-    "bus_events_total_7d": 24485,
+    "articles_published_7d": 22,
+    "bus_events_total_7d": 24483,
     "active_bots": 4,
     "heartbeat_integrity_pct": 100.0
   },
