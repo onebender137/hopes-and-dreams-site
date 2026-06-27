@@ -2332,7 +2332,7 @@ html {
 /* Inner Glass Content Area */
 .stack-builder-promo .promo-content {
     position: relative;
-    background: #000000; /* Must match bg-main */
+    background: var(--bg-main); /* theme-aware: was hardcoded #000 and stayed black in light mode */
     border-radius: 17px; /* Matches inner curve */
     padding: 40px 30px;
     z-index: 2;
