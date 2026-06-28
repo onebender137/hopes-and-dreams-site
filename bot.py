@@ -781,7 +781,7 @@ class HopesAndDreamsBot:
 
                 print(f"[{datetime.now()}] EXECUTIVE EXECUTION: Hitting FB Graph API for daily tip (Content length: {len(tip_content)}).")
                 # Prepend topic as ALL-CAPS title — FBClient._apply_unicode_style turns it bold
-                fb_message = f"{topic.upper()}\n\n{tip_content}"
+                fb_message = f"{self._short_title(topic).upper()}\n\n{tip_content}"
                 
                 # --- NEW ARMOR BLOCK ---
                 try:
@@ -1073,7 +1073,53 @@ class HopesAndDreamsBot:
 
         return False
 
-    def _generate_topic_image(self, topic):
+    # Compounds with NO established human dosing (preclinical / research-only).
+    # Extend this list as new research compounds show up in drafts. The guard only
+    # FLAGS these for owner review when a draft pairs them with a specific dose -
+    # it never edits the article. (Long-term fix: ground claims against the KB.)
+    _NO_HUMAN_DOSE = [
+        "tabernanthalog", "aaz-a-154", "2-bromo-lsd", "2-br-lsd",
+        "dlx-001", "dlx-007",
+    ]
+
+    def _dose_guard(self, body):
+        """Return research-only compounds that appear in the body next to a specific
+        dose. Review flag for the owner, never an auto-edit."""
+        import re
+        if not body:
+            return []
+        low = body.lower()
+        dose_re = re.compile(r'\b\d+(?:\.\d+)?\s*(?:mg|mcg|\u00b5g|ug|g|iu)\b')
+        out = []
+        for comp in self._NO_HUMAN_DOSE:
+            i = low.find(comp)
+            while i != -1:
+                if dose_re.search(low[max(0, i - 180): i + len(comp) + 180]):
+                    if comp not in out:
+                        out.append(comp)
+                    break
+                i = low.find(comp, i + len(comp))
+        return out
+
+    @staticmethod
+    def _short_title(s, max_words=8, max_chars=72, fallback="Biohacking Protocol"):
+        """Deterministic title cap - the model never controls final headline length.
+        Strips quotes/preamble, takes the first line, caps words + chars on a word boundary."""
+        import re
+        t = (s or "").strip().strip('"\'')
+        t = re.sub(r'^(headline|title)\s*[:\-]\s*', '', t, flags=re.I).strip()
+        t = t.splitlines()[0].strip() if t else ""
+        if not t:
+            return fallback
+        words = t.split()
+        if len(words) > max_words:
+            t = " ".join(words[:max_words])
+        if len(t) > max_chars:
+            t = t[:max_chars].rsplit(" ", 1)[0]
+        t = t.strip().rstrip('.:;,!?-\u2013\u2014').strip()
+        return t or fallback
+
+    def _generate_topic_image(self, topic, title=None):
         """Generates a topic image with FLUX visual + Pillow text overlay for readable text."""
         import requests
         import os
@@ -1089,7 +1135,7 @@ class HopesAndDreamsBot:
 
         # Visual-only prompt — NO text instructions, FLUX can't spell
         prompt = (
-            f"Abstract scientific illustration representing {topic}. "
+            f"Abstract scientific illustration representing {title or self._short_title(topic)}. "
             "Dark navy blue background. Glowing neon cyan and gold molecular structures. "
             "Brain anatomy, neural networks, biochemical pathways. "
             "Cyberpunk cinematic lighting, deep blue and gold color palette. "
@@ -1145,7 +1191,7 @@ class HopesAndDreamsBot:
             draw.rectangle([(0, H-90), (W, H)], fill=(3, 9, 31, 220))
 
             # TITLE — uppercase, centered, gold — width-aware fit
-            title = topic.upper()
+            title = (title or self._short_title(topic)).upper()
             words = title.split()
             MAX_WIDTH = int(W * 0.92)  # leave 4% margin each side
 
@@ -1253,7 +1299,7 @@ class HopesAndDreamsBot:
             self._log_uplink(f"IMAGE GEN: Failed ({e}), falling back to random media.")
         return None
         
-    def _post_to_website(self, content, topic, image_path=None):
+    def _post_to_website(self, content, topic, image_path=None, title=None):
         """Beautifies the content and posts it to the website (articles/ and intel.html)."""
         os.makedirs("articles", exist_ok=True)
         self._log_uplink(f"WEBSITE: Initializing Syndicate Transmission for {topic}...")
@@ -1271,7 +1317,7 @@ class HopesAndDreamsBot:
         # 1. Beautify content using LLM
         try:
             # We now capture priority and a clean title from beautification
-            beautified_html, priority, clean_title = self._beautify_for_blog(content, topic, image_path)
+            beautified_html, priority, clean_title = self._beautify_for_blog(content, topic, image_path, title_override=title)
             if not beautified_html or len(beautified_html) < 100:
                 self._log_uplink("WEBSITE ERROR: Beautification returned empty or suspiciously short HTML.")
                 return False
@@ -1303,6 +1349,9 @@ class HopesAndDreamsBot:
         # 5b. Update transmissions.json (Optimized Scroller Metadata)
         self._update_transmissions_json(clean_title, filename, date_str)
 
+        # 5c. Rebuild full-text search index (new article body becomes searchable)
+        self._rebuild_search_index()
+
         # 6. Git Commit and Push
         git_ok = self._git_push_changes(f"Syndicate Transmission: {topic}")
         if not git_ok:
@@ -1319,7 +1368,7 @@ class HopesAndDreamsBot:
             return False
         return True
 
-    def _beautify_for_blog(self, content, topic, image_path):
+    def _beautify_for_blog(self, content, topic, image_path, title_override=None):
         """Uses the LLM to beautify content and then injects it into the HTML template."""
         # Defensive: scrub any meta-commentary that might have leaked through earlier stages
         sanitized = self._sanitize_topic(topic)
@@ -1382,7 +1431,7 @@ class HopesAndDreamsBot:
         try:
             data = json.loads(json_clean)
             beautified_body = data.get('body', f"<p>{content.replace('\n', '<br>')}</p>")
-            clean_title = data.get('title', topic).strip()
+            clean_title = (title_override or data.get('title', topic)).strip()
 
             # --- POST-PROCESSING SANITIZATION ---
             # 1. Catch LLM errors like using <h1>
@@ -1448,7 +1497,7 @@ class HopesAndDreamsBot:
             self._log_uplink(f"WEBSITE ERROR: JSON parsing failed: {e}. Falling back to raw content.")
             # Fallback if JSON fails
             beautified_body = f"<p>{content.replace('\n', '<br>')}</p>"
-            clean_title = topic.strip()
+            clean_title = (title_override or topic).strip()
 
             # Robust fallback for hack content: try to find it in raw content or use a default
             hack_match = re.search(r'(?:PROSTAR LIFE HACK|LIFE HACK|PROTOCOL TIP):?\s*(.*)', content, re.IGNORECASE)
@@ -1480,7 +1529,7 @@ class HopesAndDreamsBot:
         # Final scrub of meta-commentary from the clean_title (last line of defense)
         sanitized_title = self._sanitize_topic(clean_title)
         if sanitized_title:
-            clean_title = sanitized_title
+            clean_title = self._short_title(sanitized_title)
         else:
             print(f"[BLOG] WARNING: clean_title '{clean_title[:80]}' failed sanitation; using fallback")
             clean_title = "Biohacking Protocol"
@@ -1786,6 +1835,24 @@ class HopesAndDreamsBot:
             return False
         return True
 
+    def _rebuild_search_index(self):
+        """Rebuild search-index.json so new article body text is searchable.
+        Non-fatal: a stale index still serves title search and never blocks the push."""
+        import sys
+        try:
+            self._log_uplink("WEBSITE: Rebuilding search index...")
+            repo_dir = os.path.dirname(os.path.abspath(__file__))
+            res = subprocess.run(
+                [sys.executable, "build-search-index.py"],
+                capture_output=True, text=True, timeout=120, cwd=repo_dir
+            )
+            if res.returncode == 0:
+                self._log_uplink(f"WEBSITE: search index rebuilt - {res.stdout.strip()[:120]}")
+            else:
+                self._log_uplink(f"WEBSITE WARN: search index rc={res.returncode}: {res.stderr.strip()[:200]}")
+        except Exception as e:
+            self._log_uplink(f"WEBSITE WARN: search index rebuild skipped: {e}")
+
     def _git_push_changes(self, commit_message):
         """Automates the git workflow to push generated content to the repository.
         Every subprocess call has a timeout - the bot must NEVER hang on git.
@@ -1799,6 +1866,7 @@ class HopesAndDreamsBot:
         T_NET = self.GIT_NET_TIMEOUT
         T_LOCAL = self.GIT_LOCAL_TIMEOUT
         OWNED = ["intel.html", "transmissions.html", "transmissions.json",
+                 "search-index.json",
                  "empire_stats.json", "articles/", "media/"]
         try:
             git_dir = ".git"

@@ -311,7 +311,6 @@ class LLMClient:
         """Generates the Facebook/Site Masterclass."""
         prompt = (
             f"Draft an expansive Masterclass on: {topic}.\n\n"
-            "MANDATORY: Start the post with a punchy, professional title in ALL CAPS based on the topic.\n"
             "Use headers: Mechanics, Biological Leverage, Tactical Implementation.\n"
             "Ensure technical weight and visionary tone. Each section must be expansive, containing at least TWO substantial paragraphs of 4-5 sentences each.\n"
             "Use double newlines between sections and paragraphs to ensure proper formatting.\n"
@@ -319,6 +318,21 @@ class LLMClient:
         )
         # We reflect=True to ensure quality, and sanitize=True to strip HTML for social media
         return self.generate_response(prompt, self.syndicate_persona, context, reflect=True, sanitize=True)
+
+    def generate_title(self, body: str):
+        """Short headline derived from the article BODY (echo-proof - there is no long
+        steering prompt here to echo). Caller passes the result through
+        HopesAndDreamsBot._short_title() for the final deterministic cap."""
+        snippet = (body or "").strip()[:1400]
+        prompt = (
+            "Write a punchy 3 to 6 word headline in Title Case for the masterclass below. "
+            "Output ONLY the headline - no quotes, no trailing punctuation, no preamble, no markdown.\n\n"
+            f"MASTERCLASS:\n{snippet}"
+        )
+        try:
+            return self.generate_response(prompt, self.syndicate_persona, "", reflect=False, sanitize=True)
+        except Exception:
+            return ""
 
 
 if __name__ == "__main__":
