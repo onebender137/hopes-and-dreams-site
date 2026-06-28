@@ -308,16 +308,22 @@ class LLMClient:
             return content.strip()
 
     def create_biohacking_post(self, topic: str, context: str = ""):
-        """Generates the Facebook/Site Masterclass."""
+        """Generates the Facebook/Site Masterclass - GROUNDED in the supplied research context."""
         prompt = (
             f"Draft an expansive Masterclass on: {topic}.\n\n"
             "Use headers: Mechanics, Biological Leverage, Tactical Implementation.\n"
             "Ensure technical weight and visionary tone. Each section must be expansive, containing at least TWO substantial paragraphs of 4-5 sentences each.\n"
-            "Use double newlines between sections and paragraphs to ensure proper formatting.\n"
+            "Use double newlines between sections and paragraphs to ensure proper formatting.\n\n"
+            "GROUNDING RULES (CRITICAL - this is health content, accuracy is mandatory):\n"
+            "- Base every factual claim - especially doses, mechanisms of action, receptor targets, half-lives, percentages, and compound origins - ONLY on the LOCAL RESEARCH CONTEXT provided above.\n"
+            "- Do NOT state a specific number (dose, percentage, half-life, binding figure) unless it appears in that context. If it is not there, describe it qualitatively instead (e.g. 'low-to-moderate amounts', not '2-5 grams').\n"
+            "- If the context does not cover a compound or claim, state what is and is not established rather than inventing detail. Better to write 'human dosing is not well established' than to fabricate a figure.\n"
+            "- Do NOT invent receptor mechanisms, plant or chemical origins, or study findings. When the evidence is thin, stay general and qualitative.\n"
             "MANDATORY: You must end the post with exactly: 'Do your own research. Don't be a statistic.'"
         )
-        # We reflect=True to ensure quality, and sanitize=True to strip HTML for social media
-        return self.generate_response(prompt, self.syndicate_persona, context, reflect=True, sanitize=True)
+        # reflect=False on purpose: the reflection pass expands invented mechanics and strips
+        # citations, which de-grounds. sanitize still runs. num_ctx bumped for evidence headroom.
+        return self.generate_response(prompt, self.syndicate_persona, context, reflect=False, sanitize=True, options={'num_ctx': 8192})
 
     def generate_title(self, body: str):
         """Short headline derived from the article BODY (echo-proof - there is no long

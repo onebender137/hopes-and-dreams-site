@@ -22,7 +22,7 @@ class SyndicateCrew:
         # Agent 1: Biohacking Researcher
         self.researcher = Agent(
             role="Biohacking Researcher",
-            goal="Extract high-impact technical facts and physiological mechanisms about {topic} from the provided context.",
+            goal="Extract technical facts and physiological mechanisms about {topic} ONLY from the provided context. Never introduce a dose, mechanism, percentage, or origin that is not present in the context.",
             backstory=(
                 "You are the Syndicate's Lead Researcher. You specialize in pharmacological deep-dives "
                 "and neurological optimization. You provide the raw, science-heavy intelligence that "
@@ -62,8 +62,14 @@ class SyndicateCrew:
         # Task 1: Research Phase
         research_task = Task(
             description=(
-                f"Analyze the following context about {topic} and extract: "
-                "1. Core physiological mechanics. 2. Specific dosages or protocols. 3. Actionable biological leverage.\n\n"
+                f"Analyze the context below about {topic} and extract, USING ONLY WHAT THE CONTEXT STATES:\n"
+                "1. Core physiological mechanics that the context actually describes.\n"
+                "2. Dosages or protocols ONLY if they appear in the context. If the context gives no dosing, write 'No established dosing in sources' - do NOT estimate or invent a number.\n"
+                "3. Actionable biological leverage supported by the context.\n\n"
+                "GROUNDING RULES (CRITICAL - health content):\n"
+                "- Do NOT introduce any dose, percentage, half-life, receptor mechanism, or compound origin that is not explicitly in the context.\n"
+                "- If the context does not cover something, state that it is not established rather than filling the gap.\n"
+                "- Attribute every mechanism to the correct compound; never borrow a mechanism from one compound and assign it to another.\n\n"
                 f"### CONTEXT:\n{context}\n\n"
                 f"{self.logic_bridges}"
             ),
@@ -80,6 +86,9 @@ class SyndicateCrew:
                 "MANDATORY: Each section must contain at least TWO substantial paragraphs of 3-4 sentences each. No one-sentence paragraphs.\n"
                 "Do NOT use HTML tags. Do NOT use markdown headers or bolding. Use plain text only.\n"
                 "Ensure the tone is gritty, professional, and science-heavy. No fluff. No polite intros. "
+                "GROUNDING (CRITICAL): Add NO new facts. Every dose, percentage, mechanism, and claim in your post "
+                "must already appear in the researcher's report. Do NOT invent specifics to sound authoritative. If the "
+                "report marks something as not established, keep it that way. Precision over padding.\n"
                 "Keep the total length under 4000 characters (max depth while ensuring social media compatibility).\n"
                 "End with: 'Do your own research. Don't be a statistic.'\n"
                 f"{self.logic_bridges}"

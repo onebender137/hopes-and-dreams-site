@@ -1,34 +1,35 @@
-# --- PHOENIX OBSERVABILITY INITIALIZATION ---
+# --- PHOENIX OBSERVABILITY INITIALIZATION (opt-in) ---
 import os
-# Set environment variables BEFORE any other imports to lock in Phoenix project
-os.environ["PHOENIX_PROJECT_NAME"] = "syndicate-intelligence"
-# Use OTLP HTTP collector to avoid gRPC binding conflicts on MSI Claw hardware
-os.environ["PHOENIX_COLLECTOR_ENDPOINT"] = "http://localhost:6006"
+# Tracing is OFF by default. The Phoenix UI launch fails to bind its port on this
+# box (spamming a grpc/uvicorn traceback) and registers against a collector that
+# isn't running, so it was pure noise. Set SYNDICATE_TRACING=1 to re-enable the
+# full Phoenix/OpenInference stack (launch UI + register + auto-instrument).
+if os.environ.get("SYNDICATE_TRACING") == "1":
+    os.environ["PHOENIX_PROJECT_NAME"] = "syndicate-intelligence"
+    os.environ.setdefault("PHOENIX_COLLECTOR_ENDPOINT", "http://localhost:6006")
+    try:
+        import phoenix as px
+        from phoenix.otel import register
+        from openinference.instrumentation.langchain import LangChainInstrumentor
+        from openinference.instrumentation.crewai import CrewAIInstrumentor
+        from openinference.instrumentation.litellm import LiteLLMInstrumentor
 
-import phoenix as px
-from phoenix.otel import register
-from openinference.instrumentation.langchain import LangChainInstrumentor
-from openinference.instrumentation.crewai import CrewAIInstrumentor
-from openinference.instrumentation.litellm import LiteLLMInstrumentor
+        try:
+            session = px.launch_app()
+            print(f"Phoenix Observability Dashboard launched at: {session.url}")
+        except Exception as e:
+            print(f"Warning: Failed to launch Phoenix app: {e}")
 
-# Start Phoenix in the background
-try:
-    session = px.launch_app()
-    print(f"Phoenix Observability Dashboard launched at: {session.url}")
-except Exception as e:
-    print(f"Warning: Failed to launch Phoenix app: {e}")
-
-# Register the tracer provider - explicitly using HTTP exporter
-tracer_provider = register(
-    project_name="syndicate-intelligence",
-    endpoint="http://localhost:6006/v1/traces",
-    auto_instrument=True
-)
-
-# Instrument LangChain, CrewAI, and LiteLLM (for local Ollama traces)
-LangChainInstrumentor().instrument(tracer_provider=tracer_provider)
-CrewAIInstrumentor().instrument(tracer_provider=tracer_provider)
-LiteLLMInstrumentor().instrument(tracer_provider=tracer_provider)
+        tracer_provider = register(
+            project_name="syndicate-intelligence",
+            endpoint="http://localhost:6006/v1/traces",
+            auto_instrument=True
+        )
+        LangChainInstrumentor().instrument(tracer_provider=tracer_provider)
+        CrewAIInstrumentor().instrument(tracer_provider=tracer_provider)
+        LiteLLMInstrumentor().instrument(tracer_provider=tracer_provider)
+    except Exception as e:
+        print(f"Warning: tracing init failed, continuing without it: {e}")
 # ---------------------------------------------
 # --- LOGGING: mute noisy libraries that leak credentials in URLs ---
 import logging
@@ -504,6 +505,110 @@ class HopesAndDreamsBot:
         """Returns the list of catalog theme names for /themes display."""
         return sorted(self.THEME_CATALOG.keys())
 
+    @staticmethod
+    def _norm_topic(t):
+        """Normalize a topic title for dedup: lowercase, alnum-only, collapsed spaces."""
+        import re
+        return re.sub(r'[^a-z0-9]+', ' ', (t or '').lower()).strip()
+
+    # Low-rigor folders to skip in the general (pharmacology) rotation.
+    _MINE_SKIP = ("astral", "dream", "lucid", "projection")
+    # Soft/woo phrases to keep OUT of the auto-supply (pharmacology lane only).
+    _SOFT_SKIP = ("spiritual", "meditation", "manifest", "astral", "chakra",
+                  "energy healing", "consciousness expansion", "lifespan correlation")
+    _MINE_DOMAINS = [
+        "kratom", "nootropics", "peptides", "nicotine", "mushrooms",
+        "sleep", "dopamine", "mitochondria", "longevity", "DMT",
+    ]
+
+    def _mine_one_domain(self, domain, n, k, covered, norm_covered):
+        """Mine up to n fresh topics from one domain's KB material. Read-only helper."""
+        import re
+        try:
+            ctx = self.knowledge.query_knowledge(domain, limit=k)
+        except Exception:
+            return []
+        chunks = [p.strip()[:600] for p in (ctx or "").split("\n---\n") if p.strip()]
+        if not chunks:
+            return []
+        evidence = "\n---\n".join(chunks[:k])
+        exclude_hint = "; ".join(sorted(covered)[:50])
+        system_msg = (
+            "You are the Syndicate's Lead Content Strategist. You propose specific, technical "
+            "biohacking article topics that are SUPPORTED BY the supplied research excerpts."
+        )
+        prompt = (
+            f"### RESEARCH LIBRARY EXCERPTS (domain: {domain}):\n{evidence}\n\n"
+            f"Propose exactly {n} SPECIFIC biohacking article topics these excerpts can support.\n\n"
+            "RULES:\n"
+            "1. Each topic MUST be answerable from the excerpts above - a compound, mechanism, or protocol they actually discuss.\n"
+            "2. 3-8 words, punchy and technical. Format like: 'Mitragynine Mu-Opioid Receptor Profile'.\n"
+            f"3. Do NOT propose anything similar to these already-covered topics: {exclude_hint}\n"
+            "4. No wellness fluff, no vague categories, no metaphysics.\n"
+            "5. Return ONLY the topic names, one per line. No numbering, no preamble, no commentary.\n\n"
+            f"Output {n} fresh topics now, one per line:"
+        )
+        try:
+            raw = self.llm.generate_response(prompt, system_msg, "", reflect=False, sanitize=True, options={'num_ctx': 8192})
+        except Exception as e:
+            print(f"[MINE:{domain}] generation failed: {e}")
+            return []
+        out = []
+        for line in (raw or "").split("\n"):
+            line = re.sub(r'^[\d\.\)\-\*\s]+', '', line.strip())
+            if not line:
+                continue
+            clean = self._sanitize_topic(line)
+            if not clean:
+                continue
+            if any(sk in clean.lower() for sk in self._SOFT_SKIP):
+                continue
+            if self._norm_topic(clean) in norm_covered:
+                continue
+            if clean in out:
+                continue
+            out.append(clean)
+            if len(out) >= n:
+                break
+        return out
+
+    def mine_kb_topics(self, domain=None, count=15, per_domain=4, chunks_per_domain=6):
+        """Mine the KB for fresh, groundable topics with BALANCED domain coverage.
+        Read-only: returns candidate titles, writes nothing. Mines each science domain
+        separately so a loud folder (DMT) can't crowd out kratom/peptides, dedups against
+        everything already covered, and round-robin merges for an even spread. Pass
+        domain='kratom' to mine one vein; astral/dreams skipped by default, minable on demand."""
+        if domain:
+            domains = [domain]
+        else:
+            domains = [d for d in self._MINE_DOMAINS
+                       if not any(sk in d.lower() for sk in self._MINE_SKIP)]
+
+        covered = set()
+        for v in self.THEME_CATALOG.values():
+            covered.update(v)
+        covered.update(SYNDICATE_TOPIC_POOL)
+        covered.update(self.posted_topics or [])
+        norm_covered = {self._norm_topic(t) for t in covered}
+
+        per_domain_lists = []
+        for dom in domains:
+            topics = self._mine_one_domain(dom, per_domain, chunks_per_domain, covered, norm_covered)
+            if topics:
+                per_domain_lists.append(topics)
+                for t in topics:
+                    norm_covered.add(self._norm_topic(t))
+
+        out, i = [], 0
+        while len(out) < count and any(i < len(lst) for lst in per_domain_lists):
+            for lst in per_domain_lists:
+                if i < len(lst):
+                    out.append(lst[i])
+                    if len(out) >= count:
+                        break
+            i += 1
+        return out
+
     def brainstorm_theme_topics(self, theme_name, count=3, exclude=None):
         """
         Generate `count` topics for a theme. Tries catalog first, falls back to LLM.
@@ -512,24 +617,43 @@ class HopesAndDreamsBot:
         Returns list of topic strings (may be < count if LLM fallback fails).
         """
         exclude = set(exclude or [])
+        exclude.update(self.posted_topics or [])  # B2: kill week-over-week repeats
+        norm_exclude = {self._norm_topic(t) for t in exclude}
+        results = []
 
-        # Catalog path
+        def _add(t):
+            nt = self._norm_topic(t)
+            if t and nt not in norm_exclude and t not in results:
+                results.append(t)
+                norm_exclude.add(nt)
+
+        # 1) Curated catalog gems first (hand-picked quality, fast)
         catalog_topics = self._resolve_theme(theme_name)
         if catalog_topics:
-            available = [t for t in catalog_topics if t not in exclude]
-            if len(available) >= count:
-                return random.sample(available, count)
-            # Catalog didn't have enough fresh — return what we have and let caller decide
-            if available:
-                return available[:count]
+            available = [t for t in catalog_topics if self._norm_topic(t) not in norm_exclude]
+            random.shuffle(available)
+            for t in available:
+                _add(t)
+                if len(results) >= count:
+                    return results[:count]
 
-        # LLM fallback path (no catalog match OR catalog exhausted)
-        print(f"[THEME] No catalog match for '{theme_name}' — invoking LLM brainstorm.")
+        # 2) Catalog thin/exhausted — mine GROUNDED topics straight from the KB
+        try:
+            mined = self.mine_kb_topics(domain=theme_name, count=max(count * 2, 8))
+            for t in mined:
+                _add(t)
+                if len(results) >= count:
+                    return results[:count]
+        except Exception as e:
+            print(f"[THEME] KB mining failed for '{theme_name}': {e}")
+
+        # 3) Still short — last-resort LLM brainstorm to top up the grounded picks
+        print(f"[THEME] {len(results)} grounded topic(s) for '{theme_name}'; topping up via LLM.")
         system_msg = (
             "You are the Syndicate's Lead Content Strategist. You generate fresh, "
             "technical, pharmacology-driven topic ideas for biohacking content."
         )
-        exclude_str = ', '.join(sorted(exclude)) if exclude else "(none)"
+        exclude_str = ', '.join(sorted(exclude)[:25]) if exclude else "(none)"
         prompt = (
             f"Brainstorm exactly {count} distinct, specific biohacking topics about: \"{theme_name}\".\n\n"
             f"AVOID THESE (already-queued or recently-posted): {exclude_str}\n\n"
@@ -545,24 +669,26 @@ class HopesAndDreamsBot:
         try:
             raw = self.llm.generate_response(prompt, system_msg)
             if not raw:
-                return []
-            # Parse: split by lines, sanitize each line through our topic sanitizer
-            results = []
+                return results
+            # Parse: append LLM top-ups to the grounded picks already in `results`
             for line in raw.split('\n'):
                 line = line.strip()
                 # Strip leading numbers/bullets that LLMs sometimes add despite instructions
                 line = re.sub(r'^[\d\.\)\-\*\s]+', '', line)
                 if not line:
                     continue
+                if any(sk in line.lower() for sk in self._SOFT_SKIP):
+                    continue
                 clean = self._sanitize_topic(line)
-                if clean and clean not in exclude and clean not in results:
+                if clean and self._norm_topic(clean) not in norm_exclude and clean not in results:
                     results.append(clean)
+                    norm_exclude.add(self._norm_topic(clean))
                 if len(results) >= count:
                     break
             return results
         except Exception as e:
             print(f"[THEME] LLM brainstorm failed: {e}")
-            return []
+            return results
 
     def _topic_cluster(self, topic):
         """Returns the cluster name a topic belongs to, or None if no cluster matched."""
@@ -594,6 +720,94 @@ class HopesAndDreamsBot:
                     print(f"[COOLDOWN] '{topic}' is in same cluster ({new_cluster}) as recent '{past}' — blocking.")
                     return True
         return False
+
+    KB_FEED_THRESHOLD = 1.0  # mean top-k L2 distance above which a topic is "thin" -> feed
+
+    def _ensure_kb_coverage(self, topic):
+        """T4 gate: if the KB barely covers `topic` (mean coverage > KB_FEED_THRESHOLD),
+        pull PubMed and ingest it so generation grounds on fresh material. Returns True
+        if it fed. Self-regulating — once fed, the score drops below threshold and this
+        won't fire again. NEVER blocks generation; on any failure it continues ungated."""
+        try:
+            cov = self.kb_coverage_score(topic)
+            if not cov or cov.get("mean") is None:
+                return False
+            if cov["mean"] <= self.KB_FEED_THRESHOLD:
+                return False
+            print(f"[KB-GATE] '{topic}' thin (mean={cov['mean']} > {self.KB_FEED_THRESHOLD}); "
+                  f"feeding from PubMed.")
+            _studies, n_chunks = self.feed_kb_from_pubmed(topic)
+            return n_chunks > 0
+        except Exception as e:
+            print(f"[KB-GATE] coverage check failed for '{topic}': {e}; continuing ungated.")
+            return False
+
+    def kb_coverage_score(self, topic, k=5):
+        """READ-ONLY: measure how well the KB covers `topic`. Returns a dict with the
+        best (lowest) and mean L2 distance of the top-k matches. LOWER = better coverage
+        (closer match); a HIGH best-distance means the corpus barely covers the topic.
+        Pure measurement for threshold calibration — mutates nothing. None if no index."""
+        vs = getattr(self.knowledge, "vector_store", None)
+        if vs is None:
+            print("[KB-COVERAGE] no vector store loaded.")
+            return None
+        try:
+            hits = vs.similarity_search_with_score(topic, k=k)
+        except Exception as e:
+            print(f"[KB-COVERAGE] search failed for '{topic}': {e}")
+            return None
+        if not hits:
+            print(f"[KB-COVERAGE] '{topic}': no hits (empty index?).")
+            return {"topic": topic, "n": 0, "best": None, "mean": None, "all": []}
+        scores = [float(score) for _doc, score in hits]
+        best = round(min(scores), 4)
+        mean = round(sum(scores) / len(scores), 4)
+        allr = [round(s, 4) for s in scores]
+        print(f"[KB-COVERAGE] '{topic}': best={best} mean={mean} "
+              f"(n={len(scores)}, lower=better) {allr}")
+        return {"topic": topic, "n": len(scores), "best": best, "mean": mean, "all": allr}
+
+    def feed_kb_from_pubmed(self, topic, limit=4, subfolder="pubmed_feed"):
+        """T4 FOUNDATION: pull PubMed studies for `topic`, write them as an attributed
+        source doc into the KB, and incrementally reindex. Returns (n_studies, n_chunks).
+        Manual primitive — not auto-wired into the scheduler yet."""
+        if not getattr(self, "research", None) or not getattr(self, "knowledge", None):
+            print("[KB-FEED] research/knowledge client unavailable.")
+            return (0, 0)
+        try:
+            studies = self.research.search_studies(topic, limit=limit)
+        except Exception as e:
+            print(f"[KB-FEED] PubMed search failed for '{topic}': {e}")
+            return (0, 0)
+        studies = [s for s in (studies or []) if s.get("abstract", "").strip()]
+        if not studies:
+            print(f"[KB-FEED] no abstracts found for '{topic}'.")
+            return (0, 0)
+
+        # Build a clean, source-attributed text doc from the abstracts.
+        lines = [f"TOPIC: {topic}",
+                 f"SOURCE: PubMed (ingested {datetime.now().strftime('%Y-%m-%d')})", ""]
+        for s in studies:
+            lines.append(f"### {s.get('title', '(untitled)')}")
+            meta = []
+            if s.get("journal"):
+                meta.append(str(s["journal"]))
+            if s.get("year"):
+                meta.append(str(s["year"]))
+            if meta:
+                lines.append(" | ".join(meta))
+            if s.get("doi"):
+                lines.append(str(s["doi"]))
+            lines.append("")
+            lines.append(s["abstract"].strip())
+            lines.append("")
+        text = "\n".join(lines)
+
+        slug = re.sub(r"[^a-z0-9]+", "_", topic.lower()).strip("_")[:60] or "pubmed"
+        fname = f"{slug}_{datetime.now().strftime('%Y%m%d')}.txt"
+        n_chunks = self.knowledge.add_text_document(text, fname, subfolder=subfolder)
+        print(f"[KB-FEED] '{topic}': {len(studies)} studies -> {n_chunks} chunks ingested.")
+        return (len(studies), n_chunks)
 
     def get_recent_topics_from_memory(self, slot=None):
         """Extracts potential topics from the Telegram chat history, prioritizing the Admin."""
@@ -654,6 +868,22 @@ class HopesAndDreamsBot:
     def brainstorm_autonomous_topic(self):
         """Uses the LLM to brainstorm a fresh, diverse biohacking topic from the Syndicate Pool."""
         print(f"[{datetime.now()}] EXECUTIVE BRAINSTORM: Generating fresh intelligence...")
+
+        # B1: prefer a fresh, GROUNDED topic mined from one rotating KB domain.
+        # Mined topics are groundable by construction; we only fall through to the
+        # legacy SYNDICATE_TOPIC_POOL below if mining yields nothing (safety net).
+        try:
+            mine_dom = random.choice([d for d in self._MINE_DOMAINS
+                                      if not any(sk in d.lower() for sk in self._MINE_SKIP)])
+            mined = self.mine_kb_topics(domain=mine_dom, count=8)
+            mined = [t for t in mined if not self._is_topic_on_cooldown(t, cooldown=5)]
+            if mined:
+                pick = random.choice(mined)
+                print(f"[AUTONOMOUS] KB-mined grounded topic ({mine_dom}): {pick}")
+                return pick
+            print(f"[AUTONOMOUS] KB mining ({mine_dom}) empty; using legacy pool.")
+        except Exception as e:
+            print(f"[AUTONOMOUS] KB mining failed ({e}); using legacy pool.")
 
         # Filter pool: remove exact recent repeats AND topics in same cluster as recent posts
         recent_for_filter = self.posted_topics[-10:] if self.posted_topics else []
@@ -742,6 +972,10 @@ class HopesAndDreamsBot:
                 topic = self.get_recent_topics_from_memory(slot=slot)
 
             self._log_uplink(f"POST: Topic confirmed for slot {slot_label}: '{topic}'")
+
+            # T4 auto-feed: if the KB barely covers this topic, deepen it from PubMed
+            # BEFORE the RAG pull, so generation grounds on the fresh material.
+            self._ensure_kb_coverage(topic)
 
             # 1. RAG Check (Query local knowledge base)
             print(f"[{datetime.now()}] EXECUTIVE EXECUTION: Querying local knowledge base...")

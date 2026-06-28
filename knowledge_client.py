@@ -56,6 +56,42 @@ class KnowledgeClient:
         self.vector_store.save_local(VECTOR_DB_DIR)
         print("Knowledge index built and saved successfully.")
 
+    def add_text_document(self, text, source_filename, subfolder="pubmed_feed"):
+        """Write `text` to knowledge_base/<subfolder>/<source_filename> and add ONLY that
+        file to the FAISS index incrementally (embeds the new file, not the whole corpus).
+        Returns the number of chunks added (0 on empty/failure)."""
+        if not text or not text.strip():
+            print("[KB-INGEST] empty text; nothing to add.")
+            return 0
+        if not source_filename.lower().endswith(".txt"):
+            source_filename += ".txt"
+        dest_dir = os.path.join(KNOWLEDGE_BASE_DIR, subfolder)
+        os.makedirs(dest_dir, exist_ok=True)
+        dest_path = os.path.join(dest_dir, source_filename)
+        try:
+            with open(dest_path, "w", encoding="utf-8") as f:
+                f.write(text)
+        except Exception as e:
+            print(f"[KB-INGEST] failed to write {dest_path}: {e}")
+            return 0
+        try:
+            docs = TextLoader(dest_path).load()
+            splitter = RecursiveCharacterTextSplitter(chunk_size=1000, chunk_overlap=100)
+            chunks = splitter.split_documents(docs)
+            if not chunks:
+                print(f"[KB-INGEST] {source_filename} produced no chunks.")
+                return 0
+            if self.vector_store is None:
+                self.vector_store = FAISS.from_documents(chunks, self.embeddings)
+            else:
+                self.vector_store.add_documents(chunks)
+            self.vector_store.save_local(VECTOR_DB_DIR)
+            print(f"[KB-INGEST] +{len(chunks)} chunks from {source_filename}; index saved.")
+            return len(chunks)
+        except Exception as e:
+            print(f"[KB-INGEST] indexing failed for {dest_path}: {e}")
+            return 0
+
     def query_knowledge(self, query: str, limit: int = 15):
         """Retrieves the most relevant chunks from the local knowledge base."""
         if not self.vector_store:

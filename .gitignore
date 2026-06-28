@@ -60,3 +60,6 @@ dsda_print.py
 # Backup files from surgical edits
 *.bak-*
 *.bak
+knowledge_base/
+_patches_applied/
+patch_*.py
