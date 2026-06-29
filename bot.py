@@ -620,6 +620,7 @@ class HopesAndDreamsBot:
         exclude.update(self.posted_topics or [])  # B2: kill week-over-week repeats
         norm_exclude = {self._norm_topic(t) for t in exclude}
         results = []
+        self._last_theme_source = "none"  # where topics came from (for the UI label)
 
         def _add(t):
             nt = self._norm_topic(t)
@@ -635,7 +636,12 @@ class HopesAndDreamsBot:
             for t in available:
                 _add(t)
                 if len(results) >= count:
+                    self._last_theme_source = "catalog"
                     return results[:count]
+
+        # T4: catalog didn't cover this keyword — if the KB is thin on it, deepen
+        # it from PubMed BEFORE mining so we mine grounded material, not LLM drift.
+        self._ensure_kb_coverage(theme_name)
 
         # 2) Catalog thin/exhausted — mine GROUNDED topics straight from the KB
         try:
@@ -643,11 +649,13 @@ class HopesAndDreamsBot:
             for t in mined:
                 _add(t)
                 if len(results) >= count:
+                    self._last_theme_source = "grounded"
                     return results[:count]
         except Exception as e:
             print(f"[THEME] KB mining failed for '{theme_name}': {e}")
 
         # 3) Still short — last-resort LLM brainstorm to top up the grounded picks
+        self._last_theme_source = "grounded" if results else "none"
         print(f"[THEME] {len(results)} grounded topic(s) for '{theme_name}'; topping up via LLM.")
         system_msg = (
             "You are the Syndicate's Lead Content Strategist. You generate fresh, "
@@ -683,6 +691,7 @@ class HopesAndDreamsBot:
                 if clean and self._norm_topic(clean) not in norm_exclude and clean not in results:
                     results.append(clean)
                     norm_exclude.add(self._norm_topic(clean))
+                    self._last_theme_source = "llm"
                 if len(results) >= count:
                     break
             return results
@@ -741,6 +750,175 @@ class HopesAndDreamsBot:
         except Exception as e:
             print(f"[KB-GATE] coverage check failed for '{topic}': {e}; continuing ungated.")
             return False
+
+    def _read_fed_topics(self):
+        """Read the real TOPIC headers from knowledge_base/pubmed_feed/*.txt (what the
+        bot has gone and LEARNED). Read-only. Returns a list of topic strings."""
+        import glob
+        try:
+            from knowledge_client import KNOWLEDGE_BASE_DIR
+        except Exception:
+            KNOWLEDGE_BASE_DIR = "knowledge_base"
+        feed_dir = os.path.join(KNOWLEDGE_BASE_DIR, "pubmed_feed")
+        out = []
+        if os.path.isdir(feed_dir):
+            for fp in sorted(glob.glob(os.path.join(feed_dir, "*.txt"))):
+                try:
+                    with open(fp, encoding="utf-8") as fh:
+                        first = fh.readline().strip()
+                    if first.upper().startswith("TOPIC:"):
+                        t = first.split(":", 1)[1].strip()
+                        if t:
+                            out.append(t)
+                except Exception:
+                    continue
+        return out
+
+    def suggest_themes(self, recent_n=80, cluster_t=0.50, show=20):
+        """READ-ONLY: surface accumulated topics (posted history + PubMed-fed) that fit the
+        existing THEME_CATALOG WORST -- i.e. emerging material that may deserve its own theme.
+        Scores each candidate's cosine fit to its nearest catalog theme; weakest fits are the
+        most emergent. Groups weak fits by the theme they loosely orbit so clusters surface.
+        Deterministic (same embedding space as the KB). Proposes signal only -- you decide
+        what becomes a theme. Returns {'scored': [...], 'weak_groups': {...}, 'note': ...}."""
+        import numpy as np
+        from collections import defaultdict
+        fed = self._read_fed_topics()
+        posted = list(self.posted_topics or [])[-recent_n:]
+        seen, cand = set(), []
+        for t in (posted + fed):
+            nt = self._norm_topic(t)
+            if t and nt not in seen:
+                seen.add(nt)
+                cand.append(t)
+        if not cand:
+            return {"scored": [], "weak_groups": {}, "note": "no candidates yet"}
+        cat_names = list(self.THEME_CATALOG.keys())
+
+        def _unit(m):
+            n = np.linalg.norm(m, axis=1, keepdims=True)
+            n[n == 0] = 1.0
+            return m / n
+
+        try:
+            emb = self.knowledge.embeddings
+            cv = _unit(np.array(emb.embed_documents(cand), dtype="float32"))
+            # Each theme = CENTROID of its ACTUAL topic list (rich phrases), not the bare
+            # one-word name. Comparing topic phrases to bare names scored everything low and
+            # produced noise assignments (CoQ10 -> nicotine). Centroids give real fits.
+            centroids, valid_themes = [], []
+            for name in cat_names:
+                topics = self.THEME_CATALOG.get(name) or []
+                if not topics:
+                    continue
+                tvecs = _unit(np.array(emb.embed_documents(topics), dtype="float32"))
+                centroids.append(tvecs.mean(axis=0))
+                valid_themes.append(name)
+            tu = _unit(np.array(centroids, dtype="float32"))
+        except Exception as e:
+            print(f"[SUGGEST] embedding failed: {e}")
+            return {"scored": [], "weak_groups": {}, "note": "embedding failed"}
+
+        sims = cv @ tu.T  # [n_cand x n_themes] cosine vs theme centroids
+        scored = []
+        for i, t in enumerate(cand):
+            j = int(np.argmax(sims[i]))
+            scored.append({"topic": t, "nearest_theme": valid_themes[j],
+                           "fit": round(float(sims[i][j]), 3)})
+        scored.sort(key=lambda r: r["fit"])  # weakest fit first = most emergent
+        fit_by_topic = {r["topic"]: r["fit"] for r in scored}
+        theme_by_topic = {r["topic"]: r["nearest_theme"] for r in scored}
+
+        # Cluster candidates against EACH OTHER (not by nearest theme), so a real
+        # emerging group (telomere/senolytic/healthspan) binds into ONE cluster even
+        # when its members scatter across different nearest catalog themes.
+        cc = cv @ cv.T  # candidate-candidate cosine (cv is unit-normalized)
+        n_c = len(cand)
+        used = [False] * n_c
+        deg = [int((cc[i] >= cluster_t).sum()) for i in range(n_c)]
+        clusters = []
+        for i in sorted(range(n_c), key=lambda x: -deg[x]):
+            if used[i]:
+                continue
+            members = [j for j in range(n_c) if not used[j] and cc[i][j] >= cluster_t]
+            if len(members) >= 2:
+                for j in members:
+                    used[j] = True
+                topics = [cand[j] for j in members]
+                avg_fit = round(sum(fit_by_topic[t] for t in topics) / len(topics), 3)
+                themes = sorted({theme_by_topic[t] for t in topics})
+                clusters.append({"topics": topics, "avg_catalog_fit": avg_fit,
+                                 "nearest_themes": themes})
+        clusters.sort(key=lambda c: c["avg_catalog_fit"])  # most emergent first
+        return {"clusters": clusters, "scored": scored[:show], "note": ""}
+
+    def suggest_new_themes(self, n_emergent=15, max_fit=0.55):
+        """B-layer: deterministic low-fit detection (suggest_themes) -> ONE constrained LLM
+        call to GROUP + NAME the emergent topics. Read-only. Structural guard: the LLM may
+        only use the exact topics provided (hallucinated/reworded ones are dropped); clusters
+        need >=2 valid members. Falls back to the ranked list if the JSON is unusable.
+        Returns {'groups': [{'theme','topics'}], 'ranked': [(topic,fit,near)], 'note'}."""
+        base = self.suggest_themes(show=40)
+        scored = base.get("scored", [])
+        emergent = [r["topic"] for r in scored if r["fit"] < max_fit][:n_emergent]
+        ranked = [(r["topic"], r["fit"], r["nearest_theme"]) for r in scored[:n_emergent]]
+        if len(emergent) < 2:
+            return {"groups": [], "ranked": ranked, "note": "not enough emergent topics yet"}
+        topic_set = set(emergent)
+        sys_msg = ("You organize a given list of items into thematic groups. You ONLY use the "
+                   "exact items provided, never invent or reword them. Output strict JSON only.")
+        listing = "\n".join(f"- {t}" for t in emergent)
+        prompt = (
+            "These biohacking content topics do not fit our existing themes well. Group only "
+            "the STRONGLY related ones into coherent clusters; name each cluster (2-4 words).\n\n"
+            "RULES:\n"
+            "- Use ONLY these exact topics, verbatim. Do NOT invent or reword any.\n"
+            "- Group two topics ONLY if they share a SPECIFIC mechanism, compound class, or "
+            "molecular target (same pathway, same kind of molecule). A shared vague vibe "
+            "(both 'brain stuff', both 'health') is NOT enough.\n"
+            "- It is BETTER to leave a topic ungrouped than to force a weak pairing. Most "
+            "topics will belong to no cluster -- that is expected and correct.\n"
+            "- A cluster needs at least 2 genuinely-related topics. Omit everything else.\n"
+            "- Output ONLY a JSON array; each element has keys 'theme' (string) and 'topics' "
+            "(array of the exact topic strings). No prose, no code fences.\n\n"
+            f"TOPICS:\n{listing}\n\nJSON:"
+        )
+        try:
+            raw = self.llm.generate_response(prompt, system_message=sys_msg,
+                                             reflect=False, sanitize=False)
+        except Exception as e:
+            print(f"[SUGGEST] LLM grouping failed: {e}")
+            return {"groups": [], "ranked": ranked, "note": "llm failed; see ranked"}
+        groups = self._parse_theme_groups(raw, topic_set)
+        return {"groups": groups, "ranked": ranked,
+                "note": "" if groups else "no clean groups; see ranked list"}
+
+    def _parse_theme_groups(self, raw, topic_set):
+        """Parse the LLM grouping JSON; GUARD against hallucinated topics (keep only items
+        present in the input set verbatim); drop clusters with < 2 valid topics."""
+        import json, re
+        if not raw:
+            return []
+        s = re.sub(r"```(?:json)?", "", str(raw)).replace("```", "").strip()
+        a, b = s.find("["), s.rfind("]")
+        if a == -1 or b == -1 or b <= a:
+            return []
+        try:
+            data = json.loads(s[a:b + 1])
+        except Exception:
+            return []
+        if not isinstance(data, list):
+            return []
+        out = []
+        for item in data:
+            if not isinstance(item, dict):
+                continue
+            name = str(item.get("theme", "")).strip()
+            topics = item.get("topics", [])
+            valid = [t for t in topics if isinstance(t, str) and t in topic_set]
+            if name and len(valid) >= 2:
+                out.append({"theme": name, "topics": valid})
+        return out
 
     def kb_coverage_score(self, topic, k=5):
         """READ-ONLY: measure how well the KB covers `topic`. Returns a dict with the

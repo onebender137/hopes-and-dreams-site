@@ -491,7 +491,8 @@ class TelegramBot:
         }
         self.pending_theme_proposal = proposal
 
-        source_tag = "📋 catalog" if proposal['used_catalog'] else "🧠 LLM brainstorm"
+        _src = getattr(self.hdbot, "_last_theme_source", None) or ("catalog" if proposal['used_catalog'] else "llm")
+        source_tag = {"catalog": "📋 catalog", "grounded": "🌱 grounded (KB)", "llm": "🧠 LLM brainstorm"}.get(_src, "🧠 LLM brainstorm")
         msg = f"<b>🎨 THEME PROPOSAL — {theme}</b> ({source_tag})\n\n📅 <b>{date_str}</b>\n"
         for slot, topic in zip(self.SLOTS_IN_ORDER, topics):
             msg += f"  • <code>{slot}</code> — {topic}\n"
