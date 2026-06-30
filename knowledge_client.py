@@ -92,18 +92,52 @@ class KnowledgeClient:
             print(f"[KB-INGEST] indexing failed for {dest_path}: {e}")
             return 0
 
-    def query_knowledge(self, query: str, limit: int = 15):
-        """Retrieves the most relevant chunks from the local knowledge base."""
+    # --- source-domain hygiene -------------------------------------------------
+    # The dream/astral/psychonaut corpus is ~36% of the index, and its supplement-
+    # stacking books (esp. Yuschak 'Advanced Lucid Dreaming: The Power of Supplements')
+    # dominate TACTICAL/dosing retrieval for UNRELATED topics. Exclude that domain by
+    # default; include it ONLY when the query is itself dream/lucid/astral-flavored.
+    _DREAM_SOURCE_MARKERS = ("lucid", "astral", "yuschak", "muldoon", "laberge",
+                             "sparrow", "dmt_and_entity", "ayahuasca", "psychonaut",
+                             "galantamine", "oneiro", "dromen")
+    _DREAM_QUERY_MARKERS = ("lucid", "astral", "out-of-body", "out of body", "oneiro",
+                            "galantamine", "wbtb", "wild induction", "mild induction",
+                            "sleep paralysis", "hypnagog", "dmt", "ayahuasca",
+                            "astral projection", "obe")
+
+    def _is_dream_source(self, source_name):
+        s = (source_name or "").lower()
+        return any(m in s for m in self._DREAM_SOURCE_MARKERS)
+
+    def _query_is_dream(self, query):
+        q = (query or "").lower()
+        return any(m in q for m in self._DREAM_QUERY_MARKERS)
+
+    def query_knowledge(self, query: str, limit: int = 15, include_dream=None):
+        """Retrieves the most relevant chunks from the local knowledge base.
+        Domain hygiene: dream/astral/psychonaut sources are excluded by default (they
+        otherwise flood TACTICAL/dosing retrieval for unrelated topics) and included
+        only when the query is dream/lucid/astral-flavored, or include_dream=True."""
         if not self.vector_store:
             return ""
-            
-        print(f"Querying knowledge base for: {query}...")
-        results = self.vector_store.similarity_search(query, k=limit)
-        
+
+        if include_dream is None:
+            include_dream = self._query_is_dream(query)
+
+        mode = "on" if include_dream else "off"
+        print(f"Querying knowledge base for: {query}... (dream_sources={mode})")
+        # over-fetch when filtering so we still return `limit` good chunks
+        fetch_k = limit if include_dream else max(limit * 4, limit)
+        results = self.vector_store.similarity_search(query, k=fetch_k)
+
         context_chunks = []
         for doc in results:
             source = os.path.basename(doc.metadata.get('source', 'unknown'))
+            if not include_dream and self._is_dream_source(source):
+                continue
             context_chunks.append(f"[SOURCE: {source}]\n{doc.page_content}")
+            if len(context_chunks) >= limit:
+                break
 
         context = "\n---\n".join(context_chunks)
         return context

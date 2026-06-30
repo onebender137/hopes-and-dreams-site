@@ -1545,14 +1545,17 @@ class HopesAndDreamsBot:
             self._log_uplink("IMAGE GEN: No TOGETHER_API_KEY found, skipping.")
             return None
 
-        # Visual-only prompt — NO text instructions, FLUX can't spell
+        # Visual-only prompt. FLUX renders ANY title/topic words handed to it as garbled
+        # lettering in the image ("Magnenium", "Mortix"), so we inject NO title/topic text and
+        # forbid text emphatically (front-loaded). The Pillow overlay is the ONLY text — it
+        # spells correctly. Visual style is topic-agnostic by design (brand consistency).
         prompt = (
-            f"Abstract scientific illustration representing {title or self._short_title(topic)}. "
-            "Dark navy blue background. Glowing neon cyan and gold molecular structures. "
-            "Brain anatomy, neural networks, biochemical pathways. "
-            "Cyberpunk cinematic lighting, deep blue and gold color palette. "
-            "Atmospheric, professional pharmaceutical research aesthetic. "
-            "No text, no letters, no words, pure visual imagery, dramatic depth of field."
+            "No text. No letters. No words. No typography. No captions. No labels. No writing. "
+            "Abstract scientific illustration: glowing neon cyan and gold molecular structures, "
+            "brain anatomy, neural networks, biochemical pathways, on a dark navy blue background. "
+            "Cyberpunk cinematic lighting, deep blue and gold color palette, atmospheric "
+            "professional pharmaceutical research aesthetic, dramatic depth of field. "
+            "Pure visual imagery only — absolutely no written text anywhere in the image."
         )
 
         try:
@@ -1780,6 +1783,89 @@ class HopesAndDreamsBot:
             return False
         return True
 
+    _PROSTAR_ACTION_KW = (
+        "dose", "dosage", "mg", "mcg", "\u00b5g", "microgram", "milligram", "take", "taking",
+        "timing", "morning", "midday", "evening", "night", "before", "after", "empty stomach",
+        "stack", "stacking", "combine", "combining", "cycle", "cycling", "fasting", "fasted",
+        "exercise", "workout", "protocol", "daily", "per day", "twice", "week", "administer",
+        "sublingual", "intranasal", "start with", "begin", "titrate", "ensure", "avoid",
+        "maintain", "pair", "consume", "hydrate", "baseline", "track",
+    )
+    _PROSTAR_REJECT_KW = ("galantamine", "yuschak", "lds induction", "lucid dreaming protocol", "astral")
+
+    def _derive_prostar_hack(self, html):
+        """Deterministic Prostar Life Hack: the most actionable sentence from the article's
+        own TACTICAL section (else MECHANICS). Contamination-guarded (never headlines
+        galantamine/yuschak/lucid). Returns a clean one-liner or None (caller -> generic).
+        Replaces the LLM 'hack' field, which was empty/generic ~85% of the time."""
+        import re
+        import html as _htmllib
+        if not html:
+            return None
+        text = re.sub(r"<[^>]+>", " ", html)
+        text = _htmllib.unescape(text)
+        text = re.sub(r"\s+", " ", text).strip()
+
+        def _section(starts, ends):
+            s = None
+            for m in starts:
+                i = text.find(m)
+                if i != -1:
+                    s = i + len(m)
+                    break
+            if s is None:
+                return ""
+            e = len(text)
+            for m in ends:
+                j = text.find(m, s)
+                if j != -1:
+                    e = min(e, j)
+            return text[s:e].strip()
+
+        def _sents(block):
+            out = []
+            for s in re.split(r"(?<=[.!?])\s+", block):
+                s = s.strip()
+                wc = len(s.split())
+                if 6 <= wc <= 34 and not s.isupper():
+                    out.append(s)
+            return out
+
+        def _score(sent):
+            low = sent.lower()
+            if any(r in low for r in self._PROSTAR_REJECT_KW):
+                return -99
+            sc = sum(1 for kw in self._PROSTAR_ACTION_KW if kw in low)
+            if re.search(r"\d", sent):
+                sc += 1
+            if low.startswith(("however", "additionally", "moreover", "furthermore")):
+                sc -= 1
+            return sc
+
+        def _clean(sent):
+            s = sent.strip()
+            s = re.sub(r"^[:\-\u2013\u2014\u2022\s]+", "", s)
+            s = re.sub(r"^(specific dosages?( or protocols?)?|protocol tip|note|tip)\s*:\s*", "", s, flags=re.I)
+            s = re.sub(r"^(additionally|moreover|furthermore|however|also|thus|therefore|meanwhile|for instance|for example)[,:]?\s+", "", s, flags=re.I)
+            if s:
+                s = s[0].upper() + s[1:]
+            if s and s[-1] not in ".!?":
+                s += "."
+            return s
+
+        pool = _sents(_section(["TACTICAL IMPLEMENTATION", "TACTICAL"],
+                               ["Do your own research", "Prostar Life Hack", "STATUS:"]))
+        if not pool:
+            pool = _sents(_section(["THE MECHANICS", "MECHANICS"],
+                                   ["THE BIOLOGICAL", "BIOLOGICAL LEVERAGE", "TACTICAL"]))
+        if not pool:
+            return None
+        ranked = sorted(range(len(pool)), key=lambda i: (_score(pool[i]), -i), reverse=True)
+        best = ranked[0]
+        if _score(pool[best]) < 1:
+            return None
+        return _clean(pool[best])
+
     def _beautify_for_blog(self, content, topic, image_path, title_override=None):
         """Uses the LLM to beautify content and then injects it into the HTML template."""
         # Defensive: scrub any meta-commentary that might have leaked through earlier stages
@@ -1919,6 +2005,14 @@ class HopesAndDreamsBot:
                 hack_content = "Always verify protocol biological leverage with baseline biometric tracking. Data is sovereignty."
 
             priority = 2
+
+        # Deterministic Prostar hack from the article's own tactical content (the LLM
+        # 'hack' field was empty/generic ~85% of the time). Contamination-guarded; generic last.
+        derived_hack = self._derive_prostar_hack(beautified_body)
+        if derived_hack:
+            hack_content = derived_hack
+        if not hack_content:
+            hack_content = "Always verify protocol biological leverage with baseline biometric tracking. Data is sovereignty."
 
         # 3. Construct the Hack Box HTML if content exists
         hack_html = ""
