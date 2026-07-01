@@ -1,0 +1,118 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Sovereign Tech // Hopes and Dreams</title>
+<meta name="description" content="Build logs from the sovereign-tech division. Own your stack, own your data, run it local. Do your own research, don't be a statistic.">
+<style>
+  :root {
+    --bg:#05080a; --panel:#0a0f0c; --edge:#12351f;
+    --green:#33ff99; --green-dim:#1fbf74; --green-glow:#33ff9c;
+    --text:#c8e6d4; --text-dim:#6f8a7a; --amber:#ffb347;
+    --mono:'SFMono-Regular',Consolas,'Liberation Mono',Menlo,monospace;
+  }
+  * { box-sizing:border-box; }
+  body { margin:0; background:var(--bg); color:var(--text);
+    font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,sans-serif; line-height:1.7;
+    background-image:radial-gradient(circle at 20% 0%, rgba(51,255,156,0.05), transparent 45%); }
+  header.site { border-bottom:1px solid var(--edge); padding:14px 20px; text-align:center; }
+  header.site .brand { color:var(--green); font-family:var(--mono); letter-spacing:2px;
+    font-size:0.8rem; text-transform:uppercase; opacity:0.85; }
+  nav { display:flex; flex-wrap:wrap; gap:6px 18px; justify-content:center; padding:10px 20px;
+    border-bottom:1px solid var(--edge); font-family:var(--mono); font-size:0.82rem; }
+  nav a { color:var(--text-dim); text-decoration:none; }
+  nav a:hover, nav a.active { color:var(--green); }
+  .wrap { max-width:860px; margin:0 auto; padding:48px 22px 80px; }
+  .tagline { font-family:var(--mono); color:var(--green-dim); font-size:0.72rem; letter-spacing:3px;
+    text-transform:uppercase; margin-bottom:10px; }
+  h1 { font-size:2.4rem; line-height:1.1; margin:0 0 14px; color:#eafff2;
+    text-shadow:0 0 26px rgba(51,255,156,0.28); }
+  .intro { color:var(--text-dim); max-width:640px; margin-bottom:12px; }
+  .intro strong { color:var(--green); }
+  .rule { border:none; border-top:1px solid var(--edge); margin:34px 0 8px; }
+  .count { font-family:var(--mono); color:var(--green-dim); font-size:0.72rem; letter-spacing:2px;
+    text-transform:uppercase; margin-bottom:22px; }
+  .feed { display:flex; flex-direction:column; gap:2px; }
+  .log { display:block; text-decoration:none; color:inherit; border:1px solid var(--edge);
+    border-left:3px solid var(--edge); border-radius:6px; padding:18px 20px; margin-bottom:12px;
+    background:rgba(10,15,12,0.5); transition:border-color .15s, transform .15s, background .15s; }
+  .log:hover { border-color:var(--edge); border-left-color:var(--green);
+    background:rgba(51,255,156,0.04); transform:translateX(3px); }
+  .log .meta { font-family:var(--mono); font-size:0.68rem; color:var(--green-dim);
+    letter-spacing:2px; text-transform:uppercase; margin-bottom:6px; }
+  .log .title { font-size:1.2rem; color:#eafff2; font-weight:600; }
+  .log:hover .title { color:var(--green-glow); }
+  .log .arrow { font-family:var(--mono); color:var(--text-dim); font-size:0.8rem; margin-top:6px; }
+  .log:hover .arrow { color:var(--green); }
+  .empty { font-family:var(--mono); color:var(--text-dim); padding:30px 0; }
+  .signoff { margin-top:44px; padding-top:20px; border-top:1px solid var(--edge);
+    font-family:var(--mono); color:var(--amber); letter-spacing:1px; font-size:0.9rem; }
+  footer { border-top:1px solid var(--edge); padding:26px 20px; text-align:center;
+    color:var(--text-dim); font-size:0.75rem; }
+</style>
+</head>
+<body>
+  <header class="site"><div class="brand">HOPES &amp; DREAMS // SOVEREIGN TECH DIVISION</div></header>
+  <nav>
+    <a href="index.html">Home</a>
+    <a href="shop.html">Shop</a>
+    <a href="optimization.html">Optimization</a>
+    <a href="cipher.html">Cipher</a>
+    <a href="intel.html">Intel Hub</a>
+    <a href="sovereign.html" class="active">Sovereign Tech</a>
+    <a href="https://merch.hopes-and-dreams.ca">Merch</a>
+    <a href="about.html">About</a>
+  </nav>
+
+  <div class="wrap">
+    <div class="tagline">SYS_OUTPUT // DIVISION INDEX</div>
+    <h1>Sovereign Tech</h1>
+    <p class="intro">Build logs from the other half of the empire. Not supplements &mdash; <strong>infrastructure</strong>.
+      How to run your own AI stack on your own iron, own your data, and take the power back from Big Tech.
+      Every one of these is a real war story from the disco hut. Nothing theorized, all fought for.</p>
+    <hr class="rule">
+    <div class="count" id="count">LOADING TRANSMISSIONS...</div>
+    <div class="feed" id="feed"></div>
+    <div class="signoff">// Do your own research. Don't be a statistic.</div>
+  </div>
+
+  <footer>
+    &copy; <span id="yr"></span> Dream Syndicate Digital Assets. All Rights Reserved.<br>
+    Sovereign-tech transmissions from the disco hut &middot; New Brunswick, Canada
+  </footer>
+
+<script>
+  document.getElementById('yr').textContent = new Date().getFullYear();
+  (async function () {
+    const feed = document.getElementById('feed');
+    const count = document.getElementById('count');
+    try {
+      const res = await fetch('tech_transmissions.json?' + Date.now());
+      if (!res.ok) throw new Error(res.status);
+      let items = await res.json();
+      if (!Array.isArray(items) || items.length === 0) {
+        count.textContent = '// NO TRANSMISSIONS YET';
+        feed.innerHTML = '<div class="empty">Build logs incoming. Stand by.</div>';
+        return;
+      }
+      // newest first by date
+      items.sort((a, b) => (b.date || '').localeCompare(a.date || ''));
+      count.textContent = items.length + ' BUILD LOG' + (items.length === 1 ? '' : 'S') + ' // DECODED';
+      feed.innerHTML = items.map(function (it) {
+        const date = (it.date || '').replace(/-/g, '.');
+        const title = (it.title || 'Untitled').replace(/</g, '&lt;');
+        return '<a class="log" href="' + it.href + '">' +
+                 '<div class="meta">' + date + ' &middot; sovereign tech</div>' +
+                 '<div class="title">' + title + '</div>' +
+                 '<div class="arrow">&gt;&gt; decode build log</div>' +
+               '</a>';
+      }).join('');
+    } catch (e) {
+      count.textContent = '// FEED ERROR';
+      feed.innerHTML = '<div class="empty">Could not load transmissions (' + e.message + ').</div>';
+    }
+  })();
+</script>
+</body>
+</html>
