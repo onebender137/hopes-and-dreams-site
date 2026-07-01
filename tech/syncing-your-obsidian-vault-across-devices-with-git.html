@@ -1,0 +1,103 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Sync Your Obsidian Vault Across Devices with Git: Own Your Stack | Hopes and Dreams</title>
+<meta name="description" content="The problem is clear: you want to take control of your notes and sync them seamlessly across multiple devices without relying on centralized services....">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;700;900&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="../style.css">
+<style>
+  .tech-log { max-width:820px; margin:0 auto; padding:30px 22px 80px; counter-reset:stepcount; }
+  .tech-back { font-family:'Courier New',monospace; font-size:0.85rem; display:inline-block; margin-bottom:20px; color:var(--neon-blue); }
+  .tech-tagline { font-family:'Courier New',monospace; color:var(--neon-blue); font-size:0.72rem;
+    letter-spacing:3px; text-transform:uppercase; margin-bottom:8px; opacity:0.85; }
+  .tech-log h1 { font-size:2.2rem; line-height:1.15; margin:0 0 22px; color:var(--text-main);
+    text-shadow:0 0 22px rgba(56,189,248,0.25); }
+  .tech-log h2 { font-family:'Courier New',monospace; color:var(--neon-blue); text-transform:uppercase;
+    letter-spacing:1px; font-size:1.15rem; margin:40px 0 12px; padding-top:18px;
+    border-top:1px solid rgba(148,163,184,0.18); }
+  .tech-log h2::before { content:"SYS_// "; color:var(--neon-gold); opacity:0.9; }
+  .tech-log h3 { color:var(--neon-gold); font-size:1rem; margin:24px 0 8px; }
+  .tech-log h3.step::before { counter-increment:stepcount; content:"Step " counter(stepcount) " // ";
+    color:var(--neon-blue); font-family:'Courier New',monospace; }
+  .tech-log p { margin:0 0 16px; color:var(--text-main); line-height:1.7; }
+  .tech-log a { color:var(--neon-blue); }
+  .tech-log ul, .tech-log ol { padding-left:22px; color:var(--text-main); }
+  .tech-log li { margin-bottom:8px; line-height:1.6; }
+  .tech-log code { font-family:'Courier New',monospace; background:rgba(56,189,248,0.1);
+    color:var(--neon-blue); padding:2px 6px; border-radius:4px; font-size:0.9em; }
+  .tech-log pre { background:var(--card-bg); border:1px solid rgba(56,189,248,0.2);
+    border-left:3px solid var(--neon-blue); border-radius:6px; padding:16px 18px; overflow-x:auto;
+    margin:0 0 20px; }
+  .tech-log pre code { background:none; padding:0; color:var(--text-main); font-size:0.85rem; line-height:1.55; }
+  .tech-signoff { margin-top:44px; padding-top:20px; border-top:1px solid rgba(148,163,184,0.18);
+    font-family:'Courier New',monospace; color:var(--neon-gold); letter-spacing:1px; font-size:0.9rem; }
+</style>
+</head>
+<body>
+  <div id="scroll-progress"></div>
+  <button id="theme-toggle" class="theme-toggle-pill" aria-label="Toggle between dark and light mode">&#9728;&#65039; LIGHT MODE</button>
+  <header>
+    <div class="logo-wrap">
+      <a href="../index.html"><img src="../topper.png" alt="Hopes and Dreams Syndicate Neuro-Optimization"></a>
+    </div>
+    <nav><a href="../index.html">Home</a> <a href="../shop.html">Shop</a> <a href="../optimization.html">Optimization</a> <a href="../cipher.html">Cipher</a> <a href="../intel.html">Intel Hub</a> <a href="../sovereign.html">Sovereign Tech</a> <a href="https://merch.hopes-and-dreams.ca">Merch</a> <a href="../about.html">About</a></nav>
+  </header>
+
+  <main class="tech-log">
+    <a class="tech-back" href="../sovereign.html">&lt;&lt; back to build logs</a>
+    <div class="tech-tagline">SYS_OUTPUT // BUILD_LOG DECODED</div>
+    <h1>Sync Your Obsidian Vault Across Devices with Git: Own Your Stack</h1>
+    <p>The problem is clear: you want to take control of your notes and sync them seamlessly across multiple devices without relying on centralized services. The solution? Set up Obsidian with a GitHub repository using the Git plugin, ensuring that both your desktop and mobile devices stay in sync.</p>
+<h3>THE PROBLEM</h3>
+<p>You’ve got notes scattered across different environments—your desktop at home and your phone while you’re out. To keep everything consistent and accessible, you need to set up Obsidian on both devices so they can sync via a GitHub repository. This ensures that no matter where you are or what device you're using, your notes stay current.</p>
+<h3>THE STACK</h3>
+<p>To achieve this setup, you'll need:
+- <strong>Obsidian</strong>: A powerful note-taking application.
+- <strong>GitHub Account</strong>: For hosting the repository.
+- <strong>Git Plugin for Obsidian</strong> (version 2.83.2): To manage version control within Obsidian.
+- <strong>Desktop Computer and Mobile Device (Android)</strong>: Both devices should have Obsidian installed.</p>
+<h3>THE BUILD</h3>
+<h4>Desktop Setup</h4>
+<ol>
+<li>Install the Git plugin in Obsidian (ensure it's version 2.83.2).</li>
+<li>Configure auto-pull and auto-push intervals to every 5 minutes each.
+   - In settings, change the auto-push interval from <code>0</code> to <code>5</code>.</li>
+</ol>
+<h4>Mobile Setup (Android)</h4>
+<ol>
+<li>Install Obsidian and ensure it has Git support.</li>
+<li>Create a GitHub Personal Access Token with repo access permissions.</li>
+<li>In the Obsidian settings, authenticate using your token and username (<code>onebender137</code>).</li>
+<li>Set the remote URL to <code>https://github.com/onebender137/Obsidian.git</code>.</li>
+<li>Clone the repository from GitHub into your Obsidian vault.</li>
+</ol>
+<h3>THE GOTCHAS</h3>
+<ul>
+<li>Ensure both devices have similar auto-interval settings for syncing. In this case, 5 minutes is set for both desktop and mobile.</li>
+<li>Use the "Commit-and-sync and close" command manually to trigger syncs when needed on mobile.</li>
+<li>Be mindful of potential issues with Obsidian’s Git plugin stability, especially on larger vaults or using isomorphic-git on mobile.</li>
+</ul>
+<p>This setup ensures consistent syncing between your desktop and mobile devices via GitHub, allowing seamless note-taking across different environments. However, keep an eye out for any inconsistencies due to the manual nature of syncing commands on mobile and potential performance issues with larger repositories.</p>
+
+    <div class="tech-signoff">// Do your own research. Don't be a statistic.</div>
+  </main>
+
+  <footer>
+    <p>&copy; 2026 Dream Syndicate Digital Assets. All Rights Reserved.</p>
+    <p>
+      <a href="https://www.facebook.com/profile.php?id=61581034972328" target="_blank" rel="noopener noreferrer">Connect on Facebook</a> |
+      <a href="https://merch.hopes-and-dreams.ca" target="_blank" rel="noopener noreferrer">Merch</a> |
+      <a href="../intel.html">Intel Hub</a> |
+      <a href="../sovereign.html">Sovereign Tech</a> |
+      <a href="../privacy.html">Privacy Policy</a> |
+      <a href="../about.html">Contact Us</a>
+    </p>
+    <p style="font-size:0.7rem; color:var(--text-dim); margin-top:10px;">Location: Saint John, New Brunswick, Canada</p>
+  </footer>
+  <script src="../script.js" defer></script>
+</body>
+</html>
