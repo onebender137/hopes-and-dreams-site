@@ -519,6 +519,12 @@ height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
             </div>
         </div>
 
+        <div class="profile-cta-wrap" data-reveal>
+            <button id="neuro-compile-btn" class="neuro-compile-btn">&#9673; COMPILE FULL PROFILE</button>
+            <p class="profile-cta-sub">Reads your inputs above &middot; builds a shareable readout &middot; screenshot or print it</p>
+        </div>
+        <div id="neuro-profile-card" class="neuro-profile-card" aria-hidden="true"></div>
+
         <div class="codex-matrix-panel" data-reveal id="syndicate-codex">
             <div class="matrix-sector-title">CODEX_DATA // BIOLOGICAL PARAMETER SPECS</div>
             <h3 style="color:var(--text-main); font-size:1.4rem; text-transform:uppercase; margin-bottom:10px; font-weight:900;">What Each Slider Actually Means</h3>
@@ -1052,5 +1058,236 @@ height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
             calculateMetrics();
         });
     </script>
+<style>
+  .profile-cta-wrap { text-align:center; margin:10px auto 34px; max-width:760px; padding:0 20px; }
+  .neuro-compile-btn { font-family:'Courier New',monospace; font-weight:700; letter-spacing:2px;
+    text-transform:uppercase; font-size:0.95rem; color:var(--bg-main); background:var(--neon-blue);
+    border:none; border-radius:8px; padding:16px 32px; cursor:pointer; transition:transform .15s, box-shadow .15s;
+    box-shadow:0 0 22px rgba(56,189,248,0.35); }
+  .neuro-compile-btn:hover { transform:translateY(-2px); box-shadow:0 0 30px rgba(56,189,248,0.55); }
+  .profile-cta-sub { font-family:'Courier New',monospace; font-size:0.72rem; color:var(--text-dim);
+    letter-spacing:1px; text-transform:uppercase; margin-top:12px; }
+  .neuro-profile-card { display:none; max-width:760px; margin:0 auto 40px; background:var(--card-bg);
+    border:1px solid rgba(56,189,248,0.25); border-radius:14px; padding:30px 30px 26px;
+    box-shadow:0 0 40px rgba(56,189,248,0.12); }
+  .neuro-profile-card.show { display:block; }
+  .npc-head { display:flex; justify-content:space-between; align-items:baseline; flex-wrap:wrap;
+    border-bottom:1px solid rgba(148,163,184,0.2); padding-bottom:14px; margin-bottom:20px; }
+  .npc-head h3 { font-family:'Courier New',monospace; color:var(--neon-blue); text-transform:uppercase;
+    letter-spacing:2px; font-size:1.1rem; margin:0; }
+  .npc-date { font-family:'Courier New',monospace; color:var(--text-dim); font-size:0.72rem; letter-spacing:1px; }
+  .npc-scores { display:flex; gap:14px; flex-wrap:wrap; margin-bottom:24px; }
+  .npc-score { flex:1; min-width:120px; text-align:center; background:rgba(56,189,248,0.06);
+    border:1px solid rgba(56,189,248,0.18); border-radius:10px; padding:16px 8px; }
+  .npc-score .n { font-size:2.1rem; font-weight:900; color:var(--neon-blue); line-height:1; }
+  .npc-score .l { font-family:'Courier New',monospace; font-size:0.62rem; color:var(--text-dim);
+    letter-spacing:1.5px; text-transform:uppercase; margin-top:8px; }
+  .npc-sec { margin-bottom:22px; }
+  .npc-sec h4 { font-family:'Courier New',monospace; font-size:0.82rem; letter-spacing:2px;
+    text-transform:uppercase; margin:0 0 12px; padding-bottom:6px; border-bottom:1px dashed rgba(148,163,184,0.2); }
+  .npc-sec.dialed h4 { color:var(--neon-blue); }
+  .npc-sec.leaking h4 { color:var(--neon-gold); }
+  .npc-sec.protocol h4 { color:var(--neon-blue); }
+  .npc-item { margin-bottom:12px; line-height:1.6; color:var(--text-main); font-size:0.95rem; }
+  .npc-item .tag { font-family:'Courier New',monospace; font-weight:700; font-size:0.82rem; margin-right:8px; }
+  .dialed .tag { color:var(--neon-blue); }
+  .leaking .tag { color:var(--neon-gold); }
+  .npc-supp { display:flex; justify-content:space-between; align-items:center; gap:12px;
+    background:rgba(251,191,36,0.06); border:1px solid rgba(251,191,36,0.22); border-radius:8px;
+    padding:12px 16px; margin-bottom:10px; }
+  .npc-supp .for { color:var(--text-dim); font-size:0.82rem; }
+  .npc-supp .name { color:var(--text-main); font-weight:700; }
+  .npc-supp a { font-family:'Courier New',monospace; font-size:0.72rem; letter-spacing:1px;
+    text-transform:uppercase; color:var(--neon-blue); text-decoration:none; white-space:nowrap;
+    border:1px solid var(--neon-blue); border-radius:6px; padding:6px 12px; }
+  .npc-supp a:hover { background:var(--neon-blue); color:var(--bg-main); }
+  .npc-clean { color:var(--neon-blue); font-weight:700; }
+  .npc-foot { display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:12px;
+    border-top:1px solid rgba(148,163,184,0.2); padding-top:16px; margin-top:6px; }
+  .npc-dyor { font-family:'Courier New',monospace; color:var(--neon-gold); font-size:0.78rem; letter-spacing:1px; }
+  .npc-print { font-family:'Courier New',monospace; font-size:0.72rem; letter-spacing:1px; text-transform:uppercase;
+    color:var(--neon-blue); background:none; border:1px solid var(--neon-blue); border-radius:6px;
+    padding:8px 16px; cursor:pointer; }
+  .npc-print:hover { background:var(--neon-blue); color:var(--bg-main); }
+  #neuro-print-clone { display:none; }
+  @media print {
+    @page { margin:14mm; }
+    /* keep the paper white even in dark mode + with background-graphics on */
+    html, body { background:#fff !important; }
+    /* only the print-clone (a direct child of body) prints; everything else collapses */
+    body.printing-profile > *:not(#neuro-print-clone) { display:none !important; }
+    #neuro-print-clone { display:block !important; max-width:100%; margin:0; box-shadow:none;
+      border:none; padding:0; color:#0b1220 !important; background:#fff !important;
+      -webkit-print-color-adjust:exact; print-color-adjust:exact; }
+    #neuro-print-clone * { -webkit-print-color-adjust:exact; print-color-adjust:exact; }
+    #neuro-print-clone .npc-head h3 { color:#0369a1 !important; }
+    #neuro-print-clone .npc-head { border-bottom:2px solid #0369a1 !important; }
+    #neuro-print-clone .npc-date { color:#475569 !important; }
+    #neuro-print-clone .npc-score { background:#f1f5f9 !important; border:1px solid #cbd5e1 !important; }
+    #neuro-print-clone .npc-score .n { color:#0369a1 !important; }
+    #neuro-print-clone .npc-score .l { color:#475569 !important; }
+    #neuro-print-clone .npc-sec h4 { border-bottom:1px dashed #94a3b8 !important; }
+    #neuro-print-clone .npc-sec.dialed h4, #neuro-print-clone .npc-sec.protocol h4 { color:#0369a1 !important; }
+    #neuro-print-clone .npc-sec.leaking h4 { color:#b45309 !important; }
+    #neuro-print-clone .npc-item { color:#0b1220 !important; }
+    #neuro-print-clone .dialed .tag, #neuro-print-clone .protocol .tag { color:#0369a1 !important; }
+    #neuro-print-clone .leaking .tag { color:#b45309 !important; }
+    #neuro-print-clone .npc-supp { background:#fff7ed !important; border:1px solid #fdba74 !important; }
+    #neuro-print-clone .npc-supp .for { color:#475569 !important; }
+    #neuro-print-clone .npc-supp .name { color:#0b1220 !important; }
+    #neuro-print-clone .npc-supp a { color:#0369a1 !important; border:1px solid #0369a1 !important; }
+    #neuro-print-clone .npc-dyor { color:#b45309 !important; }
+    #neuro-print-clone .npc-foot { border-top:1px solid #cbd5e1 !important; }
+    #neuro-print-clone .npc-print { display:none !important; }
+  }
+</style>
+<script>
+(function () {
+  var btn = document.getElementById('neuro-compile-btn');
+  if (!btn) return;
+  var card = document.getElementById('neuro-profile-card');
+
+  function val(id) { var el = document.getElementById(id); return el ? parseFloat(el.value) : 0; }
+  function clamp(x) { return x > 100 ? 100 : (x < 10 ? 10 : x); }
+
+  var SUPP = {
+    sdur:  { name:'5-HTP (200mg)',        href:'shop.html#5-htp' },
+    squal: { name:'Huperzine-A',          href:'shop.html#huperzine' },
+    hrv:   { name:'Ashwagandha (KSM-66)', href:'shop.html#ashwagandha' },
+    stress:{ name:'NAC (N-Acetyl Cysteine)', href:'shop.html#nac' },
+    dw:    { name:'Alpha GPC Choline',    href:'shop.html#alpha-gpc' },
+    caf:   { name:'L-Theanine',           href:'shop.html#l-theanine' },
+    hyd:   { name:'Creatine Monohydrate', href:'shop.html#creatine' }
+  };
+
+  function classify(v) {
+    var out = [];
+    // sleep duration
+    out.push({ key:'sdur', name:'Sleep Duration',
+      status: v.sDur >= 7.5 ? 'STRONG' : (v.sDur >= 6.5 ? 'OK' : 'WEAK'),
+      strong:"Sleep duration is locked in — that's the foundation the rest of your system is built on.",
+      weak:"You're short on sleep hours, so your overnight repair gets cut off before it finishes. Usually the single highest-leverage fix on this whole board." });
+    // sleep quality
+    out.push({ key:'squal', name:'Sleep Quality',
+      status: v.sQual > 80 ? 'STRONG' : (v.sQual >= 60 ? 'OK' : 'WEAK'),
+      strong:"Your sleep architecture is solid — deep and REM cycles are doing their job.",
+      weak:"Your sleep is fragmented — you're logging hours in bed, but not getting the deep and REM sleep that actually restores you." });
+    // hrv
+    out.push({ key:'hrv', name:'Heart Rate Variability',
+      status: v.hrv > 70 ? 'STRONG' : (v.hrv >= 40 ? 'OK' : 'WEAK'),
+      strong:"Strong HRV — your nervous system is flexible and recovering well between loads.",
+      weak:"Your HRV is running low, which means your recovery isn't keeping pace with your load. You're running closer to the red than you want to be." });
+    // stress (inverted)
+    out.push({ key:'stress', name:'Systemic Stress',
+      status: v.stress < 35 ? 'STRONG' : (v.stress <= 60 ? 'OK' : 'WEAK'),
+      strong:"Stress load is low — your system has room to recover and adapt.",
+      weak:"Stress is running high, locking your nervous system into fight-or-flight and dragging everything downstream — HRV, sleep, recovery — down with it." });
+    // caffeine (sweet spot)
+    out.push({ key:'caf', name:'Caffeine Load',
+      status: v.caf > 350 ? 'WEAK' : ((v.caf >= 50 && v.caf <= 250) ? 'STRONG' : 'OK'),
+      strong:"Caffeine's in the sweet spot — clean focus without wrecking your sleep.",
+      weak:"Caffeine's running high — past this point you're overworking your adrenals and eating into the deep sleep you need that night." });
+    // hydration
+    out.push({ key:'hyd', name:'Hydration',
+      status: v.hyd > 3 ? 'STRONG' : (v.hyd >= 2 ? 'OK' : 'WEAK'),
+      strong:"Well hydrated — everything downstream runs smoother for it.",
+      weak:"You're running dry, which thickens your blood and makes your heart work harder just to get nutrients to your brain." });
+    // deep work (demand — never 'weak', but high demand earns a fuel rec)
+    out.push({ key:'dw', name:'Deep Work Output', demand:true,
+      status: v.dw > 5 ? 'HIGH' : (v.dw >= 2 ? 'STRONG' : 'OK'),
+      strong:"Solid, sustainable deep-work output — enough to matter without frying yourself.",
+      high:"You're running heavy cognitive output. That's not a leak — but at this level you're burning through neural fuel fast and should replenish it." });
+    return out;
+  }
+
+  function render() {
+    var v = {
+      sDur:  val('sleep-duration'), sQual: val('sleep-quality'), hrv: val('hrv-score'),
+      stress:val('stress-level'),   dw:    val('deep-work'),     caf: val('caffeine-input'),
+      hyd:   val('hydration-input')
+    };
+    var sleepFactor = Math.min(100, (v.sDur/8)*40 + (v.sQual/100)*60);
+    var hrvFactor   = Math.min(100, (v.hrv/100)*100);
+    var penalty     = v.stress*0.6 + (v.caf > 300 ? (v.caf-300)/300*20 : 0);
+    var readiness = clamp(Math.round(sleepFactor*0.4 + hrvFactor*0.4 + (v.hyd/4)*20 - penalty*0.2));
+    var cognitive = clamp(Math.round(sleepFactor*0.5 + (v.dw/4)*30 + (Math.min(v.caf,200)/200*20) - v.stress*0.1));
+    var recovery  = clamp(Math.round(hrvFactor*0.6 + v.sQual*0.4 - v.stress*0.3));
+
+    var items = classify(v);
+    var dialed = items.filter(function (i) { return i.status === 'STRONG'; });
+    var leaking = items.filter(function (i) { return i.status === 'WEAK'; });
+    var highDemand = items.filter(function (i) { return i.status === 'HIGH'; });
+
+    var date = new Date().toISOString().slice(0,10).replace(/-/g, '.');
+    var h = '';
+    h += '<div class="npc-head"><h3>Neuro-Optimization Profile</h3><span class="npc-date">' + date + '</span></div>';
+    h += '<div class="npc-scores">'
+       + '<div class="npc-score"><div class="n">' + readiness + '</div><div class="l">Neural Readiness</div></div>'
+       + '<div class="npc-score"><div class="n">' + cognitive + '</div><div class="l">Cognitive Depth</div></div>'
+       + '<div class="npc-score"><div class="n">' + recovery  + '</div><div class="l">Recovery Reserve</div></div>'
+       + '</div>';
+
+    // DIALED IN
+    h += '<div class="npc-sec dialed"><h4>&#10003; Dialed In</h4>';
+    if (dialed.length) {
+      dialed.forEach(function (i) { h += '<div class="npc-item"><span class="tag">' + i.name + '</span>' + i.strong + '</div>'; });
+    } else {
+      h += '<div class="npc-item">No parameters are in the strong zone yet — plenty of upside to chase.</div>';
+    }
+    h += '</div>';
+
+    // LEAKING
+    if (leaking.length || highDemand.length) {
+      h += '<div class="npc-sec leaking"><h4>&#9888; Leaking</h4>';
+      leaking.forEach(function (i) { h += '<div class="npc-item"><span class="tag">' + i.name + '</span>' + i.weak + '</div>'; });
+      highDemand.forEach(function (i) { h += '<div class="npc-item"><span class="tag">' + i.name + '</span>' + i.high + '</div>'; });
+      h += '</div>';
+    } else {
+      h += '<div class="npc-sec leaking"><h4>&#9888; Leaking</h4><div class="npc-item npc-clean">Nothing\'s leaking — you\'re dialed in across the board. Hold the line.</div></div>';
+    }
+
+    // PRIORITY PROTOCOL — supplements for weak areas + high-demand fuel
+    var protoKeys = leaking.map(function (i) { return i.key; }).concat(highDemand.map(function (i) { return i.key; }));
+    if (protoKeys.length) {
+      h += '<div class="npc-sec protocol"><h4>&#9670; Priority Protocol</h4>';
+      protoKeys.forEach(function (k) {
+        var s = SUPP[k]; if (!s) return;
+        var forName = items.filter(function (i) { return i.key === k; })[0].name;
+        h += '<div class="npc-supp"><div><span class="for">for ' + forName + ' &rarr; </span><span class="name">' + s.name + '</span></div>'
+           + '<a href="' + s.href + '">View in Shop</a></div>';
+      });
+      h += '</div>';
+    }
+
+    h += '<div class="npc-foot"><span class="npc-dyor">// Do your own research. Don\'t be a statistic.</span>'
+       + '<button class="npc-print" onclick="neuroPrint()">&#128424; Print / Save PDF</button></div>';
+
+    card.innerHTML = h;
+    card.classList.add('show');
+    card.setAttribute('aria-hidden', 'false');
+    card.scrollIntoView({ behavior:'smooth', block:'start' });
+  }
+
+  window.neuroPrint = function () {
+    if (!card || !card.classList.contains('show')) return;
+    var prev = document.title;
+    var d = new Date().toISOString().slice(0,10).replace(/-/g, '.');
+    document.title = 'Neuro-Optimization-Profile-' + d;
+    var clone = card.cloneNode(true);
+    clone.id = 'neuro-print-clone';
+    clone.setAttribute('aria-hidden', 'true');
+    document.body.appendChild(clone);
+    document.body.classList.add('printing-profile');
+    window.print();
+    setTimeout(function () {
+      document.title = prev;
+      document.body.classList.remove('printing-profile');
+      if (clone && clone.parentNode) clone.parentNode.removeChild(clone);
+    }, 800);
+  };
+
+  btn.addEventListener('click', render);
+})();
+</script>
 </body>
 </html>
