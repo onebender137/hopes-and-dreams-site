@@ -114,6 +114,35 @@ def auto_clean(md):
     return re.sub(r"\n{3,}", "\n\n", md).strip(), [r.strip() for r in removed if r and r.strip()]
 
 
+# Grounding keeps real commands verbatim (good) but also real identifiers (bad — that's
+# publishing your own coordinates). Swap personal infra tokens for generic placeholders so
+# the reader substitutes their own. Runs automatically on every publish. Order: specific first.
+REDACT_RULES = [
+    (r'https?://github\.com/onebender137/([A-Za-z0-9._-]+?)(\.git)?\b',
+     r'https://github.com/your-username/\1\2', "repo URL"),
+    (r'\bgithub\.com/onebender137\b', r'github.com/your-username', "github path"),
+    (r'\bonebender137\b', r'your-username', "GitHub handle"),
+    (r'\bcoryr@bigboy\b', r'user@host', "shell prompt"),
+    (r'\bbender@\w+\b', r'user@host', "shell prompt"),
+    (r'100\.108\.37\.25', r'<TAILNET_IP>', "tailnet IP"),
+    (r'100\.123\.157\.7', r'<TAILNET_IP>', "tailnet IP"),
+    (r'\b100\.(?:6[4-9]|[7-9]\d|1[01]\d|12[0-7])\.\d{1,3}\.\d{1,3}\b', r'<TAILNET_IP>', "tailnet IP"),
+    (r'192\.168\.\d{1,3}\.\d{1,3}', r'<LAN_IP>', "LAN IP"),
+    (r'EnvironmentFile=-?/home/\w+/', r'EnvironmentFile=-/home/user/', "systemd env path"),
+    (r'/home/coryr\b', r'/home/user', "home path"),
+    (r'/home/bender\b', r'/home/user', "home path"),
+]
+
+
+def redact(text):
+    hits = []
+    for pat, repl, label in REDACT_RULES:
+        text, n = re.subn(pat, repl, text)
+        if n:
+            hits.append((label, n))
+    return text, hits
+
+
 def extract_title(md):
     # prefer a proper H1 heading
     m = re.search(r"^#\s+(.+)$", md, re.MULTILINE)
@@ -154,6 +183,14 @@ def main():
             print(f"    - {r[:100]}")
     else:
         print("[auto-clean] nothing matched.")
+
+    cleaned, redactions = redact(cleaned)
+    if redactions:
+        print("[redact] scrubbed personal identifiers -> placeholders:")
+        for label, n in redactions:
+            print(f"    - {label}: {n}x")
+    else:
+        print("[redact] no personal identifiers found.")
 
     title, body_md = extract_title(cleaned)
     body_html = markdown.markdown(body_md, extensions=["fenced_code", "tables", "sane_lists"])
