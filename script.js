@@ -1600,3 +1600,28 @@ document.addEventListener('DOMContentLoaded', () => {
         }
     }
 });
+
+/* === DSDA MOBILE NAV DRAWER === */
+(function () {
+  function init() {
+    if (document.getElementById('dsda-nav-toggle')) return;
+    if (document.getElementById('hero-mobile-nav')) return; /* homepage has its own mobile menu */
+    var nav = document.querySelector('header nav') || document.querySelector('body > nav');
+    if (!nav) return;
+    var btn = document.createElement('button');
+    btn.id = 'dsda-nav-toggle';
+    btn.setAttribute('aria-label', 'Toggle menu');
+    btn.innerHTML = '<span></span><span></span><span></span>';
+    document.body.appendChild(btn);
+    btn.addEventListener('click', function () {
+      document.body.classList.toggle('dsda-nav-open');
+    });
+    nav.addEventListener('click', function (e) {
+      if (e.target.tagName === 'A') document.body.classList.remove('dsda-nav-open');
+    });
+  }
+  if (document.readyState === 'loading') {
+    document.addEventListener('DOMContentLoaded', init);
+  } else { init(); }
+})();
+

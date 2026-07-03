@@ -2407,3 +2407,42 @@ html {
         transform: rotate(360deg);
     }
 }
+
+/* === DSDA MOBILE NAV DRAWER === */
+#dsda-nav-toggle { display:none; }
+@media (max-width: 768px) {
+  #dsda-nav-toggle {
+    display:flex; flex-direction:column; justify-content:center; align-items:center; gap:5px;
+    position:fixed; top:14px; right:16px; z-index:10001;
+    width:48px; height:48px; border-radius:12px; cursor:pointer;
+    background:var(--card-bg, #0b0b0b); border:1px solid var(--neon-blue, #38bdf8);
+    box-shadow:0 0 14px rgba(56,189,248,0.25);
+  }
+  #dsda-nav-toggle span {
+    display:block; width:22px; height:2px; border-radius:2px;
+    background:var(--neon-blue, #38bdf8); transition:transform .22s ease, opacity .22s ease;
+  }
+  body.dsda-nav-open #dsda-nav-toggle span:nth-child(1) { transform:translateY(7px) rotate(45deg); }
+  body.dsda-nav-open #dsda-nav-toggle span:nth-child(2) { opacity:0; }
+  body.dsda-nav-open #dsda-nav-toggle span:nth-child(3) { transform:translateY(-7px) rotate(-45deg); }
+
+  /* the page's existing nav becomes the drawer */
+  header nav, body > nav {
+    position:fixed; inset:0; z-index:10000; margin:0; padding:70px 24px 40px;
+    display:flex; flex-direction:column; justify-content:center; align-items:center; gap:6px;
+    background:color-mix(in srgb, var(--bg-main, #03091f) 88%, transparent);
+    -webkit-backdrop-filter:blur(14px); backdrop-filter:blur(14px);
+    transform:translateX(102%); transition:transform .25s ease; border:none;
+    overflow-y:auto;
+  }
+  body.dsda-nav-open header nav, body.dsda-nav-open body > nav { transform:translateX(0); }
+  header nav a, body > nav a {
+    font-size:1.3rem; padding:12px 26px; width:min(320px, 82vw); text-align:center;
+    border-radius:10px; letter-spacing:1px;
+  }
+  header nav a.active, body > nav a.active {
+    color:var(--neon-gold, #fbbf24); border:1px solid var(--neon-gold, #fbbf24);
+  }
+  body.dsda-nav-open { overflow:hidden; }
+}
+
