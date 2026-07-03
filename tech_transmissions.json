@@ -2,19 +2,19 @@
   {
     "href": "tech/consolidating-gpus-onto-one-machine-for-local-llm-inference.html",
     "title": "Consolidating GPUs for Local LLM Inference",
-    "date": "2026-07-01",
+    "date": "2026-07-03",
     "image_url": ""
   },
   {
     "href": "tech/syncing-your-obsidian-vault-across-devices-with-git.html",
     "title": "Sync Your Obsidian Vault Across Devices with Git: Own Your Stack",
-    "date": "2026-07-01",
+    "date": "2026-07-03",
     "image_url": ""
   },
   {
     "href": "tech/exposing-ollama-to-wsl-over-the-network.html",
     "title": "Expose Ollama to WSL Over the Network",
-    "date": "2026-07-01",
+    "date": "2026-07-03",
     "image_url": ""
   }
 ]

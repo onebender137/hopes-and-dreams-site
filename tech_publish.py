@@ -28,6 +28,7 @@ NAV = [
     ("Cipher", "../cipher.html"), ("Intel Hub", "../intel.html"),
     ("Sovereign Tech", "../sovereign.html"),
     ("Merch", "https://merch.hopes-and-dreams.ca"), ("About", "../about.html"),
+    ("Privacy", "../privacy.html"),
 ]
 
 TEMPLATE = """<!DOCTYPE html>
@@ -198,7 +199,11 @@ def main():
     body_html = re.sub(r"<p>\s*Do your own research\.?\s*Don't be a statistic\.?\s*</p>", "",
                        body_html, flags=re.I)
 
-    nav_html = " ".join(f'<a href="{href}">{label}</a>' for label, href in NAV)
+    nav_html = " ".join(
+        (f'<a class="active" href="{href}">{label}</a>' if label == "Sovereign Tech"
+         else f'<a href="{href}">{label}</a>')
+        for label, href in NAV
+    )
     desc = re.sub(r"<[^>]+>", "", body_html)[:150].replace('"', "'") + "..."
     html = TEMPLATE.format(title=title, desc=desc, nav=nav_html, body=body_html,
                            year=datetime.date.today().year)
