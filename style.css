@@ -2446,3 +2446,26 @@ html {
   body.dsda-nav-open { overflow:hidden; }
 }
 
+
+
+/* === DSDA MOBILE NAV DRAWER V2 === */
+@media (max-width: 768px) {
+  /* kill legacy underline effects inside the drawer (they stacked under the active ring) */
+  header nav a, body > nav a {
+    text-decoration: none !important;
+    border-bottom: none !important;
+    box-sizing: border-box;
+    max-width: 84vw;
+  }
+  header nav a::after, body > nav a::after { content: none !important; display: none !important; }
+
+  /* active page: one clean filled gold pill */
+  header nav a.active, body > nav a.active {
+    color: var(--neon-gold, #fbbf24);
+    background: rgba(251, 191, 36, 0.10);
+    border: 1px solid rgba(251, 191, 36, 0.45);
+    border-radius: 12px;
+    box-shadow: 0 0 18px rgba(251, 191, 36, 0.18);
+  }
+}
+

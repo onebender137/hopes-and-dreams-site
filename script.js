@@ -1605,7 +1605,6 @@ document.addEventListener('DOMContentLoaded', () => {
 (function () {
   function init() {
     if (document.getElementById('dsda-nav-toggle')) return;
-    if (document.getElementById('hero-mobile-nav')) return; /* homepage has its own mobile menu */
     var nav = document.querySelector('header nav') || document.querySelector('body > nav');
     if (!nav) return;
     var btn = document.createElement('button');
