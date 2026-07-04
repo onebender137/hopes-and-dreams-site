@@ -763,6 +763,12 @@ document.addEventListener('DOMContentLoaded', () => {
     const themeToggle = document.getElementById('theme-toggle');
     const themeToggleLander = document.getElementById('theme-toggle-lander');
     const body = document.body;
+    // === SYNDICATE_KB: local knowledge, loaded once ===
+    if(!window.SYNDICATE_KB){
+        fetch('/chat-knowledge.json').then(function(r){return r.ok?r.json():null;})
+            .then(function(kb){window.SYNDICATE_KB=kb;}).catch(function(){});
+    }
+
     const logo = document.querySelector('.logo-wrap img');
 
     // Check for saved theme
@@ -966,13 +972,13 @@ document.addEventListener('DOMContentLoaded', () => {
                 <h4>SYNDICATE_INTEL</h4>
                 <button id="close-chat" style="background:none; border:none; color:var(--text-dim); cursor:pointer;">&times;</button>
             </div>
-            <div class="agent-selector">
+            <div class="agent-selector" style="display:none;">
                 <span class="agent-chip active" data-agent="Ghost">Ghost</span>
                 <span class="agent-chip" data-agent="Pulse">Pulse</span>
                 <span class="agent-chip" data-agent="Spark">Spark</span>
             </div>
             <div class="chat-messages" id="chat-messages">
-                <div class="message bot">System initialized. Agent Ghost online. How can the Syndicate assist your optimization today?</div>
+                <div class="message bot">You're in the Syndicate. Ask me about a supplement, a tool, or where to find something on the site — I'll point you the right way. // Do your own research, don't be a statistic.</div>
             </div>
             <div class="chat-input-area">
                 <button class="chat-send-btn" id="chat-mic" title="Voice Input (Requires Chrome/Brave permissions)">
@@ -1061,42 +1067,7 @@ document.addEventListener('DOMContentLoaded', () => {
         addMessage(text, 'user');
         input.value = '';
         setThinking(true);
-
-        // Integrated with Local Bot via Cloudflare Tunnel
-        try {
-            const headers = {
-                'Content-Type': 'application/json'
-            };
-
-            // Add API Key if available (Check for global config)
-            if (window.SYNDICATE_CONFIG && window.SYNDICATE_CONFIG.API_KEY) {
-                headers['X-Syndicate-Key'] = window.SYNDICATE_CONFIG.API_KEY;
-            }
-
-            const response = await fetch('https://ai.hopes-and-dreams.ca/api/chat', {
-                method: 'POST',
-                headers: headers,
-                body: JSON.stringify({
-                    message: text
-                })
-            });
-
-            if (!response.ok) throw new Error('Network response was not ok');
-
-            const data = await response.json();
-            setThinking(false);
-
-            const botReply = data.reply || data.response || (typeof data === 'string' ? data : getBotResponse(text));
-            addMessage(botReply, 'bot');
-        } catch (error) {
-            console.error('Syndicate Backend Error:', error);
-            setThinking(false);
-            // Fallback to local intelligence if backend is offline
-            setTimeout(() => {
-                const response = getBotResponse(text);
-                addMessage(`[LOCAL_MODE] ${response}`, 'bot');
-            }, 600);
-        }
+        setTimeout(function(){ setThinking(false); addMessage(getBotResponse(text), 'bot'); }, 450 + Math.random()*350);
     }
 
     sendBtn.addEventListener('click', handleSend);
@@ -1140,33 +1111,26 @@ document.addEventListener('DOMContentLoaded', () => {
         messagesContainer.scrollTop = messagesContainer.scrollHeight;
     }
 
-    function getBotResponse(input) {
-        const lowerInput = input.toLowerCase();
-
-        // 1. Check Biohacking Codex (Resilience check)
-        if (typeof codexData !== 'undefined') {
-            for (const [key, value] of Object.entries(codexData)) {
-                if (lowerInput.includes(key)) {
-                    return `[${currentAgent}] Intelligence retrieved: ${value}`;
-                }
+    function getBotResponse(input){
+        if(!window.SYNDICATE_KB||!window.SYNDICATE_KB.entries){return "Still booting my knowledge core \u2014 give me a second and ask again.";}
+        var q=(input||'').toLowerCase().replace(/[^a-z0-9\s]/g,' ');
+        var words=q.split(/\s+/).filter(Boolean);
+        var best=null,bestScore=0;
+        for(var i=0;i<window.SYNDICATE_KB.entries.length;i++){
+            var e=window.SYNDICATE_KB.entries[i]; var score=0;
+            for(var j=0;j<e.keywords.length;j++){
+                var k=(e.keywords[j]||'').toLowerCase().replace(/[^a-z0-9\s]/g,' '); if(!k)continue;
+                if(q.indexOf(k)>=0)score+=(k.indexOf(' ')>=0?3:2);
+                else if(words.some(function(w){return w.length>3&&k.split(' ').indexOf(w)>=0;}))score+=1;
             }
+            if(score>bestScore){bestScore=score;best=e;}
         }
-
-        // 2. Intent-based responses
-        if (lowerInput.includes("who are you") || lowerInput.includes("syndicate")) {
-            return `[${currentAgent}] We are the Syndicate. A private research and development collective focused on neuro-optimization and biological sovereignty.`;
+        if(best&&bestScore>=2){
+            var reply=best.answer;
+            if(best.cta_href){reply+='<br><br><a href="'+best.cta_href+'" class="chat-cta">\u25B6 '+(best.cta_label||'Learn more')+'</a>';}
+            return reply;
         }
-
-        if (lowerInput.includes("hello") || lowerInput.includes("hi")) {
-            return `[${currentAgent}] Transmission received. Ready for protocol analysis.`;
-        }
-
-        if (lowerInput.includes("facebook") || lowerInput.includes("fb")) {
-            return `[${currentAgent}] Our official community intelligence is hosted on Facebook. Use the link in the footer to access the full research archive.`;
-        }
-
-        // 3. Fallback
-        return `[${currentAgent}] Query logged. My current intelligence parameters are limited to known protocols. Try asking about 'Alpha GPC', 'HRV', or 'The Syndicate'.`;
+        return window.SYNDICATE_KB.fallback||"Not sure on that one \u2014 try the Intel Hub search, or ask about a supplement, the Optimization Hub, or the Cipher.";
     }
 });
 

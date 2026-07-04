@@ -1,0 +1,122 @@
+{
+  "meta": {
+    "persona": "Hopes & Dreams front-of-house guide. Whole-empire voice: direct, a little gritty, science-first, never hype. Signs off intent, always points somewhere useful. Never claims to be a doctor. Tagline DNA: do your own research, don't be a statistic.",
+    "version": "1.0"
+  },
+  "greeting": "You're in the Syndicate. I'm the guide — ask me about a supplement, a tool, or where to find something on the site. I'll point you the right way. // Do your own research, don't be a statistic.",
+  "fallback": "I don't have a canned answer for that one — but I'm not going to leave you hanging. Two moves: hit the <a href=\"intel.html\">Intel Hub</a> and search the article archive, or ask me about a specific supplement (magnesium, L-theanine, creatine, ashwagandha...), the <a href=\"optimization.html\">Optimization Hub</a>, or the <a href=\"cipher.html\">Cipher</a>. What are you chasing?",
+  "entries": [
+    {
+      "id": "about",
+      "keywords": ["what is this", "who are you", "about", "hopes and dreams", "what do you do", "what is this site", "dsda", "dream syndicate"],
+      "answer": "Hopes & Dreams is a community-first biohacking outfit out of Saint John, NB — the blueprint and the tools to close the gap between where you are and your peak. Two halves: body sovereignty (supplements, protocols, real science) and digital sovereignty (own your stack, run your own AI). No fluff, no hype, no selling your data.",
+      "cta_label": "Read the full story",
+      "cta_href": "about.html"
+    },
+    {
+      "id": "optimization-tool",
+      "keywords": ["optimize", "optimization", "readiness", "hrv", "sleep", "recovery", "how do i improve", "dashboard", "tune", "cognitive", "profile", "score"],
+      "answer": "That's exactly what the Optimization Hub is for — dial in your sleep, HRV, stress, deep-work and caffeine on live sliders and it computes your neural readiness, cognitive depth and recovery scores. Then hit COMPILE FULL PROFILE for a shareable readout of what's dialed in, what's leaking, and the exact supplements to fix the weak spots.",
+      "cta_label": "Open the Optimization Hub",
+      "cta_href": "optimization.html"
+    },
+    {
+      "id": "cipher-tool",
+      "keywords": ["cipher", "numerology", "reading", "name", "birthday", "fun", "personality", "profile reading"],
+      "answer": "The Cipher's your free numerology decode — no email, just a personal readout you can screenshot and share. Good rabbit hole if you like that side of things.",
+      "cta_label": "Run the Cipher",
+      "cta_href": "cipher.html"
+    },
+    {
+      "id": "sovereign-tech",
+      "keywords": ["sovereign", "tech", "self host", "local ai", "own your stack", "ollama", "wsl", "obsidian", "server", "homelab", "build log", "infrastructure", "gpu"],
+      "answer": "That's the Sovereign Tech division — real war stories on running your own AI stack on your own iron, owning your data, and taking the power back from Big Tech. Build logs, nothing theorized, all fought for.",
+      "cta_label": "Enter Sovereign Tech",
+      "cta_href": "sovereign.html"
+    },
+    {
+      "id": "intel-hub",
+      "keywords": ["article", "research", "read", "find", "search", "archive", "where can i find", "info", "studies", "intel"],
+      "answer": "The Intel Hub is the full article archive — every biohacking breakdown we've published, searchable. If you've got a specific topic in mind, that's where to dig.",
+      "cta_label": "Search the Intel Hub",
+      "cta_href": "intel.html"
+    },
+    {
+      "id": "shop",
+      "keywords": ["buy", "shop", "purchase", "where do i get", "store", "supplement store", "order", "product", "price"],
+      "answer": "The shop's where we point you to the compounds worth taking — vetted, no kitchen-sink stacks. Every supplement I mention, you can find there with the reasoning behind it.",
+      "cta_label": "Browse the Shop",
+      "cta_href": "shop.html"
+    },
+    {
+      "id": "magnesium",
+      "keywords": ["magnesium", "mag glycinate", "cramps", "sleep mineral", "calm"],
+      "answer": "Magnesium's a foundational one — most people run low, and it touches sleep, stress, muscle recovery and HRV. Glycinate is the form worth chasing for sleep and calm (up to ~1g/day is a common range). It's a quiet workhorse, not a flashy one.",
+      "cta_label": "Magnesium in the Shop",
+      "cta_href": "shop.html"
+    },
+    {
+      "id": "l-theanine",
+      "keywords": ["theanine", "l-theanine", "caffeine crash", "jitters", "calm focus", "green tea"],
+      "answer": "L-Theanine is the caffeine buffer — takes the jitters and the crash off your coffee while keeping the focus. Classic pairing is ~200mg theanine to ~100mg caffeine for clean, calm energy. Cheap, well-studied, low-risk.",
+      "cta_label": "L-Theanine in the Shop",
+      "cta_href": "shop.html"
+    },
+    {
+      "id": "creatine",
+      "keywords": ["creatine", "monohydrate", "strength", "muscle", "brain", "power"],
+      "answer": "Creatine isn't just for lifters — it's one of the most-studied compounds on earth, and the cognitive/hydration benefits are real. Plain monohydrate, ~5g/day, no loading phase needed. Boring, proven, works.",
+      "cta_label": "Creatine in the Shop",
+      "cta_href": "shop.html"
+    },
+    {
+      "id": "ashwagandha",
+      "keywords": ["ashwagandha", "ksm-66", "stress", "cortisol", "adaptogen", "anxiety"],
+      "answer": "Ashwagandha (KSM-66 is the standardized extract to look for) is the go-to adaptogen for cortisol and stress load — it can help pull your nervous system out of fight-or-flight, which knocks on to better HRV and sleep. Not an everyday-forever compound for everyone; cycle it and see.",
+      "cta_label": "Ashwagandha in the Shop",
+      "cta_href": "shop.html"
+    },
+    {
+      "id": "nac",
+      "keywords": ["nac", "n-acetyl", "cysteine", "glutathione", "detox", "liver", "antioxidant"],
+      "answer": "NAC (N-Acetyl Cysteine) is a glutathione precursor — antioxidant support, respiratory and liver angles, and some interesting cognitive/stress research. A solid one when systemic stress is running high.",
+      "cta_label": "NAC in the Shop",
+      "cta_href": "shop.html"
+    },
+    {
+      "id": "alpha-gpc",
+      "keywords": ["alpha gpc", "alpha-gpc", "choline", "focus", "deep work", "acetylcholine", "memory"],
+      "answer": "Alpha-GPC is choline for your brain's focus circuit — good fuel when you're running long deep-work sessions and feel the tank draining. Pairs well with caffeine for cognitive output.",
+      "cta_label": "Alpha-GPC in the Shop",
+      "cta_href": "shop.html"
+    },
+    {
+      "id": "5-htp",
+      "keywords": ["5-htp", "5htp", "serotonin", "mood", "sleep onset", "tryptophan"],
+      "answer": "5-HTP is a serotonin precursor — mood and sleep-onset angles, usually taken in the evening (~200mg range). Worth reading up on interactions before stacking it, especially with anything affecting serotonin.",
+      "cta_label": "5-HTP in the Shop",
+      "cta_href": "shop.html"
+    },
+    {
+      "id": "sleep-help",
+      "keywords": ["cant sleep", "insomnia", "better sleep", "fall asleep", "sleep quality", "deep sleep", "rest"],
+      "answer": "Sleep's the foundation — fix it and half your other numbers follow. Magnesium glycinate, L-theanine, and getting your evening light/caffeine timing right are the high-leverage moves. Best play: run your inputs through the Optimization Hub and it'll show you exactly where your sleep is leaking.",
+      "cta_label": "Build your sleep protocol",
+      "cta_href": "optimization.html"
+    },
+    {
+      "id": "focus-help",
+      "keywords": ["focus", "concentration", "brain fog", "productivity", "mental energy", "adhd", "deep work"],
+      "answer": "For focus, the stack usually comes down to clean caffeine (buffered with L-theanine), choline (Alpha-GPC) for the long sessions, and — unglamorously — sleep and hydration underneath it all. Dial your deep-work and caffeine sliders in the Optimization Hub to see what's actually holding you back.",
+      "cta_label": "Tune your focus inputs",
+      "cta_href": "optimization.html"
+    },
+    {
+      "id": "safety",
+      "keywords": ["safe", "side effects", "doctor", "medication", "interaction", "pregnant", "is it ok"],
+      "answer": "Straight up: I'm a guide, not a doctor, and nothing here is medical advice. Supplements interact with meds and conditions in ways that matter — do your own research and talk to a professional before you start something, especially if you're on medication or pregnant. Do your own research, don't be a statistic.",
+      "cta_label": "Read the deeper articles",
+      "cta_href": "intel.html"
+    }
+  ]
+}
