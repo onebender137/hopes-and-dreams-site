@@ -249,6 +249,18 @@ j=d.createElement(s),dl=l!='dataLayer'?'&l='+l:'';j.async=true;j.src=
             #neuro-print-clone .rx-return, #neuro-print-clone .rx-disclaim { color:#475569 !important; }
             #neuro-print-clone .npc-foot { border-top:1px solid #cbd5e1 !important; }
         }
+
+        /* --- QR back-to-shop on the readout footer --- */
+        .npc-foot { overflow:hidden; }
+        .rx-qr { float:right; text-align:center; margin:0 0 8px 16px; max-width:120px; }
+        .rx-qr svg { width:104px; height:104px; display:block; margin:0 auto 4px;
+            background:#fff; padding:6px; border-radius:6px; box-sizing:content-box; }
+        .rx-qr-cap { font-family:'Courier New',monospace; font-size:0.6rem; letter-spacing:1px;
+            text-transform:uppercase; color:var(--text-dim); }
+        @media print {
+            #neuro-print-clone .rx-qr svg { background:#fff !important; }
+            #neuro-print-clone .rx-qr-cap { color:#475569 !important; }
+        }
     </style>
 </head>
 <body>
@@ -715,6 +727,30 @@ height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
       document.body.classList.remove('printing-profile');
       if(clone && clone.parentNode) clone.parentNode.removeChild(clone);
     }, 500);
+  };
+})();
+</script>
+<script src="qrcode.js"></script>
+<script>
+(function(){
+  var _orig = window.buildRxReadout;
+  if (typeof _orig !== 'function') return;          // no readout -> nothing to wrap
+  window.buildRxReadout = function(stackName, components, dosage, details){
+    _orig(stackName, components, dosage, details);   // build the readout as before
+    try {
+      if (typeof qrcode === 'undefined') return;     // lib missing -> silent, text URL stays
+      var card = document.getElementById('rx-card');
+      var foot = card && card.querySelector('.npc-foot');
+      if (!foot || foot.querySelector('.rx-qr')) return;
+      var qr = qrcode(0, 'M');
+      qr.addData('https://hopes-and-dreams.ca/shop.html');
+      qr.make();
+      var div = document.createElement('div');
+      div.className = 'rx-qr';
+      div.innerHTML = qr.createSvgTag({ cellSize:3, margin:2, scalable:true })
+                    + '<span class="rx-qr-cap">Scan to return<br>&amp; acquire</span>';
+      foot.insertBefore(div, foot.firstChild);
+    } catch (e) { /* readout still works without the QR */ }
   };
 })();
 </script>
