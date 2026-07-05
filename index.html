@@ -201,14 +201,34 @@ j=d.createElement(s),dl=l!='dataLayer'?'&l='+l:'';j.async=true;j.src=
             const splash = document.getElementById("splash-screen");
             const video = document.getElementById("splash-video");
 
-            video.onended = function() {
-                splash.style.opacity = "0"; // Trigger CSS fade
-                
-                setTimeout(() => {
-                    splash.style.display = "none"; // Remove from flow
-                    sessionStorage.setItem("hopesSplashSeen", "true"); // Save memory
-                }, 800); 
-            };
+            let dismissed = false;
+            function dismissSplash() {
+                if (dismissed) return;            // fire once only
+                dismissed = true;
+                splash.style.opacity = "0";       // trigger CSS fade
+                setTimeout(function() {
+                    splash.style.display = "none";
+                    sessionStorage.setItem("hopesSplashSeen", "true");
+                }, 800);
+            }
+
+            // Normal path: intro plays to the end
+            video.onended = dismissSplash;
+
+            // Video fails to load / decode -> don't trap the user
+            video.onerror = dismissSplash;
+
+            // Autoplay blocked (iPadOS Safari, Samsung Internet, data-saver,
+            // low-power mode): play() rejects -> bail instead of freezing on
+            // frame 1 (the brain logo). THIS is the tablet hang.
+            var attempt = video.play();
+            if (attempt && typeof attempt.catch === "function") {
+                attempt.catch(function() { dismissSplash(); });
+            }
+
+            // Hard safety net: never trap longer than 10s no matter what.
+            // (intro is ~8s; good devices finish first via onended.)
+            setTimeout(dismissSplash, 10000);
         });
     }
 </script>

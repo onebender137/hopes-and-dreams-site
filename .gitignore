@@ -63,3 +63,30 @@ dsda_print.py
 knowledge_base/
 _patches_applied/
 patch_*.py
+
+# --- LOCAL-ONLY TOOLING & SCRATCH (added 2026-07-05) ---
+# One-off backend tool scripts that live in the repo dir but must never ship.
+# (Repo already tracks other .py, so we name these explicitly rather than *.py.)
+distill_briefs.py
+fb_tools.py
+fix_obsidian_md.py
+hopes_tools.py
+kb_verify.py
+make_ansi.py
+tech_redact.py
+hopes_bot_finalize.sh
+ansilove.js
+tech_publish (1).py
+
+# Scratch / probe / preview patterns
+*_test.py
+*_test.html
+*_probe.py
+*-preview.html
+
+# Disk snapshots (e.g. bot.py.predisk-1780230215)
+*.predisk-*
+
+# Stray social-card exports
+cipher-fb-feed.png
+cipher-square.png
