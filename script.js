@@ -719,6 +719,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
             // Highlight Cards
             highlightShopCards(components);
+            if (window.buildRxReadout) window.buildRxReadout(stackName, components, dosage, details);
         }
     }
 

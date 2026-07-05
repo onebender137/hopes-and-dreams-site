@@ -194,6 +194,61 @@ j=d.createElement(s),dl=l!='dataLayer'?'&l='+l:'';j.async=true;j.src=
             .widget-container { padding: 22px 18px; }
             .widget-title { font-size: 1.05rem; }
         }
+
+        /* --- STACK READOUT (printable protocol) — mirrors optimization card --- */
+        .neuro-profile-card { display:none; max-width:760px; margin:0 auto; background:var(--card-bg);
+            border:1px solid rgba(56,189,248,0.25); border-radius:14px; padding:30px 30px 26px; text-align:left; }
+        .npc-head { display:flex; justify-content:space-between; align-items:baseline; flex-wrap:wrap;
+            border-bottom:1px solid rgba(148,163,184,0.2); padding-bottom:14px; margin-bottom:20px; }
+        .npc-head h3 { font-family:'Courier New',monospace; color:var(--neon-blue); text-transform:uppercase;
+            letter-spacing:2px; font-size:1.1rem; margin:0; }
+        .npc-date { font-family:'Courier New',monospace; color:var(--text-dim); font-size:0.72rem; letter-spacing:1px; }
+        .rx-stackname { text-align:center; font-family:'Inter',sans-serif; color:var(--neon-gold); font-weight:900;
+            text-transform:uppercase; letter-spacing:2px; font-size:1.4rem; margin:0 0 22px;
+            background:rgba(251,191,36,0.08); border:1px solid rgba(251,191,36,0.25); border-radius:10px; padding:16px; }
+        .npc-sec { margin-bottom:22px; }
+        .npc-sec h4 { font-family:'Courier New',monospace; font-size:0.82rem; letter-spacing:2px;
+            text-transform:uppercase; margin:0 0 12px; padding-bottom:6px; color:var(--neon-blue);
+            border-bottom:1px dashed rgba(148,163,184,0.2); }
+        .npc-sec p { color:var(--text-dim); font-size:0.92rem; line-height:1.6; margin:0; }
+        .npc-sec.dosage p { color:var(--text-main); font-family:'Courier New',monospace; font-size:0.85rem; }
+        .npc-supp { display:flex; justify-content:space-between; align-items:center; gap:14px; flex-wrap:wrap;
+            background:rgba(251,191,36,0.06); border:1px solid rgba(251,191,36,0.22); border-radius:8px;
+            padding:12px 16px; margin-bottom:10px; }
+        .rx-supp-body { flex:1; min-width:220px; }
+        .npc-supp .name { display:block; color:var(--text-main); font-weight:700; margin-bottom:3px; }
+        .rx-why { color:var(--text-dim); font-size:0.82rem; line-height:1.45; margin:0; }
+        .npc-supp a { font-family:'Courier New',monospace; font-size:0.72rem; letter-spacing:1px;
+            text-transform:uppercase; color:var(--neon-blue); text-decoration:none; white-space:nowrap;
+            border:1px solid var(--neon-blue); border-radius:6px; padding:6px 12px; }
+        .npc-foot { border-top:1px solid rgba(148,163,184,0.2); padding-top:16px; margin-top:6px; }
+        .npc-dyor { font-family:'Courier New',monospace; color:var(--neon-gold); font-size:0.8rem; letter-spacing:1px; display:block; margin-bottom:6px; }
+        .rx-return { font-family:'Courier New',monospace; color:var(--text-dim); font-size:0.72rem; letter-spacing:1px; }
+        .rx-disclaim { color:var(--text-dim); font-size:0.68rem; line-height:1.4; margin-top:10px; }
+        #rx-save-btn { display:block; width:100%; margin-top:14px; }
+        #neuro-print-clone { display:none; }
+        @media print {
+            @page { margin:14mm; }
+            html, body { background:#fff !important; }
+            body.printing-profile > *:not(#neuro-print-clone) { display:none !important; }
+            #neuro-print-clone { display:block !important; max-width:100%; margin:0; box-shadow:none; border:none;
+                padding:0; color:#0b1220 !important; background:#fff !important;
+                -webkit-print-color-adjust:exact; print-color-adjust:exact; }
+            #neuro-print-clone * { -webkit-print-color-adjust:exact; print-color-adjust:exact; }
+            #neuro-print-clone .npc-head h3 { color:#0369a1 !important; }
+            #neuro-print-clone .npc-head { border-bottom:2px solid #0369a1 !important; }
+            #neuro-print-clone .npc-date { color:#475569 !important; }
+            #neuro-print-clone .rx-stackname { color:#b45309 !important; background:#fff7ed !important; border:1px solid #fdba74 !important; }
+            #neuro-print-clone .npc-sec h4 { color:#0369a1 !important; border-bottom:1px dashed #94a3b8 !important; }
+            #neuro-print-clone .npc-sec p, #neuro-print-clone .rx-why { color:#334155 !important; }
+            #neuro-print-clone .npc-sec.dosage p { color:#0b1220 !important; }
+            #neuro-print-clone .npc-supp { background:#fff7ed !important; border:1px solid #fdba74 !important; }
+            #neuro-print-clone .npc-supp .name { color:#0b1220 !important; }
+            #neuro-print-clone .npc-supp a { color:#0369a1 !important; border:1px solid #0369a1 !important; }
+            #neuro-print-clone .npc-dyor { color:#b45309 !important; }
+            #neuro-print-clone .rx-return, #neuro-print-clone .rx-disclaim { color:#475569 !important; }
+            #neuro-print-clone .npc-foot { border-top:1px solid #cbd5e1 !important; }
+        }
     </style>
 </head>
 <body>
@@ -595,5 +650,73 @@ height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
             });
         }
     </script>
+<div id="rx-card" class="neuro-profile-card" aria-hidden="true"></div>
+<script>
+(function(){
+  function esc(s){ return (s==null?'':String(s)).replace(/[&<>"]/g,function(c){
+    return {'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]; }); }
+
+  window.buildRxReadout = function(stackName, components, dosage, details){
+    var card = document.getElementById('rx-card');
+    if(!card) return;
+    var d = new Date().toISOString().slice(0,10).replace(/-/g,'.');
+    var h = '';
+    h += '<div class="npc-head"><h3>Your Neuro-Stack Protocol</h3><span class="npc-date">'+d+'</span></div>';
+    h += '<div class="rx-stackname">'+esc(stackName)+'</div>';
+    if(details) h += '<div class="npc-sec"><h4>&#9670; Why This Stack</h4><p>'+esc(details)+'</p></div>';
+    if(dosage)  h += '<div class="npc-sec dosage"><h4>&#9636; Protocol Dosage</h4><p>'+esc(dosage)+'</p></div>';
+    h += '<div class="npc-sec"><h4>&#9878; Your Supplements &amp; Why</h4>';
+    (components||[]).forEach(function(id){
+      var src = document.querySelector('.item-card[data-product="'+id+'"]');
+      if(!src) return;
+      var nameEl = src.querySelector('h3'), whyEl = src.querySelector('p'), linkEl = src.querySelector('a.buy-btn');
+      var name = nameEl ? nameEl.textContent.trim() : id;
+      var why  = whyEl  ? whyEl.textContent.trim()  : '';
+      var href = linkEl ? linkEl.getAttribute('href') : '#';
+      h += '<div class="npc-supp"><div class="rx-supp-body"><span class="name">'+esc(name)+'</span>'
+         + '<p class="rx-why">'+esc(why)+'</p></div>'
+         + '<a href="'+esc(href)+'" target="_blank" rel="noopener noreferrer">Acquire</a></div>';
+    });
+    h += '</div>';
+    h += '<div class="npc-foot">'
+       + '<span class="npc-dyor">// Do your own research. Don\'t be a statistic.</span>'
+       + '<span class="rx-return">Return to the procurement hub anytime: hopes-and-dreams.ca/shop.html</span>'
+       + '<p class="rx-disclaim">This readout is generated from your self-reported inputs for educational '
+       + 'purposes only. It is not medical advice. Consult a qualified healthcare professional before '
+       + 'starting any supplement protocol.</p></div>';
+    card.innerHTML = h;
+
+    var old = document.getElementById('rx-save-btn');
+    if(old && old.parentNode) old.parentNode.removeChild(old);
+    var out = document.getElementById('recommendation-output');
+    if(out){
+      var btn = document.createElement('button');
+      btn.id = 'rx-save-btn'; btn.className = 'buy-btn';
+      btn.innerHTML = '&#128424; Save My Stack (PDF)';
+      btn.onclick = window.rxPrint;
+      out.parentNode.insertBefore(btn, out.nextSibling);
+    }
+  };
+
+  window.rxPrint = function(){
+    var card = document.getElementById('rx-card');
+    if(!card || !card.innerHTML.trim()) return;
+    var prev = document.title;
+    var d = new Date().toISOString().slice(0,10).replace(/-/g,'.');
+    document.title = 'HopesAndDreams-Neuro-Stack-'+d;
+    var clone = card.cloneNode(true);
+    clone.id = 'neuro-print-clone';
+    clone.removeAttribute('aria-hidden');
+    document.body.appendChild(clone);
+    document.body.classList.add('printing-profile');
+    window.print();
+    setTimeout(function(){
+      document.title = prev;
+      document.body.classList.remove('printing-profile');
+      if(clone && clone.parentNode) clone.parentNode.removeChild(clone);
+    }, 500);
+  };
+})();
+</script>
 </body>
 </html>
