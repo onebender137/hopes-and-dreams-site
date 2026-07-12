@@ -1107,7 +1107,10 @@ document.addEventListener('DOMContentLoaded', () => {
     function addMessage(text, side) {
         const msg = document.createElement('div');
         msg.className = `message ${side}`;
-        msg.textContent = text;
+        // bot content is our own trusted knowledge file -> render HTML (clickable links);
+        // user content stays as plain text so nothing they type can inject markup.
+        if (side === 'bot') { msg.innerHTML = text; }
+        else { msg.textContent = text; }
         messagesContainer.appendChild(msg);
         messagesContainer.scrollTop = messagesContainer.scrollHeight;
     }
