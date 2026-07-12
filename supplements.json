@@ -1,0 +1,1222 @@
+[
+  {
+    "name": "Alpha-GPC",
+    "what": "Choline source for acetylcholine synthesis. Focus and mind-muscle signalling.",
+    "dose": "300-600 mg daily",
+    "shop": "shop.html",
+    "aliases": [
+      "alpha gpc",
+      "glycerophosphocholine",
+      "choline"
+    ],
+    "articles": [
+      {
+        "href": "articles/2026-07-09-pramiracetam-high-affinity-choline-uptake.html",
+        "title": "Pramiracetam High-Affinity Choline Uptake",
+        "date": "2026-07-09"
+      },
+      {
+        "href": "articles/2026-07-01-l-theanine-calm-alertness-masterclass.html",
+        "title": "L-Theanine: Calm Alertness Masterclass",
+        "date": "2026-07-01"
+      },
+      {
+        "href": "articles/2026-06-30-phosphatidylserine-modulates-membrane-fluidity-and-enzyme-activity.html",
+        "title": "Phosphatidylserine Modulates Membrane Fluidity And Enzyme Activity",
+        "date": "2026-06-30"
+      },
+      {
+        "href": "articles/2026-06-30-magnesium-l-threonate-enhances-brain-function.html",
+        "title": "Magnesium L-Threonate Enhances Brain Function",
+        "date": "2026-06-30"
+      },
+      {
+        "href": "articles/2026-06-28-magnesium-mastering-cognitive-and-cardiovascular-performance.html",
+        "title": "Magnesium: Mastering Cognitive And Cardiovascular Performance",
+        "date": "2026-06-28"
+      },
+      {
+        "href": "articles/2026-06-28-choline-bitartrate-dream-cofactor.html",
+        "title": "Choline Bitartrate Dream Cofactor",
+        "date": "2026-06-28"
+      },
+      {
+        "href": "articles/2026-06-24-citicoline-acetylcholine-synthesis.html",
+        "title": "Citicoline Acetylcholine Synthesis",
+        "date": "2026-06-24"
+      },
+      {
+        "href": "articles/2026-06-24-phenylpiracetam-stim-cognitive-stack.html",
+        "title": "Phenylpiracetam Stim-Cognitive Stack",
+        "date": "2026-06-24"
+      },
+      {
+        "href": "articles/2026-06-21-semax-bdnf-heptapeptide.html",
+        "title": "Semax BDNF Heptapeptide",
+        "date": "2026-06-21"
+      },
+      {
+        "href": "articles/2026-06-18-alpha-gpc-choline-donor-stack.html",
+        "title": "Alpha-GPC Choline Donor Stack",
+        "date": "2026-06-18"
+      },
+      {
+        "href": "articles/2026-06-13-alpha-gpc-choline-donor-stack.html",
+        "title": "Alpha-GPC Choline Donor Stack",
+        "date": "2026-06-13"
+      },
+      {
+        "href": "articles/2026-06-13-citicoline-acetylcholine-synthesis.html",
+        "title": "Citicoline Acetylcholine Synthesis",
+        "date": "2026-06-13"
+      },
+      {
+        "href": "articles/2026-06-12-galantamine-cholinergic-rem-stack.html",
+        "title": "Galantamine Cholinergic REM Stack",
+        "date": "2026-06-12"
+      },
+      {
+        "href": "articles/2026-06-10-pramiracetam-high-affinity-choline-uptake.html",
+        "title": "Pramiracetam High-Affinity Choline Uptake",
+        "date": "2026-06-10"
+      },
+      {
+        "href": "articles/2026-06-06-magnesium-bisglycinate-sleep-architecture.html",
+        "title": "Magnesium Bisglycinate Sleep Architecture",
+        "date": "2026-06-06"
+      },
+      {
+        "href": "articles/2026-06-03-alpha-7-nachr-cognitive-pathway.html",
+        "title": "Alpha-7 nAChR Cognitive Pathway",
+        "date": "2026-06-03"
+      },
+      {
+        "href": "articles/2026-06-02-taurine-healthspan-research.html",
+        "title": "Taurine Healthspan Research",
+        "date": "2026-06-02"
+      },
+      {
+        "href": "articles/2026-06-01-alpha-gpc-choline-donor-stack.html",
+        "title": "Alpha-GPC Choline Donor Stack",
+        "date": "2026-06-01"
+      },
+      {
+        "href": "articles/2026-05-27-galantamine-cholinergic-rem-stack.html",
+        "title": "Galantamine Cholinergic REM Stack",
+        "date": "2026-05-27"
+      },
+      {
+        "href": "articles/2026-05-24-nicotinic-receptor-subtypes-explained.html",
+        "title": "Nicotinic Receptor Subtypes Explained",
+        "date": "2026-05-24"
+      },
+      {
+        "href": "articles/2026-05-15-choline-bitartrate-dream-cofactor.html",
+        "title": "Choline Bitartrate Dream Cofactor",
+        "date": "2026-05-15"
+      },
+      {
+        "href": "articles/2026-05-15-galantamine-cholinergic-rem-stack.html",
+        "title": "Galantamine Cholinergic REM Stack",
+        "date": "2026-05-15"
+      },
+      {
+        "href": "articles/2026-05-06-peptides.html",
+        "title": "Peptides",
+        "date": "2026-05-06"
+      },
+      {
+        "href": "articles/2026-05-01-alpha-gpc-choline.html",
+        "title": "Alpha GPC Choline",
+        "date": "2026-05-01"
+      },
+      {
+        "href": "articles/2026-04-27-valerian-root.html",
+        "title": "Valerian Root",
+        "date": "2026-04-27"
+      },
+      {
+        "href": "articles/2026-04-27-post-with-title-good-morning-monday.html",
+        "title": "Good Morning Monday",
+        "date": "2026-04-27"
+      },
+      {
+        "href": "articles/2026-04-27-n-acetyl-cysteine-nac-for-neuroprotection-and-mitochondrial-support.html",
+        "title": "N-Acetyl Cysteine (NAC) for Neuroprotection and Mitochondrial Support",
+        "date": "2026-04-27"
+      },
+      {
+        "href": "articles/2026-04-26-methylene-blue-mitochondrial-electron-cycling.html",
+        "title": "Methylene Blue: Mitochondrial Electron Cycling",
+        "date": "2026-04-26"
+      },
+      {
+        "href": "articles/2026-04-25-a-post-about-kratom-and-nicotine-nootropic-effects-and-how-it-relates-to-biohacking-go-in-depth-engage-the-reader.html",
+        "title": "Kratom and Nicotine Synergy",
+        "date": "2026-04-25"
+      },
+      {
+        "href": "articles/2026-04-23-recommended-topic-astral-projection.html",
+        "title": "Astral Projection: The Separation Protocol",
+        "date": "2026-04-23"
+      },
+      {
+        "href": "articles/2026-04-23-nootropics-101-foundation.html",
+        "title": "Nootropics 101: The Foundation",
+        "date": "2026-04-23"
+      },
+      {
+        "href": "articles/2026-04-23-molecular-biology-of-memory.html",
+        "title": "The Molecular Biology of Memory",
+        "date": "2026-04-23"
+      },
+      {
+        "href": "articles/2025-05-15-nootropics-foundation-definition.html",
+        "title": "Nootropics Foundation: Definition &amp; Scope",
+        "date": "2025-05-15"
+      }
+    ]
+  },
+  {
+    "name": "Ashwagandha",
+    "what": "Adaptogen. Blunts cortisol response to stress; studied for anxiety and recovery.",
+    "dose": "300-600 mg standardized extract, daily",
+    "shop": "shop.html",
+    "aliases": [
+      "withania",
+      "ksm-66",
+      "ksm 66",
+      "sensoril"
+    ],
+    "articles": [
+      {
+        "href": "articles/2026-07-04-cold-thermogenesis-hrv-optimization.html",
+        "title": "Cold Thermogenesis HRV Optimization",
+        "date": "2026-07-04"
+      },
+      {
+        "href": "articles/2026-07-01-phytoncides-enhance-immune-and-neural-health.html",
+        "title": "Phytoncides Enhance Immune And Neural Health",
+        "date": "2026-07-01"
+      },
+      {
+        "href": "articles/2026-06-22-ashwagandha-cortisol-modulation.html",
+        "title": "Ashwagandha Cortisol Modulation",
+        "date": "2026-06-22"
+      },
+      {
+        "href": "articles/2026-06-11-ashwagandha-hpa-axis-regulation.html",
+        "title": "Ashwagandha HPA Axis Regulation",
+        "date": "2026-06-11"
+      },
+      {
+        "href": "articles/2026-05-29-sauna-heat-shock-protein-activation.html",
+        "title": "Sauna Heat Shock Protein Activation",
+        "date": "2026-05-29"
+      },
+      {
+        "href": "articles/2026-05-18-ashwagandha-cortisol-modulation.html",
+        "title": "Ashwagandha Cortisol Modulation",
+        "date": "2026-05-18"
+      },
+      {
+        "href": "articles/2026-05-15-mugwort-tea-an-overview-of-its-health-benefits-and-traditional-uses.html",
+        "title": "MUGWORT TEA: AN OVERVIEW OF ITS HEALTH BENEFITS AND TRADITIONAL USES",
+        "date": "2026-05-15"
+      }
+    ]
+  },
+  {
+    "name": "Bacopa Monnieri",
+    "what": "Ayurvedic nootropic. Memory consolidation over 8-12 week horizons.",
+    "dose": "300 mg (50% bacosides), daily",
+    "shop": "shop.html",
+    "aliases": [
+      "bacopa",
+      "bacosides",
+      "brahmi"
+    ],
+    "articles": [
+      {
+        "href": "articles/2026-06-27-kratom-alkaloids-modulate-opioid-pathways.html",
+        "title": "Kratom Alkaloids Modulate Opioid Pathways",
+        "date": "2026-06-27"
+      },
+      {
+        "href": "articles/2026-06-16-selank-anxiolytic-nootropic-peptide.html",
+        "title": "Selank Anxiolytic Nootropic Peptide",
+        "date": "2026-06-16"
+      },
+      {
+        "href": "articles/2026-06-01-bacopa-monnieri-memory-enhancement.html",
+        "title": "Bacopa Monnieri Memory Enhancement",
+        "date": "2026-06-01"
+      },
+      {
+        "href": "articles/2026-05-13-bacopa-monnieri-memory-enhancement.html",
+        "title": "Bacopa Monnieri Memory Enhancement",
+        "date": "2026-05-13"
+      },
+      {
+        "href": "articles/2026-05-07-neurobiology-of-magnesium-bisglycinate-a-deep-dive-into-cognitive-enhancement.html",
+        "title": "Neurobiology of Magnesium Bisglycinate: A Deep Dive into Cognitive Enhancement",
+        "date": "2026-05-07"
+      },
+      {
+        "href": "articles/2026-04-23-molecular-biology-of-memory.html",
+        "title": "The Molecular Biology of Memory",
+        "date": "2026-04-23"
+      },
+      {
+        "href": "articles/2026-04-20-gaba-receptor-modulation-through-bacopa-monnieri.html",
+        "title": "GABA Receptor Modulation through Bacopa",
+        "date": "2026-04-20"
+      },
+      {
+        "href": "articles/2025-05-15-nootropics-foundation-definition.html",
+        "title": "Nootropics Foundation: Definition &amp; Scope",
+        "date": "2025-05-15"
+      }
+    ]
+  },
+  {
+    "name": "Caffeine",
+    "what": "Adenosine antagonist. Acute alertness and output; best stacked with L-theanine.",
+    "dose": "50-200 mg, watch the half-life",
+    "shop": "shop.html",
+    "aliases": [
+      "coffee",
+      "caffeine anhydrous"
+    ],
+    "articles": [
+      {
+        "href": "articles/2026-07-12-l-theanine-gabaergic-calming.html",
+        "title": "L-Theanine GABAergic Calming",
+        "date": "2026-07-12"
+      },
+      {
+        "href": "articles/2026-07-07-synergistic-effects-of-nicotine-and-caffeine-on-cognitive.html",
+        "title": "Synergistic Effects of Nicotine and Caffeine on Cognitive",
+        "date": "2026-07-07"
+      },
+      {
+        "href": "articles/2026-07-07-nicotine-patch-cognitive-stack.html",
+        "title": "Nicotine Patch Cognitive Stack",
+        "date": "2026-07-07"
+      },
+      {
+        "href": "articles/2026-07-04-chaga-antioxidant-and-anti-inflammatory-elixir.html",
+        "title": "Chaga: Antioxidant And Anti-inflammatory Elixir",
+        "date": "2026-07-04"
+      },
+      {
+        "href": "articles/2026-07-04-cold-thermogenesis-hrv-optimization.html",
+        "title": "Cold Thermogenesis HRV Optimization",
+        "date": "2026-07-04"
+      },
+      {
+        "href": "articles/2026-07-01-l-theanine-calm-alertness-masterclass.html",
+        "title": "L-Theanine: Calm Alertness Masterclass",
+        "date": "2026-07-01"
+      },
+      {
+        "href": "articles/2026-06-27-kratom-alkaloids-modulate-opioid-pathways.html",
+        "title": "Kratom Alkaloids Modulate Opioid Pathways",
+        "date": "2026-06-27"
+      },
+      {
+        "href": "articles/2026-06-27-kratom-strain-alkaloid-profiles.html",
+        "title": "Kratom Strain Alkaloid Profiles",
+        "date": "2026-06-27"
+      },
+      {
+        "href": "articles/2026-06-21-l-theanine-caffeine-synergy.html",
+        "title": "L-Theanine + Caffeine Synergy",
+        "date": "2026-06-21"
+      },
+      {
+        "href": "articles/2026-06-14-dasatinib-quercetin-senolytic-combination.html",
+        "title": "Dasatinib Quercetin Senolytic Combination",
+        "date": "2026-06-14"
+      },
+      {
+        "href": "articles/2026-06-11-l-theanine-gabaergic-calming.html",
+        "title": "L-Theanine GABAergic Calming",
+        "date": "2026-06-11"
+      },
+      {
+        "href": "articles/2026-06-09-cold-thermogenesis-hrv-optimization.html",
+        "title": "Cold Thermogenesis HRV Optimization",
+        "date": "2026-06-09"
+      },
+      {
+        "href": "articles/2026-06-03-nicotine-patch-cognitive-stack.html",
+        "title": "Nicotine Patch Cognitive Stack",
+        "date": "2026-06-03"
+      },
+      {
+        "href": "articles/2026-06-03-asprey-style-low-dose-nicotine.html",
+        "title": "Asprey-Style Low-Dose Nicotine",
+        "date": "2026-06-03"
+      },
+      {
+        "href": "articles/2026-05-29-sauna-heat-shock-protein-activation.html",
+        "title": "Sauna Heat Shock Protein Activation",
+        "date": "2026-05-29"
+      },
+      {
+        "href": "articles/2026-05-29-cold-thermogenesis-hrv-optimization.html",
+        "title": "Cold Thermogenesis HRV Optimization",
+        "date": "2026-05-29"
+      },
+      {
+        "href": "articles/2026-05-24-nicotine-caffeine-synergy.html",
+        "title": "Nicotine + Caffeine Synergy",
+        "date": "2026-05-24"
+      },
+      {
+        "href": "articles/2026-05-22-l-theanine-gabaergic-calming.html",
+        "title": "L-Theanine GABAergic Calming",
+        "date": "2026-05-22"
+      },
+      {
+        "href": "articles/2026-05-15-mugwort-tea-preparation-protocol.html",
+        "title": "Mugwort Tea Preparation Protocol",
+        "date": "2026-05-15"
+      },
+      {
+        "href": "articles/2026-05-12-nicotine-patch-cognitive-stack.html",
+        "title": "Nicotine Patch Cognitive Stack",
+        "date": "2026-05-12"
+      },
+      {
+        "href": "articles/2026-05-09-deciphering-nootropics-a-dive-into-cognitive-enhancement-mechanisms.html",
+        "title": "Deciphering Nootropics: A Dive into Cognitive Enhancement Mechanisms",
+        "date": "2026-05-09"
+      },
+      {
+        "href": "articles/2026-05-04-the-neurobiological-mechanisms-of-sulbutiamine-for-enhancing-cognitive-performance.html",
+        "title": "The Neurobiological Mechanisms of Sulbutiamine for Enhancing Cognitive Performance",
+        "date": "2026-05-04"
+      },
+      {
+        "href": "articles/2026-05-01-the-science-of-coffee.html",
+        "title": "The Science of Coffee",
+        "date": "2026-05-01"
+      },
+      {
+        "href": "articles/2026-04-28-the-neurophysiological-effects-of-l-theanine-on-cortisol-levels-and-cognitive-function.html",
+        "title": "The Neurophysiological Effects of L-Theanine on Cortisol Levels and Cognitive Function",
+        "date": "2026-04-28"
+      },
+      {
+        "href": "articles/2026-04-23-nootropics-101-foundation.html",
+        "title": "Nootropics 101: The Foundation",
+        "date": "2026-04-23"
+      },
+      {
+        "href": "articles/2025-05-15-nicotine-performance-biohack.html",
+        "title": "Nicotine: The Formidable Performance Biohack",
+        "date": "2025-05-15"
+      }
+    ]
+  },
+  {
+    "name": "CoQ10",
+    "what": "Mitochondrial electron-transport cofactor. Cellular energy and cardiovascular support.",
+    "dose": "100-200 mg (ubiquinol), with fat",
+    "shop": "shop.html",
+    "aliases": [
+      "coenzyme q10",
+      "ubiquinol",
+      "ubiquinone",
+      "coq-10"
+    ],
+    "articles": [
+      {
+        "href": "articles/2026-06-25-pqq-mitochondrial-biogenesis.html",
+        "title": "PQQ Mitochondrial Biogenesis",
+        "date": "2026-06-25"
+      },
+      {
+        "href": "articles/2026-06-25-coq10-vs-ubiquinol-bioavailability.html",
+        "title": "CoQ10 vs Ubiquinol Bioavailability",
+        "date": "2026-06-25"
+      },
+      {
+        "href": "articles/2026-05-28-coq10-vs-ubiquinol-bioavailability.html",
+        "title": "CoQ10 vs Ubiquinol Bioavailability",
+        "date": "2026-05-28"
+      },
+      {
+        "href": "articles/2026-05-07-unlocking-cellular-vitality-through-targeted-nad-precursor-strategies.html",
+        "title": "Unlocking Cellular Vitality through Targeted NAD+ Precursor Strategies",
+        "date": "2026-05-07"
+      },
+      {
+        "href": "articles/2026-05-05-optimizing-mitochondrial-function-with-pyrroloquinoline-quinone-pqq.html",
+        "title": "Optimizing Mitochondrial Function with Pyrroloquinoline Quinone (PQQ)",
+        "date": "2026-05-05"
+      },
+      {
+        "href": "articles/2026-05-04-topic-name-mitochondrial-support-and-recovery-the-science-of-nad-precursors.html",
+        "title": "Mitochondrial Support and Recovery: The Science of NAD+ Precursors",
+        "date": "2026-05-04"
+      },
+      {
+        "href": "articles/2026-05-04-neurobiology-of-mitochondrial-optimization-harnessing-cellular-powerhouses-for-enhanced-cognitive-performance.html",
+        "title": "Neurobiology of Mitochondrial Optimization: Harnessing Cellular Powerhouses for Enhanced Cognitive Performance",
+        "date": "2026-05-04"
+      },
+      {
+        "href": "articles/2026-05-03-pineal-gland-detox.html",
+        "title": "Pineal Gland Detox",
+        "date": "2026-05-03"
+      }
+    ]
+  },
+  {
+    "name": "Creatine",
+    "what": "Cellular energy buffer. Strength/power output plus emerging cognitive and mood support.",
+    "dose": "3-5 g daily, timing-agnostic",
+    "shop": "shop.html",
+    "aliases": [
+      "creatine monohydrate",
+      "creatine hcl"
+    ],
+    "articles": [
+      {
+        "href": "articles/2026-06-25-pqq-mitochondrial-biogenesis.html",
+        "title": "PQQ Mitochondrial Biogenesis",
+        "date": "2026-06-25"
+      },
+      {
+        "href": "articles/2026-06-25-creatine-monohydrate-atp-reservoir.html",
+        "title": "Creatine Monohydrate ATP Reservoir",
+        "date": "2026-06-25"
+      },
+      {
+        "href": "articles/2026-06-20-tongkat-ali-testosterone-recovery.html",
+        "title": "Tongkat Ali Testosterone Recovery",
+        "date": "2026-06-20"
+      },
+      {
+        "href": "articles/2026-06-19-pqq-mitochondrial-biogenesis.html",
+        "title": "PQQ Mitochondrial Biogenesis",
+        "date": "2026-06-19"
+      },
+      {
+        "href": "articles/2026-06-19-creatine-monohydrate-atp-reservoir.html",
+        "title": "Creatine Monohydrate ATP Reservoir",
+        "date": "2026-06-19"
+      },
+      {
+        "href": "articles/2026-05-04-neurobiology-of-mitochondrial-optimization-harnessing-cellular-powerhouses-for-enhanced-cognitive-performance.html",
+        "title": "Neurobiology of Mitochondrial Optimization: Harnessing Cellular Powerhouses for Enhanced Cognitive Performance",
+        "date": "2026-05-04"
+      }
+    ]
+  },
+  {
+    "name": "Glycine",
+    "what": "Inhibitory amino acid. Lowers core temp for sleep onset; collagen substrate.",
+    "dose": "3 g before bed",
+    "shop": "shop.html",
+    "aliases": [
+      "glycine"
+    ],
+    "articles": [
+      {
+        "href": "articles/2026-06-26-glycine-nac-methionine-restriction-mimetic.html",
+        "title": "Glycine + NAC Methionine Restriction Mimetic",
+        "date": "2026-06-26"
+      },
+      {
+        "href": "articles/2026-06-25-creatine-monohydrate-atp-reservoir.html",
+        "title": "Creatine Monohydrate ATP Reservoir",
+        "date": "2026-06-25"
+      },
+      {
+        "href": "articles/2026-06-17-glycine-nmda-modulation-for-deep-sleep.html",
+        "title": "Glycine NMDA Modulation for Deep Sleep",
+        "date": "2026-06-17"
+      },
+      {
+        "href": "articles/2026-06-08-glycine-nmda-modulation-for-deep-sleep.html",
+        "title": "Glycine NMDA Modulation for Deep Sleep",
+        "date": "2026-06-08"
+      },
+      {
+        "href": "articles/2026-06-06-magnesium-bisglycinate-sleep-architecture.html",
+        "title": "Magnesium Bisglycinate Sleep Architecture",
+        "date": "2026-06-06"
+      },
+      {
+        "href": "articles/2026-05-22-glycine-nmda-modulation-for-deep-sleep.html",
+        "title": "Glycine NMDA Modulation for Deep Sleep",
+        "date": "2026-05-22"
+      },
+      {
+        "href": "articles/2026-05-14-glycine-nmda-modulation-for-deep-sleep.html",
+        "title": "Glycine NMDA Modulation for Deep Sleep",
+        "date": "2026-05-14"
+      },
+      {
+        "href": "articles/2026-04-23-glycine-nmda-receptor-modulation-and-sleep-regulation.html",
+        "title": "Glycine: NMDA Modulation and Sleep Architecture",
+        "date": "2026-04-23"
+      }
+    ]
+  },
+  {
+    "name": "L-Theanine",
+    "what": "Amino acid from green tea. Smooths caffeine's edge, promotes calm-focus without sedation.",
+    "dose": "100-200 mg, often 2:1 with caffeine",
+    "shop": "shop.html",
+    "aliases": [
+      "theanine",
+      "l theanine"
+    ],
+    "articles": [
+      {
+        "href": "articles/2026-07-12-l-theanine-gabaergic-calming.html",
+        "title": "L-Theanine GABAergic Calming",
+        "date": "2026-07-12"
+      },
+      {
+        "href": "articles/2026-07-01-l-theanine-calm-alertness-masterclass.html",
+        "title": "L-Theanine: Calm Alertness Masterclass",
+        "date": "2026-07-01"
+      },
+      {
+        "href": "articles/2026-06-27-kratom-alkaloids-modulate-opioid-pathways.html",
+        "title": "Kratom Alkaloids Modulate Opioid Pathways",
+        "date": "2026-06-27"
+      },
+      {
+        "href": "articles/2026-06-24-thc-effects-on-the-hrv.html",
+        "title": "THC effects on the HRV",
+        "date": "2026-06-24"
+      },
+      {
+        "href": "articles/2026-06-21-semax-bdnf-heptapeptide.html",
+        "title": "Semax BDNF Heptapeptide",
+        "date": "2026-06-21"
+      },
+      {
+        "href": "articles/2026-06-21-l-theanine-caffeine-synergy.html",
+        "title": "L-Theanine + Caffeine Synergy",
+        "date": "2026-06-21"
+      },
+      {
+        "href": "articles/2026-06-13-the-neurobiology-of-sulbutiamine.html",
+        "title": "The Neurobiology of Sulbutiamine",
+        "date": "2026-06-13"
+      },
+      {
+        "href": "articles/2026-06-11-l-theanine-gabaergic-calming.html",
+        "title": "L-Theanine GABAergic Calming",
+        "date": "2026-06-11"
+      },
+      {
+        "href": "articles/2026-05-22-l-theanine-gabaergic-calming.html",
+        "title": "L-Theanine GABAergic Calming",
+        "date": "2026-05-22"
+      },
+      {
+        "href": "articles/2026-05-15-mugwort-tea-preparation-protocol.html",
+        "title": "Mugwort Tea Preparation Protocol",
+        "date": "2026-05-15"
+      },
+      {
+        "href": "articles/2026-05-05-dmt-and-the-pineal-gland.html",
+        "title": "DMT and the Pineal Gland",
+        "date": "2026-05-05"
+      },
+      {
+        "href": "articles/2026-05-01-the-science-of-coffee.html",
+        "title": "The Science of Coffee",
+        "date": "2026-05-01"
+      },
+      {
+        "href": "articles/2026-04-30-deep-meditation-techniques.html",
+        "title": "Deep Meditation Techniques",
+        "date": "2026-04-30"
+      },
+      {
+        "href": "articles/2026-04-28-the-neurophysiological-effects-of-l-theanine-on-cortisol-levels-and-cognitive-function.html",
+        "title": "The Neurophysiological Effects of L-Theanine on Cortisol Levels and Cognitive Function",
+        "date": "2026-04-28"
+      },
+      {
+        "href": "articles/2026-04-27-natural-methods-to-enhance-cognitive-function-and-mood.html",
+        "title": "Natural Methods to Enhance Cognitive Function and Mood",
+        "date": "2026-04-27"
+      },
+      {
+        "href": "articles/2026-04-23-nootropics-101-foundation.html",
+        "title": "Nootropics 101: The Foundation",
+        "date": "2026-04-23"
+      }
+    ]
+  },
+  {
+    "name": "L-Tyrosine",
+    "what": "Dopamine precursor. Cognitive performance under acute stress/sleep debt.",
+    "dose": "500-2000 mg, empty stomach",
+    "shop": "shop.html",
+    "aliases": [
+      "tyrosine",
+      "l tyrosine",
+      "n-acetyl-l-tyrosine",
+      "nalt"
+    ],
+    "articles": [
+      {
+        "href": "articles/2026-07-04-cold-thermogenesis-hrv-optimization.html",
+        "title": "Cold Thermogenesis HRV Optimization",
+        "date": "2026-07-04"
+      },
+      {
+        "href": "articles/2026-06-30-tyrosine-catecholamine-precursor.html",
+        "title": "Tyrosine Catecholamine Precursor",
+        "date": "2026-06-30"
+      },
+      {
+        "href": "articles/2026-06-09-cold-thermogenesis-hrv-optimization.html",
+        "title": "Cold Thermogenesis HRV Optimization",
+        "date": "2026-06-09"
+      },
+      {
+        "href": "articles/2026-05-30-tyrosine-catecholamine-precursor.html",
+        "title": "Tyrosine Catecholamine Precursor",
+        "date": "2026-05-30"
+      },
+      {
+        "href": "articles/2026-05-06-dopamine-fasting.html",
+        "title": "Dopamine Fasting",
+        "date": "2026-05-06"
+      }
+    ]
+  },
+  {
+    "name": "Lion's Mane",
+    "what": "Mushroom studied for nerve-growth-factor support and cognitive maintenance.",
+    "dose": "500-1000 mg extract, daily",
+    "shop": "shop.html",
+    "aliases": [
+      "lions mane",
+      "lion's mane",
+      "hericium",
+      "hericium erinaceus"
+    ],
+    "articles": [
+      {
+        "href": "articles/2026-06-15-lions-mane-neurogenesis-protocols.html",
+        "title": "Lions Mane Neurogenesis Protocols",
+        "date": "2026-06-15"
+      },
+      {
+        "href": "articles/2025-05-15-nootropics-foundation-definition.html",
+        "title": "Nootropics Foundation: Definition &amp; Scope",
+        "date": "2025-05-15"
+      }
+    ]
+  },
+  {
+    "name": "Magnesium",
+    "what": "Cofactor in 300+ enzymatic reactions. Supports sleep depth, muscle recovery, and nervous-system downregulation.",
+    "dose": "200-400 mg elemental, evening",
+    "shop": "shop.html",
+    "aliases": [
+      "magnesium glycinate",
+      "mag glycinate",
+      "magnesium l-threonate",
+      "magnesium threonate",
+      "magnesium bisglycinate",
+      "magnesium citrate"
+    ],
+    "articles": [
+      {
+        "href": "articles/2026-07-11-magnesium-l-threonate-recovery-stack.html",
+        "title": "Magnesium L-Threonate Recovery Stack",
+        "date": "2026-07-11"
+      },
+      {
+        "href": "articles/2026-07-07-valerian-root-calms-gaba-and-serotonin-pathways.html",
+        "title": "Valerian Root Calms Gaba And Serotonin Pathways",
+        "date": "2026-07-07"
+      },
+      {
+        "href": "articles/2026-07-05-valerian-root-boosts-gaba-and-calms-nerves.html",
+        "title": "Valerian Root Boosts Gaba And Calms Nerves",
+        "date": "2026-07-05"
+      },
+      {
+        "href": "articles/2026-07-04-magnesium-l-threonate-recovery-stack.html",
+        "title": "Magnesium L-Threonate Recovery Stack",
+        "date": "2026-07-04"
+      },
+      {
+        "href": "articles/2026-06-30-magnesium-l-threonate-enhances-brain-function.html",
+        "title": "Magnesium L-Threonate Enhances Brain Function",
+        "date": "2026-06-30"
+      },
+      {
+        "href": "articles/2026-06-28-magnesium-mastering-cognitive-and-cardiovascular-performance.html",
+        "title": "Magnesium: Mastering Cognitive And Cardiovascular Performance",
+        "date": "2026-06-28"
+      },
+      {
+        "href": "articles/2026-06-17-magnesium-bisglycinate-sleep-architecture.html",
+        "title": "Magnesium Bisglycinate Sleep Architecture",
+        "date": "2026-06-17"
+      },
+      {
+        "href": "articles/2026-06-17-glycine-nmda-modulation-for-deep-sleep.html",
+        "title": "Glycine NMDA Modulation for Deep Sleep",
+        "date": "2026-06-17"
+      },
+      {
+        "href": "articles/2026-06-08-glycine-nmda-modulation-for-deep-sleep.html",
+        "title": "Glycine NMDA Modulation for Deep Sleep",
+        "date": "2026-06-08"
+      },
+      {
+        "href": "articles/2026-06-07-magnesium-l-threonate-recovery-stack.html",
+        "title": "Magnesium L-Threonate Recovery Stack",
+        "date": "2026-06-07"
+      },
+      {
+        "href": "articles/2026-06-06-magnesium-bisglycinate-sleep-architecture.html",
+        "title": "Magnesium Bisglycinate Sleep Architecture",
+        "date": "2026-06-06"
+      },
+      {
+        "href": "articles/2026-06-04-nmn-nad-bioenergetics.html",
+        "title": "NMN NAD+ Bioenergetics",
+        "date": "2026-06-04"
+      },
+      {
+        "href": "articles/2026-05-23-magnesium.html",
+        "title": "Magnesium",
+        "date": "2026-05-23"
+      },
+      {
+        "href": "articles/2026-05-23-magnesium-the-vital-element-for-peak-physiological-performance.html",
+        "title": "Magnesium: The Vital Element for Peak Physiological Performance",
+        "date": "2026-05-23"
+      },
+      {
+        "href": "articles/2026-05-22-glycine-nmda-modulation-for-deep-sleep.html",
+        "title": "Glycine NMDA Modulation for Deep Sleep",
+        "date": "2026-05-22"
+      },
+      {
+        "href": "articles/2026-05-22-l-theanine-gabaergic-calming.html",
+        "title": "L-Theanine GABAergic Calming",
+        "date": "2026-05-22"
+      },
+      {
+        "href": "articles/2026-05-18-magnesium-l-threonate-recovery-stack.html",
+        "title": "Magnesium L-Threonate Recovery Stack",
+        "date": "2026-05-18"
+      },
+      {
+        "href": "articles/2026-05-14-glycine-nmda-modulation-for-deep-sleep.html",
+        "title": "Glycine NMDA Modulation for Deep Sleep",
+        "date": "2026-05-14"
+      },
+      {
+        "href": "articles/2026-05-14-magnesium-bisglycinate-sleep-architecture.html",
+        "title": "Magnesium Bisglycinate Sleep Architecture",
+        "date": "2026-05-14"
+      },
+      {
+        "href": "articles/2026-05-07-neurobiology-of-magnesium-bisglycinate-a-deep-dive-into-cognitive-enhancement.html",
+        "title": "Neurobiology of Magnesium Bisglycinate: A Deep Dive into Cognitive Enhancement",
+        "date": "2026-05-07"
+      },
+      {
+        "href": "articles/2026-04-30-magnesium-l-threonate.html",
+        "title": "Magnesium L-Threonate",
+        "date": "2026-04-30"
+      },
+      {
+        "href": "articles/2026-04-23-glycine-nmda-receptor-modulation-and-sleep-regulation.html",
+        "title": "Glycine: NMDA Modulation and Sleep Architecture",
+        "date": "2026-04-23"
+      },
+      {
+        "href": "articles/2026-04-21-biohacking-hpa-axis-regulation-through-5-htp.html",
+        "title": "Biohacking HPA Axis Regulation through 5-HTP",
+        "date": "2026-04-21"
+      },
+      {
+        "href": "articles/2026-04-20-electrolyte-imbalance-correction-through-potassium-citrate-supplementation.html",
+        "title": "Electrolyte Imbalance Correction",
+        "date": "2026-04-20"
+      }
+    ]
+  },
+  {
+    "name": "Melatonin",
+    "what": "Circadian signalling hormone. Sleep-onset timing, not a sedative.",
+    "dose": "0.3-1 mg, ~1 hr before bed",
+    "shop": "shop.html",
+    "aliases": [
+      "melatonin"
+    ],
+    "articles": [
+      {
+        "href": "articles/2026-07-12-saffron-crocin-sleep-quality.html",
+        "title": "Saffron Crocin Sleep Quality",
+        "date": "2026-07-12"
+      },
+      {
+        "href": "articles/2026-07-02-l-tryptophan-serotonin-melatonin-pathway.html",
+        "title": "L-Tryptophan Serotonin-Melatonin Pathway",
+        "date": "2026-07-02"
+      },
+      {
+        "href": "articles/2026-06-30-magnesium-l-threonate-enhances-brain-function.html",
+        "title": "Magnesium L-Threonate Enhances Brain Function",
+        "date": "2026-06-30"
+      },
+      {
+        "href": "articles/2026-06-23-low-dose-melatonin-circadian-entrainment.html",
+        "title": "Low-Dose Melatonin Circadian Entrainment",
+        "date": "2026-06-23"
+      },
+      {
+        "href": "articles/2026-06-22-tart-cherry-sleep-inflammation.html",
+        "title": "Tart Cherry Sleep & Inflammation",
+        "date": "2026-06-22"
+      },
+      {
+        "href": "articles/2026-06-17-glycine-nmda-modulation-for-deep-sleep.html",
+        "title": "Glycine NMDA Modulation for Deep Sleep",
+        "date": "2026-06-17"
+      },
+      {
+        "href": "articles/2026-06-12-calea-zacatechichi-oneirogen.html",
+        "title": "Calea Zacatechichi Oneirogen",
+        "date": "2026-06-12"
+      },
+      {
+        "href": "articles/2026-06-08-low-dose-melatonin-circadian-entrainment.html",
+        "title": "Low-Dose Melatonin Circadian Entrainment",
+        "date": "2026-06-08"
+      },
+      {
+        "href": "articles/2026-06-08-l-tryptophan-serotonin-melatonin-pathway.html",
+        "title": "L-Tryptophan Serotonin-Melatonin Pathway",
+        "date": "2026-06-08"
+      },
+      {
+        "href": "articles/2026-06-07-tart-cherry-sleep-inflammation.html",
+        "title": "Tart Cherry Sleep & Inflammation",
+        "date": "2026-06-07"
+      },
+      {
+        "href": "articles/2026-06-06-low-dose-melatonin-circadian-entrainment.html",
+        "title": "Low-Dose Melatonin Circadian Entrainment",
+        "date": "2026-06-06"
+      },
+      {
+        "href": "articles/2026-06-05-pineal-gland-dmt-hypothesis.html",
+        "title": "Pineal Gland DMT Hypothesis",
+        "date": "2026-06-05"
+      },
+      {
+        "href": "articles/2026-05-29-tart-cherry-sleep-inflammation.html",
+        "title": "Tart Cherry Sleep & Inflammation",
+        "date": "2026-05-29"
+      },
+      {
+        "href": "articles/2026-05-23-magnesium.html",
+        "title": "Magnesium",
+        "date": "2026-05-23"
+      },
+      {
+        "href": "articles/2026-05-22-low-dose-melatonin-circadian-entrainment.html",
+        "title": "Low-Dose Melatonin Circadian Entrainment",
+        "date": "2026-05-22"
+      },
+      {
+        "href": "articles/2026-05-18-the-role-of-tart-cherries-in-sleep-enhancement-a-strategic-approach.html",
+        "title": "The Role of Tart Cherries in Sleep Enhancement: A Strategic Approach",
+        "date": "2026-05-18"
+      },
+      {
+        "href": "articles/2026-05-16-melatonin.html",
+        "title": "Melatonin",
+        "date": "2026-05-16"
+      },
+      {
+        "href": "articles/2026-05-10-melatonin.html",
+        "title": "Melatonin",
+        "date": "2026-05-10"
+      },
+      {
+        "href": "articles/2026-05-08-unlocking-the-power-of-melatonin-a-deep-dive-into-its-mechanisms-and-uses.html",
+        "title": "Unlocking the Power of Melatonin: A Deep Dive into its Mechanisms and Uses",
+        "date": "2026-05-08"
+      },
+      {
+        "href": "articles/2026-05-05-dmt-and-the-pineal-gland.html",
+        "title": "DMT and the Pineal Gland",
+        "date": "2026-05-05"
+      },
+      {
+        "href": "articles/2026-05-03-pineal-gland-detox.html",
+        "title": "Pineal Gland Detox",
+        "date": "2026-05-03"
+      },
+      {
+        "href": "articles/2026-04-23-circadian-rhythm-entrainment-through-melatonin-supplementation.html",
+        "title": "Circadian Entrainment: Low-Dose Melatonin Protocols",
+        "date": "2026-04-23"
+      }
+    ]
+  },
+  {
+    "name": "NAC",
+    "what": "Glutathione precursor. Antioxidant support and glutamate modulation.",
+    "dose": "600-1200 mg daily",
+    "shop": "shop.html",
+    "aliases": [
+      "n-acetylcysteine",
+      "n acetylcysteine",
+      "acetylcysteine"
+    ],
+    "articles": [
+      {
+        "href": "articles/2026-07-01-thc-modulates-neural-activity-through-endocannabinoid-system-binding.html",
+        "title": "Thc Modulates Neural Activity Through Endocannabinoid System Binding",
+        "date": "2026-07-01"
+      },
+      {
+        "href": "articles/2026-06-26-glycine-nac-methionine-restriction-mimetic.html",
+        "title": "Glycine + NAC Methionine Restriction Mimetic",
+        "date": "2026-06-26"
+      },
+      {
+        "href": "articles/2026-05-04-neurobiology-of-mitochondrial-optimization-harnessing-cellular-powerhouses-for-enhanced-cognitive-performance.html",
+        "title": "Neurobiology of Mitochondrial Optimization: Harnessing Cellular Powerhouses for Enhanced Cognitive Performance",
+        "date": "2026-05-04"
+      },
+      {
+        "href": "articles/2026-05-03-pineal-gland-detox.html",
+        "title": "Pineal Gland Detox",
+        "date": "2026-05-03"
+      },
+      {
+        "href": "articles/2026-05-02-detox-from-nano-tech.html",
+        "title": "Detox from Nano-tech",
+        "date": "2026-05-02"
+      },
+      {
+        "href": "articles/2026-04-27-n-acetyl-cysteine-nac-for-neuroprotection-and-mitochondrial-support.html",
+        "title": "N-Acetyl Cysteine (NAC) for Neuroprotection and Mitochondrial Support",
+        "date": "2026-04-27"
+      }
+    ]
+  },
+  {
+    "name": "Omega-3",
+    "what": "EPA/DHA fatty acids. Anti-inflammatory, cardiovascular, and neuronal membrane support.",
+    "dose": "1-2 g combined EPA+DHA daily",
+    "shop": "shop.html",
+    "aliases": [
+      "fish oil",
+      "epa",
+      "dha",
+      "epa/dha",
+      "krill oil"
+    ],
+    "articles": [
+      {
+        "href": "articles/2026-07-11-omega-3-spm-resolvins.html",
+        "title": "Omega-3 SPM Resolvins",
+        "date": "2026-07-11"
+      },
+      {
+        "href": "articles/2026-07-04-omega-3-spm-resolvins.html",
+        "title": "Omega-3 SPM Resolvins",
+        "date": "2026-07-04"
+      },
+      {
+        "href": "articles/2026-05-15-choline-bitartrate-dream-cofactor.html",
+        "title": "Choline Bitartrate Dream Cofactor",
+        "date": "2026-05-15"
+      },
+      {
+        "href": "articles/2026-05-05-the-neurobiology-of-sulbutiamine-optimizing-cognitive-function-via-nmda-receptor-modulation.html",
+        "title": "The Neurobiology of Sulbutiamine: Optimizing Cognitive Function via NMDA Receptor Modulation",
+        "date": "2026-05-05"
+      },
+      {
+        "href": "articles/2026-04-26-nad-precursors-and-mitochondrial-biogenesis.html",
+        "title": "NAD+ precursors and mitochondrial biogenesis",
+        "date": "2026-04-26"
+      },
+      {
+        "href": "articles/2026-04-24-cytokine-modulation-through-omega-3-fatty-acids.html",
+        "title": "Cytokine Modulation: Omega-3 Protocols",
+        "date": "2026-04-24"
+      }
+    ]
+  },
+  {
+    "name": "Rhodiola Rosea",
+    "what": "Adaptogen for fatigue resistance and mental stamina under load.",
+    "dose": "200-400 mg (3% rosavins), morning",
+    "shop": "shop.html",
+    "aliases": [
+      "rhodiola",
+      "rosavins",
+      "salidroside"
+    ],
+    "articles": [
+      {
+        "href": "articles/2026-07-04-cold-thermogenesis-hrv-optimization.html",
+        "title": "Cold Thermogenesis HRV Optimization",
+        "date": "2026-07-04"
+      },
+      {
+        "href": "articles/2026-07-01-phytoncides-enhance-immune-and-neural-health.html",
+        "title": "Phytoncides Enhance Immune And Neural Health",
+        "date": "2026-07-01"
+      },
+      {
+        "href": "articles/2026-06-27-kratom-alkaloids-modulate-opioid-pathways.html",
+        "title": "Kratom Alkaloids Modulate Opioid Pathways",
+        "date": "2026-06-27"
+      },
+      {
+        "href": "articles/2026-06-24-rhodiola-rosea-mental-fatigue.html",
+        "title": "Rhodiola Rosea Mental Fatigue",
+        "date": "2026-06-24"
+      },
+      {
+        "href": "articles/2026-06-16-selank-anxiolytic-nootropic-peptide.html",
+        "title": "Selank Anxiolytic Nootropic Peptide",
+        "date": "2026-06-16"
+      },
+      {
+        "href": "articles/2026-06-14-dasatinib-quercetin-senolytic-combination.html",
+        "title": "Dasatinib Quercetin Senolytic Combination",
+        "date": "2026-06-14"
+      },
+      {
+        "href": "articles/2026-06-11-ashwagandha-hpa-axis-regulation.html",
+        "title": "Ashwagandha HPA Axis Regulation",
+        "date": "2026-06-11"
+      },
+      {
+        "href": "articles/2026-06-09-cold-thermogenesis-hrv-optimization.html",
+        "title": "Cold Thermogenesis HRV Optimization",
+        "date": "2026-06-09"
+      },
+      {
+        "href": "articles/2026-06-01-rhodiola-rosea-mental-fatigue.html",
+        "title": "Rhodiola Rosea Mental Fatigue",
+        "date": "2026-06-01"
+      },
+      {
+        "href": "articles/2026-05-29-sauna-heat-shock-protein-activation.html",
+        "title": "Sauna Heat Shock Protein Activation",
+        "date": "2026-05-29"
+      },
+      {
+        "href": "articles/2026-05-29-cold-thermogenesis-hrv-optimization.html",
+        "title": "Cold Thermogenesis HRV Optimization",
+        "date": "2026-05-29"
+      },
+      {
+        "href": "articles/2026-04-27-natural-methods-to-enhance-cognitive-function-and-mood.html",
+        "title": "Natural Methods to Enhance Cognitive Function and Mood",
+        "date": "2026-04-27"
+      }
+    ]
+  },
+  {
+    "name": "Taurine",
+    "what": "Conditionally-essential amino acid. Cardiovascular, mitochondrial, calming support.",
+    "dose": "1-2 g daily",
+    "shop": "shop.html",
+    "aliases": [
+      "taurine"
+    ],
+    "articles": [
+      {
+        "href": "articles/2026-06-26-taurine-healthspan-research.html",
+        "title": "Taurine Healthspan Research",
+        "date": "2026-06-26"
+      },
+      {
+        "href": "articles/2026-06-02-taurine-healthspan-research.html",
+        "title": "Taurine Healthspan Research",
+        "date": "2026-06-02"
+      }
+    ]
+  },
+  {
+    "name": "Vitamin D3",
+    "what": "Hormone-precursor vitamin. Immune, bone, and mood function; pairs with K2.",
+    "dose": "2000-5000 IU daily, with fat",
+    "shop": "shop.html",
+    "aliases": [
+      "vitamin d",
+      "cholecalciferol",
+      "d3",
+      "d3/k2",
+      "vitamin d3"
+    ],
+    "articles": [
+      {
+        "href": "articles/2026-06-28-magnesium-mastering-cognitive-and-cardiovascular-performance.html",
+        "title": "Magnesium: Mastering Cognitive And Cardiovascular Performance",
+        "date": "2026-06-28"
+      },
+      {
+        "href": "articles/2026-05-23-magnesium.html",
+        "title": "Magnesium",
+        "date": "2026-05-23"
+      },
+      {
+        "href": "articles/2026-05-22-biohacking-protocol.html",
+        "title": "Biohacking Protocol",
+        "date": "2026-05-22"
+      },
+      {
+        "href": "articles/2026-04-30-magnesium-l-threonate.html",
+        "title": "Magnesium L-Threonate",
+        "date": "2026-04-30"
+      },
+      {
+        "href": "articles/2026-04-26-nad-precursors-and-mitochondrial-biogenesis.html",
+        "title": "NAD+ precursors and mitochondrial biogenesis",
+        "date": "2026-04-26"
+      }
+    ]
+  },
+  {
+    "name": "Zinc",
+    "what": "Trace mineral for immune function, testosterone, and enzymatic activity.",
+    "dose": "15-30 mg daily, away from other minerals",
+    "shop": "shop.html",
+    "aliases": [
+      "zinc picolinate",
+      "zinc bisglycinate"
+    ],
+    "articles": [
+      {
+        "href": "articles/2026-06-26-taurine-healthspan-research.html",
+        "title": "Taurine Healthspan Research",
+        "date": "2026-06-26"
+      }
+    ]
+  }
+]
