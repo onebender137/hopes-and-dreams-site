@@ -1204,7 +1204,7 @@ class HopesAndDreamsBot:
 
                 # 5. Website Transmission Uplink (RUNS NO MATTER WHAT)
                 print(f"[{datetime.now()}] EXECUTIVE EXECUTION: Initiating website transmission uplink...")
-                self._post_to_website(tip_content, topic, image_path)
+                article_file = self._post_to_website(tip_content, topic, image_path)
                 dsda_print(f"Syndicate Masterclass saved and site synced at {datetime.now()}!")
 
                 # Record the topic as posted to avoid repeats
@@ -1220,6 +1220,10 @@ class HopesAndDreamsBot:
                 if result:
                     post_id = result.get('id')
                     self._add_affiliate_comment(post_id, topic, tip_content)
+                    try:
+                        self._add_site_comment(post_id, article_file)
+                    except Exception as _e:
+                        self._log_uplink(f"SITE COMMENT ERROR: {_e}")
                     return result
                 else:
                     dsda_print(f"[{datetime.now()}] EXECUTIVE WARNING: Facebook API failed, but website was successfully updated anyway.")
@@ -1266,7 +1270,8 @@ class HopesAndDreamsBot:
             "1. Identify the core supplement, compound, or biohacking tool mentioned.\n"
             "2. If the topic is a messy command (e.g., 'a post called...'), ignore the command fluff and find the actual subject.\n"
             "3. Return ONLY the name of the product (e.g., 'Alpha GPC' or 'Nicotine Patches').\n"
-            "4. NO punctuation, NO meta-commentary, NO 'The product is...'.\n"
+            "4. Use normal spaces between words. No punctuation marks, "
+            "no meta-commentary, no 'The product is...' preamble.\n"
             "5. If multiple are found, pick the most central one.\n"
             "6. If none are found, return the original topic cleaned of obvious command prefixes."
         )
@@ -1326,6 +1331,52 @@ class HopesAndDreamsBot:
             print(f"Affiliate recommendation posted to post {post_id} successfully.")
         else:
             print(f"Failed to post affiliate recommendation to post {post_id}.")
+
+    SITE_BASE_URL = "https://hopes-and-dreams.ca"
+
+    def _add_site_comment(self, post_id, article_file, max_wait=150):
+        """Second follow-up comment: links the live article on the site.
+
+        Polls with a cache-busting querystring until Pages/Cloudflare serve a
+        200. The cache-buster is load-bearing: polling the clean URL before the
+        Pages build finishes would let Cloudflare cache the 404 (negative TTL
+        ~3min), and FB's OG scraper would then inherit that cached 404 and
+        render a dead comment. Probing a throwaway key leaves the real URL's
+        cache entry untouched.
+
+        Skips rather than posting a link it can't verify.
+        """
+        import requests
+
+        if not post_id or not article_file:
+            return
+
+        url = f"{self.SITE_BASE_URL}/articles/{article_file}"
+        deadline = time.time() + max_wait
+        live = False
+        while time.time() < deadline:
+            try:
+                probe = f"{url}?cb={int(time.time())}"
+                if requests.head(probe, timeout=10, allow_redirects=True).status_code == 200:
+                    live = True
+                    break
+            except Exception:
+                pass
+            time.sleep(10)
+
+        if not live:
+            self._log_uplink(f"SITE COMMENT: Skipped - {url} no 200 within {max_wait}s")
+            return
+
+        message = (
+            "Full breakdown on this one is live at the site - deeper intel, "
+            f"full archive, searchable:\n\n{url}\n\n"
+            "New transmissions 3x daily."
+        )
+        if self.fb.reply_to_comment(post_id, message):
+            self._log_uplink(f"SITE COMMENT: Posted {url} to {post_id}")
+        else:
+            self._log_uplink(f"SITE COMMENT: FAILED posting {url} to {post_id}")
 
     def _process_page_comments(self, is_first_iteration=False):
         """Processes comments for all posts in the Page feed."""
@@ -1545,37 +1596,54 @@ class HopesAndDreamsBot:
             self._log_uplink("IMAGE GEN: No TOGETHER_API_KEY found, skipping.")
             return None
 
-        # Visual-only prompt. FLUX renders ANY title/topic words handed to it as garbled
-        # lettering in the image ("Magnenium", "Mortix"), so we inject NO title/topic text and
-        # forbid text emphatically (front-loaded). The Pillow overlay is the ONLY text — it
-        # spells correctly. Visual style is topic-agnostic by design (brand consistency).
+        # Visual-only prompt. NO title/topic text is injected — the Pillow overlay is the
+        # ONLY text in the final image. Visual style is topic-agnostic by design (brand
+        # consistency). Prohibitions live in negative_prompt, not here: describing what we
+        # WANT in the positive prompt and what we DON'T in the negative is how Qwen expects
+        # to be driven. Positive prompt describes LIGHT, not darkness — asking for "deep
+        # blacks" made the model dim everything and the gold went sepia; making the cyan
+        # glow the light source gives contrast as a by-product of the lighting instead.
         prompt = (
-            "No text. No letters. No words. No typography. No captions. No labels. No writing. "
-            "Abstract scientific illustration: glowing neon cyan and gold molecular structures, "
-            "brain anatomy, neural networks, biochemical pathways, on a dark navy blue background. "
-            "Cyberpunk cinematic lighting, deep blue and gold color palette, atmospheric "
-            "professional pharmaceutical research aesthetic, dramatic depth of field. "
-            "Pure visual imagery only — absolutely no written text anywhere in the image."
+            "Abstract scientific illustration: a glowing electric cyan neuron and polished "
+            "metallic gold molecular lattice, rendered against dark navy. The cyan glow is "
+            "the light source, emissive and radiant, casting rich light across the gold "
+            "structures. Vivid high-chroma saturated colors, brilliant luminous cyan, rich "
+            "metallic gold with bright specular highlights, strong tonal contrast between "
+            "the bright subject and the dark background. Layered depth: crisp detailed hero "
+            "subject in the middle third, finer dimmer lattice structures receding into the "
+            "deep navy background. Sharp focus throughout. Cyberpunk cinematic "
+            "pharmaceutical research aesthetic, premium editorial quality."
+        )
+
+        # "chemical element labels / atom labels / molecular formula notation" are load-
+        # bearing: skeletal formulas render H, N, HO as part of the SUBJECT, so a generic
+        # no-text negative misses them. The haze/desaturation terms hold the contrast.
+        negative_prompt = (
+            "text, letters, words, typography, captions, labels, writing, watermark, "
+            "signature, chemical element labels, atom labels, molecular formula notation, "
+            "haze, fog, mist, washed out, low contrast, milky, desaturated, muted colors, "
+            "sepia, dusty, beige, flat lighting, blurry, heavy bokeh, empty background"
         )
 
         try:
-            self._log_uplink(f"IMAGE GEN: Requesting FLUX visual for '{topic}'...")
+            self._log_uplink(f"IMAGE GEN: Requesting Qwen-Image visual for '{topic}'...")
             response = requests.post(
                 "https://api.together.xyz/v1/images/generations",
                 headers={"Authorization": f"Bearer {api_key}", "Content-Type": "application/json"},
                 json={
-                    "model": "black-forest-labs/FLUX.1-schnell",
+                    "model": "Qwen/Qwen-Image",
                     "prompt": prompt,
+                    "negative_prompt": negative_prompt,
                     "width": 1280,
                     "height": 720,
-                    "steps": 4,
+                    "steps": 28,
                     "n": 1,
                     "response_format": "b64_json"
                 },
                 timeout=60
             )
             if response.status_code != 200:
-                self._log_uplink(f"IMAGE GEN: FLUX returned {response.status_code}: {response.text[:200]}")
+                self._log_uplink(f"IMAGE GEN: image API returned {response.status_code}: {response.text[:200]}")
                 return None
 
             img_data = base64.b64decode(response.json()["data"][0]["b64_json"])
@@ -1755,8 +1823,8 @@ class HopesAndDreamsBot:
             self._log_uplink(f"WEBSITE ERROR: Failed to save article file: {e}")
             return False
 
-        # 4. Update intel.html (Latest 3)
-        self._update_intel_html(clean_title, filename, date_str, priority)
+        # intel.html renders its feed client-side from transmissions.json
+        # (see intel.html:842). Server-side card splicing removed.
 
         # 5. Update transmissions.html (Archive)
         self._update_transmissions_html(clean_title, filename, date_str)
@@ -1781,7 +1849,7 @@ class HopesAndDreamsBot:
             except Exception:
                 pass
             return False
-        return True
+        return filename
 
     _PROSTAR_ACTION_KW = (
         "dose", "dosage", "mg", "mcg", "\u00b5g", "microgram", "milligram", "take", "taking",
@@ -2047,6 +2115,21 @@ class HopesAndDreamsBot:
         final_html = final_html.replace("{{SYNDICATE_CONTENT}}", beautified_body)
         final_html = final_html.replace("{{SYNDICATE_HACK}}", hack_html)
         final_html = final_html.replace("{{SYNDICATE_IMAGE}}", image_html)
+
+        # --- Open Graph / Twitter card metadata ---
+        # FB REQUIRES absolute URLs for og:image; image_path is relative to the
+        # project root and the article lives in /articles/, so a bare path would
+        # resolve wrong even before FB rejected it.
+        import html as _html
+        if image_path:
+            og_image = f"{self.SITE_BASE_URL}/{image_path.lstrip('/')}"
+        else:
+            og_image = f"{self.SITE_BASE_URL}/hopes-and-dreams-pro-logo.webp"
+        og_desc = re.sub(r'<[^>]+>', ' ', beautified_body or '')
+        og_desc = re.sub(r'\s+', ' ', og_desc).strip()[:200]
+        final_html = final_html.replace("{{SYNDICATE_OG_IMAGE}}", _html.escape(og_image, quote=True))
+        final_html = final_html.replace("{{SYNDICATE_OG_TITLE}}", _html.escape(clean_title, quote=True))
+        final_html = final_html.replace("{{SYNDICATE_OG_DESC}}", _html.escape(og_desc, quote=True))
 
         return final_html, priority, clean_title
     def _update_intel_html(self, topic, filename, date_str, priority=2):
