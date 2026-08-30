@@ -11,14 +11,14 @@ if not hasattr(Image, 'ANTIALIAS'):
 
 # --- CRITICAL WSL/LINUX FIX ---
 # Must be set BEFORE moviepy is imported to ensure the backend is found
-os.environ["IMAGEMAGICK_BINARY"] = "/usr/bin/convert"
+os.environ.setdefault("IMAGEMAGICK_BINARY", "/usr/bin/convert")
 
 import asyncio
 import edge_tts
 from moviepy.config import change_settings
 
 # Explicitly tell MoviePy where the binary is
-change_settings({"IMAGEMAGICK_BINARY": "/usr/bin/convert"})
+change_settings({"IMAGEMAGICK_BINARY": os.environ.get("IMAGEMAGICK_BINARY", "/usr/bin/convert")})
 
 from moviepy.editor import TextClip, AudioFileClip, ImageClip, ColorClip, CompositeVideoClip, VideoFileClip, concatenate_videoclips
 from config import Config
@@ -70,7 +70,7 @@ class VideoCreator:
         )
 
         try:
-            print(f"[VIDEO BG] Requesting FLUX vertical visual for '{topic}'...")
+            print(f"[VIDEO BG] Requesting Qwen-Image vertical visual for '{topic}'...")
             response = requests.post(
                 "https://api.together.xyz/v1/images/generations",
                 headers={
@@ -78,18 +78,18 @@ class VideoCreator:
                     "Content-Type": "application/json"
                 },
                 json={
-                    "model": "black-forest-labs/FLUX.1-schnell",
+                    "model": "Qwen/Qwen-Image",
                     "prompt": prompt,
-                    "width": 768,    # FLUX schnell needs multiples of 16, 768x1344 ~= 9:16 ratio
+                    "width": 768,    # 768x1344 ~= 9:16, verified returned unresized by Qwen-Image
                     "height": 1344,
-                    "steps": 4,
+                    "steps": 28,
                     "n": 1,
                     "response_format": "b64_json"
                 },
                 timeout=60
             )
             if response.status_code != 200:
-                print(f"[VIDEO BG] FLUX returned {response.status_code}: {response.text[:200]}")
+                print(f"[VIDEO BG] image API returned {response.status_code}: {response.text[:200]}")
                 return None
 
             img_data = base64.b64decode(response.json()["data"][0]["b64_json"])
@@ -104,7 +104,7 @@ class VideoCreator:
             date_str = datetime.now().strftime('%Y-%m-%d-%H%M%S')
             filename = f"media/video_backgrounds/{date_str}-{slug}.jpg"
             img.save(filename, "JPEG", quality=88, optimize=True)
-            print(f"[VIDEO BG] FLUX background saved: {filename}")
+            print(f"[VIDEO BG] background saved: {filename}")
             return filename
 
         except Exception as e:
