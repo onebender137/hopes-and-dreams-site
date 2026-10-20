@@ -2,8 +2,9 @@
 """sovereign_writer.py — write + publish a sovereign build-log article.
 
 Input: event_id. Builds a build-log prompt, calls the 35b (no-think),
-publishes via tech_publish.py, git commits + pushes. Prints `HREF: <url>`
-on the last line for the watcher to capture.
+generates a header image (tech_image.py), publishes via tech_publish.py,
+git commits + pushes. Prints `HREF: <url>` on the last line for the
+watcher to capture.
 """
 import sqlite3, datetime, os, sys, re, subprocess, json, urllib.request
 
@@ -59,6 +60,22 @@ def gen_markdown(title, summary, tags):
     return msg.get("content", "") if isinstance(msg, dict) else str(msg)
 
 
+def gen_image(title, content, slug):
+    """Generate a header image via tech_image.py. Returns the image path or ''."""
+    r = subprocess.run(
+        [sys.executable, os.path.join(SITE, "tech_image.py"),
+         "--title", title, "--content", content, "--slug", slug],
+        capture_output=True, text=True, timeout=900)
+    print(r.stdout)
+    if r.returncode != 0:
+        print(f"image gen failed (non-fatal): {r.stderr}")
+        return ""
+    for line in r.stdout.splitlines():
+        if line.startswith("IMAGE_PATH:"):
+            return line.split("IMAGE_PATH:", 1)[1].strip()
+    return ""
+
+
 def main():
     if len(sys.argv) < 2:
         print("usage: sovereign_writer.py <event_id>")
@@ -84,19 +101,27 @@ def main():
     with open(md_path, "w") as f:
         f.write(md)
 
+    # Generate the header image (non-fatal — article publishes even if image fails)
+    image_path = gen_image(title, md, slug)
+
     date = datetime.date.today().isoformat()
-    r = subprocess.run(
-        [sys.executable, os.path.join(SITE, "tech_publish.py"),
-         "--md", md_path, "--date", date],
-        capture_output=True, text=True, timeout=300, cwd=SITE)
+    publish_cmd = [sys.executable, os.path.join(SITE, "tech_publish.py"),
+                   "--md", md_path, "--date", date]
+    if image_path:
+        # tech_publish stores the image URL in the manifest; use the relative site path
+        rel_image = os.path.relpath(image_path, SITE)
+        publish_cmd += ["--image", f"{SITE_DOMAIN}/{rel_image}"]
+    r = subprocess.run(publish_cmd, capture_output=True, text=True, timeout=300, cwd=SITE)
     print(r.stdout)
     if r.returncode != 0:
         print(f"tech_publish failed: {r.stderr}")
         sys.exit(1)
 
-    # Git commit + push
-    subprocess.run(["git", "add", "tech/", "tech_transmissions.json"],
-                   cwd=SITE, capture_output=True)
+    # Git commit + push (include the image if generated)
+    git_add = ["git", "add", "tech/", "tech_transmissions.json"]
+    if image_path:
+        git_add += [os.path.relpath(image_path, SITE)]
+    subprocess.run(git_add, cwd=SITE, capture_output=True)
     commit = subprocess.run(["git", "commit", "-m", f"sovereign: {title}"],
                             cwd=SITE, capture_output=True, text=True)
     if commit.returncode != 0 and "nothing to commit" not in commit.stdout:
