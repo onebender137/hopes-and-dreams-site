@@ -1,0 +1,115 @@
+#!/usr/bin/env python3
+"""sovereign_writer.py — write + publish a sovereign build-log article.
+
+Input: event_id. Builds a build-log prompt, calls the 35b (no-think),
+publishes via tech_publish.py, git commits + pushes. Prints `HREF: <url>`
+on the last line for the watcher to capture.
+"""
+import sqlite3, datetime, os, sys, re, subprocess, json, urllib.request
+
+SITE = os.path.dirname(os.path.abspath(__file__))
+DB = os.path.join(SITE, "syndicate_memory.db")
+BASE = "http://100.123.157.7:11434"
+MODEL = "huihui_ai/qwen3.6-abliterated:35b"
+SITE_DOMAIN = "https://hopes-and-dreams.ca"
+
+BUILD_LOG_SYSTEM = (
+    "You are the Sovereign Tech writer for Hopes and Dreams. You write first-person "
+    "build logs about infrastructure and systems you actually built. Plain English, "
+    "not overly technical. You link to repos where relevant and give platform-specific "
+    "directions. Gritty, insider, confident. No AI tells, no disclaimers, no marketing "
+    "fluff. The article body uses plain text with section labels in CAPS on their own "
+    "line (no markdown headers, no bold, no lists). End the article with exactly: "
+    "'Do your own research. Don't be a statistic.'"
+)
+
+
+def slugify(s):
+    # must match tech_publish.py's slugify exactly
+    s = re.sub(r"[^\w\s-]", "", s.lower()).strip()
+    return re.sub(r"[\s_-]+", "-", s)[:60] or "article"
+
+
+def gen_markdown(title, summary, tags):
+    prompt = (
+        f"Write a Sovereign Tech build-log article.\n\n"
+        f"TITLE: {title}\n\n"
+        f"WHAT I BUILT (the seed — expand on this, first person):\n{summary}\n\n"
+        f"TAGS: {tags}\n\n"
+        "Start with a single H1 line: '# ' followed by the title, then a blank line.\n"
+        "Then write the build log body: what I did, why, how, what it took, what's next.\n"
+        "Plain English, first person, not overly technical. Link to repos where relevant.\n"
+        "Use plain text with section labels in CAPS on their own line (no markdown headers).\n"
+        "End with exactly: 'Do your own research. Don't be a statistic.'"
+    )
+    body = {
+        "model": MODEL,
+        "messages": [
+            {"role": "system", "content": BUILD_LOG_SYSTEM},
+            {"role": "user", "content": prompt},
+        ],
+        "stream": False,
+        "think": False,
+        "options": {"num_ctx": 8192},
+    }
+    req = urllib.request.Request(BASE + "/api/chat", data=json.dumps(body).encode(),
+                                 headers={"Content-Type": "application/json"})
+    d = json.load(urllib.request.urlopen(req, timeout=900))
+    msg = d.get("message", {})
+    return msg.get("content", "") if isinstance(msg, dict) else str(msg)
+
+
+def main():
+    if len(sys.argv) < 2:
+        print("usage: sovereign_writer.py <event_id>")
+        sys.exit(1)
+    eid = sys.argv[1]
+    c = sqlite3.connect(DB)
+    row = c.execute("SELECT title, summary, tags FROM empire_events WHERE id=?", (eid,)).fetchone()
+    c.close()
+    if not row:
+        print(f"event {eid} not found")
+        sys.exit(1)
+    title, summary, tags = row
+
+    md = gen_markdown(title, summary, tags)
+    if not md or len(md) < 200:
+        print(f"generation too short ({len(md)} chars), aborting")
+        sys.exit(1)
+
+    # Name the file <slug>.md (tech_publish derives the slug from the filename)
+    slug = slugify(title)
+    md_path = os.path.join(SITE, "tech_articles", f"{slug}.md")
+    os.makedirs(os.path.dirname(md_path), exist_ok=True)
+    with open(md_path, "w") as f:
+        f.write(md)
+
+    date = datetime.date.today().isoformat()
+    r = subprocess.run(
+        [sys.executable, os.path.join(SITE, "tech_publish.py"),
+         "--md", md_path, "--date", date],
+        capture_output=True, text=True, timeout=300, cwd=SITE)
+    print(r.stdout)
+    if r.returncode != 0:
+        print(f"tech_publish failed: {r.stderr}")
+        sys.exit(1)
+
+    # Git commit + push
+    subprocess.run(["git", "add", "tech/", "tech_transmissions.json"],
+                   cwd=SITE, capture_output=True)
+    commit = subprocess.run(["git", "commit", "-m", f"sovereign: {title}"],
+                            cwd=SITE, capture_output=True, text=True)
+    if commit.returncode != 0 and "nothing to commit" not in commit.stdout:
+        print(f"git commit issue: {commit.stdout} {commit.stderr}")
+    push = subprocess.run(["git", "push"], cwd=SITE, capture_output=True, text=True)
+    print(push.stdout)
+    if push.returncode != 0:
+        print(f"git push failed: {push.stderr}")
+        sys.exit(1)
+
+    href = f"{SITE_DOMAIN}/tech/{slug}.html"
+    print(f"HREF: {href}")
+
+
+if __name__ == "__main__":
+    main()
