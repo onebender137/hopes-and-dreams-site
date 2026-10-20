@@ -710,21 +710,51 @@ class HopesAndDreamsBot:
                     return cluster_name
         return None
 
+    COOLDOWN_HOURS = 72  # v0.9x: time-based (was post-count=5 = ~1.7 days at 3 posts/day)
+
+    def _recent_topics_fresh(self, hours=None):
+        """Fresh DB read of topics posted within `hours` (newest first).
+
+        v0.9x: the in-memory self.posted_topics cache went stale (9/22: the
+        7am GHK-Cu topic was in the DB but not in the running process's list
+        at noon, so the cluster check missed it). The cooldown now reads the
+        DB directly; falls back to the cache only if the DB read fails.
+        """
+        hours = hours or self.COOLDOWN_HOURS
+        try:
+            return self.db.get_recent_topics_with_ts(hours)
+        except Exception as e:
+            print(f"[COOLDOWN] fresh DB read failed ({e}); using cache fallback.")
+            return [(t, None) for t in (self.posted_topics or [])]
+
     def _is_topic_on_cooldown(self, topic, cooldown=5):
         """
-        Returns True if this topic OR a topic from the same cluster has been posted
-        in the last `cooldown` posts. Prevents NAD+/NMN/NR rotation spam.
+        Returns True if this topic (or a same-molecule variant / same-cluster
+        topic) was posted within the last COOLDOWN_HOURS. Time-based, fresh
+        DB read. `cooldown` arg kept for signature compat, unused.
+        Prevents NAD+/NMN/NR rotation spam AND same-day molecule repeats.
         """
         if not topic:
             return False
-        recent = self.posted_topics[-cooldown:] if self.posted_topics else []
-        # Direct match
-        if topic in recent:
-            return True
-        # Cluster match
+        recent = self._recent_topics_fresh()
+        if not recent:
+            return False
+        norm_new = self._norm_topic(topic)
+        new_prefix = norm_new.split()[:3]
+        for past, _ts in recent:
+            norm_past = self._norm_topic(past)
+            # 1. Normalized exact match
+            if norm_past == norm_new:
+                print(f"[COOLDOWN] '{topic}' exact repeat of '{past}' — blocking.")
+                return True
+            # 2. Same molecule + same angle (3-token prefix)
+            if len(new_prefix) >= 2 and norm_past.split()[:3] == new_prefix:
+                print(f"[COOLDOWN] '{topic}' same-molecule variant of '{past}' — blocking.")
+                return True
+        # 3. Cluster match (same domain)
         new_cluster = self._topic_cluster(topic)
         if new_cluster:
-            for past in recent:
+            for past, _ts in recent:
                 if self._topic_cluster(past) == new_cluster:
                     print(f"[COOLDOWN] '{topic}' is in same cluster ({new_cluster}) as recent '{past}' — blocking.")
                     return True
@@ -962,9 +992,12 @@ class HopesAndDreamsBot:
             print(f"[KB-FEED] no abstracts found for '{topic}'.")
             return (0, 0)
 
-        # Build a clean, source-attributed text doc from the abstracts.
+        # Build a clean, source-attributed text doc. v0.9x: FULL TEXT first
+        # (PMC), abstract fallback — the difference between a generic article
+        # and a masterclass (mechanism, dose, section data).
         lines = [f"TOPIC: {topic}",
-                 f"SOURCE: PubMed (ingested {datetime.now().strftime('%Y-%m-%d')})", ""]
+                 f"SOURCE: PubMed/PMC full text (ingested {datetime.now().strftime('%Y-%m-%d')})", ""]
+        n_full = 0
         for s in studies:
             lines.append(f"### {s.get('title', '(untitled)')}")
             meta = []
@@ -977,14 +1010,26 @@ class HopesAndDreamsBot:
             if s.get("doi"):
                 lines.append(str(s["doi"]))
             lines.append("")
-            lines.append(s["abstract"].strip())
+            body = None
+            if s.get("pmid"):
+                try:
+                    import time as _t
+                    _t.sleep(0.5)  # pace between papers (keyless NCBI 3 req/s)
+                    body = self.research.full_text_for_pmid(s["pmid"])
+                except Exception as e:
+                    print(f"[KB-FEED] full-text attempt failed for {s.get('pmid')}: {e}")
+            if body:
+                n_full += 1
+                lines.append(body.strip())
+            else:
+                lines.append(s["abstract"].strip())
             lines.append("")
         text = "\n".join(lines)
 
         slug = re.sub(r"[^a-z0-9]+", "_", topic.lower()).strip("_")[:60] or "pubmed"
         fname = f"{slug}_{datetime.now().strftime('%Y%m%d')}.txt"
         n_chunks = self.knowledge.add_text_document(text, fname, subfolder=subfolder)
-        print(f"[KB-FEED] '{topic}': {len(studies)} studies -> {n_chunks} chunks ingested.")
+        print(f"[KB-FEED] '{topic}': {len(studies)} studies ({n_full} full-text, {len(studies)-n_full} abstract) -> {n_chunks} chunks ingested.")
         return (len(studies), n_chunks)
 
     def get_recent_topics_from_memory(self, slot=None):
@@ -1093,7 +1138,7 @@ class HopesAndDreamsBot:
 
         prompt = (
             f"Brainstorm a specific, compelling topic for today's Facebook Masterclass.\n\n"
-            f"RECENTLY POSTED TOPICS (avoid these and closely related ones): {', '.join(self.posted_topics[-10:])}\n\n"
+            f"RECENTLY POSTED TOPICS (avoid these and closely related ones): {', '.join(t for t, _ in self._recent_topics_fresh()[:10])}\n\n"
             f"POTENTIAL SEED KEYWORDS: {', '.join(candidates)}\n\n"
             "INSTRUCTIONS:\n"
             "1. Pick a keyword from the seed list OR brainstorm a closely related alternative biohack/supplement.\n"
@@ -1169,6 +1214,8 @@ class HopesAndDreamsBot:
             # 3. Generate Masterclass Content
             # Routes through create_biohacking_post() which has the headline patch
             # AND runs through _sanitize_output() to strip markdown bold from CrewAI.
+            # Free RAM: stop ComfyUI before the 35b model loads
+            self._stop_comfyui()
             print(f"[{datetime.now()}] EXECUTIVE EXECUTION: Generating headlined Masterclass for {topic}...")
             try:
                 tip_content = self.crew.run(topic, combined_context)
@@ -1177,6 +1224,9 @@ class HopesAndDreamsBot:
             except Exception as inner_e:
                 print(f"[{datetime.now()}] EXECUTIVE EXECUTION: CrewAI failed: {inner_e}. Using create_biohacking_post fallback...")
                 tip_content = self.llm.create_biohacking_post(topic, context=combined_context)
+
+            # Restore ComfyUI (always, even if article gen failed)
+            self._start_comfyui()
 
             if tip_content and not self._is_bad_content(tip_content):
                 # 4. Handle Media Attachment — generate topic-specific image first
@@ -1565,6 +1615,66 @@ class HopesAndDreamsBot:
         return out
 
     @staticmethod
+    def _deconcat_title(s):
+        """Split run-together / CamelCase title words into real words.
+
+        The LLM sometimes returns a title as one concatenated token
+        (e.g. 'AdrenalStimulationSaltInversion'). That produces a funny page
+        title AND an un-splittable image headline (cramped/cut-off). We split
+        such tokens using /usr/share/dict/words as the oracle. Legit single
+        words (e.g. 'acetylcholinesterase', 'NAD+') are left untouched.
+        """
+        if not hasattr(HopesAndDreamsBot, "_dict_cache"):
+            d = set()
+            try:
+                with open("/usr/share/dict/words") as f:
+                    for line in f:
+                        w = line.strip().lower()
+                        if w.isalpha() and len(w) >= 3:
+                            d.add(w)
+            except Exception:
+                pass
+            HopesAndDreamsBot._dict_cache = d
+        words = HopesAndDreamsBot._dict_cache
+
+        def _split_token(tok):
+            low = tok.lower()
+            if not low.isalpha():
+                return tok  # digits/punct (e.g. NAD+) -> leave
+            if low in words:
+                return tok  # legit dictionary word -> leave
+            if len(low) < 10:
+                return tok
+            internal_caps = sum(1 for c in tok[1:] if c.isupper())
+            if not (internal_caps >= 1 or len(low) >= 14):
+                return tok  # not obviously concatenated -> leave
+            # DP: segment into the FEWEST dictionary words (avoids over-splitting)
+            n = len(low)
+            INF = float("inf")
+            dp = [INF] * (n + 1)
+            dp[0] = 0
+            parent = [-1] * (n + 1)
+            for i in range(1, n + 1):
+                for L in range(min(i, 20), 2, -1):
+                    j = i - L
+                    if dp[j] < INF and low[j:i] in words:
+                        if dp[j] + 1 < dp[i]:
+                            dp[i] = dp[j] + 1
+                            parent[i] = j
+            if dp[n] == INF or dp[n] < 2:
+                return tok  # can't segment into 2+ words -> leave
+            parts = []
+            i = n
+            while i > 0:
+                j = parent[i]
+                parts.append(low[j:i])
+                i = j
+            parts.reverse()
+            return " ".join(p.capitalize() for p in parts)
+
+        return " ".join(_split_token(tok) for tok in s.split())
+
+    @staticmethod
     def _short_title(s, max_words=8, max_chars=72, fallback="Biohacking Protocol"):
         """Deterministic title cap - the model never controls final headline length.
         Strips quotes/preamble, takes the first line, caps words + chars on a word boundary."""
@@ -1574,6 +1684,7 @@ class HopesAndDreamsBot:
         t = t.splitlines()[0].strip() if t else ""
         if not t:
             return fallback
+        t = HopesAndDreamsBot._deconcat_title(t)
         words = t.split()
         if len(words) > max_words:
             t = " ".join(words[:max_words])
@@ -1581,6 +1692,32 @@ class HopesAndDreamsBot:
             t = t[:max_chars].rsplit(" ", 1)[0]
         t = t.strip().rstrip('.:;,!?-\u2013\u2014').strip()
         return t or fallback
+
+    def _stop_comfyui(self):
+        """Stop ComfyUI to free RAM for the 35b model load (non-fatal)."""
+        try:
+            subprocess.run(["systemctl", "--user", "stop", "comfyui.service"],
+                           capture_output=True, timeout=60)
+            self._log_uplink("COMFYUI: stopped (freeing RAM for 35b model load)")
+        except Exception as e:
+            print(f"COMFYUI stop failed (non-fatal): {e}")
+
+    def _start_comfyui(self):
+        """Start ComfyUI back up for image gen (non-fatal). Waits until ready."""
+        try:
+            subprocess.run(["systemctl", "--user", "start", "comfyui.service"],
+                           capture_output=True, timeout=60)
+            import time
+            for _ in range(45):  # up to 90s for ComfyUI to come up
+                time.sleep(2)
+                try:
+                    urllib.request.urlopen("http://100.123.157.7:8188/", timeout=5)
+                    break
+                except Exception:
+                    continue
+            self._log_uplink("COMFYUI: started (ready for image gen)")
+        except Exception as e:
+            print(f"COMFYUI start failed (non-fatal): {e}")
 
     def _generate_topic_image(self, topic, title=None):
         """Generates a topic image with FLUX visual + Pillow text overlay for readable text."""
@@ -1591,26 +1728,57 @@ class HopesAndDreamsBot:
         from PIL import Image, ImageDraw, ImageFont
         from io import BytesIO
 
+        # TOGETHER_API_KEY is only needed for the Qwen fallback; SDXL (primary) is local.
         api_key = os.environ.get("TOGETHER_API_KEY")
-        if not api_key:
-            self._log_uplink("IMAGE GEN: No TOGETHER_API_KEY found, skipping.")
-            return None
 
         # Visual-only prompt. NO title/topic text is injected — the Pillow overlay is the
-        # ONLY text in the final image. Visual style is topic-agnostic by design (brand
-        # consistency). Prohibitions live in negative_prompt, not here: describing what we
-        # WANT in the positive prompt and what we DON'T in the negative is how Qwen expects
-        # to be driven. Positive prompt describes LIGHT, not darkness — asking for "deep
-        # blacks" made the model dim everything and the gold went sepia; making the cyan
-        # glow the light source gives contrast as a by-product of the lighting instead.
+        # 2026-09-20: topic-aware molecule + random environment. The SUBJECT matches the
+        # article's topic (deterministic map below); the ENVIRONMENT rotates randomly so
+        # the mood never goes static. Brand (cyan/gold/navy) + Pillow overlay unchanged.
+        # Prohibitions live in negative_prompt, not here: describing what we WANT in the
+        # positive prompt and what we DON'T in the negative is how the model is driven.
+        # Positive prompt describes LIGHT, not darkness — asking for "deep blacks" made
+        # the model dim everything and the gold went sepia; making the cyan glow the light
+        # source gives contrast as a by-product of the lighting instead.
+        MOLECULES = {
+            "dopamine": "the dopamine molecule — a benzene ring with an ethylamine chain and hydroxyl groups, each atom a luminous cyan node, bonds as radiant cyan light, gold atoms at the key functional groups",
+            "serotonin": "the serotonin molecule — an indole ring with hydroxyl and ethylamine side chains, each atom a luminous cyan node, bonds as radiant cyan light, gold atoms at the key functional groups",
+            "melatonin": "the melatonin molecule — a methoxyindole ring with an acetic acid side chain, each atom a luminous cyan node, bonds as radiant cyan light, gold atoms at the key functional groups",
+            "nicotine": "the nicotine molecule — a pyridine ring fused to a pyrrolidine ring, each atom a luminous cyan node, bonds as radiant cyan light, gold atoms at the nitrogen",
+            "kratom": "the mitragynine molecule — a complex polycyclic alkaloid with multiple fused rings, each atom a luminous cyan node, bonds as radiant cyan light, gold atoms at the nitrogen and hydroxyl groups",
+            "dmt": "the DMT molecule — a dimethyltryptamine structure with an indole ring and ethylamine chain, each atom a luminous cyan node, bonds as radiant cyan light, gold atoms at the nitrogen",
+            "ghk": "the GHK-Cu peptide — a tripeptide chain of glycine-histidine-lysine bound to a gold copper ion, each residue a luminous cyan node, bonds as radiant cyan light",
+            "selank": "the Selank peptide — a short peptide chain with a central histidine, each residue a luminous cyan node, bonds as radiant cyan light, gold atoms at the key residues",
+            "lions mane": "the hericenone molecule — a complex triterpenoid structure with multiple fused rings, each atom a luminous cyan node, bonds as radiant cyan light, gold atoms at the key functional groups",
+            "cordycepin": "the cordycepin molecule — an adenosine analog with a hydroxyl group, each atom a luminous cyan node, bonds as radiant cyan light, gold atoms at the key functional groups",
+            "maitake": "the maitake D-fraction beta-glucan — a branched polysaccharide chain, each sugar unit a luminous cyan node, bonds as radiant cyan light, gold atoms at the branch points",
+            "turkey tail": "the turkey tail polysaccharopeptide — a branched polysaccharide-protein complex, each unit a luminous cyan node, bonds as radiant cyan light, gold atoms at the key residues",
+            "alpha gpc": "the alpha-GPC molecule — a phosphatidylcholine structure with a choline head group, each atom a luminous cyan node, bonds as radiant cyan light, gold atoms at the key functional groups",
+            "l-dopa": "the L-DOPA molecule — a catecholamine structure with a benzene ring and amino acid chain, each atom a luminous cyan node, bonds as radiant cyan light, gold atoms at the key functional groups",
+            "cortisol": "the cortisol molecule — a steroid structure with four fused rings, each atom a luminous cyan node, bonds as radiant cyan light, gold atoms at the key functional groups",
+        }
+        ENVIRONMENTS = [
+            "floating in a bioluminescent deep-sea environment, translucent jellyfish-like organisms with cyan light pulsing through their radial canals drifting in the dark water, gold plankton particles suspended around it, the subject is the primary light source, emissive and radiant, casting rich light across the surrounding water",
+            "suspended in a nebula of glowing cyan gas and dust, gold molecular filaments threading through the nebula like neural pathways, the subject is the primary light source, emissive and radiant, casting rich light across the surrounding gas",
+            "hovering above a glowing circuit board, cyan light tracing the copper pathways like neural signals, gold solder points and vias catching the light, the subject is the primary light source, emissive and radiant, casting rich light across the dark navy PCB",
+            "rendered against dark navy, the subject is the light source, emissive and radiant, casting rich light across the gold structures",
+        ]
+        # Topic → molecule: first matching keyword wins; fallback = generic molecule.
+        topic_lower = (topic or "").lower()
+        molecule = None
+        for key, mol in MOLECULES.items():
+            if key in topic_lower:
+                molecule = mol
+                break
+        if molecule is None:
+            molecule = "a glowing cyan molecule with a complex ring structure, each atom a luminous cyan node, bonds as radiant cyan light, gold atoms at the key functional groups"
+        environment = random.choice(ENVIRONMENTS)
         prompt = (
-            "Abstract scientific illustration: a glowing electric cyan neuron and polished "
-            "metallic gold molecular lattice, rendered against dark navy. The cyan glow is "
-            "the light source, emissive and radiant, casting rich light across the gold "
-            "structures. Vivid high-chroma saturated colors, brilliant luminous cyan, rich "
+            f"Abstract scientific illustration: {molecule}, {environment}. "
+            "Vivid high-chroma saturated colors, brilliant luminous cyan, rich "
             "metallic gold with bright specular highlights, strong tonal contrast between "
             "the bright subject and the dark background. Layered depth: crisp detailed hero "
-            "subject in the middle third, finer dimmer lattice structures receding into the "
+            "subject in the middle third, finer dimmer structures receding into the "
             "deep navy background. Sharp focus throughout. Cyberpunk cinematic "
             "pharmaceutical research aesthetic, premium editorial quality."
         )
@@ -1625,163 +1793,437 @@ class HopesAndDreamsBot:
             "sepia, dusty, beige, flat lighting, blurry, heavy bokeh, empty background"
         )
 
+        # === PRIMARY: Qwen-Image-2.1 (clamps ComfyUI, free, local, ~2min) ===
+        # === FALLBACK 1: SDXL-turbo (clamps ComfyUI, free, local, ~8s) ===
+        # === FALLBACK 2: together.xyz Qwen-Image (paid, 120s timeout + 1 retry) ===
+        img = None
         try:
-            self._log_uplink(f"IMAGE GEN: Requesting Qwen-Image visual for '{topic}'...")
-            response = requests.post(
-                "https://api.together.xyz/v1/images/generations",
-                headers={"Authorization": f"Bearer {api_key}", "Content-Type": "application/json"},
-                json={
-                    "model": "Qwen/Qwen-Image",
-                    "prompt": prompt,
-                    "negative_prompt": negative_prompt,
-                    "width": 1280,
-                    "height": 720,
-                    "steps": 28,
-                    "n": 1,
-                    "response_format": "b64_json"
-                },
-                timeout=60
-            )
-            if response.status_code != 200:
-                self._log_uplink(f"IMAGE GEN: image API returned {response.status_code}: {response.text[:200]}")
-                return None
+            img = self._generate_qwen21_image(prompt, negative_prompt)
+            if img is not None:
+                self._log_uplink("IMAGE GEN: Qwen-Image-2.1 (clamps ComfyUI) visual generated.")
+            else:
+                raise RuntimeError("Qwen-2.1 returned no image")
+        except Exception as e:
+            self._log_uplink(f"IMAGE GEN: Qwen-2.1 failed ({e}), falling back to SDXL turbo.")
+            try:
+                img = self._generate_sdxl_image(prompt, negative_prompt)
+                if img is not None:
+                    self._log_uplink("IMAGE GEN: SDXL (clamps ComfyUI) visual generated.")
+                else:
+                    raise RuntimeError("SDXL returned no image")
+            except Exception as e2:
+                self._log_uplink(f"IMAGE GEN: SDXL failed ({e2}), falling back to Qwen-Image (together.xyz).")
+                try:
+                    img = self._generate_qwen_image(prompt, negative_prompt, api_key)
+                except Exception as e3:
+                    self._log_uplink(f"IMAGE GEN: Qwen fallback also failed ({e3}).")
+                    img = None
 
-            img_data = base64.b64decode(response.json()["data"][0]["b64_json"])
-            img = Image.open(BytesIO(img_data)).convert("RGB")
+        if img is None:
+            # Old last-resort path: smart/random media (deduped).
+            return None
 
-            # === PILLOW TEXT OVERLAY ===
-            draw = ImageDraw.Draw(img, "RGBA")
-            W, H = img.size
+        # === PILLOW TEXT OVERLAY ===
+        draw = ImageDraw.Draw(img, "RGBA")
+        W, H = img.size
 
-            # Try common system fonts, fall back gracefully
-            def load_font(size, bold=False):
-                paths = [
-                    "/usr/share/fonts/truetype/dejavu/DejaVuSans-Bold.ttf" if bold else "/usr/share/fonts/truetype/dejavu/DejaVuSans.ttf",
-                    "/usr/share/fonts/truetype/liberation/LiberationSans-Bold.ttf" if bold else "/usr/share/fonts/truetype/liberation/LiberationSans-Regular.ttf",
-                ]
-                for p in paths:
-                    if os.path.exists(p):
-                        return ImageFont.truetype(p, size)
-                return ImageFont.load_default()
+        # Try common system fonts, fall back gracefully
+        def load_font(size, bold=False):
+            paths = [
+                "/usr/share/fonts/truetype/dejavu/DejaVuSans-Bold.ttf" if bold else "/usr/share/fonts/truetype/dejavu/DejaVuSans.ttf",
+                "/usr/share/fonts/truetype/liberation/LiberationSans-Bold.ttf" if bold else "/usr/share/fonts/truetype/liberation/LiberationSans-Regular.ttf",
+            ]
+            for p in paths:
+                if os.path.exists(p):
+                    return ImageFont.truetype(p, size)
+            return ImageFont.load_default()
 
-            title_font = load_font(72, bold=True)
-            tagline_font = load_font(28, bold=True)
-            footer_font = load_font(24, bold=True)
+        title_font = load_font(72, bold=True)
+        tagline_font = load_font(28, bold=True)
+        footer_font = load_font(24, bold=True)
 
-            # Top dark band for title
-            draw.rectangle([(0, 0), (W, 160)], fill=(3, 9, 31, 200))
-            # Bottom dark band for footer
-            draw.rectangle([(0, H-90), (W, H)], fill=(3, 9, 31, 220))
+        # Top dark band for title
+        draw.rectangle([(0, 0), (W, 160)], fill=(3, 9, 31, 200))
+        # Bottom dark band for footer
+        draw.rectangle([(0, H-90), (W, H)], fill=(3, 9, 31, 220))
 
-            # TITLE — uppercase, centered, gold — width-aware fit
-            title = (title or self._short_title(topic)).upper()
-            words = title.split()
-            MAX_WIDTH = int(W * 0.92)  # leave 4% margin each side
+        # TITLE — uppercase, centered, gold — width-aware fit
+        title = (title or self._short_title(topic)).upper()
+        words = title.split()
+        MAX_WIDTH = int(W * 0.92)  # leave 4% margin each side
 
-            def measure(text, font):
-                bbox = draw.textbbox((0, 0), text, font=font)
-                return bbox[2] - bbox[0]
+        def measure(text, font):
+            bbox = draw.textbbox((0, 0), text, font=font)
+            return bbox[2] - bbox[0]
 
-            def best_split(words):
-                """Find split point that minimizes max line width difference."""
-                if len(words) < 2:
-                    return [' '.join(words)]
-                best = None
-                best_max_len = float('inf')
-                for i in range(1, len(words)):
-                    a = ' '.join(words[:i])
-                    b = ' '.join(words[i:])
-                    m = max(len(a), len(b))
-                    if m < best_max_len:
-                        best_max_len = m
-                        best = [a, b]
-                return best
+        def best_split(words):
+            """Find split point that minimizes max line width difference."""
+            if len(words) < 2:
+                return [' '.join(words)]
+            best = None
+            best_max_len = float('inf')
+            for i in range(1, len(words)):
+                a = ' '.join(words[:i])
+                b = ' '.join(words[i:])
+                m = max(len(a), len(b))
+                if m < best_max_len:
+                    best_max_len = m
+                    best = [a, b]
+            return best
 
-            def split_3(words):
-                """Split into 3 balanced lines."""
-                if len(words) < 3:
-                    return [' '.join(words)]
-                n = len(words)
-                a = n // 3
-                b = 2 * n // 3
-                return [' '.join(words[:a]), ' '.join(words[a:b]), ' '.join(words[b:])]
+        def split_3(words):
+            """Split into 3 balanced lines."""
+            if len(words) < 3:
+                return [' '.join(words)]
+            n = len(words)
+            a = n // 3
+            b = 2 * n // 3
+            return [' '.join(words[:a]), ' '.join(words[a:b]), ' '.join(words[b:])]
 
-            rendered = False
+        rendered = False
 
-            # Attempt 1: single line at full size, shrink if needed
-            for size in (72, 64, 58, 52, 46, 40):
-                font_try = load_font(size, bold=True)
-                if measure(title, font_try) <= MAX_WIDTH:
-                    w = measure(title, font_try)
-                    draw.text(((W-w)//2, 40), title, font=font_try, fill=(251, 191, 36))
-                    tagline_y = 125
-                    rendered = True
-                    break
-
-            # Attempt 2: 2 lines
-            if not rendered:
-                lines2 = best_split(words)
-                for size in (52, 46, 40, 36, 32):
-                    font_try = load_font(size, bold=True)
-                    widths = [measure(L, font_try) for L in lines2]
-                    if max(widths) <= MAX_WIDTH:
-                        draw.rectangle([(0, 0), (W, 220)], fill=(3, 9, 31, 200))
-                        draw.text(((W-widths[0])//2, 20), lines2[0], font=font_try, fill=(251, 191, 36))
-                        draw.text(((W-widths[1])//2, 20+size+18), lines2[1], font=font_try, fill=(251, 191, 36))
-                        tagline_y = 175
-                        rendered = True
-                        break
-
-            # Attempt 3: 3 lines, smallest font
-            if not rendered:
-                lines3 = split_3(words)
-                for size in (36, 32, 28, 24, 20):
-                    font_try = load_font(size, bold=True)
-                    widths = [measure(L, font_try) for L in lines3]
-                    if max(widths) <= MAX_WIDTH:
-                        draw.rectangle([(0, 0), (W, 260)], fill=(3, 9, 31, 200))
-                        y = 20
-                        for i, L in enumerate(lines3):
-                            draw.text(((W-widths[i])//2, y), L, font=font_try, fill=(251, 191, 36))
-                            y += size + 12
-                        tagline_y = 210
-                        rendered = True
-                        break
-
-            # Last resort: 1 line at tiny size (should basically never hit)
-            if not rendered:
-                font_try = load_font(20, bold=True)
+        # Attempt 1: single line at full size, shrink if needed
+        for size in (72, 64, 58, 52, 46, 40):
+            font_try = load_font(size, bold=True)
+            if measure(title, font_try) <= MAX_WIDTH:
                 w = measure(title, font_try)
                 draw.text(((W-w)//2, 40), title, font=font_try, fill=(251, 191, 36))
                 tagline_y = 125
+                rendered = True
+                break
 
-            # Tagline below title — neon cyan
-            tagline = "SYNDICATE INTELLIGENCE // BIOHACKING PROTOCOL"
-            bbox = draw.textbbox((0, 0), tagline, font=tagline_font)
-            w = bbox[2] - bbox[0]
-            draw.text(((W-w)//2, tagline_y), tagline, font=tagline_font, fill=(56, 189, 248))
+        # Attempt 2: 2 lines
+        if not rendered:
+            lines2 = best_split(words)
+            for size in (52, 46, 40, 36, 32):
+                font_try = load_font(size, bold=True)
+                widths = [measure(L, font_try) for L in lines2]
+                if max(widths) <= MAX_WIDTH:
+                    draw.rectangle([(0, 0), (W, 220)], fill=(3, 9, 31, 200))
+                    draw.text(((W-widths[0])//2, 20), lines2[0], font=font_try, fill=(251, 191, 36))
+                    draw.text(((W-widths[1])//2, 20+size+18), lines2[1], font=font_try, fill=(251, 191, 36))
+                    tagline_y = 175
+                    rendered = True
+                    break
 
-            # FOOTER — white
-            footer = "DO YOUR OWN RESEARCH. DON'T BE A STATISTIC."
-            bbox = draw.textbbox((0, 0), footer, font=footer_font)
-            w = bbox[2] - bbox[0]
-            draw.text(((W-w)//2, H-60), footer, font=footer_font, fill=(248, 250, 252))
+        # Attempt 3: 3 lines, smallest font
+        if not rendered:
+            lines3 = split_3(words)
+            for size in (36, 32, 28, 24, 20):
+                font_try = load_font(size, bold=True)
+                widths = [measure(L, font_try) for L in lines3]
+                if max(widths) <= MAX_WIDTH:
+                    draw.rectangle([(0, 0), (W, 260)], fill=(3, 9, 31, 200))
+                    y = 20
+                    for i, L in enumerate(lines3):
+                        draw.text(((W-widths[i])//2, y), L, font=font_try, fill=(251, 191, 36))
+                        y += size + 12
+                    tagline_y = 210
+                    rendered = True
+                    break
 
-            # Save
-            os.makedirs("media/general", exist_ok=True)
-            # Strict slug sanitization to avoid newlines or special characters in filenames
-            slug = re.sub(r'[^a-z0-9]+', '-', topic.lower()).strip('-')[:50]
-            date_str = datetime.now().strftime('%Y-%m-%d')
-            filename = f"media/general/{date_str}-{slug}.jpg"
-            # Save as JPEG with optimized quality and progressive loading for faster web delivery
-            img.save(filename, "JPEG", quality=85, optimize=True, progressive=True)
-            self._log_uplink(f"IMAGE GEN: Saved to {filename}")
-            return filename
+        # Last resort: 1 line at tiny size (should basically never hit)
+        if not rendered:
+            font_try = load_font(20, bold=True)
+            w = measure(title, font_try)
+            draw.text(((W-w)//2, 40), title, font=font_try, fill=(251, 191, 36))
+            tagline_y = 125
 
+        # Tagline below title — neon cyan
+        tagline = "SYNDICATE INTELLIGENCE // BIOHACKING PROTOCOL"
+        bbox = draw.textbbox((0, 0), tagline, font=tagline_font)
+        w = bbox[2] - bbox[0]
+        draw.text(((W-w)//2, tagline_y), tagline, font=tagline_font, fill=(56, 189, 248))
+
+        # FOOTER — white
+        footer = "DO YOUR OWN RESEARCH. DON'T BE A STATISTIC."
+        bbox = draw.textbbox((0, 0), footer, font=footer_font)
+        w = bbox[2] - bbox[0]
+        draw.text(((W-w)//2, H-60), footer, font=footer_font, fill=(248, 250, 252))
+
+        # Save
+        os.makedirs("media/general", exist_ok=True)
+        # Strict slug sanitization to avoid newlines or special characters in filenames
+        slug = re.sub(r'[^a-z0-9]+', '-', topic.lower()).strip('-')[:50]
+        date_str = datetime.now().strftime('%Y-%m-%d')
+        filename = f"media/general/{date_str}-{slug}.jpg"
+        # Save as JPEG with optimized quality and progressive loading for faster web delivery
+        img.save(filename, "JPEG", quality=85, optimize=True, progressive=True)
+        self._log_uplink(f"IMAGE GEN: Saved to {filename}")
+        return filename
+
+    def _generate_qwen21_image(self, prompt, negative_prompt):
+        """PRIMARY image gen: Qwen-Image-2.1-Turbo (Q4_K_M GGUF) + PE rewrite, 8 steps.
+
+        2026-10-11: swapped from base Q4 + Viggle 4-step LoRA to the distilled
+        Turbo model (8 steps, no LoRA). A/B tested with Cory: 8-9/10 quality at
+        ~110s/gen (vs 9/10 at 130s for the old path). Added a quality-check
+        retry safety net: each output is scored 1-10 by the 27B vision API
+        (bigboy); if it scores below threshold (degenerate/bad seed) the seed is
+        re-rolled and regenerated, up to MAX_ATTEMPTS. 1280x1280 output.
+        PE-T2I rewriter (QwenPERewriteT8, via llama-server) rewrites the prompt
+        first. Returns a PIL Image (RGB), or None on failure.
+        """
+        import json
+        import time
+        import urllib.request
+        from PIL import Image
+        from io import BytesIO
+
+        BASE = "http://100.123.157.7:8188"
+        MAX_ATTEMPTS = 3        # quality-check retry budget
+        QUALITY_THRESHOLD = 6   # score below this -> re-roll the seed
+
+        # === VRAM FREE (9/21 fix) ===
+        # The 14B writer's keep_alive=0 unload takes ~20s, but image gen starts
+        # immediately after the article -> writer still resident -> Qwen-2.1 OOM
+        # (happened 9/21 07:02; SDXL fallback caught it). Explicitly unload the
+        # writer and wait for /api/ps to clear before loading Qwen-2.1-Turbo.
+        try:
+            from config import Config as _Cfg
+            _obase = getattr(_Cfg, "OLLAMA_BASE_URL", "http://100.123.157.7:11434")
+            _omodel = getattr(_Cfg, "OLLAMA_MODEL", "huihui_ai/qwen2.5-abliterate:14b")
+            _req = urllib.request.Request(
+                _obase + "/api/generate",
+                data=json.dumps({"model": _omodel, "keep_alive": 0}).encode(),
+                headers={"Content-Type": "application/json"})
+            urllib.request.urlopen(_req, timeout=30).read()
+            for _ in range(20):  # up to 40s for the unload to complete
+                try:
+                    _ps = json.loads(urllib.request.urlopen(_obase + "/api/ps", timeout=10).read())
+                    if not _ps.get("models"):
+                        break
+                except Exception:
+                    break
+                time.sleep(2)
+            self._log_uplink("IMAGE GEN: Writer unloaded, VRAM freed for Qwen-2.1-Turbo.")
         except Exception as e:
-            self._log_uplink(f"IMAGE GEN: Failed ({e}), falling back to random media.")
+            self._log_uplink(f"IMAGE GEN: Writer unload failed ({e}); proceeding (may OOM).")
+
+        def post(path, payload):
+            req = urllib.request.Request(BASE + path, data=json.dumps(payload).encode(),
+                                         headers={"Content-Type": "application/json"})
+            with urllib.request.urlopen(req, timeout=60) as r:
+                return json.loads(r.read())
+
+        def get(path):
+            with urllib.request.urlopen(BASE + path, timeout=60) as r:
+                return r.read()
+
+        def build_wf(seed):
+            # 2026-10-11: Turbo distilled model (8 steps, no Viggle LoRA) + PE rewrite.
+            return {
+                "0": {"class_type": "QwenPERewriteT8", "inputs": {
+                    "user_prompt": prompt, "task": "t2i", "aspect_ratio": "1:1",
+                    "output_language": "English", "transparent_rgba": False,
+                    "t2i_model": "Qwen-Image-2.1-PE-T2I.Q4_K_M.gguf",
+                    "edit_model": "Qwen-Image-2.1-PE-T2I.Q4_K_M.gguf",
+                    "vision_model": "Auto", "model_lifetime": "after_run",
+                    "seed": seed}},
+                "1": {"class_type": "UnetLoaderGGUF", "inputs": {"unet_name": "qwen-image-2.1-turbo-Q4_K_M.gguf"}},
+                "2": {"class_type": "CLIPLoader", "inputs": {
+                    "clip_name": "qwen3vl_8b_w4a8.safetensors", "type": "qwen_image"}},
+                "3": {"class_type": "VAELoader", "inputs": {"vae_name": "qwen_image_2.1_vae_bf16.safetensors"}},
+                "4": {"class_type": "TextEncodeQwenImage21", "inputs": {
+                    "clip": ["2", 0], "prompt": ["0", 0], "negative_prompt": negative_prompt,
+                    "resolution": 1280}},
+                "5": {"class_type": "KSampler", "inputs": {
+                    "seed": seed, "steps": 8, "cfg": 1.0, "sampler_name": "euler",
+                    "scheduler": "simple", "denoise": 1.0, "model": ["1", 0],
+                    "positive": ["4", 0], "negative": ["4", 1], "latent_image": ["4", 2]}},
+                "6": {"class_type": "VAEDecode", "inputs": {"samples": ["5", 0], "vae": ["3", 0]}},
+                "7": {"class_type": "SaveImage", "inputs": {
+                    "filename_prefix": "hopes", "format": "png", "images": ["6", 0]}},
+            }
+
+        def gen_once(seed):
+            """Queue one generation, poll /history, return PIL Image or None."""
+            wf = build_wf(seed)
+            pid = post("/prompt", {"prompt": wf})["prompt_id"]
+            for _ in range(240):  # ~8 min max; warm gen ~2min, cold load ~3min
+                time.sleep(2)
+                try:
+                    hist = json.loads(get("/history/" + pid))
+                except Exception:
+                    continue
+                if pid in hist:
+                    for node, out in hist[pid].get("outputs", {}).items():
+                        for img in out.get("images", []):
+                            if img.get("type") == "output":
+                                src = f"/view?filename={img['filename']}&subfolder={img.get('subfolder','')}&type={img['type']}"
+                                return Image.open(BytesIO(get(src))).convert("RGB")
+                    return None
+            return None
+
+        # Quality-check retry loop: generate, score via 27B vision, re-roll on bad.
+        best_image = None
+        best_score = 0
+        for attempt in range(1, MAX_ATTEMPTS + 1):
+            seed = (int(time.time() * 1000) + attempt * 7919) % (2**31)  # re-roll each attempt
+            self._log_uplink(f"IMAGE GEN: Qwen-Image-2.1-Turbo attempt {attempt}/{MAX_ATTEMPTS} for '{prompt[:40]}...'...")
+            image = gen_once(seed)
+            if image is None:
+                self._log_uplink(f"IMAGE GEN: attempt {attempt} produced no output; retrying.")
+                continue
+            score = self._quality_score(image, prompt)
+            self._log_uplink(f"IMAGE GEN: attempt {attempt} quality score {score}/10 (threshold {QUALITY_THRESHOLD}).")
+            if score > best_score:
+                best_image, best_score = image, score
+            if score >= QUALITY_THRESHOLD:
+                return image
+        # All attempts below threshold: return the best we got (don't drop the post).
+        if best_image is not None:
+            self._log_uplink(f"IMAGE GEN: all attempts below threshold; using best (score {best_score}).")
+            return best_image
+        self._log_uplink("IMAGE GEN: Qwen-2.1-Turbo failed all attempts; falling back.")
         return None
-        
+
+    def _quality_score(self, image, prompt):
+        """Score a generated image 1-10 via the 27B vision API (bigboy tailnet).
+
+        Returns an int 1-10. Returns 10 on ANY failure (treat as pass) so a down
+        or slow scorer never blocks a post.
+        """
+        import base64
+        import io
+        import json
+        import re
+        import urllib.request
+        try:
+            buf = io.BytesIO()
+            image.save(buf, format="PNG")
+            b64 = base64.b64encode(buf.getvalue()).decode()
+            api = "http://100.108.37.25:8888/v1/chat/completions"
+            payload = {
+                "model": "qwen3.8-27b-exl3-3.5bpw-wm",
+                "messages": [{"role": "user", "content": [
+                    {"type": "text", "text": (
+                        "Rate the quality of this generated image on a scale of 1 to 10. "
+                        "Consider: is it a coherent, well-formed image? Does it match the "
+                        "prompt? Are there major artifacts or distortions, or is it "
+                        "degenerate/abstract/noise? The prompt was: '" + str(prompt)[:200] + "'. "
+                        "Respond with ONLY a single integer from 1 to 10.")},
+                    {"type": "image_url", "image_url": {"url": "data:image/png;base64," + b64}},
+                ]}],
+                "max_tokens": 500,
+                "temperature": 0.0,
+            }
+            req = urllib.request.Request(api, data=json.dumps(payload).encode(),
+                                         headers={"Content-Type": "application/json"})
+            with urllib.request.urlopen(req, timeout=90) as r:
+                resp = json.loads(r.read())
+            text = resp["choices"][0]["message"]["content"].strip()
+            m = re.search(r"\b(10|[1-9])\b", text)
+            return int(m.group(1)) if m else 10
+        except Exception as e:
+            self._log_uplink(f"QUALITY CHECK: scorer failed ({e}); treating as pass.")
+            return 10
+
+    def _generate_sdxl_image(self, prompt, negative_prompt):
+        """FALLBACK image gen: SDXL-turbo on clamps' ComfyUI (free, local, ~8s).
+
+        Returns a PIL Image (RGB) at 1280x720, or None on failure.
+        Mirrors ~/bin/comfy_gen.py's workflow (KSampler/CheckpointLoader/CLIP/VAE).
+        VRAM etiquette: clamps' 3060 evicts Ollama's pinned model for the ~8s gen;
+        the LLM is already done by the time image gen runs (article writes first).
+        """
+        import json
+        import time
+        import urllib.request
+        from PIL import Image
+        from io import BytesIO
+
+        BASE = "http://100.123.157.7:8188"
+        seed = int(time.time() * 1000) % (2**32)
+        wf = {
+            "3": {"class_type": "KSampler", "inputs": {
+                "seed": seed, "steps": 4, "cfg": 1.0, "sampler_name": "euler",
+                "scheduler": "beta", "denoise": 1.0, "model": ["4", 0],
+                "positive": ["6", 0], "negative": ["7", 0], "latent_image": ["5", 0]}},
+            "4": {"class_type": "CheckpointLoaderSimple",
+                  "inputs": {"ckpt_name": "sd_xl_turbo_1.0_fp16.safetensors"}},
+            "5": {"class_type": "EmptyLatentImage",
+                  "inputs": {"width": 1280, "height": 720, "batch_size": 1}},
+            "6": {"class_type": "CLIPTextEncode", "inputs": {"text": prompt, "clip": ["4", 1]}},
+            "7": {"class_type": "CLIPTextEncode", "inputs": {"text": negative_prompt, "clip": ["4", 1]}},
+            "8": {"class_type": "VAEDecode", "inputs": {"samples": ["3", 0], "vae": ["4", 2]}},
+            "9": {"class_type": "SaveImage",
+                  "inputs": {"filename_prefix": "hopes", "format": "png", "images": ["8", 0]}},
+        }
+
+        def post(path, payload):
+            req = urllib.request.Request(BASE + path, data=json.dumps(payload).encode(),
+                                         headers={"Content-Type": "application/json"})
+            with urllib.request.urlopen(req, timeout=30) as r:
+                return json.loads(r.read())
+
+        def get(path):
+            with urllib.request.urlopen(BASE + path, timeout=30) as r:
+                return r.read()
+
+        self._log_uplink(f"IMAGE GEN: Requesting SDXL visual (clamps ComfyUI) for '{prompt[:40]}...'...")
+        pid = post("/prompt", {"prompt": wf})["prompt_id"]
+        for _ in range(60):  # ~2 min max; turbo is ~8s
+            time.sleep(2)
+            try:
+                hist = json.loads(get("/history/" + pid))
+            except Exception:
+                continue
+            if pid in hist:
+                for node, out in hist[pid].get("outputs", {}).items():
+                    for img in out.get("images", []):
+                        if img.get("type") == "output":
+                            src = f"/view?filename={img['filename']}&subfolder={img.get('subfolder','')}&type={img['type']}"
+                            return Image.open(BytesIO(get(src))).convert("RGB")
+                return None
+        self._log_uplink("IMAGE GEN: SDXL timed out waiting for generation.")
+        return None
+
+    def _generate_qwen_image(self, prompt, negative_prompt, api_key):
+        """FALLBACK image gen: together.xyz Qwen-Image (paid). 120s timeout + 1 retry.
+
+        Returns a PIL Image (RGB), or None on failure.
+        """
+        import requests
+        import base64
+        from PIL import Image
+        from io import BytesIO
+
+        if not api_key:
+            self._log_uplink("IMAGE GEN: No TOGETHER_API_KEY for Qwen fallback, skipping.")
+            return None
+
+        self._log_uplink(f"IMAGE GEN: Requesting Qwen-Image visual (together.xyz)...")
+        payload = {
+            "model": "Qwen/Qwen-Image",
+            "prompt": prompt,
+            "negative_prompt": negative_prompt,
+            "width": 1280,
+            "height": 720,
+            "steps": 28,
+            "n": 1,
+            "response_format": "b64_json",
+        }
+        last_err = None
+        for attempt in (1, 2):
+            try:
+                response = requests.post(
+                    "https://api.together.xyz/v1/images/generations",
+                    headers={"Authorization": f"Bearer {api_key}", "Content-Type": "application/json"},
+                    json=payload,
+                    timeout=120,
+                )
+                if response.status_code != 200:
+                    self._log_uplink(f"IMAGE GEN: image API returned {response.status_code}: {response.text[:200]}")
+                    return None
+                img_data = base64.b64decode(response.json()["data"][0]["b64_json"])
+                return Image.open(BytesIO(img_data)).convert("RGB")
+            except Exception as e:
+                last_err = e
+                self._log_uplink(f"IMAGE GEN: Qwen attempt {attempt} failed ({e}).")
+        self._log_uplink(f"IMAGE GEN: Qwen failed after retries ({last_err}).")
+        return None
+
     def _post_to_website(self, content, topic, image_path=None, title=None):
         """Beautifies the content and posts it to the website (articles/ and intel.html)."""
         os.makedirs("articles", exist_ok=True)
@@ -1980,7 +2422,7 @@ class HopesAndDreamsBot:
 
         # We need a longer context for beautification to handle the template and content.
         # We set sanitize=False because we WANT HTML tags in the JSON response.
-        json_response = self.llm.generate_response(prompt, system_msg, reflect=True, options={'num_ctx': 8192}, sanitize=False)
+        json_response = self.llm.generate_response(prompt, system_msg, reflect=False, options={'num_ctx': 8192}, sanitize=False)
 
         # Cleanup: Robustly extract JSON if the LLM ignores the "no markdown" instruction
         json_clean = json_response.strip()

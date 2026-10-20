@@ -38,6 +38,16 @@ TEMPLATE = """<!DOCTYPE html>
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>{title} | Hopes and Dreams</title>
 <meta name="description" content="{desc}">
+<meta property="og:type" content="article">
+<meta property="og:title" content="{title}">
+<meta property="og:description" content="{desc}">
+<meta property="og:image" content="{og_image}">
+<meta property="og:image:width" content="1280">
+<meta property="og:image:height" content="1280">
+<meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:title" content="{title}">
+<meta name="twitter:description" content="{desc}">
+<meta name="twitter:image" content="{og_image}">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;700;900&display=swap" rel="stylesheet">
@@ -87,6 +97,7 @@ TEMPLATE = """<!DOCTYPE html>
     <a class="tech-back" href="../sovereign.html">&lt;&lt; back to build logs</a>
     <div class="tech-tagline">SYS_OUTPUT // BUILD_LOG DECODED</div>
     <h1>{title}</h1>
+    {header_image}
     {body}
     <div class="tech-signoff">// Do your own research. Don't be a statistic.</div>
   </main>
@@ -208,7 +219,19 @@ def main():
         for label, href in NAV
     )
     desc = re.sub(r"<[^>]+>", "", body_html)[:150].replace('"', "'") + "..."
+    # Build the header image (relative path from the article HTML)
+    if args.image:
+        # --image is a full URL (https://hopes-and-dreams.ca/tech/images/<slug>.png)
+        # The article HTML is at tech/<slug>.html, so the relative path is images/<slug>.png
+        rel = args.image.split("/tech/", 1)[-1] if "/tech/" in args.image else args.image
+        header_image = f'<figure><img src="{rel}" alt="{title}"></figure>'
+        og_image = args.image  # full absolute URL for the share preview
+    else:
+        header_image = ""
+        og_image = "https://hopes-and-dreams.ca/topper.png"  # fallback to main image
+
     html = TEMPLATE.format(title=title, desc=desc, nav=nav_html, body=body_html,
+                           header_image=header_image, og_image=og_image,
                            year=datetime.date.today().year)
 
     slug = slugify(os.path.basename(path).replace(".md", ""))
