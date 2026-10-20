@@ -1,5 +1,11 @@
 [
   {
+    "href": "tech/fire-tv-debloat.html",
+    "title": "I Debloated My Fire TV, Killed the Tracking, and Built My Own Remote",
+    "date": "2026-10-19",
+    "image_url": ""
+  },
+  {
     "href": "tech/consolidating-gpus-onto-one-machine-for-local-llm-inference.html",
     "title": "Consolidating GPUs for Local LLM Inference",
     "date": "2026-07-03",

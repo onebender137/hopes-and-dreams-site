@@ -1,0 +1,209 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>I Debloated My Fire TV, Killed the Tracking, and Built My Own Remote | Hopes and Dreams</title>
+<meta name="description" content="2026-10-19 · sovereign tech · build log
+
+So here's the thing about a Fire TV. On the surface it's a perfectly fine little media box. You plug it in, y...">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;700;900&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="../style.css">
+<style>
+  .tech-log { max-width:820px; margin:0 auto; padding:30px 22px 80px; counter-reset:stepcount; }
+  .tech-back { font-family:'Courier New',monospace; font-size:0.85rem; display:inline-block; margin-bottom:20px; color:var(--neon-blue); }
+  .tech-tagline { font-family:'Courier New',monospace; color:var(--neon-blue); font-size:0.72rem;
+    letter-spacing:3px; text-transform:uppercase; margin-bottom:8px; opacity:0.85; }
+  .tech-log h1 { font-size:2.2rem; line-height:1.15; margin:0 0 22px; color:var(--text-main);
+    text-shadow:0 0 22px rgba(56,189,248,0.25); }
+  .tech-log h2 { font-family:'Courier New',monospace; color:var(--neon-blue); text-transform:uppercase;
+    letter-spacing:1px; font-size:1.15rem; margin:40px 0 12px; padding-top:18px;
+    border-top:1px solid rgba(148,163,184,0.18); }
+  .tech-log h2::before { content:"SYS_// "; color:var(--neon-gold); opacity:0.9; }
+  .tech-log h3 { color:var(--neon-gold); font-size:1rem; margin:24px 0 8px; }
+  .tech-log h3.step::before { counter-increment:stepcount; content:"Step " counter(stepcount) " // ";
+    color:var(--neon-blue); font-family:'Courier New',monospace; }
+  .tech-log p { margin:0 0 16px; color:var(--text-main); line-height:1.7; }
+  .tech-log a { color:var(--neon-blue); }
+  .tech-log img { max-width:100%; height:auto; border-radius:8px; margin:10px 0 22px; display:block; }
+  .tech-log figure { margin:0 0 22px; }
+  .tech-log figcaption { font-family:'Courier New',monospace; font-size:0.72rem; color:var(--text-dim); margin-top:8px; letter-spacing:1px; }
+  .tech-log ul, .tech-log ol { padding-left:22px; color:var(--text-main); }
+  .tech-log li { margin-bottom:8px; line-height:1.6; }
+  .tech-log code { font-family:'Courier New',monospace; background:rgba(56,189,248,0.1);
+    color:var(--neon-blue); padding:2px 6px; border-radius:4px; font-size:0.9em; }
+  .tech-log pre { background:var(--card-bg); border:1px solid rgba(56,189,248,0.2);
+    border-left:3px solid var(--neon-blue); border-radius:6px; padding:16px 18px; overflow-x:auto;
+    margin:0 0 20px; }
+  .tech-log pre code { background:none; padding:0; color:var(--text-main); font-size:0.85rem; line-height:1.55; }
+  .tech-signoff { margin-top:44px; padding-top:20px; border-top:1px solid rgba(148,163,184,0.18);
+    font-family:'Courier New',monospace; color:var(--neon-gold); letter-spacing:1px; font-size:0.9rem; }
+</style>
+</head>
+<body>
+  <div id="scroll-progress"></div>
+  <button id="theme-toggle" class="theme-toggle-pill" aria-label="Toggle between dark and light mode">&#9728;&#65039; LIGHT MODE</button>
+  <header>
+    <div class="logo-wrap">
+      <a href="../index.html"><img src="../topper.png" alt="Hopes and Dreams Syndicate Neuro-Optimization"></a>
+    </div>
+    <nav><a href="../index.html">Home</a> <a href="../shop.html">Shop</a> <a href="../optimization.html">Optimization</a> <a href="../cipher.html">Cipher</a> <a href="../intel.html">Intel Hub</a> <a class="active" href="../sovereign.html">Sovereign Tech</a> <a href="https://merch.hopes-and-dreams.ca">Merch</a> <a href="../about.html">About</a> <a href="../privacy.html">Privacy</a></nav>
+  </header>
+
+  <main class="tech-log">
+    <a class="tech-back" href="../sovereign.html">&lt;&lt; back to build logs</a>
+    <div class="tech-tagline">SYS_OUTPUT // BUILD_LOG DECODED</div>
+    <h1>I Debloated My Fire TV, Killed the Tracking, and Built My Own Remote</h1>
+    <p><em>2026-10-19 · sovereign tech · build log</em></p>
+<p><img alt="A moody living room with a smart TV glowing cyan" src="images/hero.jpg" /></p>
+<p>So here's the thing about a Fire TV. On the surface it's a perfectly fine little media box. You plug it in, you watch your shows, done. But underneath that friendly little interface is a machine that phones home to Amazon roughly every time you blink. It tracks what you watch, what you search, how long you hover over a thumbnail, and it pushes updates whether you want them or not. It stuffs the home screen with sponsored tiles. It wants your account. It wants to know you.</p>
+<p>I don't want to know me. I want to watch my stuff.</p>
+<p>So I did what I do: I took it apart, removed the parts I didn't want, and rebuilt it into something that actually answers to me. And because I couldn't leave well enough alone, I went and built my own remote for it too — a web one, then a real app, then a launcher widget. This is the whole journey, start to finish, with the actual commands and the actual gotchas. No theory. All of it fought for in the disco hut.</p>
+<p>If you've never touched a "repo" in your life, don't worry — I'll explain it in plain English before we get going. By the end you'll have a clean, private media box and a remote that runs off your own phone.</p>
+<h2>First: what even is a "repo"?</h2>
+<p>If the words "GitHub" and "repository" make your eyes glaze over, here's the sixty-second version.</p>
+<p>A <strong>repo</strong> (short for "repository") is just a folder of code that someone has shared online, at a site called <strong>GitHub</strong>. Think of it as a public recipe box. A developer builds a tool, writes down exactly how it works, and posts the whole folder to GitHub so anyone can grab a copy and use it.</p>
+<p>When people say "clone the repo," they mean "make a local copy of that folder on my computer." That's it. You're not hacking into anything. You're downloading a folder.</p>
+<p>You have two ways to get one:</p>
+<ul>
+<li><strong>The easy way (no setup):</strong> Go to the project's GitHub page in your browser, click the green <strong>Code</strong> button, and hit <strong>Download ZIP</strong>. Unzip it. You've got the repo. Done.</li>
+<li><strong>The "I have git" way:</strong> Open a terminal and type <code>git clone https://github.com/username/project</code>. It downloads the folder and keeps it in sync if the author updates it.</li>
+</ul>
+<p>That's the whole concept. A repo is a shared folder of code. We're going to grab one, point it at your TV, and let it do its thing.</p>
+<h2>The tool: dumbtv</h2>
+<p>The project we're using is called <strong><a href="https://github.com/humblemuzzu/dumbtv">dumbtv</a></strong>. It's open source (MIT licensed), and it does exactly what the name promises: it makes your smart TV <em>dumb</em> in the best possible way. Dumb as in "it stops ringing up Amazon."</p>
+<p>Here's what it does in one pass:</p>
+<ul>
+<li><strong>Disables the tracking packages.</strong> Dozens of Amazon background services that exist purely to collect data and push ads get switched off.</li>
+<li><strong>Applies privacy settings.</strong> Turns off the stuff Amazon turns on by default that you'd never think to check.</li>
+<li><strong>Installs a DNS filter.</strong> This is the big one — a little always-on VPN that blocks the TV's attempts to reach Amazon's tracking and update servers at the network level. Even if a package tries to phone home, the request just... dies.</li>
+<li><strong>Swaps the launcher.</strong> Replaces Amazon's cluttered home screen with a clean, minimal one that just shows your apps.</li>
+</ul>
+<p>It's reversible the whole way through (there's a restore script), so you're not bricking anything. You can always put it back.</p>
+<p>The repo even has a catalog of tested firmware versions, and it called out my exact TV model and Fire OS version as a known-good match. That's the kind of thing that makes me trust a project before I've run a single line.</p>
+<h2>Step 1 — wake the TV up (the part that's the same on every platform)</h2>
+<p>Before your computer can talk to the TV, the TV has to let it in. On a Fire TV that means turning on <strong>ADB</strong> (Android Debug Bridge). Don't let the name scare you — ADB is just a standard way for a computer to talk to an Android device, and a Fire TV <em>is</em> an Android device under the hood. ADB is like a remote control, file manager, and terminal rolled into one.</p>
+<p>On the TV:</p>
+<ol>
+<li>Go to <strong>Settings</strong> → <strong>My Fire TV</strong> → <strong>Developer Options</strong>. (If you don't see Developer Options, go to <strong>About</strong> and tap the version number seven times until it unlocks.)</li>
+<li>Turn on <strong>ADB</strong> (sometimes labeled "ADB over network" or "Developer options" → "ADB").</li>
+<li>While you're there, note the TV's <strong>IP address</strong> — it's on the <strong>About</strong> or <strong>Network</strong> screen. Mine was a <code>192.168.x.x</code> address. Write it down; you'll need it in a second.</li>
+</ol>
+<p>That's it for the TV. It's now listening for a friend on the network.</p>
+<h2>Step 2 — connect from your computer</h2>
+<p>This is where the three platforms split. The end goal is the same everywhere: get a little program called <code>adb</code> onto your computer, then tell it to connect to the TV's IP. The only difference is how you install <code>adb</code>.</p>
+<h3>On Windows</h3>
+<ol>
+<li>Download <strong>Android platform-tools</strong> from Google's developer site (search "android platform tools windows" — it's a small zip from <code>developer.android.com</code>).</li>
+<li>Unzip it somewhere permanent, like <code>C:\adb</code>.</li>
+<li>Open <strong>PowerShell</strong> (or Command Prompt) and cd into that folder.</li>
+<li>You now have <code>adb.exe</code>. Run:</li>
+</ol>
+<pre><code>adb connect &lt;LAN_IP&gt;:5555
+</code></pre>
+<p>Replace <code>&lt;LAN_IP&gt;</code> with your TV's IP address. You should see "connected to <your TV>:5555".</p>
+<blockquote>
+<p><strong>Windows gotcha:</strong> Windows loves to pop up a "Do you want to allow this app to communicate through the firewall?" box the first time. Say <strong>Yes / Allow</strong>. If you don't, the connection will silently fail and you'll pull your hair out.</p>
+</blockquote>
+<h3>On Apple (macOS)</h3>
+<ol>
+<li>Install <strong>Homebrew</strong> if you don't have it (it's the standard macOS package manager — one command from their website).</li>
+<li>In Terminal, run:</li>
+</ol>
+<pre><code>brew install android-platform-tools
+</code></pre>
+<ol start="3">
+<li>That drops <code>adb</code> onto your PATH. Connect:</li>
+</ol>
+<pre><code>adb connect &lt;LAN_IP&gt;:5555
+</code></pre>
+<p>macOS is the smoothest of the three for this. No firewall drama, no path fiddling.</p>
+<h3>On Linux (and yes, that includes Omarchy)</h3>
+<ol>
+<li>Install the platform-tools package. On a Debian/Ubuntu-based system (which Omarchy is built on):</li>
+</ol>
+<pre><code>sudo apt install android-tools-adb
+</code></pre>
+<p>Or, if you'd rather not use the distro package, grab the same zip as Windows and drop it in <code>~/bin/platform-tools</code>.</p>
+<ol start="2">
+<li>Connect:</li>
+</ol>
+<pre><code>adb connect &lt;LAN_IP&gt;:5555
+</code></pre>
+<p>On my Omarchy box I kept the platform-tools in <code>~/bin/platform-tools</code> and called it directly. Works the same.</p>
+<p><strong>Whichever platform you're on</strong>, once you run <code>adb connect &lt;LAN_IP&gt;:5555</code> and see "connected," your computer and the TV are talking. You can verify with <code>adb devices</code> — your TV's IP should be listed.</p>
+<h2>Step 3 — run the debloat</h2>
+<p>Now the fun part. From the folder where you unzipped (or cloned) dumbtv:</p>
+<pre><code>./scripts/configure.sh -y
+./scripts/all.sh -y
+</code></pre>
+<p>That's basically it. <code>configure.sh</code> sets up your preferences (I kept Prime Video's CDN, turned the launcher on, turned the DNS filter on, left YouTube alone). <code>all.sh</code> does the whole pass — disables the tracking packages, applies the privacy settings, starves the update services, and sets up the DNS filter.</p>
+<p>It takes a couple of minutes. When it's done, the TV reboots, and when it comes back... it's <em>quiet</em>. No sponsored tiles. No "Amazon wants to improve your experience" popups. Just your apps on a clean little home screen.</p>
+<p><img alt="The clean dumbtv launcher home screen — just apps and HDMI inputs, no bloat" src="images/tv-home.jpg" /></p>
+<p>That's the home screen after. A clock, your apps in a row, and your HDMI inputs. That's it. Compare that to the default Fire TV home, which is a billboard.</p>
+<h2>The gotcha: the VPN that wouldn't bind</h2>
+<p>Here's where I lost an hour, so you don't have to.</p>
+<p>The DNS filter works by running a little always-on VPN on the TV that intercepts the TV's network traffic and blocks the bad destinations. After the reboot, dumbtv's self-test said the VPN <strong>hadn't bound</strong> — the filter wasn't actually active. The blocks weren't happening.</p>
+<p>The fix was two commands and one button press on the TV:</p>
+<pre><code>adb shell appops set dnsfilter.android ACTIVATE_VPN allow
+adb shell settings put secure always_on_vpn_app dnsfilter.android
+adb shell settings put secure always_on_vpn_enabled 1
+</code></pre>
+<p>Then I hit the <strong>Connect</strong> button that popped up on the TV's screen. After that, I verified the blocks were real — the TV's attempts to reach Amazon's update and telemetry servers were all being redirected to nowhere. YouTube still worked fine. The filter was only eating the stuff I wanted it to eat.</p>
+<p>The <code>always_on_vpn</code> setting is the important one — it makes the filter survive reboots, so you don't have to redo this every time the TV restarts.</p>
+<h2>Adding back what you actually want</h2>
+<p>Debloating isn't about ending up with an empty box. It's about ending up with a box that has <em>your</em> stuff and none of <em>theirs</em>. So I added back the apps I actually use:</p>
+<ul>
+<li><strong>SmartTube</strong> — a clean, open-source YouTube client. No ads, no tracking, plays in 4K. (I set it to 2160p 60fps since the TV is a 4K panel.)</li>
+<li><strong>LocalSend</strong> — open-source, local file sharing. Send a video off your phone to the TV over the LAN, no cloud involved.</li>
+<li><strong>F-Droid</strong> — the open-source app store, so I can grab more clean apps without touching Amazon's store.</li>
+<li><strong>Aerial Views</strong> — a screensaver that shows gorgeous aerial footage. Set it as the TV's screensaver.</li>
+<li><strong>Stremio</strong> — for the addon-based streaming (more on that later).</li>
+<li><strong>Kodi</strong> — the classic media center, for my local library.</li>
+</ul>
+<p>The whole point: I chose every single thing on that home screen. Nothing got there because Amazon decided I should see it.</p>
+<h2>The remote (where it got fun)</h2>
+<p>Now the TV was clean and private, but I still had the little plastic Amazon remote, and I wasn't happy about it. It's a tracking device. It has a button that rings up Amazon's voice service. I'd rather not.</p>
+<p>So I asked the obvious question: <em>now that I can reach the TV over the network, is there an open-source remote I can run on my phone?</em></p>
+<p>There was — a project that installs a tiny app <em>on the TV</em> that runs a local web server, and you point your phone's browser at it. I installed it. It looked perfect. And it... didn't work. The TV's ADB wouldn't let the little app connect to itself (a quirk of how Fire OS handles local connections). Dead end.</p>
+<p>So I did what I always do: I built the thing I wanted.</p>
+<p>I wrote a tiny web server that runs on my always-on computer (the one that runs my AI stack). It sits on a local port, and it talks to the TV over the ADB connection I'd already set up. Your phone's browser points at that server, and every button you tap gets forwarded to the TV. No cloud. No account. No phone-home. Just your phone, your computer, and your TV on your own network.</p>
+<p>The first version was a plain web page — a D-pad, some buttons, app shortcuts. It worked, but it felt like a web page, not a remote.</p>
+<p>So I gave it a <strong>PWA</strong> treatment — a web app that installs to your phone's home screen like a real app. Its own icon, launches full-screen, no browser chrome. I made it look like an actual physical remote: a dark body, a circular nav wheel with a green OK button in the middle, rocker-style volume and channel keys, a status LED that glows green when the TV's connected and red when it drops. You can hold it in your hand and it <em>feels</em> like a remote.</p>
+<p><img alt="The native TV remote app on the phone — circular nav wheel, rockers, app shortcuts, and a green &quot;TV connected&quot; status" src="images/remote-app.jpg" /></p>
+<p>Then I went one step further and built it as a <strong>real native app</strong> — a proper APK installed on the phone, with the same remote UI, plus a <strong>launcher widget</strong> you can drop on your home screen for one-tap controls. The widget has the D-pad, home, back, volume, and a few app shortcuts, so you can control the TV without even opening the app.</p>
+<p>The whole thing is a few hundred lines. The web server is basically "receive a button press, forward it to the TV." The app is the UI. The widget is the quick-access layer. None of it touches the internet. It's all on the LAN.</p>
+<h2>Where you end up</h2>
+<p>Here's the end state, a year's-worth of "convenience" features removed and replaced with things I actually chose:</p>
+<ul>
+<li>A <strong>clean, private media box</strong> that doesn't track me, doesn't push ads, and doesn't force updates on me.</li>
+<li>A <strong>DNS filter</strong> that eats the tracking traffic at the network level and survives reboots.</li>
+<li><strong>My apps</strong> — and only my apps — on a minimal home screen.</li>
+<li><strong>My own remote</strong> — a phone app and a home-screen widget that run entirely on my network.</li>
+</ul>
+<p>And the beautiful part: every single step is reversible. There's a restore script that puts the TV back to factory Amazon if I ever change my mind. I'm not locked in. I'm just... opted out.</p>
+<h2>The bigger point</h2>
+<p>This isn't really about a Fire TV. It's about the fact that you <em>can</em> take these things back. The tools are open source. The commands are in the open. The whole "sovereign tech" idea is that you don't have to accept the default — the default is just whatever the vendor decided to ship, and you're allowed to change it.</p>
+<p>A repo is a shared folder of code. ADB is a way to talk to your own device. A DNS filter is a way to stop the phone-home. None of these are secret. They're just... available, if you're willing to spend an evening with them.</p>
+<p>So go grab the <a href="https://github.com/humblemuzzu/dumbtv">dumbtv repo</a>, point it at your TV, and take your living room back. And if you build something on top of it — like, I don't know, your own remote — write it down. That's what this section is for. Real war stories from the disco hut. Nothing theorized. All fought for.</p>
+<p>// Do your own research. Don't be a statistic.</p>
+    <div class="tech-signoff">// Do your own research. Don't be a statistic.</div>
+  </main>
+
+  <footer>
+    <p>&copy; 2026 Dream Syndicate Digital Assets. All Rights Reserved.</p>
+    <p>
+      <a href="https://www.facebook.com/profile.php?id=61581034972328" target="_blank" rel="noopener noreferrer">Connect on Facebook</a> |
+      <a href="https://merch.hopes-and-dreams.ca" target="_blank" rel="noopener noreferrer">Merch</a> |
+      <a href="../intel.html">Intel Hub</a> |
+      <a href="../sovereign.html">Sovereign Tech</a> |
+      <a href="../privacy.html">Privacy Policy</a> |
+      <a href="../about.html">Contact Us</a>
+    </p>
+    <p style="font-size:0.7rem; color:var(--text-dim); margin-top:10px;">Location: Saint John, New Brunswick, Canada</p>
+  </footer>
+  <script src="../script.js" defer></script>
+</body>
+</html>

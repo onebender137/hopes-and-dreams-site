@@ -58,6 +58,9 @@ TEMPLATE = """<!DOCTYPE html>
     color:var(--neon-blue); font-family:'Courier New',monospace; }}
   .tech-log p {{ margin:0 0 16px; color:var(--text-main); line-height:1.7; }}
   .tech-log a {{ color:var(--neon-blue); }}
+  .tech-log img {{ max-width:100%; height:auto; border-radius:8px; margin:10px 0 22px; display:block; }}
+  .tech-log figure {{ margin:0 0 22px; }}
+  .tech-log figcaption {{ font-family:'Courier New',monospace; font-size:0.72rem; color:var(--text-dim); margin-top:8px; letter-spacing:1px; }}
   .tech-log ul, .tech-log ol {{ padding-left:22px; color:var(--text-main); }}
   .tech-log li {{ margin-bottom:8px; line-height:1.6; }}
   .tech-log code {{ font-family:'Courier New',monospace; background:rgba(56,189,248,0.1);
