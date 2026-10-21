@@ -89,6 +89,22 @@ class SyndicateDatabase:
             cursor.execute('SELECT topic FROM posted_topics ORDER BY posted_at DESC LIMIT ?', (limit,))
             return [row[0] for row in cursor.fetchall()]
 
+    def get_recent_topics_with_ts(self, hours=72):
+        """Topics posted within the last `hours`, with timestamps (newest first).
+
+        v0.9x: fresh-DB read for the time-based cooldown — the in-memory
+        cache in bot.py went stale (9/22: 7am topic missing from the noon
+        check), so the cooldown must read the DB directly.
+        """
+        with self._get_connection() as conn:
+            cursor = conn.cursor()
+            cursor.execute(
+                'SELECT topic, posted_at FROM posted_topics '
+                'WHERE posted_at >= datetime(CURRENT_TIMESTAMP, ?) '
+                'ORDER BY posted_at DESC',
+                (f'-{int(hours)} hours',))
+            return [(row[0], row[1]) for row in cursor.fetchall()]
+
     def add_replied_comment(self, comment_id):
         """Records a comment ID that has been replied to."""
         with self._get_connection() as conn:

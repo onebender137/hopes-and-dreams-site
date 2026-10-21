@@ -20,7 +20,7 @@ BUILD_LOG_SYSTEM = (
     "not overly technical. You link to repos where relevant and give platform-specific "
     "directions. Gritty, insider, confident. No AI tells, no disclaimers, no marketing "
     "fluff. The article body uses plain text with section labels in CAPS on their own "
-    "line (no markdown headers, no bold, no lists). End the article with exactly: "
+    "line (no markdown headers, no bold, no lists Never include any secrets: no API tokens, keys, passwords, bearer strings, IP addresses, hostnames, or credentials. If a detail would expose a secret, describe it generically instead (e.g. 'a bearer token', not the actual value).). End the article with exactly: "
     "'Do your own research. Don't be a statistic.'"
 )
 
@@ -30,6 +30,29 @@ def slugify(s):
     s = re.sub(r"[^\w\s-]", "", s.lower()).strip()
     return re.sub(r"[\s_-]+", "-", s)[:60] or "article"
 
+
+
+def sanitize(text):
+    """Redact high-confidence secret patterns before publishing (fail-safe)."""
+    # sk- style keys (OpenAI / Together / etc.)
+    text = re.sub(r'\bsk-[A-Za-z0-9]{8,}\b', '[REDACTED]', text)
+    # Bearer <token>
+    text = re.sub(r'(?i)Bearer\s+[A-Za-z0-9_\-]{8,}', 'Bearer [REDACTED]', text)
+    # password= / token= / api_key= / secret=  value
+    text = re.sub(r'(?i)\b(password|passwd|token|api[_-]?key|secret)\s*[=:]\s*\S+',
+                  r'\1=[REDACTED]', text)
+    # Tailscale CGNAT / tailnet IPs (100.64.0.0/10)
+    text = re.sub(r'\b100\.(6[4-9]|[7-9]\d|1[0-2]\d)\.\d{1,3}\.\d{1,3}\b',
+                  '[REDACTED-IP]', text)
+    # High-entropy mixed-case alphanumeric (tokens/keys): 16+ alnum chars w/ upper+lower+digit
+    def _he(m):
+        t = m.group()
+        a = [c for c in t if c.isalnum()]
+        if len(a) >= 16 and any(c.isupper() for c in a) and any(c.islower() for c in a) and any(c.isdigit() for c in a):
+            return "[REDACTED]"
+        return t
+    text = re.sub(r"\b[A-Za-z0-9][A-Za-z0-9-]*[A-Za-z0-9]\b", _he, text)
+    return text
 
 def gen_markdown(title, summary, tags):
     prompt = (
@@ -90,6 +113,7 @@ def main():
     title, summary, tags = row
 
     md = gen_markdown(title, summary, tags)
+    md = sanitize(md)
     if not md or len(md) < 200:
         print(f"generation too short ({len(md)} chars), aborting")
         sys.exit(1)

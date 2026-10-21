@@ -78,11 +78,36 @@ class FBClient:
         try:
             images = [f for f in os.listdir(target_dir) if f.lower().endswith(('.png', '.jpg', '.jpeg'))]
             if images:
-                return os.path.join(target_dir, random.choice(images))
+                pick = self._dedup_pick(images, target_dir)
+                return os.path.join(target_dir, pick)
         except Exception as e:
             print(f"Error selecting image: {e}")
-        
+
         return None
+
+    def _dedup_pick(self, images, target_dir):
+        """Pick a random image, excluding the one used by the previous fallback.
+
+        Prevents back-to-back fallbacks (e.g. two image-gen failures in a row)
+        from reusing the same photo. State lives in media/.last_fallback_image.
+        """
+        state_file = os.path.join(self.base_media_path, ".last_fallback_image")
+        last = None
+        try:
+            with open(state_file) as f:
+                last = f.read().strip()
+        except Exception:
+            pass
+        pool = [f for f in images if os.path.join(target_dir, f) != last]
+        if not pool:
+            pool = images  # only one image; nothing to dedup against
+        pick = random.choice(pool)
+        try:
+            with open(state_file, "w") as f:
+                f.write(os.path.join(target_dir, pick))
+        except Exception:
+            pass
+        return pick
 
     def post_to_page(self, message: str, image_path: str = None):
         """Posts to Facebook Page. If image_path is None, it tries to pick one automatically."""

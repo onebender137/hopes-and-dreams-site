@@ -33,7 +33,7 @@ class Config:
     WEBSITE_API_KEY = os.getenv("WEBSITE_API_KEY")
 
     # Ollama Settings
-    OLLAMA_MODEL = os.getenv("OLLAMA_MODEL", "dolphin-llama3:8b")
+    OLLAMA_MODEL = os.getenv("OLLAMA_MODEL", "huihui_ai/qwen3.6-abliterated:35b")
     OLLAMA_BASE_URL = os.getenv("OLLAMA_BASE_URL", "http://localhost:11434")
 
     @classmethod

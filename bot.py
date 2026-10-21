@@ -2993,6 +2993,13 @@ def run_telegram_bot(hopes_and_dreams_bot):
     """Wrapper to run the Telegram bot."""
     if Config.TELEGRAM_BOT_TOKEN:
         bot = TelegramBot(hopes_and_dreams_bot=hopes_and_dreams_bot)
+        # Start the Hopes Bot server (for the APK app)
+        try:
+            from hopes_server import start_server, set_telegram_bot
+            set_telegram_bot(bot)
+            start_server()
+        except Exception as e:
+            print(f"[HOPES_SERVER] Failed to start: {e}")
         bot.run()
 
 def main():

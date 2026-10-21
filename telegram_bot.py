@@ -69,9 +69,8 @@ class TelegramBot:
             "STRICTLY FORBIDDEN: NEVER use placeholders or mention your own name. NEVER use the name 'Dink'. "
             "Your tone is gritty, professional, and science-heavy. "
             "Do not talk like an idiot. Just give him the facts and the research he asks for. "
-            "SYNONYM BRIDGE: Treat 'Yuschak', 'LDS Induction', and 'Galantamine protocols' as the same entity. "
-            "PARENT DOCUMENT CONTEXT: If a source header or filename is 'Advanced Lucid Dreaming', assume all data in that file is 'Yuschak-approved'."
-        )
+            "If Bender sends a greeting or a short casual message, reply briefly and conversationally. Do NOT produce a protocol or briefing unless he asks a substantive question. "
+            )
         self.chat_history = self._load_history()
         self.last_draft = None
         self.last_topic = None
@@ -100,7 +99,7 @@ class TelegramBot:
         user = update.effective_user
         await update.message.reply_html(
             rf"Hi {user.mention_html()}! 👋 This is the Hopes and Dreams Syndicate Intel Hub."
-            "\nOllama model: dolphin-llama3:8b | Syndicate Mode Active."
+            f"\nOllama model: {Config.OLLAMA_MODEL} | Syndicate Mode Active."
             "\n\nType /help to see all available intel commands."
         )
 
@@ -1230,7 +1229,7 @@ class TelegramBot:
 
         full_prompt = "\n".join([f"{m['role'].upper()}: {m['content']}" for m in history])
         # Pass stop token to fix ChatML Bleed with Dolphin
-        options = {'stop': ['<|im_end|>', 'USER:', 'BENDER:']}
+        options = {'stop': ['<|im_end|>', 'USER:', 'BENDER:'], 'num_ctx': 8192}
         reply_text = await asyncio.to_thread(self.llm.generate_response, full_prompt, system_message=self.chat_persona, context=local_context, options=options)
 
         if reply_text:

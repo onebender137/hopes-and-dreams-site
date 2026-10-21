@@ -90,3 +90,5 @@ tech_publish (1).py
 # Stray social-card exports
 cipher-fb-feed.png
 cipher-square.png
+hopes_token.txt
+hopes_history.jsonl

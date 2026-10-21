@@ -14,10 +14,7 @@ class SyndicateCrew:
             os.environ["OPENAI_API_KEY"] = "ollama"
 
         # Common Persona Bridges
-        self.logic_bridges = (
-            "SYNONYM BRIDGE: Treat 'Yuschak', 'LDS Induction', and 'Galantamine protocols' as the same entity. "
-            "PARENT DOCUMENT CONTEXT: If a source header or filename is 'Advanced Lucid Dreaming', assume all data in that file is 'Yuschak-approved'."
-        )
+        self.logic_bridges = ""
 
         # Agent 1: Biohacking Researcher
         self.researcher = Agent(

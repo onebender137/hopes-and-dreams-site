@@ -10,10 +10,7 @@ class LLMClient:
         self.client = ollama.Client(host=self.base_url)
 
         # Core Logic & Synonym Bridges (Immutable facts for the Syndicate)
-        self.logic_bridges = (
-            "SYNONYM BRIDGE: Treat 'Yuschak', 'LDS Induction', and 'Galantamine protocols' as the same entity. "
-            "PARENT DOCUMENT CONTEXT: If a source header or filename is 'Advanced Lucid Dreaming', assume all data in that file is 'Yuschak-approved'. "
-        )
+        self.logic_bridges = ""
 
         # ==================================================================
         # PERSONA 1: SYNDICATE RESEARCHER
@@ -243,7 +240,12 @@ class LLMClient:
         """The Research & Convey Loop."""
         # Use provided system message or default to Syndicate public for community queries
         final_system = system_message or self.public_syndicate_persona
-        options = options or {'num_ctx': 4096}  # Optimized for 8B model headroom
+        # keep_alive=0: unload the 14B writer from VRAM right after each call. The
+        # image pipeline (Qwen-Image-2.1) needs ~9.4GB on the same 3060; if the writer
+        # is still resident when it loads, the two collide and OOM. Unloading here means
+        # the writer is gone before image gen runs. Cost: a few-sec reload per call.
+        options = options or {'num_ctx': 4096, 'keep_alive': 0}
+        options['keep_alive'] = 0
 
         full_prompt = (
             f"### LOCAL RESEARCH CONTEXT:\n{context}\n\n"
@@ -257,7 +259,7 @@ class LLMClient:
                 {'role': 'system', 'content': final_system},
                 {'role': 'user', 'content': full_prompt}
             ]
-            response = self.client.chat(model=self.model, messages=messages, options=options)
+            response = self.client.chat(model=self.model, messages=messages, options=options, think=False)
             content = response['message']['content']
 
             # Quality Control Step
