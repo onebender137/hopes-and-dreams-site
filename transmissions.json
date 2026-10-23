@@ -1,5 +1,11 @@
 [
     {
+        "href": "articles/2026-10-23-nac.html",
+        "title": "Nac",
+        "date": "2026-10-23",
+        "image_url": "media/general/2026-10-23-nac.png"
+    },
+    {
         "href": "articles/2026-10-23-osmotic-modulation-of-the-hpa-axis-salt-water.html",
         "title": "Osmotic Modulation of the HPA Axis: Salt Water",
         "date": "2026-10-23",
@@ -888,12 +894,6 @@
         "image_url": "media/general/2026-09-03-dasatinib-quercetin-senolytic-combination.jpg"
     },
     {
-        "href": "articles/2026-09-03-glycine-nac-methionine-restriction-mimetic.html",
-        "title": "Glycine + NAC Methionine Restriction Mimetic",
-        "date": "2026-09-03",
-        "image_url": "media/general/2026-09-03-glycine-nac-methionine-restriction-mimetic.jpg"
-    },
-    {
         "href": "articles/2026-09-03-berberine-ampk-activation.html",
         "title": "Berberine AMPK Activation",
         "date": "2026-09-03",
@@ -1398,12 +1398,6 @@
         "image_url": "media/general/2026-07-27-thc-cooh-metabolic-pathway.jpg"
     },
     {
-        "href": "articles/2026-07-26-nicotine-nachr-pharmacology.html",
-        "title": "Nicotine nAChR Pharmacology",
-        "date": "2026-07-26",
-        "image_url": "media/general/2026-07-26-nicotine-nachr-pharmacology.jpg"
-    },
-    {
         "href": "articles/2026-07-26-nicotine-gum-pharmacokinetics.html",
         "title": "Nicotine Gum Pharmacokinetics",
         "date": "2026-07-26",
@@ -1800,12 +1794,6 @@
         "image_url": "media/general/2026-07-07-nicotine-caffeine-synergy.jpg"
     },
     {
-        "href": "articles/2026-07-07-alpha-7-nachr-cognitive-pathway.html",
-        "title": "Alpha-7 nAChR Cognitive Pathway",
-        "date": "2026-07-07",
-        "image_url": "media/general/2026-07-07-alpha-7-nachr-cognitive-pathway.jpg"
-    },
-    {
         "href": "articles/2026-07-07-nicotine-patch-cognitive-stack.html",
         "title": "Nicotine Patch Cognitive Stack",
         "date": "2026-07-07",
@@ -2080,12 +2068,6 @@
         "title": "Sulforaphane Nrf2 Activation",
         "date": "2026-06-26",
         "image_url": "media/general/2026-06-26-sulforaphane-nrf2-activation.jpg"
-    },
-    {
-        "href": "articles/2026-06-26-glycine-nac-methionine-restriction-mimetic.html",
-        "title": "Glycine + NAC Methionine Restriction Mimetic",
-        "date": "2026-06-26",
-        "image_url": "media/general/2026-06-26-glycine-nac-methionine-restriction-mimetic.jpg"
     },
     {
         "href": "articles/2026-06-25-pqq-mitochondrial-biogenesis.html",
@@ -2494,12 +2476,6 @@
         "title": "Nicotine Patch Cognitive Stack",
         "date": "2026-06-03",
         "image_url": "media/general/2026-06-03-nicotine-patch-cognitive-stack.jpg"
-    },
-    {
-        "href": "articles/2026-06-03-alpha-7-nachr-cognitive-pathway.html",
-        "title": "Alpha-7 nAChR Cognitive Pathway",
-        "date": "2026-06-03",
-        "image_url": "media/general/2026-06-03-alpha-7-nachr-cognitive-pathway.jpg"
     },
     {
         "href": "articles/2026-06-03-asprey-style-low-dose-nicotine.html",
@@ -3086,18 +3062,8 @@
         "date": "2026-04-30"
     },
     {
-        "href": "articles/2026-04-29-research-data-analysis-nicotine-s-interaction-with-n-acetylcholine-receptors-nachrs-the-benefits-of-supplementing-nicotine.html",
-        "title": "Research Data Analysis: Nicotine's Interaction with N-Acetylcholine Receptors (NACHRs) the benefits of supplementing nicotine",
-        "date": "2026-04-29"
-    },
-    {
         "href": "articles/2026-04-29-cannabis-benefits-masterclass.html",
         "title": "CANNABIS BENEFITS MASTERCLASS",
-        "date": "2026-04-29"
-    },
-    {
-        "href": "articles/2026-04-29-a-post-called-nicotinic-acetylcholine-receptors-nachrs-make-it-in-depth-and-highlight-any-relationship-found-to-the-recent-covid-vaxine.html",
-        "title": "Nicotinic Acetylcholine Receptors: Unlocking the Complexity of Health and Disease",
         "date": "2026-04-29"
     },
     {
@@ -3133,11 +3099,6 @@
     {
         "href": "articles/2026-04-27-natural-methods-to-enhance-cognitive-function-and-mood.html",
         "title": "Natural Methods to Enhance Cognitive Function and Mood",
-        "date": "2026-04-27"
-    },
-    {
-        "href": "articles/2026-04-27-n-acetyl-cysteine-nac-for-neuroprotection-and-mitochondrial-support.html",
-        "title": "N-Acetyl Cysteine (NAC) for Neuroprotection and Mitochondrial Support",
         "date": "2026-04-27"
     },
     {
