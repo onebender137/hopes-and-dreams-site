@@ -1,0 +1,360 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<!-- Google Tag Manager -->
+<script>(function(w,d,s,l,i){w[l]=w[l]||[];w[l].push({'gtm.start':
+new Date().getTime(),event:'gtm.js'});var f=d.getElementsByTagName(s)[0],
+j=d.createElement(s),dl=l!='dataLayer'?'&l='+l:'';j.async=true;j.src=
+'https://www.googletagmanager.com/gtm.js?id='+i+dl;f.parentNode.insertBefore(j,f);
+})(window,document,'script','dataLayer','GTM-P9TBCF2X');</script>
+<!-- End Google Tag Manager -->
+<!-- Google tag (gtag.js) -->
+<script async src="https://www.googletagmanager.com/gtag/js?id=G-5RWXX320YW"></script>
+<script>
+  window.dataLayer = window.dataLayer || [];
+  function gtag(){dataLayer.push(arguments);}
+  gtag('js', new Date());
+
+  gtag('config', 'G-5RWXX320YW');
+</script>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Meet Hermes: The Open-Source AI Agent That Actually Runs on Your Machine | Hopes and Dreams</title>
+    <meta name="description" content="Hermes Agent is an open-source personal AI agent that runs on your own hardware. How to install it, what it does, and why it's different from the cloud-bound coding agents.">
+    <meta property="og:type" content="article">
+    <meta property="og:site_name" content="Hopes and Dreams">
+    <meta property="og:title" content="Meet Hermes: The Open-Source AI Agent That Actually Runs on Your Machine">
+    <meta property="og:description" content="Hermes Agent is an open-source personal AI agent that runs on your own hardware. How to install it, what it does, and why it's different from the cloud-bound coding agents.">
+    <meta property="og:image" content="https://hopes-and-dreams.ca/media/general/2026-10-24-hermes-agent.png">
+    <meta name="twitter:card" content="summary_large_image">
+    <meta name="twitter:title" content="Meet Hermes: The Open-Source AI Agent That Actually Runs on Your Machine">
+    <meta name="twitter:description" content="Hermes Agent is an open-source personal AI agent that runs on your own hardware. How to install it, what it does, and why it's different from the cloud-bound coding agents.">
+    <meta name="twitter:image" content="https://hopes-and-dreams.ca/media/general/2026-10-24-hermes-agent.png">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link rel="dns-prefetch" href="https://fonts.googleapis.com">
+    <link rel="dns-prefetch" href="https://fonts.gstatic.com">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;700;900&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="../style.css">
+    <link rel="icon" type="image/x-icon" href="../favicon.ico">
+    <link rel="icon" type="image/png" sizes="32x32" href="../favicon-32x32.png">
+    <link rel="icon" type="image/png" sizes="16x16" href="../favicon-16x16.png">
+    <link rel="apple-touch-icon" sizes="180x180" href="../apple-touch-icon.png">
+    <style>
+        /* --- ARTICLE CONTENT AREA --- */
+        .article-container {
+            max-width: 800px;
+            margin: 0 auto;
+            padding: 0 24px 100px;
+        }
+
+        .glow-divider {
+            width: 100%;
+            height: 1px;
+            background: radial-gradient(circle, var(--neon-blue) 0%, transparent 70%);
+            opacity: 0.2;
+            margin-bottom: 60px;
+        }
+
+        h1 {
+            color: var(--text-main);
+            font-size: clamp(2.2rem, 7vw, 3.5rem);
+            font-weight: 900;
+            line-height: 1.1;
+            margin-bottom: 25px;
+            text-shadow: 0 0 30px rgba(255, 255, 255, 0.2);
+        }
+
+        .meta-data {
+            color: var(--neon-gold);
+            text-transform: uppercase;
+            font-size: 0.9rem;
+            letter-spacing: 2px;
+            font-weight: 700;
+            margin-bottom: 40px;
+            display: block;
+        }
+
+        h2 {
+            color: #ffffff;
+            font-size: clamp(1.6rem, 5vw, 2.4rem);
+            font-weight: 800;
+            margin-top: 60px;
+            margin-bottom: 25px;
+            text-transform: uppercase;
+            letter-spacing: 2px;
+            text-shadow: 0 0 15px var(--neon-blue), 0 0 5px #ffffff;
+        }
+
+        p {
+            color: var(--text-dim);
+            font-size: 1.2rem;
+            margin-bottom: 25px;
+        }
+
+        strong {
+            color: var(--text-main);
+            font-weight: 700;
+        }
+
+        .hack-box {
+            background-color: var(--card-bg);
+            border-left: 4px solid var(--neon-gold);
+            padding: 30px;
+            border-radius: 0 16px 16px 0;
+            margin: 40px 0;
+        }
+
+        .hack-box h4 {
+            color: var(--neon-gold);
+            margin: 0 0 10px 0;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+        }
+
+        .article-img {
+            width: 100%;
+            border-radius: 24px;
+            border: 1px solid rgba(56, 189, 248, 0.2);
+            margin: 40px 0;
+        }
+
+        ul {
+            color: var(--text-dim);
+            font-size: 1.1rem;
+            margin-bottom: 30px;
+        }
+
+        li {
+            margin-bottom: 10px;
+        }
+
+        .syndicate-footer {
+            margin-top: 80px;
+            padding: 40px;
+            background: rgba(56, 189, 248, 0.05);
+            border: 1px solid rgba(56, 189, 248, 0.1);
+            border-radius: 24px;
+            text-align: center;
+        }
+
+        .btn-fb {
+            display: inline-block;
+            margin-top: 20px;
+            background: var(--neon-blue);
+            color: var(--bg-main);
+            padding: 15px 30px;
+            border-radius: 50px;
+            text-decoration: none;
+            font-weight: 900;
+            text-transform: uppercase;
+            transition: 0.3s;
+        }
+
+        .btn-fb:hover {
+            background: var(--neon-gold);
+            transform: scale(1.05);
+        }
+
+        footer {
+            text-align: center;
+            padding: 60px 0;
+            color: #4b5563;
+            font-size: 0.85rem;
+            border-top: 1px solid rgba(255, 255, 255, 0.05);
+        }
+
+        .timestamp-live {
+            min-height: 1.2em;
+        }
+
+        @media (max-width: 600px) {
+            h1 { font-size: 2rem; }
+            nav { flex-direction: column; gap: 20px; align-items: center; }
+        }
+    </style>
+</head>
+<body>
+<!-- Google Tag Manager (noscript) -->
+<noscript><iframe src="https://www.googletagmanager.com/ns.html?id=GTM-P9TBCF2X"
+height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
+<!-- End Google Tag Manager (noscript) -->
+    <div id="scroll-progress"></div>
+    <button id="theme-toggle" class="theme-toggle-pill" aria-label="Toggle between dark and light mode">☀️ LIGHT MODE</button>
+
+    <header>
+        <div class="logo-wrap">
+            <img src="../topper.png" alt="Hopes and Dreams" width="1780" height="1050" fetchpriority="high">
+        </div>
+
+        <nav>
+            <a href="../index.html">Home</a>
+            <a href="../shop.html">Shop</a>
+            <a href="../optimization.html">Optimization</a>
+            <a href="../cipher.html">Cipher</a>
+            <a href="../intel.html">Intel Hub</a>
+            <a href="../sovereign.html">Sovereign Tech</a>
+            <a href="https://merch.hopes-and-dreams.ca" target="_blank" rel="noopener noreferrer">Merch</a>
+            <a href="../about.html">About</a>
+            <a href="../privacy.html">Privacy</a>
+        </nav>
+    </header>
+
+    <div class="container">
+        <article class="article-container" data-reveal>
+            <div class="timestamp-live" data-timestamp="2026-10-24T13:08:06.538551-03:00"></div>
+            <h1>Meet Hermes: The Open-Source AI Agent That Actually Runs on Your Machine</h1>
+
+            <img src="../media/general/2026-10-24-hermes-agent.png" alt="Meet Hermes: The Open-Source AI Agent That Actually Runs on Your Machine" class="article-img">
+
+            <div class="intel-burst">
+                
+<h2>The Problem with "Cloud AI"</h2>
+<p>Almost every AI assistant you've ever used lives in someone else's cloud. You type a message, it "thinks," and you get an answer back. But the thinking happens on their servers, with their models, under their rules. Your words flow through their infrastructure. Your "personal" assistant is really a shared service you're renting.</p>
+<p>That's fine for casual use. But if you care about privacy, self-reliance, or building something that's genuinely yours, it's a hard ceiling. You can't audit the model. You can't change the rules. You can't run it when their servers are down. And the moment they decide your use case is "not allowed," you're locked out of your own tool.</p>
+<h2>Enter Hermes Agent</h2>
+<p>Hermes Agent is an open-source personal AI agent built by Nous Research. The core difference is simple: it runs on <strong>your</strong> hardware. Your machine, your models, your rules. You talk to it from wherever you want — your phone, your watch, your terminal, your Discord, your own custom channels.</p>
+<p>And it's not a chatbot. It's a full agent. It can:</p>
+<ul>
+<li>Chat and reason across a long context window</li>
+<li>Run tools — execute code, read and write files, browse the web</li>
+<li>Manage your calendar, email, and tasks</li>
+<li>Control smart-home devices and physical hardware</li>
+<li>Remember you across sessions (persistent memory)</li>
+<li>Learn reusable procedures it saves as "skills"</li>
+<li>Be extended with plugins that add entirely new capabilities</li>
+</ul>
+<p>On top of all that, it's <strong>model-agnostic</strong>. You can point it at any model — a local one running on your own GPU, or a cloud API. The agent is the constant; the brain is swappable.</p>
+<h2>How to Install</h2>
+<p>The whole install is one line:</p>
+<pre><code class="language-bash">curl -fsSL https://hermes-agent.nousresearch.com/install.sh | bash
+</code></pre>
+<p>Then a one-time setup, and you're running:</p>
+<pre><code class="language-bash">hermes setup   # configure your model + channels
+hermes         # start the agent
+</code></pre>
+<p>The installer handles the environment, the dependencies, and the config. There's no cloud account to create, no telemetry to opt out of.</p>
+<h2>Requirements</h2>
+<ul>
+<li><strong>Python 3.10+</strong></li>
+<li><strong>A model backend</strong> — local (llama.cpp, Ollama, vLLM) or cloud (any OpenAI-compatible API)</li>
+<li><strong>~2 GB disk</strong> for the agent itself</li>
+<li><strong>Optional: a GPU</strong> if you want to run local models at speed</li>
+</ul>
+<p>That's the whole list. No proprietary runtime, no vendor lock-in.</p>
+<h2>How It Stacks Up</h2>
+<table>
+<thead>
+<tr>
+<th>Agent</th>
+<th style="text-align: center;">Open Source</th>
+<th style="text-align: center;">Self-Hosted</th>
+<th style="text-align: center;">Model-Agnostic</th>
+<th style="text-align: center;">Full Agent</th>
+<th style="text-align: center;">Multi-Platform</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Claude Code</td>
+<td style="text-align: center;">No</td>
+<td style="text-align: center;">No</td>
+<td style="text-align: center;">No (Anthropic only)</td>
+<td style="text-align: center;">Coding-focused</td>
+<td style="text-align: center;">Terminal</td>
+</tr>
+<tr>
+<td>OpenAI Codex</td>
+<td style="text-align: center;">No</td>
+<td style="text-align: center;">No</td>
+<td style="text-align: center;">No (OpenAI only)</td>
+<td style="text-align: center;">Coding-focused</td>
+<td style="text-align: center;">Terminal / cloud</td>
+</tr>
+<tr>
+<td>OpenCode</td>
+<td style="text-align: center;">Yes</td>
+<td style="text-align: center;">Yes</td>
+<td style="text-align: center;">Yes</td>
+<td style="text-align: center;">Limited</td>
+<td style="text-align: center;">Terminal</td>
+</tr>
+<tr>
+<td><strong>Hermes</strong></td>
+<td style="text-align: center;"><strong>Yes</strong></td>
+<td style="text-align: center;"><strong>Yes</strong></td>
+<td style="text-align: center;"><strong>Yes</strong></td>
+<td style="text-align: center;"><strong>Full agent</strong></td>
+<td style="text-align: center;"><strong>Many + custom</strong></td>
+</tr>
+</tbody>
+</table>
+<p>The closed coding agents are great at what they do, but they're single-purpose, cloud-bound, and locked to one vendor's models. Hermes is broader: it's a personal agent, not a code completer, and it runs wherever you point it.</p>
+<h2>Why Hermes</h2>
+<ul>
+<li><strong>Open source</strong> — you can read every line, audit it, and fork it.</li>
+<li><strong>Self-hosted</strong> — your hardware, your data, your rules.</li>
+<li><strong>Model-agnostic</strong> — swap the brain without swapping the agent.</li>
+<li><strong>Full agent</strong> — a personal assistant, not just a coding tool.</li>
+<li><strong>Multi-platform</strong> — Telegram, WhatsApp, Discord, Slack, Signal, iMessage, CLI, and fully custom channels.</li>
+<li><strong>Extensible</strong> — plugins, skills, and persistent memory let it grow with you.</li>
+</ul>
+<h2>Our Angle: The Danny Chat App</h2>
+<p>We didn't just install Hermes — we built our own integration around it. The <strong>danny-push</strong> app is a native Android app that talks to our agent over a private tailnet. No cloud, no middleman, no third-party server touching the conversation. Just our phone talking to our agent, end to end.</p>
+<p>We also flashed a small hardware gadget that connects straight into the agent — a physical device you can hold that's wired into the same brain. Ours is a <strong>Waveshare ESP32-S3-Touch-LCD-1.28</strong>: a board the size of a matchbook with a color display, a touch layer, and a motion sensor, running a custom firmware that bridges it into the agent. But the <strong>Hermes Gadget SDK</strong> is designed to be board-agnostic — breadboard builds, CYD boards, Waveshare LCDs, and a whole family of ESP32 hardware can all be wired into the same brain. You can browse the supported boards and the flashing guide at the <a href="https://adolanium.github.io/hermes-gadget-sdk/">Hermes Gadget SDK site</a>. That's the "sovereign tech" part made concrete: not a service you rent, but a stack you built yourself, from the phone app down to the silicon.</p>
+<h2>The Bigger Picture</h2>
+<p>This is what "sovereign AI" looks like in practice. Not a subscription you log into, but a system you own. Your hardware, your models, your data, your rules — and an agent that remembers you, learns your workflows, and extends the moment you want it to.</p>
+<p>Hermes is the foundation. The plugins, skills, and custom integrations are the building blocks. And the result is an AI assistant that's actually yours.</p>
+<p><em>In the next few posts we'll pull the hood off some of the deeper work — reverse-engineering tools wired into the agent, per-command sandboxing, and the custom channels we built from scratch. This is just the intro.</em></p>
+            </div>
+
+            <div class="hack-box"><h4>Builder&#39;s Note</h4><p><strong>Start local, go cloud when you need to.</strong> Point Hermes at a local model (llama.cpp or Ollama) for full privacy, then swap in a cloud API for heavy lifting. The agent stays the same &mdash; only the brain changes. That&#39;s the whole point of model-agnostic.</p></div>
+
+            <div class="researcher-sig">
+                [ STATUS: TRANSMISSION_COMPLETE ]<br>
+                [ AUTHOR: LEAD TECHNICAL RESEARCHER ]
+            </div>
+
+            <div class="syndicate-footer">
+                <h3>Join the Conversation</h3>
+                <p>Discuss this transmission and share your results with the rest of the builders in our private community.</p>
+                <a href="https://www.facebook.com/profile.php?id=61581034972328" class="btn-fb" target="_blank" rel="noopener noreferrer">Connect on Facebook →</a>
+            </div>
+        </article>
+
+        <section id="article-navigation" class="article-nav-section"></section>
+
+        <section class="newsletter-section" data-reveal>
+            <div class="newsletter-box">
+                <h3>Join the Syndicate</h3>
+                <p>Initialize your subscription for weekly intelligence on neuro-optimization, biological hacking, and technical stack evolution.</p>
+                <form action="https://formspree.io/f/xqegvale" method="POST" class="newsletter-form">
+                    <input type="email" name="email" placeholder="Enter your email address" required>
+                    <button type="submit">Secure Entry</button>
+                </form>
+            </div>
+        </section>
+
+        <footer>
+            <p>&copy; 2026 Dream Syndicate Digital Assets. All Rights Reserved.</p>
+            <p>
+                <a href="https://www.facebook.com/profile.php?id=61581034972328" target="_blank" rel="noopener noreferrer">Connect on Facebook</a> |
+                <a href="https://merch.hopes-and-dreams.ca" target="_blank" rel="noopener noreferrer">Merch</a> |
+                <a href="../intel.html">Intel Hub</a> |
+                <a href="../optimization.html">Tools</a> |
+                <a href="../cipher.html">Cipher</a> |
+                <a href="../privacy.html">Privacy Policy</a> |
+                <a href="../about.html">Contact Us</a>
+            </p>
+            <p style="font-size: 0.7rem; color: var(--text-dim); margin-top: 10px;">Location: Saint John, New Brunswick, Canada</p>
+        </footer>
+    </div>
+
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.5/gsap.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.5/Flip.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.5/TextPlugin.min.js"></script>
+    <script src="../codex.js" defer></script>
+    <script src="../script.js" defer></script>
+
+</body>
+</html>
