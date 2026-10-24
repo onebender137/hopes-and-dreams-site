@@ -34,5 +34,11 @@
     "title": "Expose Ollama to WSL Over the Network",
     "date": "2026-07-03",
     "image_url": ""
+  },
+  {
+    "href": "tech/hermes-agent-intro.html",
+    "title": "Meet Hermes: The Open-Source AI Agent That Actually Runs on Your Machine",
+    "date": "2026-10-24",
+    "image_url": "https://hopes-and-dreams.ca/media/general/2026-10-24-hermes-agent.png"
   }
 ]
