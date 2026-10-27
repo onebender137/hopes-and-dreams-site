@@ -1,0 +1,284 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>21,000 Photos, Zero Google: How We Built Our Own Photo Library | Hopes and Dreams</title>
+<meta name="description" content="Hopes &amp; Dreams — Sovereign Builds, Part 1
+
+Google Photos had every photo we'd ever taken. Twenty-one thousand of them, going back to 2004.
+One day...">
+<meta property="og:type" content="article">
+<meta property="og:title" content="21,000 Photos, Zero Google: How We Built Our Own Photo Library">
+<meta property="og:description" content="Hopes &amp; Dreams — Sovereign Builds, Part 1
+
+Google Photos had every photo we'd ever taken. Twenty-one thousand of them, going back to 2004.
+One day...">
+<meta property="og:image" content="https://hopes-and-dreams.ca/tech/images/photo-album-sovereign-photo-library.png">
+<meta property="og:image:width" content="1280">
+<meta property="og:image:height" content="1280">
+<meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:title" content="21,000 Photos, Zero Google: How We Built Our Own Photo Library">
+<meta name="twitter:description" content="Hopes &amp; Dreams — Sovereign Builds, Part 1
+
+Google Photos had every photo we'd ever taken. Twenty-one thousand of them, going back to 2004.
+One day...">
+<meta name="twitter:image" content="https://hopes-and-dreams.ca/tech/images/photo-album-sovereign-photo-library.png">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;700;900&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="../style.css">
+<style>
+  .tech-log { max-width:820px; margin:0 auto; padding:30px 22px 80px; counter-reset:stepcount; }
+  .tech-back { font-family:'Courier New',monospace; font-size:0.85rem; display:inline-block; margin-bottom:20px; color:var(--neon-blue); }
+  .tech-tagline { font-family:'Courier New',monospace; color:var(--neon-blue); font-size:0.72rem;
+    letter-spacing:3px; text-transform:uppercase; margin-bottom:8px; opacity:0.85; }
+  .tech-log h1 { font-size:2.2rem; line-height:1.15; margin:0 0 22px; color:var(--text-main);
+    text-shadow:0 0 22px rgba(56,189,248,0.25); }
+  .tech-log h2 { font-family:'Courier New',monospace; color:var(--neon-blue); text-transform:uppercase;
+    letter-spacing:1px; font-size:1.15rem; margin:40px 0 12px; padding-top:18px;
+    border-top:1px solid rgba(148,163,184,0.18); }
+  .tech-log h2::before { content:"SYS_// "; color:var(--neon-gold); opacity:0.9; }
+  .tech-log h3 { color:var(--neon-gold); font-size:1rem; margin:24px 0 8px; }
+  .tech-log h3.step::before { counter-increment:stepcount; content:"Step " counter(stepcount) " // ";
+    color:var(--neon-blue); font-family:'Courier New',monospace; }
+  .tech-log p { margin:0 0 16px; color:var(--text-main); line-height:1.7; }
+  .tech-log a { color:var(--neon-blue); }
+  .tech-log img { max-width:100%; height:auto; border-radius:8px; margin:10px 0 22px; display:block; }
+  .tech-log figure { margin:0 0 22px; }
+  .tech-log figcaption { font-family:'Courier New',monospace; font-size:0.72rem; color:var(--text-dim); margin-top:8px; letter-spacing:1px; }
+  .tech-log ul, .tech-log ol { padding-left:22px; color:var(--text-main); }
+  .tech-log li { margin-bottom:8px; line-height:1.6; }
+  .tech-log code { font-family:'Courier New',monospace; background:rgba(56,189,248,0.1);
+    color:var(--neon-blue); padding:2px 6px; border-radius:4px; font-size:0.9em; }
+  .tech-log pre { background:var(--card-bg); border:1px solid rgba(56,189,248,0.2);
+    border-left:3px solid var(--neon-blue); border-radius:6px; padding:16px 18px; overflow-x:auto;
+    margin:0 0 20px; }
+  .tech-log pre code { background:none; padding:0; color:var(--text-main); font-size:0.85rem; line-height:1.55; }
+  .tech-signoff { margin-top:44px; padding-top:20px; border-top:1px solid rgba(148,163,184,0.18);
+    font-family:'Courier New',monospace; color:var(--neon-gold); letter-spacing:1px; font-size:0.9rem; }
+</style>
+</head>
+<body>
+  <div id="scroll-progress"></div>
+  <button id="theme-toggle" class="theme-toggle-pill" aria-label="Toggle between dark and light mode">&#9728;&#65039; LIGHT MODE</button>
+  <header>
+    <div class="logo-wrap">
+      <a href="../index.html"><img src="../topper.png" alt="Hopes and Dreams Syndicate Neuro-Optimization"></a>
+    </div>
+    <nav><a href="../index.html">Home</a> <a href="../shop.html">Shop</a> <a href="../optimization.html">Optimization</a> <a href="../cipher.html">Cipher</a> <a href="../intel.html">Intel Hub</a> <a class="active" href="../sovereign.html">Sovereign Tech</a> <a href="https://merch.hopes-and-dreams.ca">Merch</a> <a href="../about.html">About</a> <a href="../privacy.html">Privacy</a></nav>
+  </header>
+
+  <main class="tech-log">
+    <a class="tech-back" href="../sovereign.html">&lt;&lt; back to build logs</a>
+    <div class="tech-tagline">SYS_OUTPUT // BUILD_LOG DECODED</div>
+    <h1>21,000 Photos, Zero Google: How We Built Our Own Photo Library</h1>
+    <figure><img src="images/photo-album-sovereign-photo-library.png" alt="21,000 Photos, Zero Google: How We Built Our Own Photo Library"></figure>
+    <p><em>Hopes &amp; Dreams — Sovereign Builds, Part 1</em></p>
+<hr />
+<p>Google Photos had every photo we'd ever taken. Twenty-one thousand of them, going back to 2004.
+One day we decided we didn't want a tech company holding our life's memories any longer — so we
+pulled it all off Google, off the phone, and onto a server in our own house, and built a native
+Android app to browse it. No cloud, no tracking, no "enhanced images," no ads in your memories.
+Just our photos, on our hardware, that we control.</p>
+<p>This is the story of how we did it — the architecture, the process, and the six bugs that nearly
+broke it. And at the end, a step-by-step you can follow to do the same thing with your own photos.</p>
+<hr />
+<h2>Why we did this</h2>
+<p>Google Photos is convenient. That's the whole problem. It means Google stores, processes, and can
+use your entire visual history — every vacation, every kid, every whiteboard. For a privacy-first
+household, that's a hard line.</p>
+<p>The goal wasn't just "move my photos." It's a <strong>de-Google campaign</strong>: replace Google services one
+by one with sovereign apps we build and run ourselves. Photos is Phase 1. The endgame is a fully
+de-googled phone running only our own apps.</p>
+<p>We set one iron rule before touching anything: <strong>verify before we delete.</strong> Nothing gets removed
+from Google or the phone until we've proven every single file is safely on our own server. (We'll
+come back to this — it's the part that makes the whole thing safe.)</p>
+<hr />
+<h2>Where we started (the numbers)</h2>
+<ul>
+<li><strong>21,074 media files, ~44 GB</strong>, spanning <strong>2004 → 2026</strong></li>
+<li><strong>881 videos</strong>, the rest photos</li>
+<li>Oldest photo: a single image from <strong>2004</strong>. The bulk is 2018–2026.</li>
+</ul>
+<p>The library is the <strong>union of two sources</strong>: a Google Takeout export (13,827 files) and a direct
+pull from the phone (7,231 files). Here's the surprising part — only <strong>107 files</strong> were
+byte-identical between the two. Google <strong>re-encodes photos in the cloud</strong>, so the "originals" in
+your Takeout are not the same files as the ones on your phone. We kept both (the union), so
+nothing was lost — we actually ended up with <em>more</em> than Google had.</p>
+<hr />
+<h2>The architecture (the part that makes it feel fast)</h2>
+<p>The naive approach — "download all 44 GB to the phone" — is terrible. It would take forever, eat
+all your storage, and every app open would wait on a multi-gigabyte transfer. Instead we built a
+<strong>three-tier caching system</strong> so opening the app is instant and it never balloons:</p>
+<ol>
+<li><strong>Tier 1 — Metadata index (a few MB).</strong> A tiny JSON tree of years → months → counts. Loaded
+   once, cached, refreshed on each sync. This is what renders the year and month screens
+   instantly.</li>
+<li><strong>Tier 2 — Thumbnails (~30–50 KB each).</strong> The grid shows <em>only</em> thumbnails. We pre-generate all
+   21,074 of them on the server (a one-time ~20-minute job), and the app caches them in an LRU
+   disk cache on the phone. The grid loads fast from the first open, and re-opening a year you've
+   seen is instant.</li>
+<li><strong>Tier 3 — Full-res (on demand).</strong> Full resolution downloads <em>only</em> when you tap a specific
+   photo. Videos stream with HTTP Range requests, so you can seek without downloading the whole
+   file.</li>
+</ol>
+<p><strong>Net effect:</strong> opening the app = a tiny index plus thumbnails trickling in. No multi-GB download,
+ever. Offline, it shows whatever's already cached.</p>
+<p><img alt="Drilling into a year — the months grid" src="images/photo-album-months-grid.png" /></p>
+<h3>The server</h3>
+<p>A single-file Python server (the same pattern as our other home services), bound to a local port
+and <strong>tailnet-only</strong> — reachable only on our private Tailscale network, never the public
+internet. It exposes:</p>
+<ul>
+<li><code>/api/tree</code> — the year/month index</li>
+<li><code>/api/stats</code> — library totals</li>
+<li><code>/api/list?y=&amp;m=</code> — the items in a month</li>
+<li><code>/img/&lt;path&gt;</code> — full-res, Range-capable (for video seeking)</li>
+<li><code>/thumb/&lt;path&gt;</code> — 512px JPEG, generated on demand and cached</li>
+</ul>
+<p>It's published over HTTPS via <code>tailscale serve</code>, so the app talks to a private <code>https://…/photo-album</code>
+URL. One real-world wrinkle: a few hundred files have messy names (<code>~</code>, <code>+</code>, <code>=</code>, leading spaces),
+so the path matcher is relaxed but still runs a <strong>realpath containment check</strong> to block directory
+traversal.</p>
+<h3>The app</h3>
+<p>Native Android (Kotlin), single-activity, programmatic UI (no XML layouts). It uses <strong>Coil</strong> for
+thumbnail/image loading (with an LRU disk cache) and <strong>ExoPlayer</strong> (media3) for video. The flow is
+<strong>Years → Months → Grid → Viewer</strong>. The viewer does pinch-zoom and pan for photos and in-app
+playback for videos. Every screen has pull-to-refresh.</p>
+<p><img alt="A month's grid with the All / Photos / Videos filter" src="images/photo-album-photo-grid.png" /></p>
+<p><img alt="The full-res viewer — pinch to zoom, pan, share, delete" src="images/photo-album-viewer.png" /></p>
+<p><img alt="Video playback, in-app, with full controls" src="images/photo-album-video.png" /></p>
+<hr />
+<h2>How we built it (three sessions)</h2>
+<p><strong>Session A — Storage + import.</strong> We built the import machinery: EXIF-date-based filing (photos
+land in <code>YYYY/MM/</code> by their <em>actual capture date</em>, not the file date), MD5 dedup, a manifest that
+keeps the library 1:1 with reality, and an incremental phone-pull script. Then we ran the Google
+Takeout import and the phone diff. Result: the 21,074-file union library.</p>
+<p><strong>Session B — Server + app.</strong> We wrote the Python server, pre-generated all the thumbnails, built
+the Android app (year → month → grid → viewer), and published it over the tailnet.</p>
+<p><strong>Session C — Video + daily sync.</strong> We verified video playback, then set up the <strong>daily sync</strong>: a
+timer that pulls new photos and videos from the phone to the server a few times a day, so new shots
+keep landing on our hardware automatically.</p>
+<hr />
+<h2>The war stories (the bugs that nearly broke it)</h2>
+<p>This is the good stuff — the parts that weren't smooth. Every one of these was a real bug we hit
+and fixed, and each one teaches something.</p>
+<p><strong>Bug 1 — Thumbnails wouldn't load (the big one).</strong>
+The grid showed empty cells and item counts, but no images; tapping a photo gave a black screen.
+We verified the <em>entire server chain</em> worked perfectly — thumbnails, full-res, and video Range all
+returned 200 over the tailnet. So the problem was in the app. We added logging and discovered the
+image loader's start callback <strong>never fired</strong> — the requests weren't even beginning. Root cause:
+the image library's <em>default</em> loader wasn't executing requests in this app. Fix: create an
+<strong>explicit image loader</strong> wired to the same network client that was already fetching our data
+successfully, and enqueue requests directly. Thumbnails and the viewer started rendering
+immediately.</p>
+<p><strong>Bug 2 — Photos opened zoomed-in, and you couldn't zoom out.</strong>
+The viewer used a matrix scale where "1" meant <em>native pixel size</em>, not "fit to screen." So a
+large photo opened showing only a corner, and you couldn't zoom out to fit. Fix: compute a "fit"
+scale (the image fits the view, preserving aspect ratio) and use it as the baseline; then the
+matrix scales about the origin and translates to center. Now photos open fit-to-screen, and
+zoom, pan, and tap all work.</p>
+<p><strong>Bug 3 — Content drew under the Android status bar.</strong>
+The app's top-left overlapped the system status bar — a mess of icons. Fix: apply the system
+window insets as padding on the root view, so content sits cleanly below the status bar and above
+the nav bar.</p>
+<p><strong>Bug 4 — All videos landed in 2026 (the sneaky one).</strong>
+The year grid showed 881 videos in 2026 and <em>zero</em> in every other year — which looked wrong (we
+definitely have videos from 2018, 2023, and so on). Root cause: the import script files photos by
+their <strong>EXIF capture date</strong>, but videos usually lack that tag, so it fell back to the file's
+<strong>mtime — which was the 2026 download date</strong>. So every video got dumped into <code>2026/10/</code>. The fix:
+a re-date pass that reads the date from the <strong>filename</strong> (camera videos are named like
+<code>20230911_185847.MP4</code> or <code>VID_20181124_175042.mp4</code>), with mtime as the last resort. It moved
+<strong>803 videos</strong> back to their real years (2012–2025) and updated the manifest and thumbnails. Now
+the grid shows videos across 2012–2026, where they belong.</p>
+<p><strong>Bug 5 — Photo and video thumbnails collided.</strong>
+A photo and a video can share a base name (e.g. <code>20230911_185847.jpg</code> and
+<code>20230911_185847.MP4</code> — the camera saves both). Thumbnails were named by the base name <em>without</em>
+the extension, so the two files collided on one thumbnail file — and the video's frame overwrote
+the photo's. 270 files were affected. Fix: include the <strong>file extension</strong> in the thumbnail name
+(<code>…/20230911_185847.jpg.jpg</code> vs <code>…/20230911_185847.mp4.jpg</code>), so every file gets a unique
+thumbnail. We migrated all 21,074 thumbs (renamed 20,529, regenerated the 545 colliding or
+missing, deleted 270 orphans).</p>
+<p><strong>Bug 6 — Video thumbnails were all black boxes (two bugs in one).</strong>
+Even after the re-date, every video showed a black placeholder box instead of a frame. Two
+compounding bugs: (1) the thumbnail generator wrote to a temp file ending in <code>.part</code>, and ffmpeg
+couldn't infer the output format from that extension — it silently produced nothing; (2) the
+generator sought to the 3-second mark (<code>-ss 3</code>), but many clips are <em>shorter</em> than 3 seconds, so
+the seek landed past the end and ffmpeg again produced nothing. The fallback (first frame) hit
+the same <code>.part</code> bug. Fix: tell ffmpeg the format explicitly (<code>-f image2</code>) and seek to 1 second
+instead of 3 (with a first-frame fallback for sub-second clips). We regenerated all 881 video
+thumbs — 878 now show real frames, 3 are genuinely unplayable.</p>
+<p><img alt="Multi-select — long-press to select, then share or delete a batch" src="images/photo-album-multiselect.png" /></p>
+<hr />
+<h2>The result</h2>
+<p>A native app that opens instantly, browses 21,000 photos by year and month, shows thumbnails,
+opens full-res with zoom and pan, plays videos, and lets you share or delete in batches — all from
+our own home server. A <strong>daily sync</strong> keeps new photos and videos flowing to the server
+automatically. And because the library is the <strong>union</strong> of the Takeout and the phone, we have
+<em>more</em> than Google had.</p>
+<hr />
+<h2>The bigger picture (the de-Google campaign)</h2>
+<p>Photos was Phase 1. The queue is <strong>Drive → Keep → Calendar → Gmail → Maps</strong>. Every sovereign app
+gets a private repo from day one (backup and history); the ones with universal value — like this
+Photo Album — get polished and posted publicly for others to use. These builds are also the war
+stories for Hopes &amp; Dreams: real, technical, honest.</p>
+<p>The endgame is <strong>GrapheneOS</strong> on the Pixel 9 (officially supported through August 2031), running
+only our own apps. We accepted the tradeoffs: the smartwatch link goes away, and the AOSP camera
+replaces the Pixel camera. For us, that's a fair price for a phone that answers only to us.</p>
+<hr />
+<h2>How you can do this too (the reproducible process)</h2>
+<p>If you want your own sovereign photo library, here's the exact process, in order. None of this
+requires a big server — a Raspberry Pi or any always-on box with a few hundred GB works.</p>
+<ol>
+<li><strong>Get your photos out of Google.</strong> Run a Google Takeout export for Photos (original quality).
+   Download the zip. This is your cloud copy.</li>
+<li><strong>Get your photos off the phone.</strong> Connect the phone over USB and <code>adb pull</code> the DCIM and
+   Pictures folders. This is your original copy. (The two differ — Google re-encodes — so keep
+   both.)</li>
+<li><strong>Import into a local library.</strong> Write a small importer that files each file into <code>YYYY/MM/</code>
+   by its <strong>EXIF capture date</strong> (fall back to the filename date for videos, then mtime), dedups by
+   MD5, and writes a manifest (one JSON line per file) so the library stays 1:1 with reality.</li>
+<li><strong>Build a tiny server.</strong> A single-file Python server that serves the index, thumbnails, and
+   full-res files. Bind it to a local port and make it <strong>tailnet-only</strong> (Tailscale) so it's never
+   on the public internet. Add a realpath containment check so paths can't escape the library.</li>
+<li><strong>Pre-generate thumbnails.</strong> One-time job: make a 512px JPEG for every image (PIL) and grab a
+   frame from every video (ffmpeg). This is what makes the grid fast.</li>
+<li><strong>Build the app.</strong> A native Android app (Kotlin) with a year → month → grid → viewer flow. Use
+   an image library with a disk cache for thumbnails and a video player for playback. Point it at
+   your server's HTTPS URL.</li>
+<li><strong>Publish over the tailnet.</strong> Use <code>tailscale serve</code> to expose the server over HTTPS on your
+   private network. The app talks to that URL — no public exposure.</li>
+<li><strong>Set up a daily sync.</strong> A timer that re-pulls new photos from the phone a few times a day, so
+   new shots land on the server automatically.</li>
+<li><strong>Verify before you delete.</strong> Diff the phone and the server. Confirm every file is present and
+   correct. <em>Only then</em> stop the Google Photos backup and delete the cloud copy.</li>
+<li><strong>Keep it running.</strong> Let the sync run for a few days, watch it reliably grab new shots, and
+    enjoy a photo library that answers only to you.</li>
+</ol>
+<p>The whole thing is a few hundred lines of Python and a single Kotlin file. The hard part isn't the
+code — it's the discipline of verifying before you delete.</p>
+<hr />
+<h2>What's next</h2>
+<p>Let the daily sync run for a few days and watch it reliably grab new shots. Then stop the Google
+Photos backup, run the final diff, and delete the cloud copy. After that, on to the next Google
+service in the queue — Drive is up.</p>
+<p><em>This is Part 1 of the de-Google series. The next war story: getting our files off Google Drive.</em></p>
+    <div class="tech-signoff">// Do your own research. Don't be a statistic.</div>
+  </main>
+
+  <footer>
+    <p>&copy; 2026 Dream Syndicate Digital Assets. All Rights Reserved.</p>
+    <p>
+      <a href="https://www.facebook.com/profile.php?id=61581034972328" target="_blank" rel="noopener noreferrer">Connect on Facebook</a> |
+      <a href="https://merch.hopes-and-dreams.ca" target="_blank" rel="noopener noreferrer">Merch</a> |
+      <a href="../intel.html">Intel Hub</a> |
+      <a href="../sovereign.html">Sovereign Tech</a> |
+      <a href="../privacy.html">Privacy Policy</a> |
+      <a href="../about.html">Contact Us</a>
+    </p>
+    <p style="font-size:0.7rem; color:var(--text-dim); margin-top:10px;">Location: Saint John, New Brunswick, Canada</p>
+  </footer>
+  <script src="../script.js" defer></script>
+</body>
+</html>
