@@ -106,6 +106,7 @@ pull from the phone (7,231 files). Here's the surprising part — only <strong>1
 byte-identical between the two. Google <strong>re-encodes photos in the cloud</strong>, so the "originals" in
 your Takeout are not the same files as the ones on your phone. We kept both (the union), so
 nothing was lost — we actually ended up with <em>more</em> than Google had.</p>
+<p><img alt="The year grid — every year from 2004 to 2026, with counts and sizes" src="images/photo-album-year-grid.png" /></p>
 <hr />
 <h2>The architecture (the part that makes it feel fast)</h2>
 <p>The naive approach — "download all 44 GB to the phone" — is terrible. It would take forever, eat
@@ -146,9 +147,6 @@ traversal.</p>
 thumbnail/image loading (with an LRU disk cache) and <strong>ExoPlayer</strong> (media3) for video. The flow is
 <strong>Years → Months → Grid → Viewer</strong>. The viewer does pinch-zoom and pan for photos and in-app
 playback for videos. Every screen has pull-to-refresh.</p>
-<p><img alt="A month's grid with the All / Photos / Videos filter" src="images/photo-album-photo-grid.png" /></p>
-<p><img alt="The full-res viewer — pinch to zoom, pan, share, delete" src="images/photo-album-viewer.png" /></p>
-<p><img alt="Video playback, in-app, with full controls" src="images/photo-album-video.png" /></p>
 <hr />
 <h2>How we built it (three sessions)</h2>
 <p><strong>Session A — Storage + import.</strong> We built the import machinery: EXIF-date-based filing (photos
@@ -209,7 +207,6 @@ the seek landed past the end and ffmpeg again produced nothing. The fallback (fi
 the same <code>.part</code> bug. Fix: tell ffmpeg the format explicitly (<code>-f image2</code>) and seek to 1 second
 instead of 3 (with a first-frame fallback for sub-second clips). We regenerated all 881 video
 thumbs — 878 now show real frames, 3 are genuinely unplayable.</p>
-<p><img alt="Multi-select — long-press to select, then share or delete a batch" src="images/photo-album-multiselect.png" /></p>
 <hr />
 <h2>The result</h2>
 <p>A native app that opens instantly, browses 21,000 photos by year and month, shows thumbnails,
