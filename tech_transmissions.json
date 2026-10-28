@@ -1,5 +1,11 @@
 [
   {
+    "href": "tech/drive-sovereign-file-manager.html",
+    "title": "80 GB of Files, Zero Google Drive: How We Built Our Own File Manager",
+    "date": "2026-10-28",
+    "image_url": "https://hopes-and-dreams.ca/tech/images/drive-sovereign-file-manager.png"
+  },
+  {
     "href": "tech/photo-album-sovereign-photo-library.html",
     "title": "21,000 Photos, Zero Google: How We Built Our Own Photo Library",
     "date": "2026-10-27",
