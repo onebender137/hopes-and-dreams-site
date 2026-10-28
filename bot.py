@@ -67,6 +67,7 @@ from crew_brain import SyndicateCrew
 REPLIED_COMMENTS_FILE = "replied_comments.json"
 CHAT_MEMORY_FILE = "chat_memory.json"
 POSTED_TOPICS_FILE = "posted_topics.json"
+MINE_DOMAINS_RECENT_FILE = "mine_domains_recent.json"
 # Imported from telegram_bot to maintain consistency and avoid circular imports
 from telegram_bot import UPLINK_LOG_FILE, SYNDICATE_VERSION
 
@@ -166,6 +167,8 @@ class HopesAndDreamsBot:
         self.db = SyndicateDatabase()
         self.crew = SyndicateCrew()
         self.website_path = "."
+        self.scheduler = None  # set in main() for retry scheduling
+        self._last_confirmed_topic = None  # captured for retry on slot failure
 
         # Perform one-time migration if JSON files exist
         if os.path.exists(REPLIED_COMMENTS_FILE) or os.path.exists(POSTED_TOPICS_FILE):
@@ -188,6 +191,25 @@ class HopesAndDreamsBot:
     def _save_posted_topics(self):
         """Deprecated: SQLite saves automatically."""
         pass
+
+    def _load_recent_mine_domains(self, n=4):
+        """Load the last n mine domains (for diversity rotation)."""
+        try:
+            with open(MINE_DOMAINS_RECENT_FILE) as f:
+                domains = json.load(f)
+            return domains[-n:]
+        except Exception:
+            return []
+
+    def _record_mine_domain(self, domain):
+        """Record a mine domain for diversity rotation (keep last 10)."""
+        try:
+            domains = self._load_recent_mine_domains(10)
+            domains.append(domain)
+            with open(MINE_DOMAINS_RECENT_FILE, "w") as f:
+                json.dump(domains[-10:], f)
+        except Exception:
+            pass
 
     def _record_posted_topic(self, topic, slot=None):
         """Records a new posted topic to SQLite."""
@@ -315,6 +337,10 @@ class HopesAndDreamsBot:
         'gaba_calm': [
             'gaba', 'kava', 'valerian', 'phenibut', 'l-theanine',
             'ashwagandha', 'magnolia',
+        ],
+        'aging_epigenetics': [
+            'aging', 'ageing', 'biological age', 'epigenet', 'methylation',
+            'reprogramm', 'senescen', 'reverse age', 'aging backwards', 'de-age',
         ],
     }
 
@@ -1092,14 +1118,35 @@ class HopesAndDreamsBot:
         """Uses the LLM to brainstorm a fresh, diverse biohacking topic from the Syndicate Pool."""
         print(f"[{datetime.now()}] EXECUTIVE BRAINSTORM: Generating fresh intelligence...")
 
+        # B0: prioritize topics the CEO explicitly /learn'd (newest first),
+        # skipping any already recently posted or on cooldown. Once all learned
+        # topics have been posted, this falls through to KB mining (B1) and the pool.
+        try:
+            import learn_client
+            learned = learn_client.get_learned_topics()
+            recent_norm = {self._norm_topic(t) for t in (self.posted_topics[-20:] if self.posted_topics else [])}
+            for lt in learned:
+                t = lt.get("topic")
+                if t and self._norm_topic(t) not in recent_norm and not self._is_topic_on_cooldown(t, cooldown=5):
+                    print(f"[AUTONOMOUS] Using /learn'd topic: {t}")
+                    return t
+        except Exception as e:
+            print(f"[AUTONOMOUS] learned-topics check failed ({e}); continuing.")
+
         # B1: prefer a fresh, GROUNDED topic mined from one rotating KB domain.
         # Mined topics are groundable by construction; we only fall through to the
         # legacy SYNDICATE_TOPIC_POOL below if mining yields nothing (safety net).
         try:
-            mine_dom = random.choice([d for d in self._MINE_DOMAINS
-                                      if not any(sk in d.lower() for sk in self._MINE_SKIP)])
+            available_domains = [d for d in self._MINE_DOMAINS
+                                 if not any(sk in d.lower() for sk in self._MINE_SKIP)]
+            # Diversity rotation: avoid domains picked in the last few slots so
+            # the miner cycles through domains instead of fixating on one theme.
+            recent_domains = self._load_recent_mine_domains(n=4)
+            rotate_domains = [d for d in available_domains if d not in recent_domains]
+            mine_dom = random.choice(rotate_domains if rotate_domains else available_domains)
             mined = self.mine_kb_topics(domain=mine_dom, count=8)
             mined = [t for t in mined if not self._is_topic_on_cooldown(t, cooldown=5)]
+            self._record_mine_domain(mine_dom)
             if mined:
                 pick = random.choice(mined)
                 print(f"[AUTONOMOUS] KB-mined grounded topic ({mine_dom}): {pick}")
@@ -1164,8 +1211,43 @@ class HopesAndDreamsBot:
         # Ultimate fallback — pick directly from cluster-filtered pool, no LLM involved
         return random.choice(available_pool)
 
+    def retry_slot(self, slot, topic=None):
+        """Slot wrapper with auto-retry on failure.
+
+        Calls generate_and_post_daily_tip. If it fails (returns None) AFTER
+        topic selection (self._last_confirmed_topic is set), schedule a
+        one-shot retry ~10 min later with the confirmed topic. If the retry
+        also fails, give up (next slot proceeds normally). No infinite loop.
+        """
+        result = self.generate_and_post_daily_tip(topic=topic, slot=slot)
+        if result is None:
+            if topic is not None:
+                # This was a retry attempt that also failed — give up.
+                self._log_uplink(f"RETRY FAILED: Slot {slot} topic '{topic}' failed again. Giving up (next slot proceeds).")
+                return None
+            # First attempt failed. Schedule a retry if a topic was confirmed.
+            if self._last_confirmed_topic and self.scheduler:
+                retry_topic = self._last_confirmed_topic
+                self._log_uplink(f"RETRY SCHEDULED: Slot {slot} failed. Retrying '{retry_topic}' in 10 min.")
+                try:
+                    from apscheduler.triggers.date import DateTrigger
+                    from datetime import timedelta as _retry_td
+                    retry_time = datetime.now() + _retry_td(minutes=10)
+                    self.scheduler.add_job(
+                        self.retry_slot,
+                        DateTrigger(run_date=retry_time),
+                        kwargs={'slot': slot, 'topic': retry_topic},
+                        id=f"retry_{slot}_{int(retry_time.timestamp())}",
+                        replace_existing=True,
+                        max_instances=1,
+                    )
+                except Exception as e:
+                    self._log_uplink(f"RETRY SCHEDULE ERROR: {e}")
+        return result
+
     def generate_and_post_daily_tip(self, topic=None, slot=None):
         """Generates a daily Syndicate Masterclass and posts it to the Facebook Page."""
+        self._last_confirmed_topic = None  # reset for this call (retry capture)
         slot_label = slot or "(no-slot)"
         self._log_uplink(f"POST FIRED: Starting masterclass generation for slot {slot_label}")
         try:
@@ -1179,9 +1261,11 @@ class HopesAndDreamsBot:
 
             # === TOPIC SELECTION PRIORITY ORDER ===
             # 1. Explicit topic argument (e.g. /post <topic>)
-            # 2. Pre-scheduled topic from queue (THE BOSS'S PLAN — always wins over chat memory)
-            # 3. Chat memory inference
-            # 4. Autonomous brainstorm fallback
+            # 2. Pre-scheduled topic from queue (THE BOSS'S PLAN)
+            # 3. Autonomous brainstorm (KB mining -> learned topics -> pool)
+            # NOTE: chat-memory topic inference was removed so the CEO can chat
+            #       freely without messages being recorded as topics. Use /learn
+            #       to research + seed a topic into the pool.
             if not topic and slot:
                 date_str = datetime.now().strftime("%Y-%m-%d")
                 queued = self.db.get_scheduled_topic(date_str, slot)
@@ -1191,10 +1275,11 @@ class HopesAndDreamsBot:
                     scheduled_used = True
 
             if not topic:
-                self._log_uplink(f"POST: Identifying topic from chat memory for slot {slot_label}...")
-                topic = self.get_recent_topics_from_memory(slot=slot)
+                self._log_uplink(f"POST: No explicit/scheduled topic; autonomous brainstorm for slot {slot_label}...")
+                topic = self.brainstorm_autonomous_topic()
 
             self._log_uplink(f"POST: Topic confirmed for slot {slot_label}: '{topic}'")
+            self._last_confirmed_topic = topic  # capture for retry
 
             # T4 auto-feed: if the KB barely covers this topic, deepen it from PubMed
             # BEFORE the RAG pull, so generation grounds on the fresh material.
@@ -2143,7 +2228,7 @@ class HopesAndDreamsBot:
             "4": {"class_type": "CheckpointLoaderSimple",
                   "inputs": {"ckpt_name": "sd_xl_turbo_1.0_fp16.safetensors"}},
             "5": {"class_type": "EmptyLatentImage",
-                  "inputs": {"width": 1280, "height": 720, "batch_size": 1}},
+                  "inputs": {"width": 1024, "height": 576, "batch_size": 1}},
             "6": {"class_type": "CLIPTextEncode", "inputs": {"text": prompt, "clip": ["4", 1]}},
             "7": {"class_type": "CLIPTextEncode", "inputs": {"text": negative_prompt, "clip": ["4", 1]}},
             "8": {"class_type": "VAEDecode", "inputs": {"samples": ["3", 0], "vae": ["4", 2]}},
@@ -2198,8 +2283,8 @@ class HopesAndDreamsBot:
             "model": "Qwen/Qwen-Image",
             "prompt": prompt,
             "negative_prompt": negative_prompt,
-            "width": 1280,
-            "height": 720,
+            "width": 1024,
+            "height": 576,
             "steps": 28,
             "n": 1,
             "response_format": "b64_json",
@@ -3031,6 +3116,7 @@ def main():
         executors={'default': APSThreadPoolExecutor(max_workers=3)},
         job_defaults={'max_instances': 1, 'coalesce': True}
     )
+    bot.scheduler = scheduler  # store for retry scheduling
 
     # Schedule daily tips at 7:00 AM, 12:00 PM, and 3:00 PM ADT
     # misfire_grace_time=3600 (1 hour) allows the job to run if the bot starts within an hour of the scheduled time
@@ -3043,7 +3129,7 @@ def main():
     for hour, minute in slots:
         slot_str = f"{hour:02d}:{minute:02d}"
         scheduler.add_job(
-            bot.generate_and_post_daily_tip,
+            bot.retry_slot,
             CronTrigger(hour=hour, minute=minute),
             kwargs={'slot': slot_str},
             misfire_grace_time=3600,
