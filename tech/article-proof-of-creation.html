@@ -1,0 +1,180 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>The Blockchain Is the Notary: Building Proof of Creation on BSV | Hopes and Dreams</title>
+<meta name="description" content="You created something. A song. A photo. A contract. A design. A letter.
+And you want proof. Not a screenshot. Not a PDF with a digital signature that ...">
+<meta property="og:type" content="article">
+<meta property="og:title" content="The Blockchain Is the Notary: Building Proof of Creation on BSV">
+<meta property="og:description" content="You created something. A song. A photo. A contract. A design. A letter.
+And you want proof. Not a screenshot. Not a PDF with a digital signature that ...">
+<meta property="og:image" content="https://hopes-and-dreams.ca/tech/images/proof-of-creation-hero.png">
+<meta property="og:image:width" content="1280">
+<meta property="og:image:height" content="1280">
+<meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:title" content="The Blockchain Is the Notary: Building Proof of Creation on BSV">
+<meta name="twitter:description" content="You created something. A song. A photo. A contract. A design. A letter.
+And you want proof. Not a screenshot. Not a PDF with a digital signature that ...">
+<meta name="twitter:image" content="https://hopes-and-dreams.ca/tech/images/proof-of-creation-hero.png">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;700;900&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="../style.css">
+<style>
+  .tech-log { max-width:820px; margin:0 auto; padding:30px 22px 80px; counter-reset:stepcount; }
+  .tech-back { font-family:'Courier New',monospace; font-size:0.85rem; display:inline-block; margin-bottom:20px; color:var(--neon-blue); }
+  .tech-tagline { font-family:'Courier New',monospace; color:var(--neon-blue); font-size:0.72rem;
+    letter-spacing:3px; text-transform:uppercase; margin-bottom:8px; opacity:0.85; }
+  .tech-log h1 { font-size:2.2rem; line-height:1.15; margin:0 0 22px; color:var(--text-main);
+    text-shadow:0 0 22px rgba(56,189,248,0.25); }
+  .tech-log h2 { font-family:'Courier New',monospace; color:var(--neon-blue); text-transform:uppercase;
+    letter-spacing:1px; font-size:1.15rem; margin:40px 0 12px; padding-top:18px;
+    border-top:1px solid rgba(148,163,184,0.18); }
+  .tech-log h2::before { content:"SYS_// "; color:var(--neon-gold); opacity:0.9; }
+  .tech-log h3 { color:var(--neon-gold); font-size:1rem; margin:24px 0 8px; }
+  .tech-log h3.step::before { counter-increment:stepcount; content:"Step " counter(stepcount) " // ";
+    color:var(--neon-blue); font-family:'Courier New',monospace; }
+  .tech-log p { margin:0 0 16px; color:var(--text-main); line-height:1.7; }
+  .tech-log a { color:var(--neon-blue); }
+  .tech-log img { max-width:100%; height:auto; border-radius:8px; margin:10px 0 22px; display:block; }
+  .tech-log figure { margin:0 0 22px; }
+  .tech-log figcaption { font-family:'Courier New',monospace; font-size:0.72rem; color:var(--text-dim); margin-top:8px; letter-spacing:1px; }
+  .tech-log ul, .tech-log ol { padding-left:22px; color:var(--text-main); }
+  .tech-log li { margin-bottom:8px; line-height:1.6; }
+  .tech-log code { font-family:'Courier New',monospace; background:rgba(56,189,248,0.1);
+    color:var(--neon-blue); padding:2px 6px; border-radius:4px; font-size:0.9em; }
+  .tech-log pre { background:var(--card-bg); border:1px solid rgba(56,189,248,0.2);
+    border-left:3px solid var(--neon-blue); border-radius:6px; padding:16px 18px; overflow-x:auto;
+    margin:0 0 20px; }
+  .tech-log pre code { background:none; padding:0; color:var(--text-main); font-size:0.85rem; line-height:1.55; }
+  .tech-signoff { margin-top:44px; padding-top:20px; border-top:1px solid rgba(148,163,184,0.18);
+    font-family:'Courier New',monospace; color:var(--neon-gold); letter-spacing:1px; font-size:0.9rem; }
+</style>
+</head>
+<body>
+  <div id="scroll-progress"></div>
+  <button id="theme-toggle" class="theme-toggle-pill" aria-label="Toggle between dark and light mode">&#9728;&#65039; LIGHT MODE</button>
+  <header>
+    <div class="logo-wrap">
+      <a href="../index.html"><img src="../topper.png" alt="Hopes and Dreams Syndicate Neuro-Optimization"></a>
+    </div>
+    <nav><a href="../index.html">Home</a> <a href="../shop.html">Shop</a> <a href="../optimization.html">Optimization</a> <a href="../cipher.html">Cipher</a> <a href="../intel.html">Intel Hub</a> <a class="active" href="../sovereign.html">Sovereign Tech</a> <a href="https://merch.hopes-and-dreams.ca">Merch</a> <a href="../about.html">About</a> <a href="../privacy.html">Privacy</a></nav>
+  </header>
+
+  <main class="tech-log">
+    <a class="tech-back" href="../sovereign.html">&lt;&lt; back to build logs</a>
+    <div class="tech-tagline">SYS_OUTPUT // BUILD_LOG DECODED</div>
+    <h1>The Blockchain Is the Notary: Building Proof of Creation on BSV</h1>
+    <figure><img src="images/proof-of-creation-hero.png" alt="The Blockchain Is the Notary: Building Proof of Creation on BSV"></figure>
+    <p>You created something. A song. A photo. A contract. A design. A letter.</p>
+<p>And you want proof. Not a screenshot. Not a PDF with a digital signature that some company's server might lose. Not a "timestamp" from a service that could go dark tomorrow.</p>
+<p>You want <strong>immutable, verifiable, permanent</strong> proof that you created it, at a specific time, and it has not changed since.</p>
+<p>That's what we built.</p>
+<h2>Why This Matters: The Centralized Data Graveyard</h2>
+<p>You don't need to take our word for it. The last decade has been a graveyard of centralized services that held people's irreplaceable data — and lost it.</p>
+<p><strong>SoundCloud:</strong> In 2020, EDM artist Slushii lost his SoundCloud account to a scammer. Years of releases, comments, + fan interactions — gone. He filed a report with the FBI. No response. The account was officially deleted by SoundCloud. His music, his community, his history — erased by a company that didn't prioritize getting it back. (<a href="https://www.edmtunes.com/2026/08/slushii-asks-fbi-to-help-restore-his-soundcloud/">EDMTunes, 2026</a>)</p>
+<p><strong>Picosong:</strong> A song hosting platform where steel guitar players uploaded their recordings. In November 2019, Picosong went out of business + <strong>deleted all their files</strong>. Every recording. Every artist. Gone. One forum post summed it up: <em>"I used to post a lot of my recordings onto Picosong. Unfortunately, they went out of business in November and deleted all their files."</em> (<a href="https://bb.steelguitarforum.com/viewtopic.php?t=355899">Steel Guitar Forum, 2020</a>)</p>
+<p><strong>Megaupload:</strong> One of the top 15 most popular sites on the internet. Responsible for ~4% of all internet traffic. Then it went out of business, without warning, + a number of people saw their legitimate files disappear into the cyber-ether. Many of these people had not backed up their files. (<a href="https://weseenow.co.uk/cloud-storage-back-ups/">WeSeeNow</a>)</p>
+<p><strong>Dropbox:</strong> In 2024, a Dropbox user lost years of photos of people she loved — some no longer with us. Her email provider went out of business, + Dropbox would only let her recover her password via that email. <em>"I'm absolutely gutted, very upset that I didn't keep the hard copy versions of some of my old photos and trusted they would be safe here."</em> (<a href="https://uk.trustpilot.com/review/www.dropbox.com?page=5">Trustpilot, 2024</a>)</p>
+<p><strong>Samsung Cloud:</strong> Gave users until the beginning of July to move their photos from the platform, or they were <strong>deleted forever</strong>. If you wonder where your photos have gone, Samsung is to blame. (<a href="https://johnthecomputerman.co.uk/death-of-cloud-connected-devices/">John The Computer Man</a>)</p>
+<p>The pattern is clear: <strong>when your data lives on someone else's server, your data is only as safe as their business model, their customer service, + their willingness to fight for you.</strong></p>
+<p>Proof of Creation fixes this. Your work is anchored on the BSV blockchain. The blockchain doesn't go out of business. The blockchain doesn't have customer service. The blockchain doesn't delete your files because you forgot to renew your subscription.</p>
+<p>The blockchain is the notary. The hash is the stamp. The math is the trust.</p>
+<h2>The Vision</h2>
+<p><strong>Proof of Creation</strong> is a service that anchors your work on the BSV blockchain.</p>
+<p>No account. No password. No trust in us. You sign in with your BSV wallet (your private key never leaves your device), upload a file, pay a small fee in BSV, + your work is anchored on-chain forever.</p>
+<p>Anyone in the world can verify your proof with just the transaction ID + the BSV blockchain. No login. No trust in us. The record outlives us.</p>
+<h2>The Tech</h2>
+<h3>Why BSV?</h3>
+<p>Three reasons:</p>
+<ol>
+<li>
+<p><strong>Unbounded blocks</strong> — BSV allows MB-scale data in a single transaction. Bitcoin caps at 1 MB; BSV goes to 2 GB blocks. You can anchor a full MP3, a photo, a video — the entire file, not just a hash.</p>
+</li>
+<li>
+<p><strong>Cheap data</strong> — The on-chain data fee is ~0.1 sat/byte. A 10 MB song is ~20 cents on-chain. A 50 MB video is ~$1. The blockchain is essentially subsidizing your storage.</p>
+</li>
+<li>
+<p><strong>Permanent</strong> — The BSV blockchain is decentralized + has been running since 2018. It's not going away. Your proof will outlive your hard drive, your smartphone, + probably your grandchildren's smartphones.</p>
+</li>
+</ol>
+<h3>How It Works</h3>
+<p><strong>Basic tier:</strong> We hash your file (SHA-256 — a 64-character fingerprint) + put that hash on-chain via an <code>OP_RETURN</code> transaction. The file stays with you; the chain proves it existed at time T + is unchanged.</p>
+<p><strong>Premium tier:</strong> We put the <strong>entire file</strong> on-chain (BSV's unbounded blocks). You can rebuild the file from the chain alone — no server, no us, just the block. We've recovered a 136 KB photo + an 8 MB GIF straight off the chain.</p>
+<h3>The Stack</h3>
+<ul>
+<li><strong>Frontend:</strong> GitHub Pages (free, fast, CDN) + vanilla JS (no framework, no build step)</li>
+<li><strong>Backend:</strong> Python <code>http.server</code> (stdlib, no framework) + SQLite (no external DB)</li>
+<li><strong>Blockchain:</strong> BSV via WhatsOnChain (free, no-auth API) + <code>bsv-sdk</code> (Python)</li>
+<li><strong>Tunnel:</strong> Cloudflare Tunnel (no Tailscale dependency, HTTPS)</li>
+<li><strong>Wallet:</strong> BSV notary keypair (WIF, 0600 permissions)</li>
+<li><strong>Auth:</strong> BSV wallet login (sign a nonce with your wallet, no password)</li>
+</ul>
+<p>The whole thing runs on a single machine (bigboy: AMD 5900X, 128GB RAM, RTX 3090). No cloud. No AWS. No SaaS. Just a machine + the blockchain.</p>
+<h2>The Build</h2>
+<p>We built this in three phases, over the course of a few days:</p>
+<h3>Phase 1: Foundation</h3>
+<p>Core anchoring (SHA-256 + OP_RETURN on BSV), BSV notary wallet, payment verification, web UI, BSV wallet login, user dashboard, session management, SQLite database, Cloudflare Tunnel, elite business design (navy + gold), light/dark theme toggle, payment QR code, payment polling loop, OP_PUSHDATA4 support, mobile responsive.</p>
+<h3>Phase 2: Features</h3>
+<p>Batch anchoring (drag 10 files, one payment, sequential anchor), proof QR code, proof management (rename, tags), proof PDF export, file list UI, dashboard tags, wallet extension login, WIF fallback.</p>
+<h3>Phase 3: Growth</h3>
+<p>Proof collections, batch export (CSV/JSON), proof history, API access (programmatic anchor + verify, API key auth), rate limiting (100 req/hour, 5MB payload cap), MP3 playback, wallet balance (live from WhatsOnChain).</p>
+<h2>The Economics</h2>
+<h3>Cost Model</h3>
+<ul>
+<li><strong>0.1 sat/byte</strong> on-chain cost</li>
+<li><strong>2× margin</strong> minimum</li>
+<li><strong>Value-driven pricing</strong> ($5–10 per anchor)</li>
+<li>The blockchain subsidizes storage (data fees are pennies)</li>
+</ul>
+<h3>Revenue</h3>
+<ul>
+<li>Customer pays (e.g., 1855 sats) → lands in the notary wallet</li>
+<li>Notary spends only what's needed for the OP_RETURN tx (~200 sats for a small file)</li>
+<li><strong>The rest stays</strong> in the notary wallet = revenue</li>
+<li>Target: 100 anchors/month = ~$500–1000/month</li>
+</ul>
+<h3>Example</h3>
+<ul>
+<li>Customer pays: 1855 sats</li>
+<li>On-chain data fee: ~200 sats</li>
+<li><strong>You keep: ~1655 sats</strong> (the 3% + margin)</li>
+</ul>
+<p>The 3% service fee is already baked into the price. The blockchain subsidizes storage. You're profitable per anchor.</p>
+<h2>The Philosophy</h2>
+<p><strong>Sovereignty.</strong> Your work is yours. The proof is yours. The blockchain is the record. No company owns your data. No server can lose it. No government can seize it.</p>
+<p><strong>Self-custody.</strong> You sign in with your BSV wallet. Your private key never leaves your device. No password to reset. No account to hack. No email to verify.</p>
+<p><strong>Math &gt; Trust.</strong> You don't need to trust us. You don't need to trust any company. You need to trust the math. SHA-256 is a 64-character fingerprint. The BSV blockchain is a decentralized network of thousands of nodes. The proof is verifiable by anyone, with just the txid + the blockchain.</p>
+<h2>The Future</h2>
+<ul>
+<li><strong>Phase 4: Monetization</strong> — Pricing tiers, subscription plans, revenue tracking, financial dashboard</li>
+<li><strong>Phase 5: Community</strong> — Proof gallery, creator profiles, social sharing, BSV community integration</li>
+<li><strong>Growth</strong> — Get real users. See where they stumble. See what they love. Build around what matters.</li>
+</ul>
+<p>The service is live at <strong>ds-da.ca/proof</strong>. The API is live at <strong>api.ds-da.ca</strong>.</p>
+<p>The blockchain is the notary. The hash is the stamp. The math is the trust.</p>
+<hr />
+<p><em>Dream Syndicate Digital Assets — New Brunswick, Canada. Running hopes-and-dreams.ca, polkahole.ca, + ds-da.ca. Proof of Creation is our leading service: immutable, BSV-anchored proof that you created something, at a time, that has not changed.</em></p>
+<p><strong>Try it:</strong> <a href="https://ds-da.ca/proof">ds-da.ca/proof</a></p>
+<p><strong>API:</strong> <code>curl -H "X-API-Key: *** https://api.ds-da.ca/api/v1/proofs</code></p>
+<p><strong>Tip jar:</strong> <a href="https://whatsonchain.com/address/14nn7V37RkgaYjieZQeafeYeyeWxgkJTsQ">14nn7V37RkgaYjieZQeafeYeyeWxgkJTsQ</a></p>
+    <div class="tech-signoff">// Do your own research. Don't be a statistic.</div>
+  </main>
+
+  <footer>
+    <p>&copy; 2026 Dream Syndicate Digital Assets. All Rights Reserved.</p>
+    <p>
+      <a href="https://www.facebook.com/profile.php?id=61581034972328" target="_blank" rel="noopener noreferrer">Connect on Facebook</a> |
+      <a href="https://merch.hopes-and-dreams.ca" target="_blank" rel="noopener noreferrer">Merch</a> |
+      <a href="../intel.html">Intel Hub</a> |
+      <a href="../sovereign.html">Sovereign Tech</a> |
+      <a href="../privacy.html">Privacy Policy</a> |
+      <a href="../about.html">Contact Us</a>
+    </p>
+    <p style="font-size:0.7rem; color:var(--text-dim); margin-top:10px;">Location: Saint John, New Brunswick, Canada</p>
+  </footer>
+  <script src="../script.js" defer></script>
+</body>
+</html>

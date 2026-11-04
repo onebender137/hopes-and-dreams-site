@@ -1,5 +1,11 @@
 [
   {
+    "href": "tech/article-proof-of-creation.html",
+    "title": "The Blockchain Is the Notary: Building Proof of Creation on BSV",
+    "date": "2026-11-04",
+    "image_url": "https://hopes-and-dreams.ca/tech/images/proof-of-creation-hero.png"
+  },
+  {
     "href": "tech/drive-sovereign-file-manager.html",
     "title": "80 GB of Files, Zero Google Drive: How We Built Our Own File Manager",
     "date": "2026-10-28",
