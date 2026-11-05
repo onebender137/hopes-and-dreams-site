@@ -1434,14 +1434,19 @@ class HopesAndDreamsBot:
         # Give FB a few seconds to index the post
         time.sleep(5)
 
-        products = self.affiliate.search_products(clean_keyword, limit=1)
-
-        if products:
-            product_title = products[0]['title']
-            product_url = products[0]['url']
-        else:
+        # iHerb is the primary CTA (global shipping, higher commission); Amazon is the fallback
+        iherb_link = self.affiliate.iherb.primary_link(clean_keyword)
+        if iherb_link:
             product_title = clean_keyword
-            product_url = self.affiliate.generate_canadian_link(clean_keyword)
+            product_url = iherb_link
+        else:
+            products = self.affiliate.search_products(clean_keyword, limit=1)
+            if products:
+                product_title = products[0]['title']
+                product_url = products[0]['url']
+            else:
+                product_title = clean_keyword
+                product_url = self.affiliate.generate_canadian_link(clean_keyword)
 
         # Generate a human-like, peer-to-peer pitch
         prompt = (
@@ -2071,7 +2076,7 @@ class HopesAndDreamsBot:
             _req = urllib.request.Request(
                 _obase + "/api/generate",
                 data=json.dumps({"model": _omodel, "keep_alive": 0}).encode(),
-                headers={"Content-Type": "application/json"})
+                headers={"Content-Type": "application/json", "User-Agent": "HopesBot/1.0 (DSDA Anchor)"})
             urllib.request.urlopen(_req, timeout=30).read()
             for _ in range(20):  # up to 40s for the unload to complete
                 try:
@@ -2087,7 +2092,7 @@ class HopesAndDreamsBot:
 
         def post(path, payload):
             req = urllib.request.Request(BASE + path, data=json.dumps(payload).encode(),
-                                         headers={"Content-Type": "application/json"})
+                                         headers={"Content-Type": "application/json", "User-Agent": "HopesBot/1.0 (DSDA Anchor)"})
             with urllib.request.urlopen(req, timeout=60) as r:
                 return json.loads(r.read())
 
@@ -2194,7 +2199,7 @@ class HopesAndDreamsBot:
                 "temperature": 0.0,
             }
             req = urllib.request.Request(api, data=json.dumps(payload).encode(),
-                                         headers={"Content-Type": "application/json"})
+                                         headers={"Content-Type": "application/json", "User-Agent": "HopesBot/1.0 (DSDA Anchor)"})
             with urllib.request.urlopen(req, timeout=90) as r:
                 resp = json.loads(r.read())
             text = resp["choices"][0]["message"]["content"].strip()
@@ -2238,7 +2243,7 @@ class HopesAndDreamsBot:
 
         def post(path, payload):
             req = urllib.request.Request(BASE + path, data=json.dumps(payload).encode(),
-                                         headers={"Content-Type": "application/json"})
+                                         headers={"Content-Type": "application/json", "User-Agent": "HopesBot/1.0 (DSDA Anchor)"})
             with urllib.request.urlopen(req, timeout=30) as r:
                 return json.loads(r.read())
 
@@ -2376,6 +2381,15 @@ class HopesAndDreamsBot:
             except Exception:
                 pass
             return False
+        # Phase 4: BSV Auto-Anchor (non-blocking)
+        try:
+            article_url = f"https://hopes-and-dreams.ca/articles/{filename}"
+            txid = self._anchor_article(article_path, clean_title, article_url)
+            if txid:
+                self._inject_bsv_badge(article_path, txid)
+                self._git_push_changes(f"BSV anchor: {txid[:16]}...")
+        except Exception as e:
+            print(f"[ANCHOR] Post-publish anchor failed: {e}")
         return filename
 
     _PROSTAR_ACTION_KW = (
@@ -3180,3 +3194,115 @@ def main():
 
 if __name__ == "__main__":
     main()
+
+
+    # ──────────────────────────────────────────────────────────────────────
+    # Phase 4: BSV Auto-Anchor (DSDA Proof of Creation)
+    # ──────────────────────────────────────────────────────────────────────
+
+    def _anchor_article(self, article_path, title, url):
+        """Anchor article manifest on BSV via DSDA API. Returns txid or None."""
+        import hashlib, json, urllib.request, os, base64
+        from datetime import datetime, timezone
+        api_url = os.environ.get("DSDA_API_URL", "https://api.ds-da.ca")
+        try:
+            content = open(article_path, "rb").read()
+            content_hash = hashlib.sha256(content).hexdigest()
+            manifest = {
+                "service": "dsda-proof-of-creation",
+                "type": "article",
+                "title": title,
+                "url": url,
+                "published": datetime.now(timezone.utc).isoformat(),
+                "content_sha256": content_hash,
+                "author": "hopes-bot",
+                "site": "hopes-and-dreams.ca",
+            }
+            manifest_bytes = json.dumps(manifest, separators=(",", ":")).encode()
+            payload = {
+                "content_b64": base64.b64encode(manifest_bytes).decode(),
+                "title": title + " (BSV manifest)",
+                "creator": "hopes-bot",
+                "tier": "premium",
+            }
+            req = urllib.request.Request(
+                api_url + "/api/anchor",
+                data=json.dumps(payload).encode(),
+                headers={"Content-Type": "application/json", "User-Agent": "HopesBot/1.0 (DSDA Anchor)"},
+                method="POST",
+            )
+            with urllib.request.urlopen(req, timeout=60) as resp:
+                result = json.loads(resp.read())
+                txid = result.get("txid")
+                if txid:
+                    print("[ANCHOR] OK %s... (%d bytes manifest)" % (txid[:16], len(manifest_bytes)))
+                    self._store_anchor(article_path, txid, manifest)
+                    return txid
+                else:
+                    print("[ANCHOR] No txid in response: %s" % result)
+        except Exception as e:
+            print("[ANCHOR] Failed: %s" % e)
+        return None
+
+    def _store_anchor(self, article_path, txid, manifest):
+        """Store anchor record in anchored_articles.json."""
+        import json, os
+        store_dir = os.path.dirname(os.path.dirname(article_path))
+        store_path = os.path.join(store_dir, "anchored_articles.json")
+        store = {}
+        if os.path.exists(store_path):
+            try:
+                store = json.load(open(store_path))
+            except Exception:
+                store = {}
+        key = os.path.basename(article_path)
+        store[key] = {
+            "txid": txid,
+            "title": manifest.get("title", ""),
+            "url": manifest.get("url", ""),
+            "anchored_at": manifest.get("published", ""),
+            "content_sha256": manifest.get("content_sha256", ""),
+        }
+        with open(store_path, "w") as f:
+            json.dump(store, f, indent=2)
+        print("[ANCHOR] Stored in %s" % store_path)
+
+    def _inject_bsv_badge(self, article_path, txid):
+        """Insert FRESH ON CHAIN badge before </body>."""
+        import os
+        from datetime import datetime
+        html = open(article_path).read()
+        if "bsv-proof-badge" in html:
+            return
+        date_str = datetime.now().strftime("%Y-%m-%d")
+        txid_short = txid[:16] + "..."
+        parts = []
+        parts.append('<div class="bsv-proof-badge" style="')
+        parts.append("margin-top:2.5rem;padding:0.75rem 1.25rem;")
+        parts.append("border:1px solid #c9a22733;border-left:3px solid #c9a227;")
+        parts.append("border-radius:6px;background:#c9a22708;")
+        parts.append("display:inline-flex;align-items:center;gap:0.75rem;")
+        parts.append('font-family:Inter,sans-serif;">')
+        parts.append('<span style="font-size:1.25rem;color:#c9a227;">\u26d3</span>')
+        parts.append('<div>')
+        parts.append('<div style="font-size:0.7rem;font-weight:700;')
+        parts.append("letter-spacing:0.12em;color:#c9a227;")
+        parts.append('text-transform:uppercase;">FRESH ON CHAIN</div>')
+        parts.append('<div style="font-size:0.75rem;color:#888;margin-top:0.15rem;">')
+        parts.append('<a href="https://bananablocks.com/tx/%s" style="color:#888;' % txid)
+        parts.append('text-decoration:none;border-bottom:1px dotted #ccc;">%s</a>' % txid_short)
+        parts.append(" &middot; %s</div></div></div>" % date_str)
+        badge = "".join(parts)
+        # v1.62: Insert into researcher-sig (under AUTHOR), not page bottom
+        target = "[ AUTHOR: LEAD TECHNICAL RESEARCHER ]"
+        if target in html:
+            link = ('<a href="https://bananablocks.com/tx/' + txid +
+                    '" style="color:#c9a227;text-decoration:none;'
+                    'border-bottom:1px dotted #c9a22744;">' + txid_short + '</a>')
+            sig_line = "<br>[FRESH ON CHAIN: " + link + " ]"
+            html = html.replace(target, target + sig_line)
+        else:
+            html = html.replace("</body>", badge + "\n</body>")
+        with open(article_path, "w") as f:
+            f.write(html)
+        print("[ANCHOR] Badge injected into %s" % os.path.basename(article_path))
