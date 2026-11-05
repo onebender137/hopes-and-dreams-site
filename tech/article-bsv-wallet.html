@@ -1,0 +1,209 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Your First BSV Wallet: A 5-Minute Guide for Normal People | Hopes and Dreams</title>
+<meta name="description" content="You want to anchor something on the blockchain. A photo. A song. A contract.
+But you've never touched crypto. You don't have a 'wallet.' You don't kno...">
+<meta property="og:type" content="article">
+<meta property="og:title" content="Your First BSV Wallet: A 5-Minute Guide for Normal People">
+<meta property="og:description" content="You want to anchor something on the blockchain. A photo. A song. A contract.
+But you've never touched crypto. You don't have a 'wallet.' You don't kno...">
+<meta property="og:image" content="https://hopes-and-dreams.ca/tech/images/bsv-wallet-guide-hero.png">
+<meta property="og:image:width" content="1280">
+<meta property="og:image:height" content="1280">
+<meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:title" content="Your First BSV Wallet: A 5-Minute Guide for Normal People">
+<meta name="twitter:description" content="You want to anchor something on the blockchain. A photo. A song. A contract.
+But you've never touched crypto. You don't have a 'wallet.' You don't kno...">
+<meta name="twitter:image" content="https://hopes-and-dreams.ca/tech/images/bsv-wallet-guide-hero.png">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;700;900&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="../style.css">
+<style>
+  .tech-log { max-width:820px; margin:0 auto; padding:30px 22px 80px; counter-reset:stepcount; }
+  .tech-back { font-family:'Courier New',monospace; font-size:0.85rem; display:inline-block; margin-bottom:20px; color:var(--neon-blue); }
+  .tech-tagline { font-family:'Courier New',monospace; color:var(--neon-blue); font-size:0.72rem;
+    letter-spacing:3px; text-transform:uppercase; margin-bottom:8px; opacity:0.85; }
+  .tech-log h1 { font-size:2.2rem; line-height:1.15; margin:0 0 22px; color:var(--text-main);
+    text-shadow:0 0 22px rgba(56,189,248,0.25); }
+  .tech-log h2 { font-family:'Courier New',monospace; color:var(--neon-blue); text-transform:uppercase;
+    letter-spacing:1px; font-size:1.15rem; margin:40px 0 12px; padding-top:18px;
+    border-top:1px solid rgba(148,163,184,0.18); }
+  .tech-log h2::before { content:"SYS_// "; color:var(--neon-gold); opacity:0.9; }
+  .tech-log h3 { color:var(--neon-gold); font-size:1rem; margin:24px 0 8px; }
+  .tech-log h3.step::before { counter-increment:stepcount; content:"Step " counter(stepcount) " // ";
+    color:var(--neon-blue); font-family:'Courier New',monospace; }
+  .tech-log p { margin:0 0 16px; color:var(--text-main); line-height:1.7; }
+  .tech-log a { color:var(--neon-blue); }
+  .tech-log img { max-width:100%; height:auto; border-radius:8px; margin:10px 0 22px; display:block; }
+  .tech-log figure { margin:0 0 22px; }
+  .tech-log figcaption { font-family:'Courier New',monospace; font-size:0.72rem; color:var(--text-dim); margin-top:8px; letter-spacing:1px; }
+  .tech-log ul, .tech-log ol { padding-left:22px; color:var(--text-main); }
+  .tech-log li { margin-bottom:8px; line-height:1.6; }
+  .tech-log code { font-family:'Courier New',monospace; background:rgba(56,189,248,0.1);
+    color:var(--neon-blue); padding:2px 6px; border-radius:4px; font-size:0.9em; }
+  .tech-log pre { background:var(--card-bg); border:1px solid rgba(56,189,248,0.2);
+    border-left:3px solid var(--neon-blue); border-radius:6px; padding:16px 18px; overflow-x:auto;
+    margin:0 0 20px; }
+  .tech-log pre code { background:none; padding:0; color:var(--text-main); font-size:0.85rem; line-height:1.55; }
+  .tech-signoff { margin-top:44px; padding-top:20px; border-top:1px solid rgba(148,163,184,0.18);
+    font-family:'Courier New',monospace; color:var(--neon-gold); letter-spacing:1px; font-size:0.9rem; }
+</style>
+</head>
+<body>
+  <div id="scroll-progress"></div>
+  <button id="theme-toggle" class="theme-toggle-pill" aria-label="Toggle between dark and light mode">&#9728;&#65039; LIGHT MODE</button>
+  <header>
+    <div class="logo-wrap">
+      <a href="../index.html"><img src="../topper.png" alt="Hopes and Dreams Syndicate Neuro-Optimization"></a>
+    </div>
+    <nav><a href="../index.html">Home</a> <a href="../shop.html">Shop</a> <a href="../optimization.html">Optimization</a> <a href="../cipher.html">Cipher</a> <a href="../intel.html">Intel Hub</a> <a class="active" href="../sovereign.html">Sovereign Tech</a> <a href="https://merch.hopes-and-dreams.ca">Merch</a> <a href="../about.html">About</a> <a href="../privacy.html">Privacy</a></nav>
+  </header>
+
+  <main class="tech-log">
+    <a class="tech-back" href="../sovereign.html">&lt;&lt; back to build logs</a>
+    <div class="tech-tagline">SYS_OUTPUT // BUILD_LOG DECODED</div>
+    <h1>Your First BSV Wallet: A 5-Minute Guide for Normal People</h1>
+    <figure><img src="images/bsv-wallet-guide-hero.png" alt="Your First BSV Wallet: A 5-Minute Guide for Normal People"></figure>
+    <p>You want to anchor something on the blockchain. A photo. A song. A contract.</p>
+<p>But you've never touched crypto. You don't have a "wallet." You don't know what a WIF is. You don't know where to get BSV.</p>
+<p>That's fine. This guide gets you from zero to "I anchored my first file on the blockchain" in about 5 minutes. No jargon. No math. Just steps.</p>
+<h2>What Is a Wallet? (It's Not What You Think)</h2>
+<p>A crypto wallet is <strong>not</strong> a physical thing. It's <strong>not</strong> a bank account. It's <strong>not</strong> an app that "holds" your coins.</p>
+<p>A wallet is just <strong>two strings of characters</strong>:</p>
+<ol>
+<li><strong>Your address</strong> (starts with <code>1</code>) — like your bank account number. People send BSV to this.</li>
+<li><strong>Your private key / WIF</strong> (starts with <code>L</code>, <code>K</code>, or <code>5</code>) — like your password. Only you should have this.</li>
+</ol>
+<p>That's it. That's the whole wallet. Two strings. One to receive, one to prove it's yours.</p>
+<p>When you "log in" to Proof of Creation, you're just showing the blockchain "hey, I own this address" by signing a message with your private key. No password. No email. No account. Just math.</p>
+<h2>Step 1: Download HandCash (2 minutes)</h2>
+<p><strong>HandCash</strong> is the easiest BSV wallet for normal people. It's free, it's on your phone, + it shows you both your address + your WIF.</p>
+<p><strong>iPhone:</strong> <a href="https://apps.apple.com/ca/app/handcash/id1387728531">App Store → HandCash</a></p>
+<p><strong>Android:</strong> <a href="https://play.google.com/store/apps/details?id=com.bsv.community">Play Store → HandCash</a></p>
+<p>Open the app → "Create a New Wallet" → set a PIN → <strong>write down the 12-word backup phrase</strong> (this is your safety net — if you lose your phone, these words restore your wallet).</p>
+<p>Done. You have a wallet.</p>
+<h2>Step 2: Get Your Address + WIF (1 minute)</h2>
+<p>In HandCash:</p>
+<p><strong>Your address:</strong>
+- Tap the wallet → tap the address at the top → copy it
+- It looks like: <code>1BenDerrVZmW5HT3MTVpZxHa178yNt8kbP</code>
+- This is where people send you BSV</p>
+<p><strong>Your WIF (private key):</strong>
+- Tap the wallet → Settings (gear icon) → "Show Private Key"
+- Enter your PIN → copy the WIF
+- It looks like: <code>L1YwkUGeja9qX8xB8uPJWaomAeawf3Jiy64p3p2MiqKua5bSMFYo</code>
+- <strong>This is your password. Don't share it. Don't lose it.</strong></p>
+<p>That's it. You have everything you need.</p>
+<h2>Step 3: Get Some BSV (2 minutes)</h2>
+<p>You need a few cents of BSV to anchor a file. That's it. A small photo costs ~500 sats (a fraction of a cent). A song costs ~2,000 sats (a few cents).</p>
+<p><strong>Option 1: Buy in the HandCash app (easiest)</strong>
+- In HandCash, tap "Buy"
+- It uses <strong>Simplex</strong> — you pay with a credit/debit card
+- Buy $5 worth of BSV (you'll only use a fraction of it)
+- Done. BSV is in your wallet.</p>
+<p><strong>Option 2: Get BSV from a friend</strong>
+- If you know someone with BSV, send them your address
+- They send you a few cents
+- Done.</p>
+<p><strong>Option 3: Swap crypto you already have</strong>
+- If you have BTC, ETH, or other crypto, use <a href="https://swapspace.co/exchange/bsv">SwapSpace</a> to swap it for BSV
+- No account needed. Paste your HandCash address. Send the crypto. Get BSV.</p>
+<p><strong>How much do you need?</strong></p>
+<table>
+<thead>
+<tr>
+<th>What you're anchoring</th>
+<th>Cost (approx)</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Small photo (100KB)</td>
+<td>~500 sats</td>
+</tr>
+<tr>
+<td>Medium photo (2MB)</td>
+<td>~5,000 sats</td>
+</tr>
+<tr>
+<td>Song (5MB MP3)</td>
+<td>~10,000 sats</td>
+</tr>
+<tr>
+<td>Video (50MB)</td>
+<td>~100,000 sats</td>
+</tr>
+</tbody>
+</table>
+<p>That's fractions of a cent to a few cents in real money. The blockchain is incredibly cheap for data.</p>
+<h2>Step 4: Anchor Your First File (2 minutes)</h2>
+<ol>
+<li>Go to <strong><a href="https://ds-da.ca/proof">ds-da.ca/proof</a></strong></li>
+<li>Click <strong>"Login"</strong> (top right)</li>
+<li>Paste your <strong>WIF</strong> in the box</li>
+<li>Enter a display name (your name, your handle, whatever)</li>
+<li>Click <strong>"Sign + Login"</strong></li>
+<li>You're in. The dashboard loads.</li>
+<li>Go to the <strong>Anchor</strong> view</li>
+<li>Upload a file (drag + drop, or browse)</li>
+<li>Pick a tier (Basic = hash only, Premium = full file on-chain)</li>
+<li>You'll see a QR code + an address + an amount</li>
+<li>Send that amount of BSV from your HandCash wallet to that address</li>
+<li>Paste the transaction ID (txid) from HandCash into the box</li>
+<li>Wait for the block confirmation (~10 minutes)</li>
+<li><strong>Done.</strong> Your file is anchored on the BSV blockchain. Forever.</li>
+</ol>
+<h2>Step 5: Verify It (30 seconds)</h2>
+<p>Go to your proof page. Anyone in the world can open it + verify:
+- The file hash matches
+- The transaction is on the BSV blockchain
+- The timestamp is permanent</p>
+<p>No login. No trust in us. Just the blockchain.</p>
+<h2>FAQ</h2>
+<p><strong>"Is my WIF safe?"</strong>
+Your WIF is your private key. Anyone with it can spend your BSV. Don't share it. Don't email it. Don't screenshot it and leave it on your desktop. HandCash stores it on your phone, encrypted. When you paste it into Proof of Creation, it's sent over HTTPS (encrypted) + used to sign a message — it's not stored on our server.</p>
+<p><strong>"What if I lose my phone?"</strong>
+Your 12-word backup phrase restores your wallet. Write it down. Put it somewhere safe. Not in a photo in your phone (ironic, but true).</p>
+<p><strong>"Do I need a lot of BSV?"</strong>
+No. A few cents is enough to anchor several files. The blockchain is incredibly cheap for data.</p>
+<p><strong>"Can I use this on a computer?"</strong>
+Yes. Proof of Creation works in any browser. You just need your WIF + a BSV address.</p>
+<p><strong>"What if I want to anchor a lot of files?"</strong>
+There's an API. Generate an API key in your dashboard + use it from your own scripts. See the <a href="https://ds-da.ca/proof">API docs</a>.</p>
+<h2>The Big Picture</h2>
+<p>You just did something that's basically impossible to undo:</p>
+<ul>
+<li>You created a file</li>
+<li>You proved you had it at a specific time</li>
+<li>The proof is on a decentralized blockchain</li>
+<li>No company can delete it</li>
+<li>No server can lose it</li>
+<li>No government can seize it</li>
+<li>It will outlive your phone, your computer, + probably your grandchildren's phones</li>
+</ul>
+<p>The blockchain is the notary. The hash is the stamp. The math is the trust.</p>
+<hr />
+<p><em>Dream Syndicate Digital Assets — New Brunswick, Canada. <a href="https://ds-da.ca/proof">ds-da.ca/proof</a></em></p>
+<p><strong>Tip jar:</strong> <a href="https://whatsonchain.com/address/14nn7V37RkgaYjieZQeafeYeyeWxgkJTsQ">14nn7V37RkgaYjieZQeafeYeyeWxgkJTsQ</a></p>
+    <div class="tech-signoff">// Do your own research. Don't be a statistic.</div>
+  </main>
+
+  <footer>
+    <p>&copy; 2026 Dream Syndicate Digital Assets. All Rights Reserved.</p>
+    <p>
+      <a href="https://www.facebook.com/profile.php?id=61581034972328" target="_blank" rel="noopener noreferrer">Connect on Facebook</a> |
+      <a href="https://merch.hopes-and-dreams.ca" target="_blank" rel="noopener noreferrer">Merch</a> |
+      <a href="../intel.html">Intel Hub</a> |
+      <a href="../sovereign.html">Sovereign Tech</a> |
+      <a href="../privacy.html">Privacy Policy</a> |
+      <a href="../about.html">Contact Us</a>
+    </p>
+    <p style="font-size:0.7rem; color:var(--text-dim); margin-top:10px;">Location: Saint John, New Brunswick, Canada</p>
+  </footer>
+  <script src="../script.js" defer></script>
+</body>
+</html>
