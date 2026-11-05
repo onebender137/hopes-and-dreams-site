@@ -1,11 +1,12 @@
 {
   "2026-11-05-osmotic-inversion-of-the-pituitary-adrenal-axis-via-sodium.html": {
-    "txid": "78434b4733d7ca5934ae4de0189d11362a1ad41cc38e587999625eb0a8b5dff9",
+    "txid": "893772cf56285580c114b18084a4215cdb1e504cdf9283efbb46f37e61f6c6e7",
     "title": "Osmotic Inversion of the Pituitary-Adrenal Axis",
     "url": "https://hopes-and-dreams.ca/articles/2026-11-05-osmotic-inversion-of-the-pituitary-adrenal-axis-via-sodium.html",
-    "anchored_at": "2026-11-05T19:42:31.172612+00:00",
-    "content_sha256": "3c2364d77bced9af5b276a55320820b1088a329a108f48438524922e0d43b6b8",
+    "anchored_at": "2026-11-05T19:54:10.363812+00:00",
+    "content_sha256": "935e79d9de70317a7c26c1eac3b6f456009e98a49efa6308756f4aeca7ff3f51",
     "tier": "premium",
-    "data_bytes": 15373
+    "data_bytes": 5078,
+    "format": "stripped-text"
   }
 }
