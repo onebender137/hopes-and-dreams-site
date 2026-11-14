@@ -23,6 +23,12 @@ class Config:
     AMAZON_ASSOCIATE_TAG = os.getenv("AMAZON_ASSOCIATE_TAG", "hopesanddreams-20")
     AMAZON_REGION = os.getenv("AMAZON_REGION", "us-east-1")
 
+    # iHerb affiliate (PRIMARY CTA). Set IHERB_AFF_ID to enable; empty = Amazon fallback.
+    IHERB_AFF_ID = os.getenv("IHERB_AFF_ID", "")
+    # Happy Hippo affiliate (Kratom/botanicals, topic-routed). Set HAPPYHIPPO_AFF_ID to enable;
+    # empty = Kratom topics fall through to iHerb/Amazon. Product URLs carry ?sacode=<id>.
+    HAPPYHIPPO_AFF_ID = os.getenv("HAPPYHIPPO_AFF_ID", "")
+
     # Research Settings (NCBI)
     NCBI_API_KEY = os.getenv("NCBI_API_KEY")  # Optional, but avoids rate limits
 
