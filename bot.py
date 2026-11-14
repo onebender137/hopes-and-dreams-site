@@ -1472,6 +1472,27 @@ class HopesAndDreamsBot:
         else:
             print(f"Failed to post affiliate recommendation to post {post_id}.")
 
+    def _inject_affiliate_cta(self, html, topic):
+        """Inject a Happy Hippo Kratom affiliate CTA into the article body for Kratom topics.
+
+        Appended just before the <footer> so it reads as part of the article.
+        No-op for non-Kratom topics or when the affiliate id is unset.
+        """
+        try:
+            hippo = self.affiliate.hippo
+        except Exception:
+            return html
+        if not (hippo.enabled and hippo.is_relevant(topic)):
+            return html
+        link = hippo.primary_link(topic) or (f"{hippo.BASE}/collections/buy-kratom?sacode={hippo.aff_id}")
+        cta = '<div class="affiliate-cta" style="margin: 32px 0; padding: 20px 24px; border: 1px solid var(--border); border-radius: 10px; background: var(--card);">\n  <h3 style="margin: 0 0 10px;">&#128722; Syndicate Procurement &mdash; Happy Hippo Herbals</h3>\n  <p style="margin: 0 0 14px; color: var(--text-dim);">Sourcing Kratom for your protocol? We\'re an official <strong>Happy Hippo Herbals</strong> affiliate &mdash; lab-tested, GMP-certified Kratom. Powder + liquid extracts ship to Canada (capsules, shots &amp; herbs are US-only).</p>\n  <p style="margin: 0;"><a href="{link}" target="_blank" rel="noopener noreferrer" class="buy-btn">Shop Happy Hippo Kratom &rarr;</a></p>\n  <p style="margin: 12px 0 0; font-size: 0.72rem; color: var(--text-dim);">As a Happy Hippo affiliate, we may earn a commission from qualifying purchases. Not medical advice.</p>\n</div>\n'
+        cta = cta.format(link=link)
+        if '<footer>' in html:
+            return html.replace('<footer>', cta + '<footer>', 1)
+        if '</body>' in html:
+            return html.replace('</body>', cta + '</body>', 1)
+        return html + cta
+
     SITE_BASE_URL = "https://hopes-and-dreams.ca"
 
     def _add_site_comment(self, post_id, article_file, max_wait=150):
@@ -2336,6 +2357,11 @@ class HopesAndDreamsBot:
             if not beautified_html or len(beautified_html) < 100:
                 self._log_uplink("WEBSITE ERROR: Beautification returned empty or suspiciously short HTML.")
                 return False
+            # Inject Happy Hippo Kratom affiliate CTA for Kratom topics
+            try:
+                beautified_html = self._inject_affiliate_cta(beautified_html, topic)
+            except Exception:
+                pass
         except Exception as e:
             self._log_uplink(f"WEBSITE ERROR: Beautification failed: {str(e)}")
             return False
